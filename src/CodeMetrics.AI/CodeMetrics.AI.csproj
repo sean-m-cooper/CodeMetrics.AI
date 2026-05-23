@@ -9,7 +9,17 @@
     <PackageId>CodeMetrics.AI</PackageId>
     <Version>1.0.0</Version>
     <Description>Deterministic code metrics and scorecard evidence for .NET solutions</Description>
+    <Authors>Sean Cooper</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/sean-m-cooper/CodeMetrics.AI</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sean-m-cooper/CodeMetrics.AI</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>code-metrics;roslyn;static-analysis;scorecard;dotnet-tool</PackageTags>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Locator" Version="1.11.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.3.0" />
