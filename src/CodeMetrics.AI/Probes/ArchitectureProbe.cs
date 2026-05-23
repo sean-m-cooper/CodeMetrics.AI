@@ -109,8 +109,13 @@ public static class ArchitectureProbe
         if (!Directory.Exists(solutionDir))
             return [];
 
-        // Find all .csproj files
-        var csprojFiles = Directory.GetFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
+        // Find all .csproj files, skipping inaccessible directories
+        var enumOptions = new EnumerationOptions
+        {
+            RecurseSubdirectories = true,
+            IgnoreInaccessible = true,
+        };
+        var csprojFiles = Directory.GetFiles(solutionDir, "*.csproj", enumOptions);
 
         // Build adjacency list: projectName → list of referenced project names
         var adjacency = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);

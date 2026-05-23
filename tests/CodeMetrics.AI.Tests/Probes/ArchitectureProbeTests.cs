@@ -18,7 +18,7 @@ public class ArchitectureProbeTests
         return ArchitectureProbe.Analyze(
             projects,
             metrics ?? [],
-            solutionDir ?? Path.GetTempPath());
+            solutionDir ?? CreateIsolatedTempDir());
     }
 
     private static DimensionResult AnalyzeWithDir(
@@ -30,6 +30,13 @@ public class ArchitectureProbeTests
             projects,
             metrics ?? [],
             solutionDir);
+    }
+
+    private static string CreateIsolatedTempDir()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(dir);
+        return dir;
     }
 
     // ── 1. Cycle detection ────────────────────────────────────────────────────
