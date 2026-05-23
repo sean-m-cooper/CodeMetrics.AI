@@ -133,7 +133,7 @@ public static class ArchitectureProbe
                     .Where(e => e.Name.LocalName == "ProjectReference")
                     .Select(e => e.Attribute("Include")?.Value)
                     .Where(v => v != null)
-                    .Select(v => Path.GetFileNameWithoutExtension(v!))
+                    .Select(v => Path.GetFileNameWithoutExtension(v!.Replace('\\', '/')))
                     .Where(n => !string.IsNullOrEmpty(n));
 
                 foreach (var refName in projectRefs)
