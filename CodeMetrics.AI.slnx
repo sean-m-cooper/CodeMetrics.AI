@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CodeMetrics.AI/CodeMetrics.AI.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CodeMetrics.AI.Tests/CodeMetrics.AI.Tests.csproj" />
+  </Folder>
+</Solution>
