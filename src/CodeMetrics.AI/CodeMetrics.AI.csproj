@@ -7,7 +7,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>code-metrics</ToolCommandName>
     <PackageId>CodeMetrics.AI</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Description>Deterministic code metrics and scorecard evidence for .NET solutions</Description>
     <Authors>Sean Cooper</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
