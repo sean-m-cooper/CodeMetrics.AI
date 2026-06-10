@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "generatedAtUtc": "2026-06-09T00:00:00.0000000Z",
+  "tool": {
+    "name": "CodeMetrics.AI",
+    "version": "1.0.1"
+  },
+  "solution": {
+    "path": "/repo/MyApp.slnx",
+    "configuration": "Debug"
+  },
+  "filters": {
+    "totalProjects": 1,
+    "analyzedProjects": 1,
+    "skipped": []
+  },
+  "population": {
+    "types": 1,
+    "members": 1
+  },
+  "dimensions": {
+    "codeQuality": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "maintainability": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "errorHandling": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "performanceAsync": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "security": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "testing": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "documentation": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "dependencyManagement": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "architecture": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] }
+  }
+}
