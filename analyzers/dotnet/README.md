@@ -91,4 +91,4 @@ The tool automatically skips non-production projects:
 
 ## License
 
-[MIT](LICENSE)
+[MIT](../../LICENSE)
