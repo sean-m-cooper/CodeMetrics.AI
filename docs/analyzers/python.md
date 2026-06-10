@@ -17,4 +17,4 @@ analyzers/python/
 
 ## Shared Outputs
 
-The analyzer will produce `.scorecard/metrics.csv` and `.scorecard/evidence.json` using the shared scorecard contract.
+The analyzer will produce `.scorecard/python/metrics.csv` and `.scorecard/python/evidence.json` using the shared scorecard contract.

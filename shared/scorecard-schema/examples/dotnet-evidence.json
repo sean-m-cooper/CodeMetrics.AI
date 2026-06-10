@@ -1,18 +1,23 @@
 {
-  "schemaVersion": 1,
-  "generatedAtUtc": "2026-06-09T00:00:00.0000000Z",
+  "schemaVersion": 2,
+  "generatedAtUtc": "2026-06-10T00:00:00.0000000Z",
   "tool": {
     "name": "CodeMetrics.AI",
-    "version": "1.0.1"
+    "version": "1.1.0",
+    "ecosystem": "dotnet"
   },
-  "solution": {
-    "path": "/repo/MyApp.slnx",
-    "configuration": "Debug"
+  "subject": {
+    "root": "/repo",
+    "entryPoint": "/repo/MyApp.slnx",
+    "name": "MyApp",
+    "variant": "Debug"
   },
   "filters": {
-    "totalProjects": 1,
-    "analyzedProjects": 1,
-    "skipped": []
+    "totalUnits": 2,
+    "analyzedUnits": 1,
+    "skipped": [
+      { "name": "MyApp.Tests", "reason": "Test project" }
+    ]
   },
   "population": {
     "types": 1,
@@ -26,7 +31,7 @@
     "security": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
     "testing": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
     "documentation": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
-    "dependencyManagement": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "dependencyManagement": { "status": "skipped", "basis": "Dependency probe skipped.", "findings": [] },
     "architecture": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] }
   }
 }

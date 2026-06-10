@@ -28,8 +28,8 @@ code-metrics --output ./results/metrics.csv --scorecard-output ./results/evidenc
 
 | File | Description |
 |------|-------------|
-| `.scorecard/metrics.csv` | VS-compatible raw metrics (same format as Visual Studio's Code Metrics Results) |
-| `.scorecard/evidence.json` | Scored evidence across 9 dimensions (schema v1) |
+| `.scorecard/dotnet/metrics.csv` | VS-compatible raw metrics (same format as Visual Studio's Code Metrics Results) |
+| `.scorecard/dotnet/evidence.json` | Scored evidence across 9 dimensions (schema v2) |
 
 ## Dimensions
 
@@ -71,8 +71,8 @@ dotnet build /t:Scorecard /p:ScorecardConfiguration=Release
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--solution` | Auto-discover | Path to .sln or .slnx file |
-| `--output` | `.scorecard/metrics.csv` | CSV output path |
-| `--scorecard-output` | `.scorecard/evidence.json` | JSON evidence output path |
+| `--output` | `.scorecard/dotnet/metrics.csv` | CSV output path |
+| `--scorecard-output` | `.scorecard/dotnet/evidence.json` | JSON evidence output path |
 | `--configuration` | `Debug` | Build configuration |
 | `--skip-dependency-probe` | `false` | Skip dependency management checks |
 

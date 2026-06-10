@@ -14,4 +14,17 @@ All analyzers use a 0-10 score scale and these stable dimension keys.
 | `dependencyManagement` | Vulnerable, deprecated, outdated, or inconsistent dependencies |
 | `architecture` | Cycles, layering, coupling hotspots, and framework-specific structure risks |
 
-Analyzers may use language-specific rules inside each dimension. The key names and score scale are stable.
+Analyzers may use language-specific rules inside each dimension. The key names, the 0-10 scale, and the `scored` / `skipped` / `failed` status values are stable.
+
+## Score Comparability
+
+Scores are always comparable **within** an ecosystem: the same analyzer version applies the same thresholds to every repository it scores.
+
+Scores are comparable **across** ecosystems only after the analyzer has completed the corpus calibration procedure in `calibration.md`. Until then, consumers must present per-ecosystem scores side by side without averaging or ranking them against each other, and must caveat uncalibrated ecosystems.
+
+| Ecosystem | Calibration status |
+|---|---|
+| `dotnet` | Baseline |
+| `javascript-typescript` | Uncalibrated |
+| `python` | Uncalibrated |
+| `rust` | Uncalibrated |

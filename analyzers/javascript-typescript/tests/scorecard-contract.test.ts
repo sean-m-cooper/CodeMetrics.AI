@@ -3,13 +3,15 @@ import {
   defaultEvidencePath,
   defaultMetricsPath,
   dimensionKeys,
+  ecosystemId,
   metricsCsvHeader,
 } from "../src/index.js";
 
 describe("scorecard contract", () => {
   it("uses the shared default output paths", () => {
-    expect(defaultMetricsPath).toBe(".scorecard/metrics.csv");
-    expect(defaultEvidencePath).toBe(".scorecard/evidence.json");
+    expect(ecosystemId).toBe("javascript-typescript");
+    expect(defaultMetricsPath).toBe(".scorecard/javascript-typescript/metrics.csv");
+    expect(defaultEvidencePath).toBe(".scorecard/javascript-typescript/evidence.json");
   });
 
   it("exports the stable dimension keys", () => {

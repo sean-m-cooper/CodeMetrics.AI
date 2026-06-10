@@ -1,5 +1,6 @@
-export const defaultMetricsPath = ".scorecard/metrics.csv";
-export const defaultEvidencePath = ".scorecard/evidence.json";
+export const ecosystemId = "javascript-typescript";
+export const defaultMetricsPath = ".scorecard/javascript-typescript/metrics.csv";
+export const defaultEvidencePath = ".scorecard/javascript-typescript/evidence.json";
 
 export const dimensionKeys = [
   "codeQuality",

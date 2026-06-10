@@ -1,9 +1,9 @@
 # Metrics CSV Contract
 
-Default path:
+Default path (see `ecosystems.md` for the ecosystem id rule):
 
 ```text
-.scorecard/metrics.csv
+.scorecard/<ecosystem-id>/metrics.csv
 ```
 
 Header:

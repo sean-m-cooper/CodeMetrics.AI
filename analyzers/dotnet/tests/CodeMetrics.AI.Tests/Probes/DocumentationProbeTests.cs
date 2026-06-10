@@ -133,7 +133,7 @@ public class DocumentationProbeTests
             var withDocsResult = DocumentationProbe.Analyze(tempDir, NoProjects());
 
             // Having docs/ should improve the score by at least 2 (the -2 deduction is removed)
-            withDocsResult.Score.Should().BeGreaterThanOrEqualTo(withDocs.Score + 2);
+            withDocsResult.Score.Should().BeGreaterThanOrEqualTo(withDocs.Score.GetValueOrDefault() + 2);
         }
         finally
         {
@@ -225,7 +225,7 @@ public class DocumentationProbeTests
             var resultClean = DocumentationProbe.Analyze(tempDir, NoProjects());
 
             // Stale README should score 1 lower
-            resultWithStale.Score.Should().BeLessThan(resultClean.Score);
+            resultWithStale.Score.Should().BeLessThan(resultClean.Score.GetValueOrDefault());
         }
         finally
         {
@@ -253,7 +253,7 @@ public class DocumentationProbeTests
             File.WriteAllText(Path.Combine(tempDir, "CLAUDE.md"), "# Instructions");
             var resultWithAi = DocumentationProbe.Analyze(tempDir, NoProjects());
 
-            resultWithAi.Score.Should().BeGreaterThan(resultNoAi.Score);
+            resultWithAi.Score.Should().BeGreaterThan(resultNoAi.Score.GetValueOrDefault());
         }
         finally
         {
@@ -374,7 +374,7 @@ public class DocumentationProbeTests
 
             var resultWithXmlDocs = DocumentationProbe.Analyze(tempDir, projects);
 
-            resultWithXmlDocs.Score.Should().BeGreaterThan(resultNoXmlDocs.Score);
+            resultWithXmlDocs.Score.Should().BeGreaterThan(resultNoXmlDocs.Score.GetValueOrDefault());
         }
         finally
         {

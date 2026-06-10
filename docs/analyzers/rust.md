@@ -16,4 +16,4 @@ analyzers/rust/
 
 ## Shared Outputs
 
-The analyzer will produce `.scorecard/metrics.csv` and `.scorecard/evidence.json` using the shared scorecard contract.
+The analyzer will produce `.scorecard/rust/metrics.csv` and `.scorecard/rust/evidence.json` using the shared scorecard contract.

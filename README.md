@@ -6,8 +6,8 @@ Each analyzer runs in the package ecosystem natural to its target language, then
 
 | File | Description |
 |------|-------------|
-| `.scorecard/metrics.csv` | Raw code metrics in the shared CSV shape |
-| `.scorecard/evidence.json` | Scored evidence across stable quality dimensions |
+| `.scorecard/<ecosystem>/metrics.csv` | Raw code metrics in the shared CSV shape |
+| `.scorecard/<ecosystem>/evidence.json` | Scored evidence across stable quality dimensions |
 
 ## Analyzers
 

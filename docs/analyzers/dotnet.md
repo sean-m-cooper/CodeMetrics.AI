@@ -22,8 +22,8 @@ code-metrics --output ./results/metrics.csv --scorecard-output ./results/evidenc
 
 | File | Description |
 |------|-------------|
-| `.scorecard/metrics.csv` | VS-compatible raw metrics |
-| `.scorecard/evidence.json` | Scorecard evidence using schema version 1 |
+| `.scorecard/dotnet/metrics.csv` | VS-compatible raw metrics |
+| `.scorecard/dotnet/evidence.json` | Scorecard evidence using schema version 2 |
 
 ## Local Development
 

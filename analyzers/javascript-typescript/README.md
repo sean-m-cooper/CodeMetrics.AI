@@ -8,15 +8,15 @@ NPM analyzer for JavaScript, TypeScript, and React projects.
 npx codemetrics-ai
 npx codemetrics-ai --project ./package.json
 npx codemetrics-ai --tsconfig ./tsconfig.json
-npx codemetrics-ai --output .scorecard/metrics.csv --scorecard-output .scorecard/evidence.json
+npx codemetrics-ai --output .scorecard/javascript-typescript/metrics.csv --scorecard-output .scorecard/javascript-typescript/evidence.json
 ```
 
 ## Outputs
 
 | File | Description |
 |------|-------------|
-| `.scorecard/metrics.csv` | Shared metrics CSV |
-| `.scorecard/evidence.json` | Scorecard evidence using schema version 1 |
+| `.scorecard/javascript-typescript/metrics.csv` | Shared metrics CSV |
+| `.scorecard/javascript-typescript/evidence.json` | Scorecard evidence using schema version 2 |
 
 ## Development
 
