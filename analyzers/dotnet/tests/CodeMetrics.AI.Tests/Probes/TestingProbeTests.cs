@@ -199,6 +199,27 @@ public class CoreTests {
         result.Score.Should().BeLessThanOrEqualTo(6);
     }
 
+    [Fact]
+    public void MultiTargetFrameworkProductionNames_MatchingBaseTestProject_AreCovered()
+    {
+        var testCode = AttributePreamble + @"
+public class CoreTests {
+    [Fact] public void TestOne() { Assert.True(true); }
+}
+";
+        var testProject = Project("MyApp.Core.Tests", testCode);
+        var prodProject = Project("MyApp.Core", @"public class CoreService { }");
+
+        var allProjects = new List<(string, Compilation)> { prodProject, testProject };
+        var analyzedNames = new List<string> { "MyApp.Core (net9.0)", "MyApp.Core (net10.0)" };
+
+        var result = TestingProbe.Analyze(allProjects, analyzedNames, TempDir());
+
+        result.Findings.Should().NotContain(f =>
+            f.Category == "uncoveredProject" &&
+            (f.Project == "MyApp.Core (net9.0)" || f.Project == "MyApp.Core (net10.0)"));
+    }
+
     // ── 6. Zero assertions → assertion density 0 → score 2 ──────────────────
 
     [Fact]

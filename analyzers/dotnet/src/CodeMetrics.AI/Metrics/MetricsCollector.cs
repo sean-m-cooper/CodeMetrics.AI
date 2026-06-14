@@ -6,13 +6,16 @@ namespace CodeMetrics.AI.Metrics;
 public static class MetricsCollector
 {
     public static (List<TypeMetrics> Types, List<MemberMetrics> Members) Collect(
-        string projectName, Compilation compilation)
+        string projectName, Compilation compilation, string? solutionDir = null)
     {
         var types = new List<TypeMetrics>();
         var members = new List<MemberMetrics>();
 
         foreach (var tree in compilation.SyntaxTrees)
         {
+            if (solutionDir != null && !SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
+                continue;
+
             var semanticModel = compilation.GetSemanticModel(tree);
             var root = tree.GetRoot();
             var filePath = tree.FilePath;

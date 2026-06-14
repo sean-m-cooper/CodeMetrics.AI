@@ -50,10 +50,14 @@ public static class ArchitectureProbe
         {
             foreach (var tree in compilation.SyntaxTrees)
             {
+                if (!SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
+                    continue;
+
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
+                var semanticModel = compilation.GetSemanticModel(tree);
 
-                AnalyzeLayeringViolations(root, filePath, projectName, findings);
+                AnalyzeLayeringViolations(root, semanticModel, filePath, projectName, findings);
             }
         }
 
@@ -216,7 +220,7 @@ public static class ArchitectureProbe
     // ── Layering violation detection ──────────────────────────────────────────
 
     private static void AnalyzeLayeringViolations(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName, List<Finding> findings)
     {
         var typeDeclarations = root.DescendantNodes().OfType<TypeDeclarationSyntax>();
 
@@ -225,12 +229,12 @@ public static class ArchitectureProbe
             var typeName = typeDecl.Identifier.Text;
 
             // Collect all constructor parameter types
-            var constructorParams = GetAllConstructorParameterTypeNames(typeDecl);
+            var constructorParams = GetAllConstructorParameterTypeNames(typeDecl, semanticModel);
 
             if (typeName.EndsWith("Controller", StringComparison.Ordinal))
             {
                 // Check for data-layer dependencies in controllers
-                foreach (var (paramTypeName, line) in constructorParams)
+                foreach (var (paramTypeName, _, line) in constructorParams)
                 {
                     if (IsCrossCuttingType(paramTypeName))
                         continue;
@@ -255,10 +259,13 @@ public static class ArchitectureProbe
             else if (typeName.EndsWith("Service", StringComparison.Ordinal))
             {
                 // Check for concrete infrastructure dependencies in services
-                foreach (var (paramTypeName, line) in constructorParams)
+                foreach (var (paramTypeName, paramNamespace, line) in constructorParams)
                 {
                     // Concrete = does NOT start with "I"
-                    if (paramTypeName.StartsWith("I", StringComparison.Ordinal))
+                    if (GetUnqualifiedTypeName(paramTypeName).StartsWith("I", StringComparison.Ordinal))
+                        continue;
+
+                    if (IsFrameworkNamespace(paramNamespace))
                         continue;
 
                     if (InfrastructureKeywords.Any(kw =>
@@ -287,10 +294,24 @@ public static class ArchitectureProbe
             typeName.StartsWith(prefix, StringComparison.Ordinal));
     }
 
-    private static List<(string TypeName, int Line)> GetAllConstructorParameterTypeNames(
-        TypeDeclarationSyntax typeDecl)
+    private static bool IsFrameworkNamespace(string? namespaceName)
     {
-        var result = new List<(string, int)>();
+        return namespaceName?.StartsWith("Microsoft.Extensions.", StringComparison.Ordinal) == true ||
+               namespaceName?.StartsWith("Microsoft.AspNetCore.", StringComparison.Ordinal) == true;
+    }
+
+    private static string GetUnqualifiedTypeName(string typeName)
+    {
+        var genericTick = typeName.IndexOf('<');
+        var withoutGeneric = genericTick >= 0 ? typeName[..genericTick] : typeName;
+        var dot = withoutGeneric.LastIndexOf('.');
+        return dot >= 0 ? withoutGeneric[(dot + 1)..] : withoutGeneric;
+    }
+
+    private static List<(string TypeName, string? Namespace, int Line)> GetAllConstructorParameterTypeNames(
+        TypeDeclarationSyntax typeDecl, SemanticModel semanticModel)
+    {
+        var result = new List<(string, string?, int)>();
 
         // Regular constructor parameters
         var constructors = typeDecl.Members.OfType<ConstructorDeclarationSyntax>();
@@ -298,12 +319,7 @@ public static class ArchitectureProbe
         {
             foreach (var param in ctor.ParameterList.Parameters)
             {
-                var typeName = param.Type?.ToString();
-                if (!string.IsNullOrEmpty(typeName))
-                {
-                    var line = param.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
-                    result.Add((typeName!, line));
-                }
+                AddParameterType(param, semanticModel, result);
             }
         }
 
@@ -312,12 +328,7 @@ public static class ArchitectureProbe
         {
             foreach (var param in record.ParameterList.Parameters)
             {
-                var typeName = param.Type?.ToString();
-                if (!string.IsNullOrEmpty(typeName))
-                {
-                    var line = param.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
-                    result.Add((typeName!, line));
-                }
+                AddParameterType(param, semanticModel, result);
             }
         }
 
@@ -326,16 +337,26 @@ public static class ArchitectureProbe
         {
             foreach (var param in classDecl.ParameterList.Parameters)
             {
-                var typeName = param.Type?.ToString();
-                if (!string.IsNullOrEmpty(typeName))
-                {
-                    var line = param.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
-                    result.Add((typeName!, line));
-                }
+                AddParameterType(param, semanticModel, result);
             }
         }
 
         return result;
+    }
+
+    private static void AddParameterType(
+        ParameterSyntax parameter,
+        SemanticModel semanticModel,
+        List<(string TypeName, string? Namespace, int Line)> result)
+    {
+        var typeName = parameter.Type?.ToString();
+        if (string.IsNullOrEmpty(typeName))
+            return;
+
+        var typeSymbol = semanticModel.GetTypeInfo(parameter.Type!).Type;
+        var namespaceName = typeSymbol?.ContainingNamespace?.ToDisplayString();
+        var line = parameter.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
+        result.Add((typeName!, namespaceName, line));
     }
 
     // ── Static metric hotspots ────────────────────────────────────────────────
@@ -359,7 +380,8 @@ public static class ArchitectureProbe
                 });
             }
 
-            if (tm.ClassCoupling >= 30)
+            var couplingThreshold = tm.Type.EndsWith("Controller", StringComparison.Ordinal) ? 50 : 30;
+            if (tm.ClassCoupling >= couplingThreshold)
             {
                 hotspots.Add(new Finding
                 {
@@ -368,7 +390,7 @@ public static class ArchitectureProbe
                     File = tm.FilePath,
                     Project = tm.Project,
                     Type = tm.Type,
-                    Message = $"Type '{tm.Type}' has class coupling of {tm.ClassCoupling} (threshold: 30)."
+                    Message = $"Type '{tm.Type}' has class coupling of {tm.ClassCoupling} (threshold: {couplingThreshold})."
                 });
             }
 

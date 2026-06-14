@@ -20,7 +20,8 @@ public static class SecurityProbe
 
     public static DimensionResult Analyze(
         IReadOnlyList<(string ProjectName, Compilation Compilation)> projects,
-        int importedVulnerabilities = 0)
+        int importedVulnerabilities = 0,
+        string? solutionDir = null)
     {
         var findings = new List<Finding>();
 
@@ -28,6 +29,9 @@ public static class SecurityProbe
         {
             foreach (var tree in compilation.SyntaxTrees)
             {
+                if (solutionDir != null && !SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
+                    continue;
+
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
 
@@ -39,7 +43,7 @@ public static class SecurityProbe
             }
 
             // missingAuthorization needs full project view (all trees)
-            AnalyzeMissingAuthorization(compilation, projectName, findings);
+            AnalyzeMissingAuthorization(compilation, projectName, findings, solutionDir);
         }
 
         var hardcodedSecrets = findings.Count(f => f.Category == "hardcodedSecret");
@@ -308,11 +312,12 @@ public static class SecurityProbe
     // ── Finding 6: Missing Authorization on Controllers ───────────────────────
 
     private static void AnalyzeMissingAuthorization(
-        Compilation compilation, string projectName, List<Finding> findings)
+        Compilation compilation, string projectName, List<Finding> findings, string? solutionDir)
     {
         // First pass: does the project use [Authorize] at all?
         bool projectUsesAuthorize = false;
         var allRoots = compilation.SyntaxTrees
+            .Where(t => solutionDir == null || SourceFileFilter.ShouldAnalyze(t.FilePath, solutionDir))
             .Select(t => t.GetRoot())
             .ToList();
 
@@ -329,35 +334,31 @@ public static class SecurityProbe
         if (!projectUsesAuthorize)
             return;
 
-        // Second pass: find controller classes missing both [Authorize] and [AllowAnonymous]
-        foreach (var tree in compilation.SyntaxTrees)
+        // Second pass: find controller classes missing both [Authorize] and [AllowAnonymous].
+        // Partial classes can place attributes on any declaration, so evaluate the union.
+        var controllersByName = allRoots
+            .SelectMany(r => r.DescendantNodes().OfType<ClassDeclarationSyntax>())
+            .Where(c => c.Identifier.Text.EndsWith("Controller", StringComparison.Ordinal))
+            .GroupBy(c => c.Identifier.Text, StringComparer.Ordinal);
+
+        foreach (var controllerGroup in controllersByName)
         {
-            var root = tree.GetRoot();
-            var filePath = tree.FilePath;
+            bool hasAuthorize = controllerGroup.Any(cls => HasAttribute(cls, "Authorize"));
+            bool hasAllowAnonymous = controllerGroup.Any(cls => HasAttribute(cls, "AllowAnonymous"));
 
-            var classes = root.DescendantNodes().OfType<ClassDeclarationSyntax>();
-            foreach (var cls in classes)
+            if (!hasAuthorize && !hasAllowAnonymous)
             {
-                var className = cls.Identifier.Text;
-                if (!className.EndsWith("Controller", StringComparison.Ordinal))
-                    continue;
-
-                bool hasAuthorize = HasAttribute(cls, "Authorize");
-                bool hasAllowAnonymous = HasAttribute(cls, "AllowAnonymous");
-
-                if (!hasAuthorize && !hasAllowAnonymous)
+                var cls = controllerGroup.First();
+                findings.Add(new Finding
                 {
-                    findings.Add(new Finding
-                    {
-                        Category = "missingAuthorization",
-                        Severity = "warning",
-                        File = filePath,
-                        Line = GetLine(cls),
-                        Project = projectName,
-                        Type = className,
-                        Message = $"Controller '{className}' has no [Authorize] or [AllowAnonymous] attribute, but the project uses authorization."
-                    });
-                }
+                    Category = "missingAuthorization",
+                    Severity = "warning",
+                    File = cls.SyntaxTree.FilePath,
+                    Line = GetLine(cls),
+                    Project = projectName,
+                    Type = controllerGroup.Key,
+                    Message = $"Controller '{controllerGroup.Key}' has no [Authorize] or [AllowAnonymous] attribute, but the project uses authorization."
+                });
             }
         }
     }

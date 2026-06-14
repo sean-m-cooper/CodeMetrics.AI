@@ -31,6 +31,7 @@ public static class MaintainabilityProbe
 
         // Top 5 offenders: sort by MI asc, Type name
         var offenders = types
+            .Where(t => !IsEntryPointType(t))
             .OrderBy(t => t.MaintainabilityIndex)
             .ThenBy(t => t.Type)
             .Take(5)
@@ -76,6 +77,13 @@ public static class MaintainabilityProbe
             Basis = basis,
             Extra = extra
         };
+    }
+
+    private static bool IsEntryPointType(TypeMetrics type)
+    {
+        return type.Type is "Program" or "Startup" ||
+               type.FilePath.EndsWith("Program.cs", StringComparison.OrdinalIgnoreCase) ||
+               type.FilePath.EndsWith("Startup.cs", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

@@ -437,6 +437,44 @@ public class SecurityProbeTests
     }
 
     [Fact]
+    public void MissingAuthorization_PartialControllerWithAuthorizeOnAnotherDeclaration_NotFound()
+    {
+        const string code = """
+            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AuthorizeAttribute : System.Attribute { }
+            [Authorize] public class AuthController { }
+            [Authorize] public partial class PublicController { }
+            public partial class PublicController {
+                public void Get() { }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f =>
+            f.Category == "missingAuthorization" && f.Type == "PublicController");
+    }
+
+    [Fact]
+    public void MissingAuthorization_PartialControllerWithAllowAnonymousOnAnotherDeclaration_NotFound()
+    {
+        const string code = """
+            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AuthorizeAttribute : System.Attribute { }
+            [Authorize] public class AuthController { }
+            [AllowAnonymous] public partial class PublicController { }
+            public partial class PublicController {
+                public void Get() { }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f =>
+            f.Category == "missingAuthorization" && f.Type == "PublicController");
+    }
+
+    [Fact]
     public void MissingAuthorization_ProjectDoesNotUseAuthorize_NotFound()
     {
         // Project uses no [Authorize] anywhere → rule does not apply

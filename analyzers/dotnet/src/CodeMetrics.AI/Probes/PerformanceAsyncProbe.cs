@@ -6,7 +6,9 @@ namespace CodeMetrics.AI.Probes;
 
 public static class PerformanceAsyncProbe
 {
-    public static DimensionResult Analyze(IReadOnlyList<(string ProjectName, Compilation Compilation)> projects)
+    public static DimensionResult Analyze(
+        IReadOnlyList<(string ProjectName, Compilation Compilation)> projects,
+        string? solutionDir = null)
     {
         var findings = new List<Finding>();
 
@@ -14,6 +16,9 @@ public static class PerformanceAsyncProbe
         {
             foreach (var tree in compilation.SyntaxTrees)
             {
+                if (solutionDir != null && !SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
+                    continue;
+
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
 
@@ -29,7 +34,7 @@ public static class PerformanceAsyncProbe
 
         var errors = findings.Count(f => f.Severity == "error");
         var warnings = findings.Count(f => f.Severity == "warning");
-        var hasSyncOverAsync = findings.Any(f => f.Category == "syncOverAsync");
+        var hasSyncOverAsync = findings.Any(f => f.Category == "syncOverAsync" && f.Severity == "error");
         var hasSaveChangesInsideLoop = findings.Any(f => f.Category == "saveChangesInsideLoop");
 
         double score;
@@ -77,7 +82,7 @@ public static class PerformanceAsyncProbe
                 findings.Add(new Finding
                 {
                     Category = "syncOverAsync",
-                    Severity = "error",
+                    Severity = SyncOverAsyncSeverity(ma),
                     File = filePath,
                     Line = GetLine(ma),
                     Project = projectName,
@@ -94,7 +99,7 @@ public static class PerformanceAsyncProbe
                     findings.Add(new Finding
                     {
                         Category = "syncOverAsync",
-                        Severity = "error",
+                        Severity = SyncOverAsyncSeverity(ma),
                         File = filePath,
                         Line = GetLine(ma),
                         Project = projectName,
@@ -114,7 +119,7 @@ public static class PerformanceAsyncProbe
                 findings.Add(new Finding
                 {
                     Category = "syncOverAsync",
-                    Severity = "error",
+                    Severity = SyncOverAsyncSeverity(inv),
                     File = filePath,
                     Line = GetLine(inv),
                     Project = projectName,
@@ -190,6 +195,9 @@ public static class PerformanceAsyncProbe
         {
             // Must be public
             if (!method.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword)))
+                continue;
+
+            if (IsAspNetCoreMiddlewareInvokeAsync(method))
                 continue;
 
             // Must be async OR return Task/Task<T> OR have *Async suffix
@@ -280,6 +288,10 @@ public static class PerformanceAsyncProbe
             if (!IsInsideLoop(awaitExpr))
                 continue;
 
+            var containingMethod = awaitExpr.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault();
+            if (containingMethod != null && HasSyncRequiredSuppression(containingMethod))
+                continue;
+
             // Get the method name being awaited
             string? methodName = null;
             if (awaitExpr.Expression is InvocationExpressionSyntax inv)
@@ -295,6 +307,9 @@ public static class PerformanceAsyncProbe
 
             // Exclude SaveChanges (covered separately)
             if (methodName == "SaveChangesAsync")
+                continue;
+
+            if (IsCursorPaginationLoop(awaitExpr))
                 continue;
 
             // Check if name contains one of the IO verbs
@@ -380,6 +395,82 @@ public static class PerformanceAsyncProbe
             ForEachStatementSyntax or
             WhileStatementSyntax or
             DoStatementSyntax);
+    }
+
+    private static bool IsAspNetCoreMiddlewareInvokeAsync(MethodDeclarationSyntax method)
+    {
+        if (method.Identifier.Text != "InvokeAsync")
+            return false;
+
+        if (method.ParameterList.Parameters.Count != 1)
+            return false;
+
+        var typeName = method.ParameterList.Parameters[0].Type?.ToString();
+        return typeName == "HttpContext" ||
+               typeName?.EndsWith(".HttpContext", StringComparison.Ordinal) == true;
+    }
+
+    private static string SyncOverAsyncSeverity(SyntaxNode node)
+    {
+        var method = node.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault();
+        if (method == null)
+            return "error";
+
+        return HasSyncRequiredSuppression(method) ||
+               IsOverrideOrExplicitInterfaceImplementation(method)
+            ? "info"
+            : "error";
+    }
+
+    private static bool HasSyncRequiredSuppression(MethodDeclarationSyntax method)
+    {
+        return method.GetLeadingTrivia()
+            .Any(trivia => trivia.IsKind(SyntaxKind.SingleLineCommentTrivia) &&
+                           trivia.ToString().Contains("amp-metrics: sync-required", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static bool IsOverrideOrExplicitInterfaceImplementation(MethodDeclarationSyntax method)
+    {
+        return method.Modifiers.Any(m => m.IsKind(SyntaxKind.OverrideKeyword)) ||
+               method.ExplicitInterfaceSpecifier != null;
+    }
+
+    private static bool IsCursorPaginationLoop(AwaitExpressionSyntax awaitExpr)
+    {
+        var resultVariable = GetAwaitedResultVariable(awaitExpr);
+        if (resultVariable == null)
+            return false;
+
+        var loop = awaitExpr.Ancestors().FirstOrDefault(a =>
+            a is ForStatementSyntax or
+            ForEachStatementSyntax or
+            WhileStatementSyntax or
+            DoStatementSyntax);
+
+        if (loop == null)
+            return false;
+
+        var tokenNames = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "NextToken", "ContinuationToken", "NextPageToken", "PageToken", "Cursor"
+        };
+
+        return loop.DescendantNodes()
+            .OfType<AssignmentExpressionSyntax>()
+            .Any(assignment =>
+                assignment.Right is MemberAccessExpressionSyntax memberAccess &&
+                memberAccess.Expression is IdentifierNameSyntax id &&
+                id.Identifier.Text == resultVariable &&
+                tokenNames.Contains(memberAccess.Name.Identifier.Text));
+    }
+
+    private static string? GetAwaitedResultVariable(AwaitExpressionSyntax awaitExpr)
+    {
+        var variable = awaitExpr.Ancestors()
+            .OfType<VariableDeclaratorSyntax>()
+            .FirstOrDefault(v => v.Initializer?.Value == awaitExpr);
+
+        return variable?.Identifier.Text;
     }
 
     private static bool IsTaskReturnType(TypeSyntax returnType)

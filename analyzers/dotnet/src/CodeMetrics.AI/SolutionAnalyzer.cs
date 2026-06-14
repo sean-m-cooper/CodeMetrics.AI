@@ -63,7 +63,7 @@ public class SolutionAnalyzer
             var compilation = await project.GetCompilationAsync();
             if (compilation == null) continue;
 
-            var (types, members) = MetricsCollector.Collect(project.Name, compilation);
+            var (types, members) = MetricsCollector.Collect(project.Name, compilation, solutionDir);
             allTypeMetrics.AddRange(types);
             allMemberMetrics.AddRange(members);
 
@@ -82,8 +82,8 @@ public class SolutionAnalyzer
 
         dimensions["codeQuality"] = CodeQualityProbe.Analyze(allTypeMetrics);
         dimensions["maintainability"] = MaintainabilityProbe.Analyze(allTypeMetrics);
-        dimensions["errorHandling"] = ErrorHandlingProbe.Analyze(projectCompilations);
-        dimensions["performanceAsync"] = PerformanceAsyncProbe.Analyze(projectCompilations);
+        dimensions["errorHandling"] = ErrorHandlingProbe.Analyze(projectCompilations, solutionDir);
+        dimensions["performanceAsync"] = PerformanceAsyncProbe.Analyze(projectCompilations, solutionDir);
 
         // Dependency probe (may be skipped)
         DimensionResult depResult;
@@ -104,7 +104,7 @@ public class SolutionAnalyzer
         // Security probe - pass vulnerability count from dependency probe
         int vulnCount = depResult.Findings.Count(f =>
             f.Category.Contains("vulnerable", StringComparison.OrdinalIgnoreCase));
-        dimensions["security"] = SecurityProbe.Analyze(projectCompilations, vulnCount);
+        dimensions["security"] = SecurityProbe.Analyze(projectCompilations, vulnCount, solutionDir);
 
         dimensions["testing"] = TestingProbe.Analyze(
             allProjectCompilations,

@@ -142,6 +142,29 @@ public class CodeQualityProbeTests
     }
 
     [Fact]
+    public void SingleMemberType_IsExcludedFromDecompositionMetricsAndOffenders()
+    {
+        var types = new List<TypeMetrics>
+        {
+            MakeType("SingleBigMethod", memberCount: 1, decompositionRatio: 20.0, maxMemberCC: 2),
+            MakeType("CleanA", memberCount: 4, decompositionRatio: 1.0, maxMemberCC: 2),
+            MakeType("CleanB", memberCount: 4, decompositionRatio: 1.0, maxMemberCC: 2)
+        };
+
+        var result = CodeQualityProbe.Analyze(types);
+
+        var metrics = (JsonElement)result.Extra["metrics"]!;
+        var decomposition = metrics.GetProperty("decomposition");
+        decomposition.GetProperty("populationPercentOver4").GetDouble().Should().Be(0);
+        decomposition.GetProperty("extremePercentOver15").GetDouble().Should().Be(0);
+
+        var offenders = (JsonElement)result.Extra["topOffenders"]!;
+        offenders.EnumerateArray()
+            .Select(o => o.GetProperty("type").GetString())
+            .Should().NotContain("SingleBigMethod");
+    }
+
+    [Fact]
     public void Score_HasMetricsAndTopOffendersInExtra()
     {
         var types = new List<TypeMetrics> { MakeType("TypeA", memberCount: 3) };

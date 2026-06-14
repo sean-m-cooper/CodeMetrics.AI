@@ -246,6 +246,36 @@ public class ArchitectureProbeTests
         result.Findings.Should().NotContain(f => f.Category == "concreteInfrastructureDependency");
     }
 
+    [Fact]
+    public void ConcreteInfrastructureDependency_ServiceWithMicrosoftExtensionsContext_NoFinding()
+    {
+        const string code = """
+            namespace Microsoft.Extensions.Hosting { public class HostContext { } }
+            public class MyService {
+                public MyService(Microsoft.Extensions.Hosting.HostContext context) { }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "concreteInfrastructureDependency");
+    }
+
+    [Fact]
+    public void ConcreteInfrastructureDependency_ServiceWithAspNetCoreHttpContext_NoFinding()
+    {
+        const string code = """
+            namespace Microsoft.AspNetCore.Http { public class HttpContext { } }
+            public class MyService {
+                public MyService(Microsoft.AspNetCore.Http.HttpContext context) { }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "concreteInfrastructureDependency");
+    }
+
     // ── 4. Metric hotspots ────────────────────────────────────────────────────
 
     [Fact]
@@ -316,6 +346,28 @@ public class ArchitectureProbeTests
         var result = Analyze(code, metrics);
 
         result.Findings.Should().Contain(f => f.Category == "highCoupling");
+    }
+
+    [Fact]
+    public void MetricHotspots_ControllerUsesHigherCouplingThreshold()
+    {
+        var metrics = new List<TypeMetrics>
+        {
+            new()
+            {
+                Project = "TestProject",
+                Namespace = "MyNs",
+                Type = "OrdersController",
+                FilePath = "OrdersController.cs",
+                CyclomaticComplexity = 5,
+                ClassCoupling = 35,
+                LinesOfSource = 50
+            }
+        };
+
+        var result = Analyze("class Placeholder { }", metrics);
+
+        result.Findings.Should().NotContain(f => f.Category == "highCoupling");
     }
 
     [Fact]

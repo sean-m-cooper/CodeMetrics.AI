@@ -94,6 +94,70 @@ public class PerformanceAsyncProbeTests
         result.Findings.Should().Contain(f => f.Category == "syncOverAsync");
     }
 
+    [Fact]
+    public void SyncRequiredComment_DowngradesSyncOverAsyncToInfo()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class C {
+                // amp-metrics: sync-required
+                void M() {
+                    var value = Task.FromResult(1).Result;
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Where(f => f.Category == "syncOverAsync")
+            .Should().ContainSingle()
+            .Which.Severity.Should().Be("info");
+    }
+
+    [Fact]
+    public void OverrideWithGetAwaiterGetResult_DowngradesSyncOverAsyncToInfo()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            abstract class Base {
+                public abstract string M();
+            }
+            class C : Base {
+                public override string M() {
+                    return Task.FromResult("value").GetAwaiter().GetResult();
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Where(f => f.Category == "syncOverAsync")
+            .Should().ContainSingle()
+            .Which.Severity.Should().Be("info");
+    }
+
+    [Fact]
+    public void ExplicitInterfaceImplementationWithGetAwaiterGetResult_DowngradesSyncOverAsyncToInfo()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            interface IFoo {
+                string M();
+            }
+            class C : IFoo {
+                string IFoo.M() {
+                    return Task.FromResult("value").GetAwaiter().GetResult();
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Where(f => f.Category == "syncOverAsync")
+            .Should().ContainSingle()
+            .Which.Severity.Should().Be("info");
+    }
+
     // ── 2. threadSleep ───────────────────────────────────────────────────────
 
     [Fact]
@@ -307,6 +371,28 @@ public class PerformanceAsyncProbeTests
             .Should().AllSatisfy(f => f.Severity.Should().Be("warning"));
     }
 
+    [Fact]
+    public void MiddlewareInvokeAsyncWithHttpContext_DoesNotFindMissingCancellationToken()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            namespace Microsoft.AspNetCore.Http { public class HttpContext { } }
+            class FakeClient {
+                public Task<string> GetAsync(string url) => Task.FromResult("");
+            }
+            class MyMiddleware {
+                public async Task InvokeAsync(Microsoft.AspNetCore.Http.HttpContext context) {
+                    var client = new FakeClient();
+                    var result = await client.GetAsync("http://example.com");
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "missingCancellationToken");
+    }
+
     // ── 5. materializationBeforeQueryShape ───────────────────────────────────
 
     [Fact]
@@ -472,6 +558,61 @@ public class PerformanceAsyncProbeTests
 
         result.Findings.Where(f => f.Category == "awaitedIoInsideLoop")
             .Should().AllSatisfy(f => f.Severity.Should().Be("warning"));
+    }
+
+    [Fact]
+    public void SyncRequiredComment_SuppressesAwaitedIoInsideLoop()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+            class FakeClient {
+                public Task<string> GetAsync(string url) => Task.FromResult("");
+            }
+            class C {
+                // amp-metrics: sync-required
+                public async Task M(IEnumerable<string> urls) {
+                    var client = new FakeClient();
+                    foreach (var url in urls) {
+                        var result = await client.GetAsync(url);
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
+    public void CursorPaginationLoop_DoesNotFindAwaitedIoInsideLoop()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class Request {
+                public string? PageToken { get; set; }
+            }
+            class Response {
+                public string? NextPageToken { get; set; }
+            }
+            class FakeClient {
+                public Task<Response> GetAsync(Request request) => Task.FromResult(new Response());
+            }
+            class C {
+                public async Task M(Request request) {
+                    var client = new FakeClient();
+                    do {
+                        var response = await client.GetAsync(request);
+                        request.PageToken = response.NextPageToken;
+                    } while (request.PageToken != null);
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
     }
 
     // ── 7. unboundedWhenAll ──────────────────────────────────────────────────

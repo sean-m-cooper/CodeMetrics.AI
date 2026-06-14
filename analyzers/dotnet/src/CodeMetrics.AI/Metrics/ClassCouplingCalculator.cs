@@ -22,6 +22,9 @@ public static class ClassCouplingCalculator
 
         foreach (var node in typeDecl.DescendantNodesAndSelf())
         {
+            if (IsInsideFromServicesParameter(node))
+                continue;
+
             CollectFromTypeInfo(model.GetTypeInfo(node).Type, coupled, selfSymbol);
             CollectFromTypeInfo(model.GetTypeInfo(node).ConvertedType, coupled, selfSymbol);
 
@@ -29,7 +32,7 @@ public static class ClassCouplingCalculator
             if (symbolInfo.Symbol is IMethodSymbol method)
             {
                 CollectFromTypeInfo(method.ReturnType, coupled, selfSymbol);
-                foreach (var p in method.Parameters)
+                foreach (var p in GetAnalyzableParameters(node, method))
                     CollectFromTypeInfo(p.Type, coupled, selfSymbol);
             }
         }
@@ -56,6 +59,52 @@ public static class ClassCouplingCalculator
                     CollectFromTypeInfo(model.GetTypeInfo(attr).Type, coupled, selfSymbol);
 
         return coupled.Count;
+    }
+
+    private static IEnumerable<IParameterSymbol> GetAnalyzableParameters(SyntaxNode node, IMethodSymbol method)
+    {
+        var parameterSyntax = node switch
+        {
+            BaseMethodDeclarationSyntax methodDecl => methodDecl.ParameterList.Parameters,
+            LocalFunctionStatementSyntax localFunction => localFunction.ParameterList.Parameters,
+            AnonymousFunctionExpressionSyntax anonymousFunction => anonymousFunction switch
+            {
+                ParenthesizedLambdaExpressionSyntax lambda => lambda.ParameterList.Parameters,
+                _ => default
+            },
+            _ => default
+        };
+
+        if (parameterSyntax.Count == 0)
+            return method.Parameters;
+
+        var skippedOrdinals = parameterSyntax
+            .Select((parameter, index) => (parameter, index))
+            .Where(item => IsFromServicesParameter(item.parameter))
+            .Select(item => item.index)
+            .ToHashSet();
+
+        return method.Parameters.Where((_, index) => !skippedOrdinals.Contains(index));
+    }
+
+    private static bool IsInsideFromServicesParameter(SyntaxNode node)
+    {
+        var parameter = node.AncestorsAndSelf().OfType<ParameterSyntax>().FirstOrDefault();
+        return parameter != null && IsFromServicesParameter(parameter);
+    }
+
+    private static bool IsFromServicesParameter(ParameterSyntax parameter)
+    {
+        return parameter.AttributeLists
+            .SelectMany(list => list.Attributes)
+            .Any(attribute =>
+            {
+                var name = attribute.Name.ToString();
+                return name == "FromServices" ||
+                       name == "FromServicesAttribute" ||
+                       name.EndsWith(".FromServices", StringComparison.Ordinal) ||
+                       name.EndsWith(".FromServicesAttribute", StringComparison.Ordinal);
+            });
     }
 
     private static void CollectFromTypeInfo(ITypeSymbol? type, HashSet<INamedTypeSymbol> set,
