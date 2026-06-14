@@ -92,7 +92,6 @@ public class SolutionAnalyzer
             depResult = new DimensionResult
             {
                 Status = "skipped",
-                Score = 0,
                 Basis = "Dependency probe skipped via --skip-dependency-probe."
             };
         }
@@ -118,15 +117,17 @@ public class SolutionAnalyzer
         // Build evidence
         var evidence = new EvidenceModel
         {
-            Solution = new Output.SolutionInfo
+            Subject = new SubjectInfo
             {
-                Path = Path.GetFullPath(solutionPath),
-                Configuration = options.Configuration
+                Root = solutionDir,
+                EntryPoint = Path.GetFullPath(solutionPath),
+                Name = Path.GetFileNameWithoutExtension(solutionPath),
+                Variant = options.Configuration
             },
             Filters = new FilterInfo
             {
-                TotalProjects = allProjects.Count,
-                AnalyzedProjects = analyzed.Count,
+                TotalUnits = allProjects.Count,
+                AnalyzedUnits = analyzed.Count,
                 Skipped = skipped,
             },
             Population = new PopulationInfo

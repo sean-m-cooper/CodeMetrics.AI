@@ -7,7 +7,7 @@ on:
     branches: [master]
 
 jobs:
-  build-and-test:
+  dotnet:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,8 +17,32 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Build
-        run: dotnet build --verbosity minimal
+      - name: Build .NET analyzer
+        run: dotnet build analyzers/dotnet/CodeMetrics.AI.slnx --verbosity minimal
 
-      - name: Test
-        run: dotnet test --verbosity minimal
+      - name: Test .NET analyzer
+        run: dotnet test analyzers/dotnet/CodeMetrics.AI.slnx --verbosity minimal
+
+  javascript-typescript:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: analyzers/javascript-typescript
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: analyzers/javascript-typescript/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build JS/TS analyzer
+        run: npm run build
+
+      - name: Test JS/TS analyzer
+        run: npm test

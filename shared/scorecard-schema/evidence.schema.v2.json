@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sean-m-cooper/CodeMetrics.AI/shared/scorecard-schema/evidence.schema.v2.json",
+  "title": "CodeMetrics.AI Evidence v2",
+  "type": "object",
+  "required": ["schemaVersion", "generatedAtUtc", "tool", "subject", "filters", "population", "dimensions"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "generatedAtUtc": { "type": "string", "format": "date-time" },
+    "tool": {
+      "type": "object",
+      "required": ["name", "version", "ecosystem"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "ecosystem": { "enum": ["dotnet", "javascript-typescript", "python", "rust"] }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "required": ["root", "entryPoint"],
+      "additionalProperties": false,
+      "properties": {
+        "root": { "type": "string", "minLength": 1 },
+        "entryPoint": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "variant": { "type": "string" }
+      }
+    },
+    "filters": {
+      "type": "object",
+      "required": ["totalUnits", "analyzedUnits", "skipped"],
+      "additionalProperties": false,
+      "properties": {
+        "totalUnits": { "type": "integer", "minimum": 0 },
+        "analyzedUnits": { "type": "integer", "minimum": 0 },
+        "skipped": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "reason"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "reason": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "population": {
+      "type": "object",
+      "required": ["types", "members"],
+      "additionalProperties": false,
+      "properties": {
+        "types": { "type": "integer", "minimum": 0 },
+        "members": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "dimensions": {
+      "type": "object",
+      "required": [
+        "codeQuality",
+        "maintainability",
+        "errorHandling",
+        "performanceAsync",
+        "security",
+        "testing",
+        "documentation",
+        "dependencyManagement",
+        "architecture"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "codeQuality": { "$ref": "#/$defs/dimensionResult" },
+        "maintainability": { "$ref": "#/$defs/dimensionResult" },
+        "errorHandling": { "$ref": "#/$defs/dimensionResult" },
+        "performanceAsync": { "$ref": "#/$defs/dimensionResult" },
+        "security": { "$ref": "#/$defs/dimensionResult" },
+        "testing": { "$ref": "#/$defs/dimensionResult" },
+        "documentation": { "$ref": "#/$defs/dimensionResult" },
+        "dependencyManagement": { "$ref": "#/$defs/dimensionResult" },
+        "architecture": { "$ref": "#/$defs/dimensionResult" }
+      }
+    }
+  },
+  "$defs": {
+    "dimensionResult": {
+      "type": "object",
+      "required": ["status", "basis", "findings"],
+      "properties": {
+        "status": { "enum": ["scored", "skipped", "failed"] },
+        "score": { "type": "number", "minimum": 0, "maximum": 10 },
+        "basis": { "type": "string", "minLength": 1 },
+        "findings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/finding" }
+        }
+      },
+      "additionalProperties": true,
+      "if": {
+        "properties": { "status": { "const": "scored" } },
+        "required": ["status"]
+      },
+      "then": { "required": ["score"] }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["category", "severity", "message"],
+      "additionalProperties": false,
+      "properties": {
+        "category": { "type": "string", "minLength": 1 },
+        "severity": { "enum": ["info", "warning", "error"] },
+        "file": { "type": "string" },
+        "line": { "type": "integer", "minimum": 0 },
+        "project": { "type": "string" },
+        "type": { "type": "string" },
+        "member": { "type": "string" },
+        "package": { "type": "string" },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

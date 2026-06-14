@@ -14,11 +14,17 @@ public class EvidenceWriterTests
         {
             var model = new EvidenceModel
             {
-                Solution = new SolutionInfo { Path = "C:/test/my.sln", Configuration = "Release" },
+                Subject = new SubjectInfo
+                {
+                    Root = "C:/test",
+                    EntryPoint = "C:/test/my.sln",
+                    Name = "my",
+                    Variant = "Release"
+                },
                 Filters = new FilterInfo
                 {
-                    TotalProjects = 3,
-                    AnalyzedProjects = 2,
+                    TotalUnits = 3,
+                    AnalyzedUnits = 2,
                     Skipped =
                     [
                         new SkippedProjectInfo { Name = "MyProject.Tests", Reason = "Test project" }
@@ -39,11 +45,13 @@ public class EvidenceWriterTests
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
 
-            root.GetProperty("schemaVersion").GetInt32().Should().Be(1);
-            root.GetProperty("solution").GetProperty("path").GetString().Should().Be("C:/test/my.sln");
-            root.GetProperty("solution").GetProperty("configuration").GetString().Should().Be("Release");
-            root.GetProperty("filters").GetProperty("totalProjects").GetInt32().Should().Be(3);
-            root.GetProperty("filters").GetProperty("analyzedProjects").GetInt32().Should().Be(2);
+            root.GetProperty("schemaVersion").GetInt32().Should().Be(2);
+            root.GetProperty("subject").GetProperty("root").GetString().Should().Be("C:/test");
+            root.GetProperty("subject").GetProperty("entryPoint").GetString().Should().Be("C:/test/my.sln");
+            root.GetProperty("subject").GetProperty("name").GetString().Should().Be("my");
+            root.GetProperty("subject").GetProperty("variant").GetString().Should().Be("Release");
+            root.GetProperty("filters").GetProperty("totalUnits").GetInt32().Should().Be(3);
+            root.GetProperty("filters").GetProperty("analyzedUnits").GetInt32().Should().Be(2);
             root.GetProperty("population").GetProperty("types").GetInt32().Should().Be(42);
             root.GetProperty("population").GetProperty("members").GetInt32().Should().Be(120);
         }
@@ -119,6 +127,43 @@ public class EvidenceWriterTests
 
             tool.GetProperty("name").GetString().Should().Be("CodeMetrics.AI");
             tool.GetProperty("version").GetString().Should().NotBeNullOrEmpty();
+            tool.GetProperty("ecosystem").GetString().Should().Be("dotnet");
+        }
+        finally
+        {
+            File.Delete(tempFile);
+        }
+    }
+
+    [Fact]
+    public async Task WriteAsync_OmitsScore_ForSkippedDimensions()
+    {
+        var tempFile = Path.GetTempFileName();
+        try
+        {
+            var model = new EvidenceModel
+            {
+                Dimensions = new Dictionary<string, object>
+                {
+                    ["dependencyManagement"] = new
+                    {
+                        status = "skipped",
+                        basis = "Skipped for test.",
+                        findings = Array.Empty<object>()
+                    }
+                }
+            };
+
+            await EvidenceWriter.WriteAsync(tempFile, model);
+
+            var json = await File.ReadAllTextAsync(tempFile);
+            using var doc = JsonDocument.Parse(json);
+            var dimension = doc.RootElement
+                .GetProperty("dimensions")
+                .GetProperty("dependencyManagement");
+
+            dimension.GetProperty("status").GetString().Should().Be("skipped");
+            dimension.TryGetProperty("score", out _).Should().BeFalse();
         }
         finally
         {

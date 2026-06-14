@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "generatedAtUtc": "2026-06-10T00:00:00.0000000Z",
+  "tool": {
+    "name": "codemetrics-ai",
+    "version": "0.1.0",
+    "ecosystem": "javascript-typescript"
+  },
+  "subject": {
+    "root": "/repo",
+    "entryPoint": "/repo/package.json",
+    "name": "my-app",
+    "variant": "tsconfig.json"
+  },
+  "filters": {
+    "totalUnits": 1,
+    "analyzedUnits": 1,
+    "skipped": []
+  },
+  "population": {
+    "types": 1,
+    "members": 1
+  },
+  "dimensions": {
+    "codeQuality": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "maintainability": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "errorHandling": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "performanceAsync": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "security": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "testing": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "documentation": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] },
+    "dependencyManagement": { "status": "skipped", "basis": "Dependency checks not implemented in scaffold.", "findings": [] },
+    "architecture": { "status": "scored", "score": 10, "basis": "Example.", "findings": [] }
+  }
+}

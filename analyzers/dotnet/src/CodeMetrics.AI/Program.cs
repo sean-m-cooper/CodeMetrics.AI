@@ -9,13 +9,13 @@ var solutionOption = new Option<string?>("--solution")
 var outputOption = new Option<string>("--output")
 {
     Description = "CSV output path",
-    DefaultValueFactory = _ => ".scorecard/metrics.csv"
+    DefaultValueFactory = _ => ".scorecard/dotnet/metrics.csv"
 };
 
 var scorecardOutputOption = new Option<string>("--scorecard-output")
 {
     Description = "JSON evidence output path",
-    DefaultValueFactory = _ => ".scorecard/evidence.json"
+    DefaultValueFactory = _ => ".scorecard/dotnet/evidence.json"
 };
 
 var configOption = new Option<string>("--configuration")

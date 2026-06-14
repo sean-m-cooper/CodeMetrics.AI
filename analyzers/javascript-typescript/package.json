@@ -1,0 +1,27 @@
+{
+  "name": "codemetrics-ai",
+  "version": "0.1.0",
+  "description": "Deterministic code metrics and scorecard evidence for JavaScript, TypeScript, and React projects",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "codemetrics-ai": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepack": "npm run build",
+    "test": "vitest run"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.2"
+  }
+}
