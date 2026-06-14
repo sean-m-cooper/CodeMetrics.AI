@@ -24,7 +24,7 @@ public static class TestingProbe
 
         foreach (var project in allProjects)
         {
-            if (IsTestProject(project.Name, project.Compilation))
+            if (IsTestProject(project.Name, project.Compilation, solutionDir))
                 testProjects.Add(project);
             else
                 nonTestProjects.Add(project);
@@ -40,6 +40,9 @@ public static class TestingProbe
         {
             foreach (var tree in compilation.SyntaxTrees)
             {
+                if (!SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
+                    continue;
+
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
 
@@ -121,7 +124,7 @@ public static class TestingProbe
 
     // ── Test project detection ────────────────────────────────────────────────
 
-    private static bool IsTestProject(string projectName, Compilation compilation)
+    private static bool IsTestProject(string projectName, Compilation compilation, string solutionDir)
     {
         // Name-based detection
         if (projectName.Contains("Test", StringComparison.OrdinalIgnoreCase))
@@ -130,6 +133,9 @@ public static class TestingProbe
         // Source-based detection: any method with a test attribute
         foreach (var tree in compilation.SyntaxTrees)
         {
+            if (!SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
+                continue;
+
             var root = tree.GetRoot();
             var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
             foreach (var method in methods)
@@ -317,9 +323,18 @@ public static class TestingProbe
     {
         // "MyApp.Core.Tests" covers "MyApp.Core"
         // Strategy: strip common test suffixes/prefixes and compare
+        productionProjectName = StripTargetFrameworkSuffix(productionProjectName);
         var strippedTest = StripTestSuffix(testProjectName);
         return strippedTest.Equals(productionProjectName, StringComparison.OrdinalIgnoreCase) ||
                testProjectName.StartsWith(productionProjectName, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string StripTargetFrameworkSuffix(string name)
+    {
+        var index = name.LastIndexOf(" (", StringComparison.Ordinal);
+        return index > 0 && name.EndsWith(")", StringComparison.Ordinal)
+            ? name[..index]
+            : name;
     }
 
     private static string StripTestSuffix(string name)

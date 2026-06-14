@@ -69,7 +69,7 @@ public static class DocumentationProbe
         bool allLibraryProjectsHaveXmlDocs = libraryProjectCount == 0 || libraryXmlDocEnabledCount == libraryProjectCount;
 
         // ── 6. Public API doc coverage ───────────────────────────────────────────
-        var (publicMemberCount, documentedMemberCount) = CountPublicApiDocCoverage(libraryProjects);
+        var (publicMemberCount, documentedMemberCount) = CountPublicApiDocCoverage(libraryProjects, solutionDir);
         double publicApiDocCoverage = publicMemberCount > 0
             ? (double)documentedMemberCount / publicMemberCount
             : 1.0; // no public members → not penalized
@@ -169,7 +169,8 @@ public static class DocumentationProbe
     }
 
     private static (int total, int documented) CountPublicApiDocCoverage(
-        IReadOnlyList<(string Name, Compilation Compilation, string? ProjectFilePath)> libraryProjects)
+        IReadOnlyList<(string Name, Compilation Compilation, string? ProjectFilePath)> libraryProjects,
+        string solutionDir)
     {
         int total = 0;
         int documented = 0;
@@ -178,6 +179,9 @@ public static class DocumentationProbe
         {
             foreach (var tree in compilation.SyntaxTrees)
             {
+                if (!SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
+                    continue;
+
                 var root = tree.GetRoot();
 
                 // Public types

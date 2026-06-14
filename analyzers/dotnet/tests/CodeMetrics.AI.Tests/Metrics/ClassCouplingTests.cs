@@ -72,4 +72,22 @@ public class ClassCouplingTests
         var coupling = ClassCouplingCalculator.Calculate(classC, model);
         coupling.Should().BeGreaterThanOrEqualTo(2); // List<T> + Dep
     }
+
+    [Fact]
+    public void FromServicesMethodParameter_IsExcludedFromCoupling()
+    {
+        const string code = """
+            namespace Microsoft.AspNetCore.Mvc { public sealed class FromServicesAttribute : System.Attribute { } }
+            public class BigInjectedService { }
+            public class MyController {
+                public void Get([Microsoft.AspNetCore.Mvc.FromServices] BigInjectedService svc) { }
+            }
+            """;
+
+        var (tree, model, _) = RoslynTestHelper.CompileCode(code);
+        var controller = RoslynTestHelper.FindAllNodes<ClassDeclarationSyntax>(tree)
+            .Single(c => c.Identifier.Text == "MyController");
+
+        ClassCouplingCalculator.Calculate(controller, model).Should().Be(0);
+    }
 }

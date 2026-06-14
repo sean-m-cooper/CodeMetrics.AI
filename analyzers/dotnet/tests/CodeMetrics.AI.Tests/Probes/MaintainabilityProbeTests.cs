@@ -124,6 +124,57 @@ public class MaintainabilityProbeTests
     }
 
     [Fact]
+    public void TopOffenders_ExcludesProgramAndStartup()
+    {
+        var program = MakeType("Program", mi: 5);
+        program = new TypeMetrics
+        {
+            Project = program.Project,
+            Namespace = program.Namespace,
+            Type = program.Type,
+            FilePath = "Program.cs",
+            MaintainabilityIndex = program.MaintainabilityIndex,
+            MemberCount = program.MemberCount,
+            CyclomaticComplexity = program.CyclomaticComplexity,
+            ClassCoupling = program.ClassCoupling,
+            LinesOfSource = program.LinesOfSource
+        };
+
+        var startup = MakeType("Startup", mi: 10);
+        startup = new TypeMetrics
+        {
+            Project = startup.Project,
+            Namespace = startup.Namespace,
+            Type = startup.Type,
+            FilePath = "Startup.cs",
+            MaintainabilityIndex = startup.MaintainabilityIndex,
+            MemberCount = startup.MemberCount,
+            CyclomaticComplexity = startup.CyclomaticComplexity,
+            ClassCoupling = startup.ClassCoupling,
+            LinesOfSource = startup.LinesOfSource
+        };
+
+        var types = new List<TypeMetrics>
+        {
+            program,
+            startup,
+            MakeType("RealHotspot", mi: 20),
+            MakeType("Healthy", mi: 90)
+        };
+
+        var result = MaintainabilityProbe.Analyze(types);
+
+        var offenders = (JsonElement)result.Extra["topOffenders"]!;
+        var offenderTypes = offenders.EnumerateArray()
+            .Select(o => o.GetProperty("type").GetString())
+            .ToList();
+
+        offenderTypes.Should().NotContain("Program");
+        offenderTypes.Should().NotContain("Startup");
+        offenderTypes.Should().Contain("RealHotspot");
+    }
+
+    [Fact]
     public void Score_HasMetricsAndTopOffendersInExtra()
     {
         var types = new List<TypeMetrics> { MakeType("TypeA", mi: 75) };

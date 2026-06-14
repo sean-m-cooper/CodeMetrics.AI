@@ -6,7 +6,9 @@ namespace CodeMetrics.AI.Probes;
 
 public static class ErrorHandlingProbe
 {
-    public static DimensionResult Analyze(IReadOnlyList<(string ProjectName, Compilation Compilation)> projects)
+    public static DimensionResult Analyze(
+        IReadOnlyList<(string ProjectName, Compilation Compilation)> projects,
+        string? solutionDir = null)
     {
         var findings = new List<Finding>();
 
@@ -14,6 +16,9 @@ public static class ErrorHandlingProbe
         {
             foreach (var tree in compilation.SyntaxTrees)
             {
+                if (solutionDir != null && !SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
+                    continue;
+
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
 

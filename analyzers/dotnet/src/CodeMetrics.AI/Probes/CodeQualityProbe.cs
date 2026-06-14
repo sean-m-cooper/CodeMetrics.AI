@@ -20,10 +20,15 @@ public static class CodeQualityProbe
         }
 
         // --- Decomposition signals ---
-        var ratios = eligible.Select(t => t.DecompositionRatio).ToList();
-        double popOver4 = eligible.Count(t => t.DecompositionRatio > 4) * 100.0 / eligible.Count;
+        var decompositionEligible = eligible.Where(t => t.MemberCount >= 2).ToList();
+        var ratios = decompositionEligible.Select(t => t.DecompositionRatio).ToList();
+        double popOver4 = decompositionEligible.Count > 0
+            ? decompositionEligible.Count(t => t.DecompositionRatio > 4) * 100.0 / decompositionEligible.Count
+            : 0.0;
         double p90Ratio = Percentile(ratios, 90);
-        double extremeOver15 = eligible.Count(t => t.DecompositionRatio > 15) * 100.0 / eligible.Count;
+        double extremeOver15 = decompositionEligible.Count > 0
+            ? decompositionEligible.Count(t => t.DecompositionRatio > 15) * 100.0 / decompositionEligible.Count
+            : 0.0;
 
         int popOver4Score = ScoreThreshold(popOver4, [1, 3, 6, 10, 15]);
         int p90RatioScore = ScoreThreshold(p90Ratio, [2.0, 2.5, 3.5, 5.0, 7.0]);
@@ -44,7 +49,7 @@ public static class CodeQualityProbe
         double finalScore = Math.Round((decompScore + ccScore) / 2.0, 1);
 
         // Top 5 offenders: sort by DecompositionRatio desc, MaxMemberCC desc, Type name
-        var offenders = eligible
+        var offenders = decompositionEligible
             .OrderByDescending(t => t.DecompositionRatio)
             .ThenByDescending(t => t.MaxMemberCyclomaticComplexity)
             .ThenBy(t => t.Type)
