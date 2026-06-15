@@ -2,6 +2,7 @@ using CodeMetrics.AI.Probes;
 using CodeMetrics.AI.Tests.Helpers;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace CodeMetrics.AI.Tests.Probes;
 
@@ -51,6 +52,49 @@ public class ErrorHandlingProbeTests
 
         result.Findings.Where(f => f.Category == "emptyCatch")
             .Should().AllSatisfy(f => f.Severity.Should().Be("error"));
+    }
+
+    [Fact]
+    public void AnalyzerProbeSources_DoNotContainEmptyCatchFindings()
+    {
+        var repoRoot = FindAnalyzerRoot();
+        var sourcePaths = new[]
+        {
+            Path.Combine("src", "CodeMetrics.AI", "Probes", "ArchitectureProbe.cs"),
+            Path.Combine("src", "CodeMetrics.AI", "Probes", "DependencyProbe.cs")
+        };
+
+        var syntaxTrees = sourcePaths.Select(path =>
+        {
+            var fullPath = Path.Combine(repoRoot, path);
+            return CSharpSyntaxTree.ParseText(File.ReadAllText(fullPath), path: fullPath);
+        });
+
+        var compilation = CSharpCompilation.Create("AnalyzerSources",
+            syntaxTrees: syntaxTrees,
+            references: [MetadataReference.CreateFromFile(typeof(object).Assembly.Location)],
+            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var result = ErrorHandlingProbe.Analyze([("CodeMetrics.AI", compilation)]);
+
+        result.Findings.Should().NotContain(f => f.Category == "emptyCatch");
+    }
+
+    private static string FindAnalyzerRoot()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir != null)
+        {
+            if (File.Exists(Path.Combine(dir.FullName, "CodeMetrics.AI.slnx")) &&
+                Directory.Exists(Path.Combine(dir.FullName, "src", "CodeMetrics.AI")))
+            {
+                return dir.FullName;
+            }
+
+            dir = dir.Parent;
+        }
+
+        throw new DirectoryNotFoundException("Could not locate analyzer root.");
     }
 
     // ── 2. throwEx ────────────────────────────────────────────────────────────

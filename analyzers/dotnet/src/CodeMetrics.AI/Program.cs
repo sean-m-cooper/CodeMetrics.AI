@@ -50,7 +50,7 @@ rootCommand.SetAction(async (parseResult, cancellationToken) =>
     };
 
     var analyzer = new SolutionAnalyzer();
-    await analyzer.RunAsync(options);
+    await analyzer.RunAsync(options, cancellationToken);
 });
 
 return await rootCommand.Parse(args).InvokeAsync();
