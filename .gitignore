@@ -340,6 +340,10 @@ __pycache__/
 
 # Local agent worktrees
 .worktrees/
+
+# Generated scorecard outputs
+.scorecard/
+analyzers/**/.scorecard/
 # !tools/packages.config
 
 # Tabs Studio
