@@ -84,6 +84,33 @@ The tool automatically skips non-production projects:
 - Aspire hosts (AppHost, ServiceDefaults, Hosting)
 - Benchmarks, Samples, Demo, Playground projects
 
+## Attribute Support
+
+CodeMetrics.AI recognizes common .NET test framework attributes when scoring the Testing dimension.
+
+Test projects are detected by project name or by methods decorated with one of these attributes:
+
+- `Fact`
+- `Theory`
+- `Test`
+- `TestCase`
+- `TestMethod`
+- `DataTestMethod`
+
+Attributes may be written with the `Attribute` suffix or a namespace qualifier, such as `[FactAttribute]` or `[Xunit.Fact]`.
+
+Skipped or ignored tests are counted when a supported test attribute has a named `Skip` or `Ignore` argument:
+
+```csharp
+[Fact(Skip = "temporarily disabled")]
+public void Uses_xunit_skip() { }
+
+[Test(Ignore = "temporarily disabled")]
+public void Uses_nunit_ignore() { }
+```
+
+CodeMetrics.AI does not currently provide a custom attribute for excluding production types or members from code metrics. Production code in analyzed projects is included unless the project itself is skipped by the filtering rules above.
+
 ## Requirements
 
 - .NET 10 SDK
