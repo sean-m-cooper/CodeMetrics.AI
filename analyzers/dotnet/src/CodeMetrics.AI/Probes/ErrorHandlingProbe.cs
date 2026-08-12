@@ -354,7 +354,18 @@ public static class ErrorHandlingProbe
             .SelectMany(c => c.ParameterList.Parameters)
             .Any(p => p.Type?.ToString().Contains("ILogger") == true);
 
-        return inCtorParams;
+        if (inCtorParams) return true;
+
+        // Check primary constructor parameters. TypeDeclarationSyntax.ParameterList covers
+        // C# 12 class/struct primary constructors as well as record positional parameters,
+        // none of which appear in Members as a ConstructorDeclarationSyntax.
+        return HasLoggerParameter(typeDecl.ParameterList);
+    }
+
+    private static bool HasLoggerParameter(ParameterListSyntax? parameterList)
+    {
+        return parameterList?.Parameters
+            .Any(p => p.Type?.ToString().Contains("ILogger") == true) == true;
     }
 
     private static string? GetContainingTypeName(SyntaxNode node)

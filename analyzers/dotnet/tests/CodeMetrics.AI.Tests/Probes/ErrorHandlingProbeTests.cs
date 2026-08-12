@@ -411,6 +411,86 @@ public class ErrorHandlingProbeTests
     }
 
     [Fact]
+    public void MultipleCatchesWithILoggerPrimaryConstructor_DoesNotFindMissingLogger()
+    {
+        const string code = """
+            using System;
+            interface ILogger<T> { }
+            public sealed class C(ILogger<C> logger) {
+                void M() {
+                    try { }
+                    catch (ArgumentNullException ex) { var x = ex.Message; }
+                    catch (InvalidOperationException ex) { var y = ex.Message; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "missingLoggerForMultipleCatches");
+    }
+
+    [Fact]
+    public void MultipleCatchesWithILoggerRecordParameter_DoesNotFindMissingLogger()
+    {
+        const string code = """
+            using System;
+            interface ILogger<T> { }
+            public record C(ILogger<C> Logger) {
+                void M() {
+                    try { }
+                    catch (ArgumentNullException ex) { var x = ex.Message; }
+                    catch (InvalidOperationException ex) { var y = ex.Message; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "missingLoggerForMultipleCatches");
+    }
+
+    [Fact]
+    public void MultipleCatchesWithILoggerStructPrimaryConstructor_DoesNotFindMissingLogger()
+    {
+        const string code = """
+            using System;
+            interface ILogger<T> { }
+            public struct C(ILogger<int> logger) {
+                void M() {
+                    try { }
+                    catch (ArgumentNullException ex) { var x = ex.Message; }
+                    catch (InvalidOperationException ex) { var y = ex.Message; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "missingLoggerForMultipleCatches");
+    }
+
+    [Fact]
+    public void MultipleCatchesWithPrimaryConstructorButNoLogger_FindsMissingLogger()
+    {
+        const string code = """
+            using System;
+            interface IProvider { }
+            public sealed class C(IProvider provider) {
+                void M() {
+                    try { }
+                    catch (ArgumentNullException ex) { var x = ex.Message; }
+                    catch (InvalidOperationException ex) { var y = ex.Message; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().Contain(f => f.Category == "missingLoggerForMultipleCatches");
+    }
+
+    [Fact]
     public void SingleCatchNoLogger_DoesNotFindMissingLogger()
     {
         const string code = """
