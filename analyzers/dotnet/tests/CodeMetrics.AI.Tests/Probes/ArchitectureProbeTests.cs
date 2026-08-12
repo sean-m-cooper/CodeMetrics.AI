@@ -451,29 +451,18 @@ public class ArchitectureProbeTests
     }
 
     [Fact]
-    public void Scoring_WithCycles_ReturnsScore2()
+    public void Scoring_WithCycles_ReturnsScore0()
     {
-        var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(Path.Combine(tempDir, "A"));
-        Directory.CreateDirectory(Path.Combine(tempDir, "B"));
-
-        File.WriteAllText(Path.Combine(tempDir, "A", "A.csproj"), """
-            <Project Sdk="Microsoft.NET.Sdk">
-              <ItemGroup><ProjectReference Include="..\B\B.csproj" /></ItemGroup>
-            </Project>
-            """);
-
-        File.WriteAllText(Path.Combine(tempDir, "B", "B.csproj"), """
-            <Project Sdk="Microsoft.NET.Sdk">
-              <ItemGroup><ProjectReference Include="..\A\A.csproj" /></ItemGroup>
-            </Project>
-            """);
+        // A cyclic project graph is an absent architecture, not merely a poor one: the
+        // dependency direction the layering rules check against does not exist. It gets
+        // rung 0 rather than sharing rung 2 with ordinary layering errors.
+        var tempDir = CreateCyclicSolution();
 
         try
         {
             var result = AnalyzeWithDir(tempDir);
 
-            result.Score.Should().Be(2);
+            result.Score.Should().Be(0);
         }
         finally
         {
@@ -494,6 +483,97 @@ public class ArchitectureProbeTests
         var result = Analyze(code);
 
         result.Score.Should().Be(2);
+    }
+
+    [Fact]
+    public void Scoring_WithHotspotsButNoCycles_ReturnsScore2()
+    {
+        // Rung 2 stays reachable on its own terms now that cycles have moved to 0.
+        var hotspot = new TypeMetrics
+        {
+            Project = "TestProject",
+            Namespace = "MyNs",
+            Type = "BigClass",
+            FilePath = "BigClass.cs",
+            CyclomaticComplexity = 100,
+            ClassCoupling = 5,
+            LinesOfSource = 50
+        };
+
+        var result = Analyze("public class GodClass { }", [hotspot]);
+
+        result.Findings.Should().NotContain(f => f.Category == "projectCycle");
+        result.Score.Should().Be(2);
+    }
+
+    [Fact]
+    public void EveryRungIsReachable_NoLadderGaps()
+    {
+        // Guards against a rung being unreachable, which is what left 0 missing and made a
+        // broken architecture indistinguishable from an untidy one.
+        const string errorRung = """
+            public class AppDbContext { }
+            public class MyController { public MyController(AppDbContext db) { } }
+            """;
+        const string noisy = """
+            public class SqlGateway { }
+            public class HttpClientWrapper { }
+            public class DataRepository { }
+            public class UserService { public UserService(SqlGateway g) { } }
+            public class OrderService { public OrderService(HttpClientWrapper c) { } }
+            public class ReportService { public ReportService(DataRepository r) { } }
+            """;
+        const string several = """
+            public class SqlGateway { }
+            public class HttpClientWrapper { }
+            public class UserService { public UserService(SqlGateway g) { } }
+            public class OrderService { public OrderService(HttpClientWrapper c) { } }
+            """;
+        const string minor = """
+            public class SqlGateway { }
+            public class UserService { public UserService(SqlGateway g) { } }
+            """;
+        const string clean = """
+            public class Money { public int Amount { get; init; } }
+            """;
+
+        var cyclicDir = CreateCyclicSolution();
+        try
+        {
+            AnalyzeWithDir(cyclicDir).Score.Should().Be(0);
+        }
+        finally
+        {
+            Directory.Delete(cyclicDir, recursive: true);
+        }
+
+        Analyze(errorRung).Score.Should().Be(2);
+        Analyze(noisy).Score.Should().Be(4);
+        Analyze(several).Score.Should().Be(6);
+        Analyze(minor).Score.Should().Be(8);
+        Analyze(clean).Score.Should().Be(10);
+    }
+
+    /// <summary>Two projects referencing each other, in a fresh temp dir the caller deletes.</summary>
+    private static string CreateCyclicSolution()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(Path.Combine(tempDir, "A"));
+        Directory.CreateDirectory(Path.Combine(tempDir, "B"));
+
+        File.WriteAllText(Path.Combine(tempDir, "A", "A.csproj"), """
+            <Project Sdk="Microsoft.NET.Sdk">
+              <ItemGroup><ProjectReference Include="..\B\B.csproj" /></ItemGroup>
+            </Project>
+            """);
+
+        File.WriteAllText(Path.Combine(tempDir, "B", "B.csproj"), """
+            <Project Sdk="Microsoft.NET.Sdk">
+              <ItemGroup><ProjectReference Include="..\A\A.csproj" /></ItemGroup>
+            </Project>
+            """);
+
+        return tempDir;
     }
 
     [Fact]

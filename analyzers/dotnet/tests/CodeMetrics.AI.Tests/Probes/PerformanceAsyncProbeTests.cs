@@ -12,13 +12,23 @@ public class PerformanceAsyncProbeTests
             Path.GetDirectoryName(typeof(object).Assembly.Location)!,
             "System.Threading.Tasks.dll");
 
-    private static DimensionResult Analyze(string code, bool addTasksRef = false)
-    {
-        MetadataReference[] extras = addTasksRef && File.Exists(TasksRef)
-            ? [MetadataReference.CreateFromFile(TasksRef)]
-            : [];
+    private static readonly string ChannelsRef =
+        Path.Combine(
+            Path.GetDirectoryName(typeof(object).Assembly.Location)!,
+            "System.Threading.Channels.dll");
 
-        var (_, _, compilation) = RoslynTestHelper.CompileCode(code, extras);
+    private static DimensionResult Analyze(
+        string code, bool addTasksRef = false, bool addChannelsRef = false)
+    {
+        var extras = new List<MetadataReference>();
+
+        if (addTasksRef && File.Exists(TasksRef))
+            extras.Add(MetadataReference.CreateFromFile(TasksRef));
+
+        if (addChannelsRef && File.Exists(ChannelsRef))
+            extras.Add(MetadataReference.CreateFromFile(ChannelsRef));
+
+        var (_, _, compilation) = RoslynTestHelper.CompileCode(code, extras.ToArray());
         var projects = new List<(string, Compilation)> { ("TestProject", compilation) };
         return PerformanceAsyncProbe.Analyze(projects);
     }
@@ -692,6 +702,272 @@ public class PerformanceAsyncProbeTests
         var result = Analyze(code, addTasksRef: true);
 
         result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    // ── 6a. Sequential-by-necessity loops ────────────────────────────────────
+    // Each suppressed shape is paired with a control proving the same recogniser
+    // does not swallow a genuine N+1.
+
+    [Fact]
+    public void CursorLoop_TokenDerivedThroughSeveralHops_DoesNotFindAwaitedIoInsideLoop()
+    {
+        // The real shape: the next URL is built from the previous response, and the
+        // continuation token reaches the loop condition only after three assignments.
+        const string code = """
+            using System.Threading.Tasks;
+            class Page { public string? NextPageToken { get; set; } }
+            class Content { public Task<string> ReadAsStringAsync() => Task.FromResult(""); }
+            class Response { public Content Content { get; } = new Content(); }
+            class FakeClient { public Task<Response> GetAsync(string url) => Task.FromResult(new Response()); }
+            class C {
+                public async Task M(FakeClient client) {
+                    string? nextPageToken = null;
+                    do {
+                        var url = BuildUrl(nextPageToken);
+                        var response = await client.GetAsync(url);
+                        var json = await response.Content.ReadAsStringAsync();
+                        var page = Deserialize(json);
+                        nextPageToken = page?.NextPageToken;
+                    } while (!string.IsNullOrEmpty(nextPageToken));
+                }
+                private static string BuildUrl(string? token) => "";
+                private static Page? Deserialize(string json) => null;
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
+    public void CursorLoop_ConditionVariableAssignedStraightFromAwait_DoesNotFindAwaitedIoInsideLoop()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class FakeClient { public Task<string> GetStringAsync(string url) => Task.FromResult(""); }
+            class C {
+                public async Task M(FakeClient client, string firstPage) {
+                    var currentJson = firstPage;
+                    var pagesWalked = 0;
+                    while (pagesWalked < 10 && !string.IsNullOrEmpty(currentJson)) {
+                        var nextUrl = NextUrl(currentJson);
+                        pagesWalked++;
+                        if (string.IsNullOrEmpty(nextUrl)) break;
+                        currentJson = await client.GetStringAsync(nextUrl);
+                    }
+                }
+                private static string NextUrl(string json) => "";
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
+    public void CursorLoop_SuppressesEveryAwaitInTheSameIteration()
+    {
+        // Once the loop is cursor-driven every await in that body is on the critical
+        // path to the next cursor, so none of them is batchable.
+        const string code = """
+            using System.Threading.Tasks;
+            class Response { public string? NextToken { get; set; } }
+            class FakeClient {
+                public Task<Response> GetAsync(string url) => Task.FromResult(new Response());
+                public Task WriteAsync(Response r) => Task.CompletedTask;
+            }
+            class C {
+                public async Task M(FakeClient client) {
+                    string? token = null;
+                    do {
+                        var response = await client.GetAsync(token ?? "");
+                        await client.WriteAsync(response);
+                        token = response.NextToken;
+                    } while (token != null);
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
+    public void NestedLoopInsideCursorLoop_StillFindsAwaitedIoInsideLoop()
+    {
+        // The outer loop is cursor-driven, but the inner foreach over that page's items
+        // is a textbook N+1. Judging each await against its innermost loop keeps it visible.
+        const string code = """
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+            class Response {
+                public string? NextToken { get; set; }
+                public List<string> Items { get; } = new List<string>();
+            }
+            class FakeClient {
+                public Task<Response> GetAsync(string url) => Task.FromResult(new Response());
+                public Task SendAsync(string item) => Task.CompletedTask;
+            }
+            class C {
+                public async Task M(FakeClient client) {
+                    string? token = null;
+                    do {
+                        var response = await client.GetAsync(token ?? "");
+                        foreach (var item in response.Items) {
+                            await client.SendAsync(item);
+                        }
+                        token = response.NextToken;
+                    } while (token != null);
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().ContainSingle(f => f.Category == "awaitedIoInsideLoop")
+            .Which.Message.Should().Contain("SendAsync");
+    }
+
+    [Fact]
+    public void WhileConditionNotDerivedFromAwait_StillFindsAwaitedIoInsideLoop()
+    {
+        // The condition variable is recomputed from a local queue, not from the response,
+        // so batching remains a legitimate suggestion.
+        const string code = """
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+            class FakeClient { public Task<string> GetAsync(string id) => Task.FromResult(""); }
+            class C {
+                public async Task M(FakeClient client, Queue<string> pending) {
+                    var hasMore = pending.Count > 0;
+                    while (hasMore) {
+                        var id = pending.Dequeue();
+                        var result = await client.GetAsync(id);
+                        hasMore = pending.Count > 0;
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().Contain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
+    public void BoundedFallbackSequence_DoesNotFindAwaitedIoInsideLoop()
+    {
+        // Try https, fall back to http, stop at the first that answers.
+        const string code = """
+            using System.Threading.Tasks;
+            class FakeClient { public Task<bool> SendAsync(string url) => Task.FromResult(true); }
+            class C {
+                public async Task M(FakeClient client, string host) {
+                    foreach (var url in new[] { "https://" + host, "http://" + host }) {
+                        var ok = await client.SendAsync(url);
+                        if (ok) return;
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
+    public void InlineLiteralLoopWithoutEarlyExit_StillFindsAwaitedIoInsideLoop()
+    {
+        // Same short inline literal, but every element is always visited — these two
+        // calls are independent and Task.WhenAll really would halve the latency.
+        const string code = """
+            using System.Threading.Tasks;
+            class FakeClient { public Task<bool> SendAsync(string url) => Task.FromResult(true); }
+            class C {
+                public async Task M(FakeClient client, string host) {
+                    foreach (var url in new[] { "https://" + host, "http://" + host }) {
+                        var ok = await client.SendAsync(url);
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().Contain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
+    public void ChannelWriterWriteAsyncInsideLoop_DoesNotFindAwaitedIoInsideLoop()
+    {
+        // The await IS the back-pressure; Task.WhenAll would defeat the channel bound.
+        const string code = """
+            using System.Collections.Generic;
+            using System.Threading.Channels;
+            using System.Threading.Tasks;
+            class C {
+                public async Task M(ChannelWriter<int> writer, IEnumerable<int> items) {
+                    foreach (var item in items) {
+                        await writer.WriteAsync(item);
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true, addChannelsRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
+    public void UserTypeNamedLikeAChannel_StillFindsAwaitedIoInsideLoop()
+    {
+        // Back-pressure is recognised from the resolved framework type, never from the
+        // name, so a hand-rolled wrapper is not silently exempted.
+        const string code = """
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+            class ChannelWriter<T> { public Task WriteAsync(T item) => Task.CompletedTask; }
+            class C {
+                public async Task M(ChannelWriter<int> writer, IEnumerable<int> items) {
+                    foreach (var item in items) {
+                        await writer.WriteAsync(item);
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().Contain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
+    public void IndependentAwaitsOverACollection_StillFindsAwaitedIoInsideLoop()
+    {
+        // The headline true positive the rule exists for: N independent lookups with no
+        // inter-iteration dependency. None of the new recognisers may touch it.
+        const string code = """
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+            class FakeClient { public Task<string> GetAsync(string id) => Task.FromResult(""); }
+            class C {
+                public async Task M(FakeClient client, IEnumerable<string> ids) {
+                    var results = new List<string>();
+                    foreach (var id in ids) {
+                        results.Add(await client.GetAsync(id));
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().Contain(f => f.Category == "awaitedIoInsideLoop");
     }
 
     // ── 7. unboundedWhenAll ──────────────────────────────────────────────────

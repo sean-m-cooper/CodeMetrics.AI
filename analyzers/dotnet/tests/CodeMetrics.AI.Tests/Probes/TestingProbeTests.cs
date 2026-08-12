@@ -318,6 +318,174 @@ public class MyTests {
         }
     }
 
+    // ── 9a. Coverage rate drives the score ───────────────────────────────────
+
+    /// <summary>
+    /// Runs the probe against a solution dir holding a Cobertura report with the given
+    /// overall rates. The sources are otherwise clean — real assertions, no placeholders,
+    /// no skips — so the resulting score is attributable to coverage alone.
+    /// </summary>
+    private static DimensionResult AnalyzeWithCoverage(
+        string? lineRate,
+        string branchRate = "0.5",
+        IReadOnlyList<string>? analyzedNames = null)
+    {
+        var tempDir = TempDir();
+        Directory.CreateDirectory(Path.Combine(tempDir, ".scorecard"));
+
+        var rootAttributes = lineRate == null
+            ? $@"branch-rate=""{branchRate}"""
+            : $@"line-rate=""{lineRate}"" branch-rate=""{branchRate}""";
+
+        File.WriteAllText(
+            Path.Combine(tempDir, ".scorecard", "coverage.cobertura.xml"),
+            $"<coverage {rootAttributes} />");
+
+        try
+        {
+            var testCode = AttributePreamble + @"
+public class CoreTests {
+    [Fact] public void TestOne() { Assert.True(true); Assert.Equal(1, 1); }
+    [Fact] public void TestTwo() { Assert.NotNull(new object()); Assert.True(true); }
+}
+";
+            var testProject = Project("MyApp.Core.Tests", testCode);
+            var prodCore = Project("MyApp.Core", @"public class CoreService { }");
+
+            var allProjects = new List<(string, Compilation)> { prodCore, testProject };
+
+            return TestingProbe.Analyze(
+                allProjects,
+                analyzedNames ?? new List<string> { "MyApp.Core" },
+                tempDir);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [Theory]
+    [InlineData("0.95", 10)]
+    [InlineData("0.80", 10)]
+    [InlineData("0.65", 8)]
+    [InlineData("0.60", 8)]
+    [InlineData("0.45", 6)]
+    [InlineData("0.40", 6)]
+    [InlineData("0.25", 4)]
+    [InlineData("0.20", 4)]
+    [InlineData("0.05", 2)]
+    [InlineData("0.0", 2)]
+    public void CoverageLineRate_CapsTheScore(string lineRate, double expected)
+    {
+        AnalyzeWithCoverage(lineRate).Score.Should().Be(expected);
+    }
+
+    [Fact]
+    public void CoverageLineRate_IsReportedInBasis()
+    {
+        var result = AnalyzeWithCoverage("0.382", branchRate: "0.2356");
+
+        result.Basis.Should().Contain("lineRate=38.2%");
+        result.Basis.Should().Contain("branchRate=23.6%");
+    }
+
+    [Fact]
+    public void NoCoverageReport_BasisReportsRateAsUnavailable()
+    {
+        var testCode = AttributePreamble + @"
+public class CoreTests {
+    [Fact] public void TestOne() { Assert.True(true); Assert.Equal(1, 1); }
+}
+";
+        var allProjects = new List<(string, Compilation)> { Project("MyApp.Core.Tests", testCode) };
+
+        var result = TestingProbe.Analyze(allProjects, new List<string>(), TempDir());
+
+        result.Basis.Should().Contain("lineRate=n/a");
+    }
+
+    [Fact]
+    public void MeasuredCoverage_SupersedesTheUncoveredProjectNameHeuristic()
+    {
+        // The consumer layout that exposed the bug: one shared test project covers several
+        // production projects, so the name match fails while real coverage is high. The
+        // measured rate must win, and the heuristic must not hold the score at 6.
+        var result = AnalyzeWithCoverage(
+            "0.85",
+            analyzedNames: new List<string> { "MyApp.Core", "MyApp.Api", "MyApp.Infrastructure" });
+
+        result.Score.Should().Be(10);
+        result.Findings.Should().Contain(f => f.Category == "uncoveredProject");
+        result.Findings.Where(f => f.Category == "uncoveredProject")
+            .Should().AllSatisfy(f => f.Severity.Should().Be("info"));
+    }
+
+    [Fact]
+    public void WithoutCoverage_UncoveredProjectHeuristicStillGatesTheScore()
+    {
+        // No report, so the name match remains the only signal available and keeps its bite.
+        var testCode = AttributePreamble + @"
+public class CoreTests {
+    [Fact] public void TestOne() { Assert.True(true); Assert.Equal(1, 1); }
+}
+";
+        var allProjects = new List<(string, Compilation)>
+        {
+            Project("MyApp.Core", @"public class CoreService { }"),
+            Project("MyApp.Api", @"public class ApiController { }"),
+            Project("MyApp.Core.Tests", testCode)
+        };
+
+        var result = TestingProbe.Analyze(
+            allProjects, new List<string> { "MyApp.Core", "MyApp.Api" }, TempDir());
+
+        result.Score.Should().Be(6);
+        result.Findings.Where(f => f.Category == "uncoveredProject")
+            .Should().AllSatisfy(f => f.Severity.Should().Be("warning"));
+    }
+
+    [Fact]
+    public void MalformedCoverageReport_FallsBackToUnknownRatherThanScoringZero()
+    {
+        // A report with no usable line-rate must not be read as 0% coverage.
+        var result = AnalyzeWithCoverage(lineRate: null);
+
+        result.Basis.Should().Contain("coverageFile=True");
+        result.Basis.Should().Contain("lineRate=n/a");
+        result.Score.Should().Be(10);
+    }
+
+    [Fact]
+    public void CoverageCeiling_DoesNotRaiseAScoreEarnedDownByOtherSignals()
+    {
+        // 100% line coverage cannot paper over placeholder tests: the ceiling only caps.
+        var tempDir = TempDir();
+        Directory.CreateDirectory(Path.Combine(tempDir, ".scorecard"));
+        File.WriteAllText(
+            Path.Combine(tempDir, ".scorecard", "coverage.cobertura.xml"),
+            @"<coverage line-rate=""1.0"" branch-rate=""1.0"" />");
+
+        try
+        {
+            var testCode = AttributePreamble + @"
+public class MyTests {
+    [Fact] public void TestOne() { Assert.True(true); }
+    [Fact] public void TestTwo() { }
+}
+";
+            var allProjects = new List<(string, Compilation)> { Project("MyApp.Core.Tests", testCode) };
+
+            var result = TestingProbe.Analyze(allProjects, new List<string>(), tempDir);
+
+            result.Score.Should().Be(4);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
     // ── 10. Status is "scored" ────────────────────────────────────────────────
 
     [Fact]
