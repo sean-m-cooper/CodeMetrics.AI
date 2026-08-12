@@ -243,6 +243,209 @@ public class ErrorHandlingProbeTests
     }
 
     [Fact]
+    public void BroadCatchLogsAndReturnsNull_DoesNotFindBroadCatchReturnsDefault()
+    {
+        // GooglePlacesClient.ResolveAnchorAsync and S3CategoryStore.GetExistingHashAsync:
+        // log the caught exception at Warning, then return the documented fallback.
+        const string code = """
+            using System;
+            class Logger { public void LogWarning(Exception ex, string msg) { } }
+            class C {
+                Logger _logger = new Logger();
+                object M() {
+                    try { return new object(); }
+                    catch (OperationCanceledException) { throw; }
+                    catch (Exception ex) {
+                        _logger.LogWarning(ex, "resolution failed");
+                        return null;
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "broadCatchReturnsDefault");
+        result.Findings.Should().NotContain(f => f.Category == "broadCatchWithoutLoggingOrRethrow");
+    }
+
+    [Fact]
+    public void BroadCatchLogsAndReturnsFalse_DoesNotFindBroadCatchReturnsDefault()
+    {
+        // SqsEmailService.SendScorecardEmailAsync: logs at Error, returns false.
+        const string code = """
+            using System;
+            class Logger { public void LogError(Exception ex, string msg) { } }
+            class C {
+                Logger _logger = new Logger();
+                bool M() {
+                    try { return true; }
+                    catch (OperationCanceledException) { throw; }
+                    catch (Exception ex) {
+                        _logger.LogError(ex, "email-queue-failed");
+                        return false;
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "broadCatchReturnsDefault");
+    }
+
+    [Fact]
+    public void BroadCatchLogsAndReturnsStringEmpty_DoesNotFindBroadCatchReturnsDefault()
+    {
+        // AgenticScorecardService.SafeApiCall: logs at Warning, returns string.Empty.
+        const string code = """
+            using System;
+            class Logger { public void LogWarning(Exception ex, string msg) { } }
+            class C {
+                Logger _logger = new Logger();
+                string M() {
+                    try { return "ok"; }
+                    catch (OperationCanceledException) { throw; }
+                    catch (Exception ex) {
+                        _logger.LogWarning(ex, "endpoint call failed");
+                        return string.Empty;
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "broadCatchReturnsDefault");
+    }
+
+    [Fact]
+    public void BroadCatchLogsInsideNestedBlock_DoesNotFindBroadCatchReturnsDefault()
+    {
+        const string code = """
+            using System;
+            class Logger { public void LogWarning(Exception ex, string msg) { } }
+            class C {
+                Logger _logger = new Logger();
+                object M(bool verbose) {
+                    try { return new object(); }
+                    catch (Exception ex) {
+                        if (verbose) {
+                            _logger.LogWarning(ex, "failed");
+                        }
+                        return null;
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "broadCatchReturnsDefault");
+        result.Findings.Should().NotContain(f => f.Category == "broadCatchWithoutLoggingOrRethrow");
+    }
+
+    [Fact]
+    public void BroadCatchLogsThroughHelper_DoesNotFindBroadCatchReturnsDefault()
+    {
+        const string code = """
+            using System;
+            static class LogExtensions { public static void LogFailure(this object o, Exception ex) { } }
+            class C {
+                object M() {
+                    try { return new object(); }
+                    catch (Exception ex) {
+                        this.LogFailure(ex);
+                        return null;
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "broadCatchReturnsDefault");
+    }
+
+    [Fact]
+    public void BroadCatchWrapsAndThrows_DoesNotFindBroadCatchReportedAsSwallowing()
+    {
+        const string code = """
+            using System;
+            class C {
+                object M() {
+                    try { return new object(); }
+                    catch (Exception ex) { throw new InvalidOperationException("wrapped", ex); }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "broadCatchWithoutLoggingOrRethrow");
+        result.Findings.Should().NotContain(f => f.Category == "broadCatchReturnsDefault");
+    }
+
+    [Fact]
+    public void PrecedingCancellationRethrow_DoesNotFindBroadCatchWithoutLoggingOrRethrow()
+    {
+        const string code = """
+            using System;
+            class C {
+                void M() {
+                    try { }
+                    catch (OperationCanceledException) { throw; }
+                    catch (Exception) { var x = 1; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "broadCatchWithoutLoggingOrRethrow");
+    }
+
+    [Fact]
+    public void PrecedingCancellationCatchWithoutRethrow_StillFindsBroadCatch()
+    {
+        // The cancellation clause swallows too, so it guarantees nothing.
+        const string code = """
+            using System;
+            class C {
+                object M() {
+                    try { return new object(); }
+                    catch (OperationCanceledException) { return null; }
+                    catch (Exception) { return null; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().Contain(f => f.Category == "broadCatchReturnsDefault");
+    }
+
+    [Fact]
+    public void SilentBroadCatchReturningNull_StillFindsBroadCatchReturnsDefault()
+    {
+        // True-positive control: no logging, no rethrow, no cancellation clause.
+        const string code = """
+            using System;
+            class C {
+                object M() {
+                    try { return new object(); }
+                    catch (Exception) { return null; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().Contain(f => f.Category == "broadCatchReturnsDefault");
+        result.Findings.Should().Contain(f => f.Category == "broadCatchWithoutLoggingOrRethrow");
+    }
+
+    [Fact]
     public void BroadCatchReturnsDefault_SeverityIsError()
     {
         const string code = """

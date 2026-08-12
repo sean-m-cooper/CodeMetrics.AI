@@ -125,11 +125,13 @@ public static class ErrorHandlingProbe
             bool isBroad = IsBroadCatch(catchClause);
             if (isBroad)
             {
-                bool hasLogging = HasLoggingCall(block);
-                bool hasBareRethrow = HasBareRethrow(block);
+                // A broad catch only swallows when nothing observes or propagates the
+                // exception. Both broad-catch rules share that test so a catch cannot
+                // be silent for one rule and handled for the other.
+                bool isHandled = IsHandledBroadCatch(catchClause);
 
                 // 3. broadCatchWithoutLoggingOrRethrow
-                if (!hasLogging && !hasBareRethrow)
+                if (!isHandled)
                 {
                     findings.Add(new Finding
                     {
@@ -144,7 +146,7 @@ public static class ErrorHandlingProbe
                 }
 
                 // 4. broadCatchReturnsDefault
-                if (ReturnsDefault(block))
+                if (!isHandled && ReturnsDefault(block))
                 {
                     findings.Add(new Finding
                     {
@@ -154,7 +156,8 @@ public static class ErrorHandlingProbe
                         Line = GetLine(catchClause),
                         Project = projectName,
                         Type = containingType,
-                        Message = "Broad catch block returns a default value, hiding exceptions."
+                        Message = "Broad catch block returns a default value without logging or " +
+                                  "rethrowing, hiding exceptions behind a successful-looking result."
                     });
                 }
             }
@@ -306,6 +309,19 @@ public static class ErrorHandlingProbe
         return typeName == "Exception" || typeName == "System.Exception";
     }
 
+    /// <summary>
+    /// A broad catch is handled — not swallowing — when the exception is recorded or
+    /// propagated. DescendantNodes is used throughout so a log call or throw nested in
+    /// an if, using or local function inside the catch body still counts.
+    /// </summary>
+    private static bool IsHandledBroadCatch(CatchClauseSyntax catchClause)
+    {
+        var block = catchClause.Block;
+        return HasLoggingCall(block)
+               || HasRethrow(block)
+               || HasPrecedingCancellationRethrow(catchClause);
+    }
+
     private static bool HasLoggingCall(BlockSyntax block)
     {
         return block.DescendantNodes()
@@ -317,11 +333,54 @@ public static class ErrorHandlingProbe
             });
     }
 
-    private static bool HasBareRethrow(BlockSyntax block)
+    /// <summary>
+    /// Any throw statement propagates. A bare 'throw;' preserves the stack trace and a
+    /// 'throw new Wrapped(ex);' surfaces the failure to the caller; neither swallows.
+    /// 'throw ex;' is reported separately by the throwEx rule, so counting it here
+    /// stops one catch from being penalised twice for a shape that does propagate.
+    /// </summary>
+    private static bool HasRethrow(BlockSyntax block)
     {
-        return block.DescendantNodes()
-            .OfType<ThrowStatementSyntax>()
-            .Any(t => t.Expression == null);
+        return block.DescendantNodes().OfType<ThrowStatementSyntax>().Any();
+    }
+
+    /// <summary>
+    /// True when an earlier catch clause on the same try rethrows cancellation, as in
+    /// 'catch (OperationCanceledException) { throw; }' ahead of a broad catch. The
+    /// broad catch is then a deliberate degrade-gracefully handler for real faults
+    /// rather than a blanket suppressor, because cancellation never reaches it.
+    /// </summary>
+    private static bool HasPrecedingCancellationRethrow(CatchClauseSyntax catchClause)
+    {
+        if (catchClause.Parent is not TryStatementSyntax tryStatement)
+            return false;
+
+        foreach (var preceding in tryStatement.Catches)
+        {
+            if (preceding == catchClause)
+                break;
+
+            if (IsCancellationCatch(preceding) && HasRethrow(preceding.Block))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsCancellationCatch(CatchClauseSyntax catchClause)
+    {
+        // A 'when' filter means the clause may decline the exception, so it cannot be
+        // relied on to propagate cancellation.
+        if (catchClause.Filter != null)
+            return false;
+
+        var typeName = catchClause.Declaration?.Type.ToString();
+        if (typeName == null)
+            return false;
+
+        // Strip any namespace qualifier: System.OperationCanceledException → OperationCanceledException.
+        var simpleName = typeName[(typeName.LastIndexOf('.') + 1)..];
+        return simpleName is "OperationCanceledException" or "TaskCanceledException";
     }
 
     private static bool ReturnsDefault(BlockSyntax block)
