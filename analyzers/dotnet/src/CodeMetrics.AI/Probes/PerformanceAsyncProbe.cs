@@ -25,7 +25,7 @@ public static class PerformanceAsyncProbe
                 AnalyzeSaveChangesInsideLoop(root, filePath, projectName, findings);
                 AnalyzeMissingCancellationToken(root, filePath, projectName, findings);
                 AnalyzeMaterializationBeforeQueryShape(root, filePath, projectName, findings);
-                AnalyzeAwaitedIoInsideLoop(root, filePath, projectName, findings);
+                AnalyzeAwaitedIoInsideLoop(root, semanticModel, filePath, projectName, findings);
                 AnalyzeUnboundedWhenAll(root, filePath, projectName, findings);
             }
         }
@@ -287,7 +287,8 @@ public static class PerformanceAsyncProbe
 
     // 6. awaitedIoInsideLoop: await <IoMethod>Async inside a loop
     private static void AnalyzeAwaitedIoInsideLoop(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName,
+        List<Finding> findings)
     {
         var awaitExpressions = root.DescendantNodes().OfType<AwaitExpressionSyntax>();
         var ioVerbs = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -297,7 +298,11 @@ public static class PerformanceAsyncProbe
 
         foreach (var awaitExpr in awaitExpressions)
         {
-            if (!IsInsideLoop(awaitExpr))
+            // The innermost loop is the one whose iterations this await would have to be
+            // batched across. Judging the await against an outer loop instead would let a
+            // cursor-driven outer loop hide a genuine N+1 nested inside it.
+            var loop = InnermostLoop(awaitExpr);
+            if (loop == null)
                 continue;
 
             var containingMethod = awaitExpr.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault();
@@ -321,7 +326,17 @@ public static class PerformanceAsyncProbe
             if (methodName == "SaveChangesAsync")
                 continue;
 
-            if (IsCursorPaginationLoop(awaitExpr))
+            // The rule's premise is that N sequential awaits should have been one batched
+            // call. Where each iteration causally requires the previous response, or where
+            // the blocking await is itself the mechanism the author wanted, there is nothing
+            // to batch and the finding would be a false positive.
+            if (IsContinuationDependentLoop(loop))
+                continue;
+
+            if (IsBoundedFallbackSequence(loop))
+                continue;
+
+            if (IsBackpressurePrimitive(semanticModel, awaitExpr))
                 continue;
 
             // Check if name contains one of the IO verbs
@@ -407,7 +422,12 @@ public static class PerformanceAsyncProbe
 
     private static bool IsInsideLoop(SyntaxNode node)
     {
-        return node.Ancestors().Any(a =>
+        return InnermostLoop(node) != null;
+    }
+
+    private static SyntaxNode? InnermostLoop(SyntaxNode node)
+    {
+        return node.Ancestors().FirstOrDefault(a =>
             a is ForStatementSyntax or
             ForEachStatementSyntax or
             WhileStatementSyntax or
@@ -452,43 +472,210 @@ public static class PerformanceAsyncProbe
                method.ExplicitInterfaceSpecifier != null;
     }
 
-    private static bool IsCursorPaginationLoop(AwaitExpressionSyntax awaitExpr)
+    // ── Sequential-by-necessity loop shapes ───────────────────────────────────
+    // These recognisers exist to remove false positives, so each one is a
+    // conjunction of signals rather than a single suggestive name, and each bails
+    // out to "flag it" whenever the shape is not unmistakable.
+
+    /// <summary>
+    /// True when the loop cannot decide whether to continue without the previous
+    /// iteration's awaited result — the cursor / continuation-token shape. Iteration
+    /// N+1's request is built from iteration N's response, so requesting page 2 before
+    /// reading page 1 is not merely slower but impossible, and there is no batched form
+    /// to suggest.
+    /// <para>
+    /// Only condition-driven loops qualify. A <c>foreach</c> iterates a sequence that is
+    /// fully determined before the first await, so it can never be cursor-driven — which
+    /// is what keeps the ordinary <c>foreach (var id in ids) await GetAsync(id)</c> N+1
+    /// firing.
+    /// </para>
+    /// </summary>
+    private static bool IsContinuationDependentLoop(SyntaxNode loop)
     {
-        var resultVariable = GetAwaitedResultVariable(awaitExpr);
-        if (resultVariable == null)
+        var condition = LoopCondition(loop);
+        if (condition == null)
             return false;
 
-        var loop = awaitExpr.Ancestors().FirstOrDefault(a =>
-            a is ForStatementSyntax or
-            ForEachStatementSyntax or
-            WhileStatementSyntax or
-            DoStatementSyntax);
-
-        if (loop == null)
+        var body = LoopBody(loop);
+        if (body == null)
             return false;
 
-        var tokenNames = new HashSet<string>(StringComparer.Ordinal)
+        var conditionReads = ReadLocations(condition);
+        if (conditionReads.Count == 0)
+            return false;
+
+        return conditionReads.Overlaps(AwaitDerivedLocations(body));
+    }
+
+    /// <summary>
+    /// True for a <c>foreach</c> over a short inline literal whose body can exit early —
+    /// <c>foreach (var url in new[] { https, http }) { ... return; }</c>. The candidates
+    /// are fixed at authoring time so there is no N to multiply, and the loop stops at the
+    /// first success so issuing them concurrently would do strictly more work than the
+    /// sequential form. Both halves are required: a short literal that always visits every
+    /// element still batches cleanly and stays flagged.
+    /// </summary>
+    private static bool IsBoundedFallbackSequence(SyntaxNode loop)
+    {
+        if (loop is not ForEachStatementSyntax forEach)
+            return false;
+
+        var candidates = InlineLiteralElementCount(forEach.Expression);
+        if (candidates is null || candidates > MaxFallbackCandidates)
+            return false;
+
+        return forEach.Statement.DescendantNodesAndSelf()
+            .Any(n => n is ReturnStatementSyntax or BreakStatementSyntax);
+    }
+
+    /// <summary>
+    /// True when the awaited member belongs to a type whose whole purpose is to block:
+    /// a bounded channel write waits precisely to apply back-pressure, and a semaphore
+    /// wait blocks precisely to cap concurrency. Hoisting these into
+    /// <c>Task.WhenAll</c> defeats the bound the author asked for.
+    /// <para>
+    /// Resolved through the semantic model against real framework types, the same way
+    /// <see cref="IsTaskLikeReceiver"/> settles sync-over-async, so a user type merely
+    /// named "…Channel" is not matched.
+    /// </para>
+    /// </summary>
+    private static bool IsBackpressurePrimitive(SemanticModel semanticModel, AwaitExpressionSyntax awaitExpr)
+    {
+        if (awaitExpr.Expression is not InvocationExpressionSyntax invocation)
+            return false;
+
+        if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol method)
+            return false;
+
+        var owner = method.ContainingType?.OriginalDefinition;
+        if (owner == null)
+            return false;
+
+        var qualifiedName = $"{owner.ContainingNamespace?.ToDisplayString()}.{owner.Name}";
+        return BackpressureTypes.Contains(qualifiedName);
+    }
+
+    private const int MaxFallbackCandidates = 4;
+
+    private static readonly HashSet<string> BackpressureTypes = new(StringComparer.Ordinal)
+    {
+        "System.Threading.Channels.ChannelWriter",
+        "System.Threading.Channels.ChannelReader",
+        "System.Threading.SemaphoreSlim"
+    };
+
+    /// <summary>
+    /// Locations in the loop body whose value comes, directly or through a chain of local
+    /// assignments, from an awaited call in the same body. The walk runs to a fixed point so
+    /// a multi-hop chain resolves: <c>json = await Read(); page = Deserialize(json);
+    /// token = page.NextPageToken</c> yields all three, which is what connects the awaited
+    /// response to the loop condition that reads <c>token</c>.
+    /// </summary>
+    private static HashSet<string> AwaitDerivedLocations(SyntaxNode body)
+    {
+        var writes = new List<(string Target, ExpressionSyntax Value)>();
+
+        foreach (var node in body.DescendantNodes())
         {
-            "NextToken", "ContinuationToken", "NextPageToken", "PageToken", "Cursor"
-        };
+            switch (node)
+            {
+                case VariableDeclaratorSyntax { Initializer: { } initializer } declarator:
+                    writes.Add((declarator.Identifier.Text, initializer.Value));
+                    break;
+                case AssignmentExpressionSyntax assignment when LocationKey(assignment.Left) is { } target:
+                    writes.Add((target, assignment.Right));
+                    break;
+            }
+        }
 
-        return loop.DescendantNodes()
-            .OfType<AssignmentExpressionSyntax>()
-            .Any(assignment =>
-                assignment.Right is MemberAccessExpressionSyntax memberAccess &&
-                memberAccess.Expression is IdentifierNameSyntax id &&
-                id.Identifier.Text == resultVariable &&
-                tokenNames.Contains(memberAccess.Name.Identifier.Text));
+        var derived = new HashSet<string>(StringComparer.Ordinal);
+
+        bool changed = true;
+        while (changed)
+        {
+            changed = false;
+            foreach (var (target, value) in writes)
+            {
+                if (derived.Contains(target))
+                    continue;
+
+                bool fromAwait =
+                    value.DescendantNodesAndSelf().OfType<AwaitExpressionSyntax>().Any() ||
+                    ReadLocations(value).Overlaps(derived);
+
+                if (fromAwait)
+                    changed |= derived.Add(target);
+            }
+        }
+
+        return derived;
     }
 
-    private static string? GetAwaitedResultVariable(AwaitExpressionSyntax awaitExpr)
+    /// <summary>
+    /// Location keys — normalised source text — for every value an expression reads. A member
+    /// access contributes both its full path and its rooted prefixes, so <c>page?.NextPageToken</c>
+    /// yields "page" and "page.NextPageToken"; the prefix is what lets the derivation walk connect
+    /// a write of <c>token</c> to the awaited value held in <c>page</c>.
+    /// </summary>
+    private static HashSet<string> ReadLocations(SyntaxNode expression)
     {
-        var variable = awaitExpr.Ancestors()
-            .OfType<VariableDeclaratorSyntax>()
-            .FirstOrDefault(v => v.Initializer?.Value == awaitExpr);
+        var keys = new HashSet<string>(StringComparer.Ordinal);
 
-        return variable?.Identifier.Text;
+        foreach (var node in expression.DescendantNodesAndSelf())
+        {
+            if (node is IdentifierNameSyntax id)
+            {
+                // The member half of 'a.B' is not a location of its own; only 'a' and the
+                // full path "a.B" are. Keeping 'B' would let unrelated same-named members
+                // collide and silently suppress a real finding.
+                if (id.Parent is MemberAccessExpressionSyntax parent && parent.Name == id)
+                    continue;
+
+                keys.Add(id.Identifier.Text);
+            }
+            else if (node is MemberAccessExpressionSyntax memberAccess &&
+                     LocationKey(memberAccess) is { } key)
+            {
+                keys.Add(key);
+            }
+        }
+
+        return keys;
     }
+
+    /// <summary>Dotted path for an expression rooted at a plain identifier, else null.</summary>
+    private static string? LocationKey(ExpressionSyntax expression) => expression switch
+    {
+        IdentifierNameSyntax id => id.Identifier.Text,
+        MemberAccessExpressionSyntax ma when ma.IsKind(SyntaxKind.SimpleMemberAccessExpression) =>
+            LocationKey(ma.Expression) is { } root ? $"{root}.{ma.Name.Identifier.Text}" : null,
+        _ => null
+    };
+
+    private static int? InlineLiteralElementCount(ExpressionSyntax expression) => expression switch
+    {
+        ArrayCreationExpressionSyntax { Initializer: { } initializer } => initializer.Expressions.Count,
+        ImplicitArrayCreationExpressionSyntax implicitArray => implicitArray.Initializer.Expressions.Count,
+        CollectionExpressionSyntax collection => collection.Elements.Count,
+        _ => null
+    };
+
+    private static ExpressionSyntax? LoopCondition(SyntaxNode loop) => loop switch
+    {
+        WhileStatementSyntax w => w.Condition,
+        DoStatementSyntax d => d.Condition,
+        ForStatementSyntax f => f.Condition,
+        _ => null
+    };
+
+    private static StatementSyntax? LoopBody(SyntaxNode loop) => loop switch
+    {
+        WhileStatementSyntax w => w.Statement,
+        DoStatementSyntax d => d.Statement,
+        ForStatementSyntax f => f.Statement,
+        ForEachStatementSyntax fe => fe.Statement,
+        _ => null
+    };
 
     private static bool IsTaskReturnType(TypeSyntax returnType)
     {
