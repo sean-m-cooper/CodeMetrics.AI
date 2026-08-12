@@ -35,19 +35,27 @@ public static class ErrorHandlingProbe
         var warnings = findings.Count(f => f.Severity == "warning");
         var errors = findings.Count(f => f.Severity == "error");
 
+        // Ladder rungs, matching SecurityProbe's convention of reserving 0/2/4 for
+        // error-severity and structural findings and 6/8 for the warning tail:
+        //   0  systemic       — five or more empty catches or default-returning broad catches
+        //   2  errors         — any empty catch or 'throw ex;'
+        //   4  structural     — a default-returning broad catch or a sync-blocking call
+        //   6  noisy          — more than three advisory warnings
+        //   8  minor          — one to three advisory warnings, no errors
+        //  10  clean          — no findings
         double score;
         if (emptyCatches >= 5 || broadDefaults >= 5)
             score = 0;
         else if (emptyCatches > 0 || throwExes > 0)
             score = 2;
-        else if (hasBroadDefault || hasSyncBlock || warnings > 3)
+        else if (hasBroadDefault || hasSyncBlock)
             score = 4;
+        else if (warnings > 3)
+            score = 6;
         else if (warnings > 0)
-            score = 6;
-        else if (errors == 0 && warnings == 0)
-            score = 10;
+            score = 8;
         else
-            score = 6;
+            score = 10;
 
         var basis = $"Findings: {findings.Count} (errors: {errors}, warnings: {warnings}). " +
                     $"emptyCatch={emptyCatches}, throwEx={throwExes}, broadDefaults={broadDefaults}.";

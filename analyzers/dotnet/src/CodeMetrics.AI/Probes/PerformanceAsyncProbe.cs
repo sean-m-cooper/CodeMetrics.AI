@@ -35,6 +35,15 @@ public static class PerformanceAsyncProbe
         var hasSyncOverAsync = findings.Any(f => f.Category == "syncOverAsync" && f.Severity == "error");
         var hasSaveChangesInsideLoop = findings.Any(f => f.Category == "saveChangesInsideLoop");
 
+        // Ladder rungs. The warning tail spans 4/6/8 rather than SecurityProbe's 6/8
+        // because rung 4 has no structural condition of its own here — collapsing
+        // 'warnings > 3' upward would make 4 unreachable while fixing the missing 8.
+        //   0  systemic  — five or more error-severity findings
+        //   2  errors    — sync-over-async, SaveChanges in a loop, or any error finding
+        //   4  noisy     — more than three advisory warnings
+        //   6  several   — two or three advisory warnings
+        //   8  minor     — a single advisory warning, no errors
+        //  10  clean     — no findings
         double score;
         if (errors >= 5)
             score = 0;
@@ -42,8 +51,10 @@ public static class PerformanceAsyncProbe
             score = 2;
         else if (warnings > 3)
             score = 4;
-        else if (warnings > 0)
+        else if (warnings > 1)
             score = 6;
+        else if (warnings > 0)
+            score = 8;
         else
             score = 10;
 

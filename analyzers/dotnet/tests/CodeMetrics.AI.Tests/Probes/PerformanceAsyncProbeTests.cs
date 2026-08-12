@@ -872,7 +872,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void OnlyThreadSleepWarning_ScoreIs6()
+    public void OnlyThreadSleepWarning_ScoreIs8()
     {
         const string code = """
             using System.Threading;
@@ -883,6 +883,24 @@ public class PerformanceAsyncProbeTests
 
         var result = Analyze(code);
 
+        result.Findings.Count(f => f.Severity == "warning").Should().Be(1);
+        result.Score.Should().Be(8);
+    }
+
+    [Fact]
+    public void TwoWarnings_ScoreIs6()
+    {
+        const string code = """
+            using System.Threading;
+            class C {
+                void M1() { Thread.Sleep(100); }
+                void M2() { Thread.Sleep(200); }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Count(f => f.Severity == "warning").Should().Be(2);
         result.Score.Should().Be(6);
     }
 

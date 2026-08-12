@@ -738,7 +738,82 @@ public class ErrorHandlingProbeTests
     }
 
     [Fact]
-    public void OnlyWarning_ScoreIs6()
+    public void BroadCatchReturnsDefault_ScoreIs4()
+    {
+        const string code = """
+            using System;
+            class C {
+                object M() {
+                    try { return new object(); }
+                    catch (Exception) { return null; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Score.Should().Be(4);
+    }
+
+    [Fact]
+    public void MoreThanThreeWarnings_ScoreIs6()
+    {
+        // Four silent broad catches, one per type so missingLoggerForMultipleCatches
+        // (which needs two catches in one type) does not add a fifth warning.
+        const string code = """
+            using System;
+            class C1 { void M() { try { } catch (Exception) { var x = 1; } } }
+            class C2 { void M() { try { } catch (Exception) { var x = 2; } } }
+            class C3 { void M() { try { } catch (Exception) { var x = 3; } } }
+            class C4 { void M() { try { } catch (Exception) { var x = 4; } } }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Count(f => f.Severity == "warning").Should().Be(4);
+        result.Findings.Should().NotContain(f => f.Severity == "error");
+        result.Score.Should().Be(6);
+    }
+
+    [Fact]
+    public void OneToThreeWarnings_ScoreIs8()
+    {
+        // A single silent broad catch — the "minor gaps, no systemic issues" rung.
+        const string code = """
+            using System;
+            class C {
+                void M() {
+                    try { }
+                    catch (Exception) { var x = 1; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Count(f => f.Severity == "warning").Should().Be(1);
+        result.Findings.Should().NotContain(f => f.Severity == "error");
+        result.Score.Should().Be(8);
+    }
+
+    [Fact]
+    public void ThreeWarnings_ScoreIs8()
+    {
+        const string code = """
+            using System;
+            class C1 { void M() { try { } catch (Exception) { var x = 1; } } }
+            class C2 { void M() { try { } catch (Exception) { var x = 2; } } }
+            class C3 { void M() { try { } catch (Exception) { var x = 3; } } }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Count(f => f.Severity == "warning").Should().Be(3);
+        result.Score.Should().Be(8);
+    }
+
+    [Fact]
+    public void OnlyWarning_ScoreIs8()
     {
         const string code = """
             using System;
@@ -753,8 +828,59 @@ public class ErrorHandlingProbeTests
 
         var result = Analyze(code);
 
-        // missingLoggerForMultipleCatches is a warning → score 6
-        result.Score.Should().BeGreaterThanOrEqualTo(4);
+        // missingLoggerForMultipleCatches is the only warning → score 8
+        result.Score.Should().Be(8);
+    }
+
+    [Fact]
+    public void EveryRungIsReachable_NoLadderGaps()
+    {
+        // Guards against a rung being unreachable, which is what left 8 missing and
+        // the trailing 'errors != 0 || warnings != 0' branch dead.
+        const string severe = """
+            using System;
+            class C {
+                void M1() { try { } catch (Exception) { } }
+                void M2() { try { } catch (Exception) { } }
+                void M3() { try { } catch (Exception) { } }
+                void M4() { try { } catch (Exception) { } }
+                void M5() { try { } catch (Exception) { } }
+            }
+            """;
+        const string errorRung = """
+            using System;
+            class C { void M() { try { } catch (Exception) { } } }
+            """;
+        const string structural = """
+            using System;
+            class C {
+                object M() {
+                    try { return new object(); }
+                    catch (Exception) { return null; }
+                }
+            }
+            """;
+        const string noisy = """
+            using System;
+            class C1 { void M() { try { } catch (Exception) { var x = 1; } } }
+            class C2 { void M() { try { } catch (Exception) { var x = 2; } } }
+            class C3 { void M() { try { } catch (Exception) { var x = 3; } } }
+            class C4 { void M() { try { } catch (Exception) { var x = 4; } } }
+            """;
+        const string minor = """
+            using System;
+            class C { void M() { try { } catch (Exception) { var x = 1; } } }
+            """;
+        const string clean = """
+            class C { void M() { int x = 1 + 1; } }
+            """;
+
+        Analyze(severe).Score.Should().Be(0);
+        Analyze(errorRung).Score.Should().Be(2);
+        Analyze(structural).Score.Should().Be(4);
+        Analyze(noisy).Score.Should().Be(6);
+        Analyze(minor).Score.Should().Be(8);
+        Analyze(clean).Score.Should().Be(10);
     }
 
     // ── Metadata ──────────────────────────────────────────────────────────────
