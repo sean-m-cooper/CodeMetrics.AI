@@ -177,11 +177,8 @@ public static class DocumentationProbe
 
         foreach (var (_, compilation, _) in libraryProjects)
         {
-            foreach (var tree in compilation.SyntaxTrees)
+            foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
             {
-                if (!SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
-                    continue;
-
                 var root = tree.GetRoot();
 
                 // Public types

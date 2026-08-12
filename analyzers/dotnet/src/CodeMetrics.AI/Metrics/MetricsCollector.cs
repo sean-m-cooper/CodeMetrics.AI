@@ -11,11 +11,8 @@ public static class MetricsCollector
         var types = new List<TypeMetrics>();
         var members = new List<MemberMetrics>();
 
-        foreach (var tree in compilation.SyntaxTrees)
+        foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
         {
-            if (solutionDir != null && !SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
-                continue;
-
             var semanticModel = compilation.GetSemanticModel(tree);
             var root = tree.GetRoot();
             var filePath = tree.FilePath;

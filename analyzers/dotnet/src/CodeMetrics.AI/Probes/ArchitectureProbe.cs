@@ -48,11 +48,8 @@ public static class ArchitectureProbe
         // 2. Convention-based layering findings
         foreach (var (projectName, compilation) in projects)
         {
-            foreach (var tree in compilation.SyntaxTrees)
+            foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
             {
-                if (!SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
-                    continue;
-
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
                 var semanticModel = compilation.GetSemanticModel(tree);

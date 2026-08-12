@@ -38,11 +38,8 @@ public static class TestingProbe
 
         foreach (var (projectName, compilation) in testProjects)
         {
-            foreach (var tree in compilation.SyntaxTrees)
+            foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
             {
-                if (!SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
-                    continue;
-
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
 
@@ -131,11 +128,8 @@ public static class TestingProbe
             return true;
 
         // Source-based detection: any method with a test attribute
-        foreach (var tree in compilation.SyntaxTrees)
+        foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
         {
-            if (!SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
-                continue;
-
             var root = tree.GetRoot();
             var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
             foreach (var method in methods)

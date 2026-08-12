@@ -27,11 +27,8 @@ public static class SecurityProbe
 
         foreach (var (projectName, compilation) in projects)
         {
-            foreach (var tree in compilation.SyntaxTrees)
+            foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
             {
-                if (solutionDir != null && !SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
-                    continue;
-
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
 
@@ -316,8 +313,7 @@ public static class SecurityProbe
     {
         // First pass: does the project use [Authorize] at all?
         bool projectUsesAuthorize = false;
-        var allRoots = compilation.SyntaxTrees
-            .Where(t => solutionDir == null || SourceFileFilter.ShouldAnalyze(t.FilePath, solutionDir))
+        var allRoots = SourceFileFilter.AnalyzableTrees(compilation, solutionDir)
             .Select(t => t.GetRoot())
             .ToList();
 
