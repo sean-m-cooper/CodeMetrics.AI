@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -52,27 +54,35 @@ public static class TestingProbe
             ? (double)assertionCount / testMethodCount
             : 0.0;
 
+        // Coverage report. The file's existence only says a tool ran, so it is recorded
+        // but never scored; the line rate inside it is the actual quality signal.
+        var coveragePath = string.IsNullOrEmpty(solutionDir)
+            ? null
+            : Path.Combine(solutionDir, ".scorecard", "coverage.cobertura.xml");
+        bool coverageFileFound = coveragePath != null && File.Exists(coveragePath);
+        var coverage = coverageFileFound ? ReadCoverageRates(coveragePath!) : null;
+
         // Determine uncovered production projects
         var testProjectNames = testProjects.Select(p => p.Name).ToList();
         var uncoveredProjects = FindUncoveredProductionProjects(analyzedProjectNames, testProjectNames);
 
         foreach (var uncovered in uncoveredProjects)
         {
+            // This is a name-matching guess: it flags a production project with no
+            // '*.Tests'-named counterpart, which is wrong for the common layout where one
+            // shared test project covers several production projects. When a measured
+            // coverage report is available it supersedes the guess, so the finding drops
+            // to advisory and stops gating the score below.
             findings.Add(new Finding
             {
                 Category = "uncoveredProject",
-                Severity = "warning",
+                Severity = coverage != null ? "info" : "warning",
                 Project = uncovered,
-                Message = $"Production project '{uncovered}' has no matching test project."
+                Message = coverage != null
+                    ? $"Production project '{uncovered}' has no matching test project by name. " +
+                      "Measured coverage is available and takes precedence over this heuristic."
+                    : $"Production project '{uncovered}' has no matching test project."
             });
-        }
-
-        // Check for coverage file
-        bool coverageFileFound = false;
-        if (!string.IsNullOrEmpty(solutionDir))
-        {
-            var coveragePath = Path.Combine(solutionDir, ".scorecard", "coverage.cobertura.xml");
-            coverageFileFound = File.Exists(coveragePath);
         }
 
         // Scoring (first match wins)
@@ -83,17 +93,28 @@ public static class TestingProbe
             score = 2;
         else if (placeholderTests > 0 || skippedTests > 2)
             score = 4;
-        else if (uncoveredProjects.Count > 0 || assertionDensity < 1.0)
+        else if ((coverage == null && uncoveredProjects.Count > 0) || assertionDensity < 1.0)
             score = 6;
         else if (skippedTests > 0)
             score = 8;
         else
             score = 10;
 
+        // A measured line rate caps the dimension. Applied as a ceiling rather than as
+        // extra rungs so the signals above still pull the score down on their own, and so
+        // solutions with no coverage report keep the previous behaviour exactly.
+        if (coverage != null)
+            score = Math.Min(score, CoverageCeiling(coverage.LineRate));
+
+        var coverageBasis = coverage != null
+            ? $"lineRate={coverage.LineRate * 100:F1}%, branchRate={coverage.BranchRate * 100:F1}%"
+            : "lineRate=n/a";
+
         var basis = $"testProjects={testProjects.Count}, testMethods={testMethodCount}, " +
                     $"skipped={skippedTests}, placeholders={placeholderTests}, " +
                     $"assertions={assertionCount}, assertionDensity={assertionDensity:F2}, " +
-                    $"uncoveredProjects={uncoveredProjects.Count}, coverageFile={coverageFileFound}.";
+                    $"uncoveredProjects={uncoveredProjects.Count}, coverageFile={coverageFileFound}, " +
+                    $"{coverageBasis}.";
 
         return new DimensionResult
         {
@@ -113,10 +134,68 @@ public static class TestingProbe
                     assertions = assertionCount,
                     assertionDensity,
                     uncoveredProjects,
-                    coverageFileFound
+                    coverageFileFound,
+                    lineRate = coverage?.LineRate,
+                    branchRate = coverage?.BranchRate
                 }
             }
         };
+    }
+
+    // ── Coverage report ───────────────────────────────────────────────────────
+
+    private sealed record CoverageRates(double LineRate, double BranchRate);
+
+    /// <summary>
+    /// Reads the overall <c>line-rate</c> and <c>branch-rate</c> from a Cobertura report's
+    /// root element. Returns null when the report is unreadable, malformed, or carries no
+    /// usable rate, so the caller falls back to treating coverage as unknown rather than
+    /// inventing a number.
+    /// </summary>
+    private static CoverageRates? ReadCoverageRates(string coveragePath)
+    {
+        try
+        {
+            var root = XDocument.Load(coveragePath).Root;
+            if (root == null)
+                return null;
+
+            var lineRate = ParseRate(root.Attribute("line-rate")?.Value);
+            if (lineRate == null)
+                return null;
+
+            return new CoverageRates(
+                lineRate.Value,
+                ParseRate(root.Attribute("branch-rate")?.Value) ?? 0.0);
+        }
+        catch (Exception ex) when (ex is IOException
+                                      or UnauthorizedAccessException
+                                      or System.Xml.XmlException)
+        {
+            return null;
+        }
+    }
+
+    private static double? ParseRate(string? value)
+    {
+        return double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var rate)
+               && rate is >= 0.0 and <= 1.0
+            ? rate
+            : null;
+    }
+
+    /// <summary>
+    /// Highest score a measured line rate permits, on conventional gates: 80% is a commonly
+    /// required threshold, 60% acceptable, 40% weak, 20% token, below that effectively
+    /// untested regardless of how many test methods exist.
+    /// </summary>
+    private static double CoverageCeiling(double lineRate)
+    {
+        if (lineRate >= 0.80) return 10;
+        if (lineRate >= 0.60) return 8;
+        if (lineRate >= 0.40) return 6;
+        if (lineRate >= 0.20) return 4;
+        return 2;
     }
 
     // ── Test project detection ────────────────────────────────────────────────
