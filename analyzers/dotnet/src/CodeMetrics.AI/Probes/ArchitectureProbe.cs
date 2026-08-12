@@ -71,15 +71,23 @@ public static class ArchitectureProbe
 
         // Ladder rungs. The warning tail spans 4/6/8 for the same reason as
         // PerformanceAsyncProbe: rung 4 has no structural condition of its own.
-        //   2  errors   — project cycles (error findings), layering errors, or hotspots
+        //   0  broken   — a circular project reference
+        //   2  errors   — layering errors or metric hotspots
         //   4  noisy    — more than two advisory warnings
         //   6  several   — two advisory warnings
         //   8  minor    — a single advisory warning, no errors or hotspots
         //  10  clean    — no findings
-        // hasCycles needs no branch of its own: cycles are emitted as error-severity
-        // findings, so hasErrors already covers them and scored the same 2 either way.
+        // Cycles get rung 0 of their own rather than sharing 2 with everything else. A
+        // cyclic project graph is not a poor architecture but an absent one: the
+        // dependency direction the layering rules are checked against does not exist, so
+        // the remaining findings are measured against nothing. Without this rung the
+        // worst achievable score was 2, leaving a catastrophically broken architecture
+        // indistinguishable from a merely untidy one — the mirror of the missing-8 bug.
+        var hasCycles = cycles.Count > 0;
         double score;
-        if (hasErrors || hasHotspots)
+        if (hasCycles)
+            score = 0;
+        else if (hasErrors || hasHotspots)
             score = 2;
         else if (warningCount > 2)
             score = 4;
