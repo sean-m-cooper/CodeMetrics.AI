@@ -14,15 +14,13 @@ public static class PerformanceAsyncProbe
 
         foreach (var (projectName, compilation) in projects)
         {
-            foreach (var tree in compilation.SyntaxTrees)
+            foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
             {
-                if (solutionDir != null && !SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
-                    continue;
-
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
+                var semanticModel = compilation.GetSemanticModel(tree);
 
-                AnalyzeSyncOverAsync(root, filePath, projectName, findings);
+                AnalyzeSyncOverAsync(root, semanticModel, filePath, projectName, findings);
                 AnalyzeThreadSleep(root, filePath, projectName, findings);
                 AnalyzeSaveChangesInsideLoop(root, filePath, projectName, findings);
                 AnalyzeMissingCancellationToken(root, filePath, projectName, findings);
@@ -37,6 +35,15 @@ public static class PerformanceAsyncProbe
         var hasSyncOverAsync = findings.Any(f => f.Category == "syncOverAsync" && f.Severity == "error");
         var hasSaveChangesInsideLoop = findings.Any(f => f.Category == "saveChangesInsideLoop");
 
+        // Ladder rungs. The warning tail spans 4/6/8 rather than SecurityProbe's 6/8
+        // because rung 4 has no structural condition of its own here — collapsing
+        // 'warnings > 3' upward would make 4 unreachable while fixing the missing 8.
+        //   0  systemic  — five or more error-severity findings
+        //   2  errors    — sync-over-async, SaveChanges in a loop, or any error finding
+        //   4  noisy     — more than three advisory warnings
+        //   6  several   — two or three advisory warnings
+        //   8  minor     — a single advisory warning, no errors
+        //  10  clean     — no findings
         double score;
         if (errors >= 5)
             score = 0;
@@ -44,8 +51,10 @@ public static class PerformanceAsyncProbe
             score = 2;
         else if (warnings > 3)
             score = 4;
-        else if (warnings > 0)
+        else if (warnings > 1)
             score = 6;
+        else if (warnings > 0)
+            score = 8;
         else
             score = 10;
 
@@ -69,7 +78,8 @@ public static class PerformanceAsyncProbe
 
     // 1. syncOverAsync: .Result, .Wait(), .GetAwaiter().GetResult()
     private static void AnalyzeSyncOverAsync(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName,
+        List<Finding> findings)
     {
         var memberAccesses = root.DescendantNodes().OfType<MemberAccessExpressionSyntax>();
 
@@ -77,7 +87,7 @@ public static class PerformanceAsyncProbe
         {
             var memberName = ma.Name.Identifier.Text;
 
-            if (memberName == "Result")
+            if (memberName == "Result" && IsTaskLikeReceiver(semanticModel, ma.Expression))
             {
                 findings.Add(new Finding
                 {
@@ -94,7 +104,8 @@ public static class PerformanceAsyncProbe
             {
                 if (ma.Expression is InvocationExpressionSyntax inv &&
                     inv.Expression is MemberAccessExpressionSyntax innerMa &&
-                    innerMa.Name.Identifier.Text == "GetAwaiter")
+                    innerMa.Name.Identifier.Text == "GetAwaiter" &&
+                    IsTaskLikeReceiver(semanticModel, innerMa.Expression))
                 {
                     findings.Add(new Finding
                     {
@@ -114,7 +125,8 @@ public static class PerformanceAsyncProbe
         foreach (var inv in invocations)
         {
             if (inv.Expression is MemberAccessExpressionSyntax ma2 &&
-                ma2.Name.Identifier.Text == "Wait")
+                ma2.Name.Identifier.Text == "Wait" &&
+                IsTaskLikeReceiver(semanticModel, ma2.Expression))
             {
                 findings.Add(new Finding
                 {
@@ -387,6 +399,11 @@ public static class PerformanceAsyncProbe
     }
 
     // --- Helpers ---
+
+    private static bool IsTaskLikeReceiver(SemanticModel semanticModel, ExpressionSyntax receiver)
+    {
+        return TaskTypes.IsTaskLike(semanticModel.GetTypeInfo(receiver).Type);
+    }
 
     private static bool IsInsideLoop(SyntaxNode node)
     {

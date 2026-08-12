@@ -515,7 +515,23 @@ public class ArchitectureProbeTests
     }
 
     [Fact]
-    public void Scoring_With1To2Warnings_ReturnsScore6()
+    public void Scoring_With2Warnings_ReturnsScore6()
+    {
+        const string code = """
+            public class SqlGateway { }
+            public class HttpClientWrapper { }
+            public class UserService { public UserService(SqlGateway g) { } }
+            public class OrderService { public OrderService(HttpClientWrapper c) { } }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Count(f => f.Severity == "warning").Should().Be(2);
+        result.Score.Should().Be(6);
+    }
+
+    [Fact]
+    public void Scoring_WithSingleWarning_ReturnsScore8()
     {
         const string code = """
             public class SqlGateway { }
@@ -524,7 +540,8 @@ public class ArchitectureProbeTests
 
         var result = Analyze(code);
 
-        result.Score.Should().Be(6);
+        result.Findings.Count(f => f.Severity == "warning").Should().Be(1);
+        result.Score.Should().Be(8);
     }
 
     // ── 6. Extra data ─────────────────────────────────────────────────────────

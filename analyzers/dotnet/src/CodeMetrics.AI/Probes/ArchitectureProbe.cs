@@ -48,11 +48,8 @@ public static class ArchitectureProbe
         // 2. Convention-based layering findings
         foreach (var (projectName, compilation) in projects)
         {
-            foreach (var tree in compilation.SyntaxTrees)
+            foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
             {
-                if (!SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
-                    continue;
-
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
                 var semanticModel = compilation.GetSemanticModel(tree);
@@ -68,20 +65,28 @@ public static class ArchitectureProbe
         // 4. Scoring
         var errorFindings = findings.Where(f => f.Severity == "error").ToList();
         var warningFindings = findings.Where(f => f.Severity == "warning").ToList();
-        var hasCycles = cycles.Count > 0;
         var hasErrors = errorFindings.Count > 0;
         var hasHotspots = hotspots.Count > 0;
         var warningCount = warningFindings.Count;
 
+        // Ladder rungs. The warning tail spans 4/6/8 for the same reason as
+        // PerformanceAsyncProbe: rung 4 has no structural condition of its own.
+        //   2  errors   — project cycles (error findings), layering errors, or hotspots
+        //   4  noisy    — more than two advisory warnings
+        //   6  several   — two advisory warnings
+        //   8  minor    — a single advisory warning, no errors or hotspots
+        //  10  clean    — no findings
+        // hasCycles needs no branch of its own: cycles are emitted as error-severity
+        // findings, so hasErrors already covers them and scored the same 2 either way.
         double score;
-        if (hasCycles)
-            score = 2;
-        else if (hasErrors || hasHotspots)
+        if (hasErrors || hasHotspots)
             score = 2;
         else if (warningCount > 2)
             score = 4;
-        else if (warningCount >= 1)
+        else if (warningCount > 1)
             score = 6;
+        else if (warningCount >= 1)
+            score = 8;
         else
             score = 10;
 

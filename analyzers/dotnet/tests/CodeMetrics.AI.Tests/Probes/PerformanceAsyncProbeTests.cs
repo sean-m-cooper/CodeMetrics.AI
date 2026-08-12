@@ -158,6 +158,85 @@ public class PerformanceAsyncProbeTests
             .Which.Severity.Should().Be("info");
     }
 
+    [Fact]
+    public void DomainResultProperty_DoesNotFindSyncOverAsync()
+    {
+        const string code = """
+            class AdjudicationResult { }
+            class AdjudicationRound {
+                public AdjudicationResult? Result { get; set; }
+            }
+            class C {
+                void M(AdjudicationRound round) {
+                    var v = round.Result;
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "syncOverAsync");
+    }
+
+    [Fact]
+    public void DomainWaitAndGetAwaiter_DoesNotFindSyncOverAsync()
+    {
+        const string code = """
+            class DomainAwaiter {
+                public string GetResult() => "ready";
+            }
+            class DomainOutcome {
+                public string Result => "ready";
+                public void Wait() { }
+                public DomainAwaiter GetAwaiter() => new DomainAwaiter();
+            }
+            class C {
+                string M(DomainOutcome outcome) {
+                    outcome.Wait();
+                    return outcome.Result + outcome.GetAwaiter().GetResult();
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "syncOverAsync");
+    }
+
+    [Fact]
+    public void ConfigureAwaitGetAwaiterGetResult_FindsSyncOverAsync()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class C {
+                void M() {
+                    Task.FromResult(1).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().Contain(f => f.Category == "syncOverAsync");
+    }
+
+    [Fact]
+    public void ValueTaskResult_FindsSyncOverAsync()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class C {
+                void M(ValueTask<int> vt) {
+                    var v = vt.Result;
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().Contain(f => f.Category == "syncOverAsync");
+    }
+
     // ── 2. threadSleep ───────────────────────────────────────────────────────
 
     [Fact]
@@ -793,7 +872,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void OnlyThreadSleepWarning_ScoreIs6()
+    public void OnlyThreadSleepWarning_ScoreIs8()
     {
         const string code = """
             using System.Threading;
@@ -804,6 +883,24 @@ public class PerformanceAsyncProbeTests
 
         var result = Analyze(code);
 
+        result.Findings.Count(f => f.Severity == "warning").Should().Be(1);
+        result.Score.Should().Be(8);
+    }
+
+    [Fact]
+    public void TwoWarnings_ScoreIs6()
+    {
+        const string code = """
+            using System.Threading;
+            class C {
+                void M1() { Thread.Sleep(100); }
+                void M2() { Thread.Sleep(200); }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Count(f => f.Severity == "warning").Should().Be(2);
         result.Score.Should().Be(6);
     }
 

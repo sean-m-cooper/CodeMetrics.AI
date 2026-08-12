@@ -13,7 +13,17 @@ public static class RoslynTestHelper
     public static (SyntaxTree Tree, SemanticModel Model, Compilation Compilation) CompileCode(
         string code, params MetadataReference[] additionalRefs)
     {
-        var tree = CSharpSyntaxTree.ParseText(code);
+        return CompileCodeAtPath(code, path: "", additionalRefs);
+    }
+
+    /// <summary>
+    /// Compiles a single source file recorded at <paramref name="path"/>, so tests can exercise
+    /// behaviour that depends on the file's location or name.
+    /// </summary>
+    public static (SyntaxTree Tree, SemanticModel Model, Compilation Compilation) CompileCodeAtPath(
+        string code, string path, params MetadataReference[] additionalRefs)
+    {
+        var tree = CSharpSyntaxTree.ParseText(code, path: path);
         var refs = new List<MetadataReference>
         {
             MetadataReference.CreateFromFile(typeof(object).Assembly.Location),

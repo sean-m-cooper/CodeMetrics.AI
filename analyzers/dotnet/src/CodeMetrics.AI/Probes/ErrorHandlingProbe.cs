@@ -14,16 +14,14 @@ public static class ErrorHandlingProbe
 
         foreach (var (projectName, compilation) in projects)
         {
-            foreach (var tree in compilation.SyntaxTrees)
+            foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
             {
-                if (solutionDir != null && !SourceFileFilter.ShouldAnalyze(tree.FilePath, solutionDir))
-                    continue;
-
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
+                var semanticModel = compilation.GetSemanticModel(tree);
 
                 AnalyzeCatchBlocks(root, filePath, projectName, findings);
-                AnalyzeSyncBlockingCalls(root, filePath, projectName, findings);
+                AnalyzeSyncBlockingCalls(root, semanticModel, filePath, projectName, findings);
                 AnalyzeConsoleWriteLine(root, filePath, projectName, findings);
                 AnalyzeMissingLoggerForMultipleCatches(root, filePath, projectName, findings);
             }
@@ -37,19 +35,27 @@ public static class ErrorHandlingProbe
         var warnings = findings.Count(f => f.Severity == "warning");
         var errors = findings.Count(f => f.Severity == "error");
 
+        // Ladder rungs, matching SecurityProbe's convention of reserving 0/2/4 for
+        // error-severity and structural findings and 6/8 for the warning tail:
+        //   0  systemic       — five or more empty catches or default-returning broad catches
+        //   2  errors         — any empty catch or 'throw ex;'
+        //   4  structural     — a default-returning broad catch or a sync-blocking call
+        //   6  noisy          — more than three advisory warnings
+        //   8  minor          — one to three advisory warnings, no errors
+        //  10  clean          — no findings
         double score;
         if (emptyCatches >= 5 || broadDefaults >= 5)
             score = 0;
         else if (emptyCatches > 0 || throwExes > 0)
             score = 2;
-        else if (hasBroadDefault || hasSyncBlock || warnings > 3)
+        else if (hasBroadDefault || hasSyncBlock)
             score = 4;
+        else if (warnings > 3)
+            score = 6;
         else if (warnings > 0)
-            score = 6;
-        else if (errors == 0 && warnings == 0)
-            score = 10;
+            score = 8;
         else
-            score = 6;
+            score = 10;
 
         var basis = $"Findings: {findings.Count} (errors: {errors}, warnings: {warnings}). " +
                     $"emptyCatch={emptyCatches}, throwEx={throwExes}, broadDefaults={broadDefaults}.";
@@ -119,11 +125,13 @@ public static class ErrorHandlingProbe
             bool isBroad = IsBroadCatch(catchClause);
             if (isBroad)
             {
-                bool hasLogging = HasLoggingCall(block);
-                bool hasBareRethrow = HasBareRethrow(block);
+                // A broad catch only swallows when nothing observes or propagates the
+                // exception. Both broad-catch rules share that test so a catch cannot
+                // be silent for one rule and handled for the other.
+                bool isHandled = IsHandledBroadCatch(catchClause);
 
                 // 3. broadCatchWithoutLoggingOrRethrow
-                if (!hasLogging && !hasBareRethrow)
+                if (!isHandled)
                 {
                     findings.Add(new Finding
                     {
@@ -138,7 +146,7 @@ public static class ErrorHandlingProbe
                 }
 
                 // 4. broadCatchReturnsDefault
-                if (ReturnsDefault(block))
+                if (!isHandled && ReturnsDefault(block))
                 {
                     findings.Add(new Finding
                     {
@@ -148,7 +156,8 @@ public static class ErrorHandlingProbe
                         Line = GetLine(catchClause),
                         Project = projectName,
                         Type = containingType,
-                        Message = "Broad catch block returns a default value, hiding exceptions."
+                        Message = "Broad catch block returns a default value without logging or " +
+                                  "rethrowing, hiding exceptions behind a successful-looking result."
                     });
                 }
             }
@@ -156,7 +165,8 @@ public static class ErrorHandlingProbe
     }
 
     private static void AnalyzeSyncBlockingCalls(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName,
+        List<Finding> findings)
     {
         // .Result and .Wait() via member access expressions
         var memberAccesses = root.DescendantNodes().OfType<MemberAccessExpressionSyntax>();
@@ -166,7 +176,7 @@ public static class ErrorHandlingProbe
             var memberName = ma.Name.Identifier.Text;
 
             // .Result
-            if (memberName == "Result")
+            if (memberName == "Result" && IsTaskLikeReceiver(semanticModel, ma.Expression))
             {
                 findings.Add(new Finding
                 {
@@ -185,7 +195,8 @@ public static class ErrorHandlingProbe
                 // Check that the expression is GetAwaiter()
                 if (ma.Expression is InvocationExpressionSyntax inv &&
                     inv.Expression is MemberAccessExpressionSyntax innerMa &&
-                    innerMa.Name.Identifier.Text == "GetAwaiter")
+                    innerMa.Name.Identifier.Text == "GetAwaiter" &&
+                    IsTaskLikeReceiver(semanticModel, innerMa.Expression))
                 {
                     findings.Add(new Finding
                     {
@@ -206,7 +217,8 @@ public static class ErrorHandlingProbe
         foreach (var inv in invocations)
         {
             if (inv.Expression is MemberAccessExpressionSyntax ma2 &&
-                ma2.Name.Identifier.Text == "Wait")
+                ma2.Name.Identifier.Text == "Wait" &&
+                IsTaskLikeReceiver(semanticModel, ma2.Expression))
             {
                 findings.Add(new Finding
                 {
@@ -277,6 +289,11 @@ public static class ErrorHandlingProbe
 
     // --- Helpers ---
 
+    private static bool IsTaskLikeReceiver(SemanticModel semanticModel, ExpressionSyntax receiver)
+    {
+        return TaskTypes.IsTaskLike(semanticModel.GetTypeInfo(receiver).Type);
+    }
+
     private static bool IsBroadCatch(CatchClauseSyntax catchClause)
     {
         // Has a when filter → not broad
@@ -292,6 +309,19 @@ public static class ErrorHandlingProbe
         return typeName == "Exception" || typeName == "System.Exception";
     }
 
+    /// <summary>
+    /// A broad catch is handled — not swallowing — when the exception is recorded or
+    /// propagated. DescendantNodes is used throughout so a log call or throw nested in
+    /// an if, using or local function inside the catch body still counts.
+    /// </summary>
+    private static bool IsHandledBroadCatch(CatchClauseSyntax catchClause)
+    {
+        var block = catchClause.Block;
+        return HasLoggingCall(block)
+               || HasRethrow(block)
+               || HasPrecedingCancellationRethrow(catchClause);
+    }
+
     private static bool HasLoggingCall(BlockSyntax block)
     {
         return block.DescendantNodes()
@@ -303,11 +333,54 @@ public static class ErrorHandlingProbe
             });
     }
 
-    private static bool HasBareRethrow(BlockSyntax block)
+    /// <summary>
+    /// Any throw statement propagates. A bare 'throw;' preserves the stack trace and a
+    /// 'throw new Wrapped(ex);' surfaces the failure to the caller; neither swallows.
+    /// 'throw ex;' is reported separately by the throwEx rule, so counting it here
+    /// stops one catch from being penalised twice for a shape that does propagate.
+    /// </summary>
+    private static bool HasRethrow(BlockSyntax block)
     {
-        return block.DescendantNodes()
-            .OfType<ThrowStatementSyntax>()
-            .Any(t => t.Expression == null);
+        return block.DescendantNodes().OfType<ThrowStatementSyntax>().Any();
+    }
+
+    /// <summary>
+    /// True when an earlier catch clause on the same try rethrows cancellation, as in
+    /// 'catch (OperationCanceledException) { throw; }' ahead of a broad catch. The
+    /// broad catch is then a deliberate degrade-gracefully handler for real faults
+    /// rather than a blanket suppressor, because cancellation never reaches it.
+    /// </summary>
+    private static bool HasPrecedingCancellationRethrow(CatchClauseSyntax catchClause)
+    {
+        if (catchClause.Parent is not TryStatementSyntax tryStatement)
+            return false;
+
+        foreach (var preceding in tryStatement.Catches)
+        {
+            if (preceding == catchClause)
+                break;
+
+            if (IsCancellationCatch(preceding) && HasRethrow(preceding.Block))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsCancellationCatch(CatchClauseSyntax catchClause)
+    {
+        // A 'when' filter means the clause may decline the exception, so it cannot be
+        // relied on to propagate cancellation.
+        if (catchClause.Filter != null)
+            return false;
+
+        var typeName = catchClause.Declaration?.Type.ToString();
+        if (typeName == null)
+            return false;
+
+        // Strip any namespace qualifier: System.OperationCanceledException → OperationCanceledException.
+        var simpleName = typeName[(typeName.LastIndexOf('.') + 1)..];
+        return simpleName is "OperationCanceledException" or "TaskCanceledException";
     }
 
     private static bool ReturnsDefault(BlockSyntax block)
@@ -354,7 +427,18 @@ public static class ErrorHandlingProbe
             .SelectMany(c => c.ParameterList.Parameters)
             .Any(p => p.Type?.ToString().Contains("ILogger") == true);
 
-        return inCtorParams;
+        if (inCtorParams) return true;
+
+        // Check primary constructor parameters. TypeDeclarationSyntax.ParameterList covers
+        // C# 12 class/struct primary constructors as well as record positional parameters,
+        // none of which appear in Members as a ConstructorDeclarationSyntax.
+        return HasLoggerParameter(typeDecl.ParameterList);
+    }
+
+    private static bool HasLoggerParameter(ParameterListSyntax? parameterList)
+    {
+        return parameterList?.Parameters
+            .Any(p => p.Type?.ToString().Contains("ILogger") == true) == true;
     }
 
     private static string? GetContainingTypeName(SyntaxNode node)
