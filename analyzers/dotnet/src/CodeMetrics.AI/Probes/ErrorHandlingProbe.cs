@@ -21,9 +21,10 @@ public static class ErrorHandlingProbe
 
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
+                var semanticModel = compilation.GetSemanticModel(tree);
 
                 AnalyzeCatchBlocks(root, filePath, projectName, findings);
-                AnalyzeSyncBlockingCalls(root, filePath, projectName, findings);
+                AnalyzeSyncBlockingCalls(root, semanticModel, filePath, projectName, findings);
                 AnalyzeConsoleWriteLine(root, filePath, projectName, findings);
                 AnalyzeMissingLoggerForMultipleCatches(root, filePath, projectName, findings);
             }
@@ -156,7 +157,8 @@ public static class ErrorHandlingProbe
     }
 
     private static void AnalyzeSyncBlockingCalls(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName,
+        List<Finding> findings)
     {
         // .Result and .Wait() via member access expressions
         var memberAccesses = root.DescendantNodes().OfType<MemberAccessExpressionSyntax>();
@@ -166,7 +168,7 @@ public static class ErrorHandlingProbe
             var memberName = ma.Name.Identifier.Text;
 
             // .Result
-            if (memberName == "Result")
+            if (memberName == "Result" && IsTaskLikeReceiver(semanticModel, ma.Expression))
             {
                 findings.Add(new Finding
                 {
@@ -185,7 +187,8 @@ public static class ErrorHandlingProbe
                 // Check that the expression is GetAwaiter()
                 if (ma.Expression is InvocationExpressionSyntax inv &&
                     inv.Expression is MemberAccessExpressionSyntax innerMa &&
-                    innerMa.Name.Identifier.Text == "GetAwaiter")
+                    innerMa.Name.Identifier.Text == "GetAwaiter" &&
+                    IsTaskLikeReceiver(semanticModel, innerMa.Expression))
                 {
                     findings.Add(new Finding
                     {
@@ -206,7 +209,8 @@ public static class ErrorHandlingProbe
         foreach (var inv in invocations)
         {
             if (inv.Expression is MemberAccessExpressionSyntax ma2 &&
-                ma2.Name.Identifier.Text == "Wait")
+                ma2.Name.Identifier.Text == "Wait" &&
+                IsTaskLikeReceiver(semanticModel, ma2.Expression))
             {
                 findings.Add(new Finding
                 {
@@ -276,6 +280,11 @@ public static class ErrorHandlingProbe
     }
 
     // --- Helpers ---
+
+    private static bool IsTaskLikeReceiver(SemanticModel semanticModel, ExpressionSyntax receiver)
+    {
+        return TaskTypes.IsTaskLike(semanticModel.GetTypeInfo(receiver).Type);
+    }
 
     private static bool IsBroadCatch(CatchClauseSyntax catchClause)
     {

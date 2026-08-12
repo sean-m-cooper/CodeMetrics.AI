@@ -333,6 +333,85 @@ public class ErrorHandlingProbeTests
             .Should().AllSatisfy(f => f.Severity.Should().Be("warning"));
     }
 
+    [Fact]
+    public void DomainResultProperty_DoesNotFindSyncBlockingCall()
+    {
+        const string code = """
+            class AdjudicationResult { }
+            class AdjudicationRound {
+                public AdjudicationResult? Result { get; set; }
+            }
+            class C {
+                void M(AdjudicationRound round) {
+                    var _ = round.Result;
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "syncBlockingCall");
+    }
+
+    [Fact]
+    public void DomainWaitAndGetAwaiter_DoesNotFindSyncBlockingCall()
+    {
+        const string code = """
+            class DomainAwaiter {
+                public string GetResult() => "ready";
+            }
+            class DomainOutcome {
+                public string Result => "ready";
+                public void Wait() { }
+                public DomainAwaiter GetAwaiter() => new DomainAwaiter();
+            }
+            class C {
+                string M(DomainOutcome outcome) {
+                    outcome.Wait();
+                    return outcome.Result + outcome.GetAwaiter().GetResult();
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "syncBlockingCall");
+    }
+
+    [Fact]
+    public void ConfigureAwaitGetAwaiterGetResult_FindsSyncBlockingCall()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class C {
+                void M() {
+                    Task.FromResult(1).ConfigureAwait(false).GetAwaiter().GetResult();
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().Contain(f => f.Category == "syncBlockingCall");
+    }
+
+    [Fact]
+    public void ValueTaskResult_FindsSyncBlockingCall()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class C {
+                void M(ValueTask<int> vt) {
+                    var _ = vt.Result;
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().Contain(f => f.Category == "syncBlockingCall");
+    }
+
     // ── 6. consoleWriteLine ───────────────────────────────────────────────────
 
     [Fact]

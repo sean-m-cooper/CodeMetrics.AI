@@ -21,8 +21,9 @@ public static class PerformanceAsyncProbe
 
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
+                var semanticModel = compilation.GetSemanticModel(tree);
 
-                AnalyzeSyncOverAsync(root, filePath, projectName, findings);
+                AnalyzeSyncOverAsync(root, semanticModel, filePath, projectName, findings);
                 AnalyzeThreadSleep(root, filePath, projectName, findings);
                 AnalyzeSaveChangesInsideLoop(root, filePath, projectName, findings);
                 AnalyzeMissingCancellationToken(root, filePath, projectName, findings);
@@ -69,7 +70,8 @@ public static class PerformanceAsyncProbe
 
     // 1. syncOverAsync: .Result, .Wait(), .GetAwaiter().GetResult()
     private static void AnalyzeSyncOverAsync(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName,
+        List<Finding> findings)
     {
         var memberAccesses = root.DescendantNodes().OfType<MemberAccessExpressionSyntax>();
 
@@ -77,7 +79,7 @@ public static class PerformanceAsyncProbe
         {
             var memberName = ma.Name.Identifier.Text;
 
-            if (memberName == "Result")
+            if (memberName == "Result" && IsTaskLikeReceiver(semanticModel, ma.Expression))
             {
                 findings.Add(new Finding
                 {
@@ -94,7 +96,8 @@ public static class PerformanceAsyncProbe
             {
                 if (ma.Expression is InvocationExpressionSyntax inv &&
                     inv.Expression is MemberAccessExpressionSyntax innerMa &&
-                    innerMa.Name.Identifier.Text == "GetAwaiter")
+                    innerMa.Name.Identifier.Text == "GetAwaiter" &&
+                    IsTaskLikeReceiver(semanticModel, innerMa.Expression))
                 {
                     findings.Add(new Finding
                     {
@@ -114,7 +117,8 @@ public static class PerformanceAsyncProbe
         foreach (var inv in invocations)
         {
             if (inv.Expression is MemberAccessExpressionSyntax ma2 &&
-                ma2.Name.Identifier.Text == "Wait")
+                ma2.Name.Identifier.Text == "Wait" &&
+                IsTaskLikeReceiver(semanticModel, ma2.Expression))
             {
                 findings.Add(new Finding
                 {
@@ -387,6 +391,11 @@ public static class PerformanceAsyncProbe
     }
 
     // --- Helpers ---
+
+    private static bool IsTaskLikeReceiver(SemanticModel semanticModel, ExpressionSyntax receiver)
+    {
+        return TaskTypes.IsTaskLike(semanticModel.GetTypeInfo(receiver).Type);
+    }
 
     private static bool IsInsideLoop(SyntaxNode node)
     {
