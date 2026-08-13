@@ -429,6 +429,14 @@ public static class ErrorHandlingProbe
 
         if (inCtorParams) return true;
 
+        // Check method parameters. Static helper types commonly receive their logger per call,
+        // so a method parameter is as valid a logging path as a field or constructor parameter.
+        bool inMethodParams = typeDecl.Members
+            .OfType<MethodDeclarationSyntax>()
+            .Any(m => HasLoggerParameter(m.ParameterList));
+
+        if (inMethodParams) return true;
+
         // Check primary constructor parameters. TypeDeclarationSyntax.ParameterList covers
         // C# 12 class/struct primary constructors as well as record positional parameters,
         // none of which appear in Members as a ConstructorDeclarationSyntax.

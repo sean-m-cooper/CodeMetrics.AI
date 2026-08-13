@@ -693,6 +693,49 @@ public class ErrorHandlingProbeTests
     }
 
     [Fact]
+    public void StaticClassWithILoggerMethodParameters_DoesNotFindMissingLogger()
+    {
+        const string code = """
+            using System;
+            interface ILogger { void LogDebug(Exception ex, string message); }
+            static class Reader {
+                internal static int A(ILogger logger) {
+                    try { return 1; }
+                    catch (Exception ex) { logger.LogDebug(ex, "a"); return 0; }
+                }
+                internal static int B(ILogger logger) {
+                    try { return 1; }
+                    catch (Exception ex) { logger.LogDebug(ex, "b"); return 0; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "missingLoggerForMultipleCatches");
+    }
+
+    [Fact]
+    public void MultipleCatchesWithGenericILoggerMethodParameter_DoesNotFindMissingLogger()
+    {
+        const string code = """
+            using System;
+            interface ILogger<T> { void LogDebug(Exception ex, string message); }
+            class C {
+                void M(ILogger<C> logger) {
+                    try { }
+                    catch (ArgumentNullException ex) { logger.LogDebug(ex, "null"); }
+                    catch (InvalidOperationException ex) { logger.LogDebug(ex, "invalid"); }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "missingLoggerForMultipleCatches");
+    }
+
+    [Fact]
     public void MultipleCatchesWithILoggerPrimaryConstructor_DoesNotFindMissingLogger()
     {
         const string code = """
