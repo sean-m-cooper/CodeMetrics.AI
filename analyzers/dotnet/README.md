@@ -84,9 +84,56 @@ The tool automatically skips non-production projects:
 - Aspire hosts (AppHost, ServiceDefaults, Hosting)
 - Benchmarks, Samples, Demo, Playground projects
 
-## Attribute Support
+## Code annotations and recognized attributes
 
-CodeMetrics.AI recognizes common .NET test framework attributes when scoring the Testing dimension.
+CodeMetrics.AI provides one analyzer-specific comment annotation and recognizes selected framework attributes whose meaning affects a scorecard dimension. It does not require a CodeMetrics.AI package reference in the analyzed solution.
+
+### Intentional synchronous code
+
+Place `// amp-metrics: sync-required` immediately before a method when a synchronous boundary is intentional and cannot safely be converted to async:
+
+```csharp
+// amp-metrics: sync-required
+public void RunSynchronously()
+{
+    var result = operation.GetAwaiter().GetResult();
+}
+```
+
+For that method, the annotation:
+
+- Changes sync-over-async findings from `error` to `info`.
+- Suppresses `awaitedIoInsideLoop` findings.
+
+Use it narrowly: the annotation records an architectural constraint; it does not make blocking or sequential I/O faster.
+
+### Dependency injection
+
+Parameters decorated with `[FromServices]` are excluded from class-coupling calculations. This prevents action-level dependency injection from making the containing controller appear more coupled than it is:
+
+```csharp
+public IActionResult Get([FromServices] IReportBuilder reports)
+{
+    return Ok(reports.Build());
+}
+```
+
+`[FromServicesAttribute]` and namespace-qualified forms are also recognized.
+
+DI registration extension types require no annotation. Static types whose exposed extension methods target `IServiceCollection` or recognized host/application builders are excluded from Architecture hotspot penalties because their coupling is intentional composition-root wiring.
+
+### Authorization
+
+The Security dimension recognizes `[Authorize]` and `[AllowAnonymous]`, including `Attribute`-suffixed and namespace-qualified forms.
+
+- The presence of `[Authorize]` signals that the project uses authorization.
+- A controller-level `[Authorize]` prevents a `missingAuthorization` finding for that controller.
+- A controller-level `[AllowAnonymous]` also prevents `missingAuthorization`, but produces an `allowAnonymous` warning for manual review.
+- `[AllowAnonymous]` on an individual member likewise produces an `allowAnonymous` warning.
+
+Attributes across partial declarations of the same controller are evaluated together.
+
+### Test frameworks
 
 Test projects are detected by project name or by methods decorated with one of these attributes:
 
@@ -97,7 +144,7 @@ Test projects are detected by project name or by methods decorated with one of t
 - `TestMethod`
 - `DataTestMethod`
 
-Attributes may be written with the `Attribute` suffix or a namespace qualifier, such as `[FactAttribute]` or `[Xunit.Fact]`.
+Attributes may use the `Attribute` suffix or a namespace qualifier, such as `[FactAttribute]` or `[Xunit.Fact]`.
 
 Skipped or ignored tests are counted when a supported test attribute has a named `Skip` or `Ignore` argument:
 
@@ -106,10 +153,14 @@ Skipped or ignored tests are counted when a supported test attribute has a named
 public void Uses_xunit_skip() { }
 
 [Test(Ignore = "temporarily disabled")]
-public void Uses_nunit_ignore() { }
+public void Uses_named_ignore() { }
 ```
 
-CodeMetrics.AI does not currently provide a custom attribute for excluding production types or members from code metrics. Production code in analyzed projects is included unless the project itself is skipped by the filtering rules above.
+Standalone framework-specific ignore attributes are not currently interpreted; only named arguments on the supported test attributes above are counted.
+
+### No general exclusion attribute
+
+CodeMetrics.AI does not provide a custom attribute for excluding arbitrary production types or members from metrics. Production code in analyzed projects remains included unless a documented semantic exemption applies or the project/file is excluded by the filtering rules above.
 
 ## Requirements
 

@@ -41,7 +41,19 @@ dotnet tool install -g CodeMetrics.AI
 code-metrics
 ```
 
-See `analyzers/dotnet/README.md` for .NET-specific usage.
+See the [.NET analyzer README](analyzers/dotnet/README.md) for installation, usage, options, filtering, and code-annotation details.
+
+### .NET code annotations
+
+The .NET analyzer recognizes several annotations that affect analysis:
+
+- `// amp-metrics: sync-required` marks an intentionally synchronous method.
+- `[FromServices]` prevents action-injected dependencies from inflating class coupling.
+- `[Authorize]` and `[AllowAnonymous]` inform security findings.
+- Common xUnit, NUnit, and MSTest attributes identify test methods and skipped tests.
+
+See [Code annotations and recognized attributes](analyzers/dotnet/README.md#code-annotations-and-recognized-attributes)
+for exact placement, supported spellings, and scoring effects.
 
 ## JavaScript / TypeScript Usage
 

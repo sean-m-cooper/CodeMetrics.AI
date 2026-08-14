@@ -419,6 +419,109 @@ public class ArchitectureProbeTests
             f.Category == "largeClass");
     }
 
+    [Fact]
+    public void MetricHotspots_DependencyInjectionExtensionType_NoHotspotFindings()
+    {
+        const string code = """
+            namespace Microsoft.Extensions.DependencyInjection {
+                public interface IServiceCollection { }
+            }
+            namespace MyNs {
+                using Microsoft.Extensions.DependencyInjection;
+                public static class ServiceCollectionExtensions {
+                    public static IServiceCollection AddInfrastructure(
+                        this IServiceCollection services) => services;
+
+                    private static void ConfigureDefaults() { }
+                }
+            }
+            """;
+        var metrics = new List<TypeMetrics>
+        {
+            new()
+            {
+                Project = "TestProject",
+                Namespace = "MyNs",
+                Type = "ServiceCollectionExtensions",
+                FilePath = "ServiceCollectionExtensions.cs",
+                CyclomaticComplexity = 100,
+                ClassCoupling = 50,
+                LinesOfSource = 600
+            }
+        };
+
+        var result = Analyze(code, metrics);
+
+        result.Findings.Should().NotContain(f =>
+            f.Category == "highCyclomaticComplexity" ||
+            f.Category == "highCoupling" ||
+            f.Category == "largeClass");
+    }
+
+    [Fact]
+    public void MetricHotspots_UnrelatedExtensionType_StillFindsHotspot()
+    {
+        const string code = """
+            namespace MyNs {
+                public static class StringExtensions {
+                    public static string NormalizeValue(this string value) => value.Trim();
+                }
+            }
+            """;
+        var metrics = new List<TypeMetrics>
+        {
+            new()
+            {
+                Project = "TestProject",
+                Namespace = "MyNs",
+                Type = "StringExtensions",
+                FilePath = "StringExtensions.cs",
+                CyclomaticComplexity = 100,
+                ClassCoupling = 5,
+                LinesOfSource = 50
+            }
+        };
+
+        var result = Analyze(code, metrics);
+
+        result.Findings.Should().Contain(f => f.Category == "highCyclomaticComplexity");
+    }
+
+    [Fact]
+    public void MetricHotspots_DiExtensionTypeWithUnrelatedExposedMethod_StillFindsHotspot()
+    {
+        const string code = """
+            namespace Microsoft.Extensions.DependencyInjection {
+                public interface IServiceCollection { }
+            }
+            namespace MyNs {
+                using Microsoft.Extensions.DependencyInjection;
+                public static class MixedExtensions {
+                    public static IServiceCollection AddInfrastructure(
+                        this IServiceCollection services) => services;
+                    public static void RunMaintenance() { }
+                }
+            }
+            """;
+        var metrics = new List<TypeMetrics>
+        {
+            new()
+            {
+                Project = "TestProject",
+                Namespace = "MyNs",
+                Type = "MixedExtensions",
+                FilePath = "MixedExtensions.cs",
+                CyclomaticComplexity = 5,
+                ClassCoupling = 35,
+                LinesOfSource = 50
+            }
+        };
+
+        var result = Analyze(code, metrics);
+
+        result.Findings.Should().Contain(f => f.Category == "highCoupling");
+    }
+
     // ── 5. Clean code / scoring ───────────────────────────────────────────────
 
     [Fact]

@@ -26,12 +26,23 @@ public static class ArchitectureProbe
         "DbContext", "Context", "Repository", "DAL"
     ];
 
+    private static readonly HashSet<string> DependencyInjectionExtensionReceivers =
+    [
+        "Microsoft.Extensions.DependencyInjection.IServiceCollection",
+        "Microsoft.Extensions.Hosting.IHostApplicationBuilder",
+        "Microsoft.Extensions.Hosting.IHostBuilder",
+        "Microsoft.Extensions.Hosting.HostApplicationBuilder",
+        "Microsoft.AspNetCore.Builder.WebApplicationBuilder",
+        "Microsoft.AspNetCore.Hosting.IWebHostBuilder"
+    ];
+
     public static DimensionResult Analyze(
         IReadOnlyList<(string Name, Compilation Compilation)> projects,
         IReadOnlyList<TypeMetrics> typeMetrics,
         string solutionDir)
     {
         var findings = new List<Finding>();
+        var dependencyInjectionExtensionTypes = new HashSet<string>(StringComparer.Ordinal);
 
         // 1. Project graph cycle detection
         var cycles = DetectProjectCycles(solutionDir);
@@ -55,11 +66,13 @@ public static class ArchitectureProbe
                 var semanticModel = compilation.GetSemanticModel(tree);
 
                 AnalyzeLayeringViolations(root, semanticModel, filePath, projectName, findings);
+                CollectDependencyInjectionExtensionTypes(
+                    root, semanticModel, projectName, dependencyInjectionExtensionTypes);
             }
         }
 
         // 3. Static metric hotspots
-        var hotspots = FindMetricHotspots(typeMetrics);
+        var hotspots = FindMetricHotspots(typeMetrics, dependencyInjectionExtensionTypes);
         findings.AddRange(hotspots);
 
         // 4. Scoring
@@ -374,12 +387,84 @@ public static class ArchitectureProbe
 
     // ── Static metric hotspots ────────────────────────────────────────────────
 
-    private static List<Finding> FindMetricHotspots(IReadOnlyList<TypeMetrics> typeMetrics)
+    private static void CollectDependencyInjectionExtensionTypes(
+        SyntaxNode root,
+        SemanticModel semanticModel,
+        string projectName,
+        HashSet<string> result)
+    {
+        foreach (var typeDecl in root.DescendantNodes().OfType<TypeDeclarationSyntax>())
+        {
+            if (semanticModel.GetDeclaredSymbol(typeDecl) is not INamedTypeSymbol typeSymbol ||
+                !IsDependencyInjectionExtensionType(typeSymbol))
+            {
+                continue;
+            }
+
+            result.Add(GetTypeKey(
+                projectName,
+                typeSymbol.ContainingNamespace?.ToDisplayString() ?? "",
+                typeSymbol.Name));
+        }
+    }
+
+    private static bool IsDependencyInjectionExtensionType(INamedTypeSymbol typeSymbol)
+    {
+        if (!typeSymbol.IsStatic)
+            return false;
+
+        var nonPrivateMethods = typeSymbol.GetMembers()
+            .OfType<IMethodSymbol>()
+            .Where(method =>
+                !method.IsImplicitlyDeclared &&
+                method.MethodKind == MethodKind.Ordinary &&
+                method.DeclaredAccessibility != Accessibility.Private)
+            .ToList();
+
+        return nonPrivateMethods.Count > 0 &&
+               nonPrivateMethods.All(IsDependencyInjectionExtensionMethod);
+    }
+
+    private static bool IsDependencyInjectionExtensionMethod(IMethodSymbol method)
+    {
+        return method.IsExtensionMethod &&
+               method.Parameters.Length > 0 &&
+               IsDependencyInjectionExtensionReceiver(method.Parameters[0].Type);
+    }
+
+    private static bool IsDependencyInjectionExtensionReceiver(ITypeSymbol receiverType)
+    {
+        if (DependencyInjectionExtensionReceivers.Contains(
+                receiverType.OriginalDefinition.ToDisplayString()))
+        {
+            return true;
+        }
+
+        return receiverType is INamedTypeSymbol named &&
+               named.AllInterfaces.Any(interfaceType =>
+                   DependencyInjectionExtensionReceivers.Contains(
+                       interfaceType.OriginalDefinition.ToDisplayString()));
+    }
+
+    private static string GetTypeKey(string project, string namespaceName, string typeName)
+    {
+        return $"{project}\0{namespaceName}\0{typeName}";
+    }
+
+    private static List<Finding> FindMetricHotspots(
+        IReadOnlyList<TypeMetrics> typeMetrics,
+        IReadOnlySet<string> dependencyInjectionExtensionTypes)
     {
         var hotspots = new List<Finding>();
 
         foreach (var tm in typeMetrics)
         {
+            if (dependencyInjectionExtensionTypes.Contains(
+                    GetTypeKey(tm.Project, tm.Namespace, tm.Type)))
+            {
+                continue;
+            }
+
             if (tm.CyclomaticComplexity >= 80)
             {
                 hotspots.Add(new Finding
