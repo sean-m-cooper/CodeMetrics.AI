@@ -20,7 +20,7 @@ public static class ErrorHandlingProbe
                 var filePath = tree.FilePath;
                 var semanticModel = compilation.GetSemanticModel(tree);
 
-                AnalyzeCatchBlocks(root, filePath, projectName, findings);
+                AnalyzeCatchBlocks(root, semanticModel, filePath, projectName, findings);
                 AnalyzeSyncBlockingCalls(root, semanticModel, filePath, projectName, findings);
                 AnalyzeConsoleWriteLine(root, filePath, projectName, findings);
                 AnalyzeMissingLoggerForMultipleCatches(root, filePath, projectName, findings);
@@ -70,7 +70,8 @@ public static class ErrorHandlingProbe
     }
 
     private static void AnalyzeCatchBlocks(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel semanticModel,
+        string filePath, string projectName, List<Finding> findings)
     {
         var catchClauses = root.DescendantNodes().OfType<CatchClauseSyntax>();
 
@@ -128,7 +129,7 @@ public static class ErrorHandlingProbe
                 // A broad catch only swallows when nothing observes or propagates the
                 // exception. Both broad-catch rules share that test so a catch cannot
                 // be silent for one rule and handled for the other.
-                bool isHandled = IsHandledBroadCatch(catchClause);
+                bool isHandled = IsHandledBroadCatch(catchClause, semanticModel);
 
                 // 3. broadCatchWithoutLoggingOrRethrow
                 if (!isHandled)
@@ -314,23 +315,74 @@ public static class ErrorHandlingProbe
     /// propagated. DescendantNodes is used throughout so a log call or throw nested in
     /// an if, using or local function inside the catch body still counts.
     /// </summary>
-    private static bool IsHandledBroadCatch(CatchClauseSyntax catchClause)
+    private static bool IsHandledBroadCatch(
+        CatchClauseSyntax catchClause, SemanticModel semanticModel)
     {
         var block = catchClause.Block;
         return HasLoggingCall(block)
                || HasRethrow(block)
-               || HasPrecedingCancellationRethrow(catchClause);
+               || HasPrecedingCancellationRethrow(catchClause)
+               || HasDeferredLogging(catchClause, semanticModel);
     }
 
     private static bool HasLoggingCall(BlockSyntax block)
     {
         return block.DescendantNodes()
             .OfType<InvocationExpressionSyntax>()
-            .Any(inv =>
-            {
-                var text = inv.Expression.ToString();
-                return text.IndexOf("Log", StringComparison.OrdinalIgnoreCase) >= 0;
-            });
+            .Any(IsLoggingCall);
+    }
+
+    private static bool HasDeferredLogging(
+        CatchClauseSyntax catchClause, SemanticModel semanticModel)
+    {
+        var caughtSymbol = catchClause.Declaration == null
+            ? null
+            : semanticModel.GetDeclaredSymbol(catchClause.Declaration);
+
+        if (caughtSymbol == null)
+            return false;
+
+        var capturedSymbols = catchClause.Block.DescendantNodes()
+            .OfType<AssignmentExpressionSyntax>()
+            .Where(assignment =>
+                assignment.IsKind(SyntaxKind.SimpleAssignmentExpression) &&
+                SymbolEqualityComparer.Default.Equals(
+                    semanticModel.GetSymbolInfo(assignment.Right).Symbol,
+                    caughtSymbol))
+            .Select(assignment => semanticModel.GetSymbolInfo(assignment.Left).Symbol)
+            .Where(symbol => symbol != null)
+            .Cast<ISymbol>()
+            .ToList();
+
+        if (capturedSymbols.Count == 0)
+            return false;
+
+        var containingScope = catchClause.Ancestors().FirstOrDefault(node =>
+            node is BaseMethodDeclarationSyntax or
+                AccessorDeclarationSyntax or
+                LocalFunctionStatementSyntax or
+                AnonymousFunctionExpressionSyntax);
+
+        if (containingScope == null)
+            return false;
+
+        return containingScope.DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Where(invocation =>
+                invocation.SpanStart > catchClause.Span.End &&
+                IsLoggingCall(invocation))
+            .SelectMany(invocation => invocation.ArgumentList.Arguments)
+            .SelectMany(argument => argument.Expression.DescendantNodesAndSelf())
+            .OfType<ExpressionSyntax>()
+            .Select(expression => semanticModel.GetSymbolInfo(expression).Symbol)
+            .Any(symbol => capturedSymbols.Any(captured =>
+                SymbolEqualityComparer.Default.Equals(symbol, captured)));
+    }
+
+    private static bool IsLoggingCall(InvocationExpressionSyntax invocation)
+    {
+        var text = invocation.Expression.ToString();
+        return text.IndexOf("Log", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
     /// <summary>

@@ -151,6 +151,73 @@ public class ErrorHandlingProbeTests
     }
 
     [Fact]
+    public void BroadCatchCapturedExceptionLoggedLater_DoesNotFindBroadCatchFinding()
+    {
+        const string code = """
+            using System;
+            class Logger { public void LogWarning(Exception? ex, string msg) { } }
+            class C {
+                void Configure() {
+                    Exception? secretFailure = null;
+                    try { }
+                    catch (Exception ex) { secretFailure = ex; }
+
+                    Register(logger => logger.LogWarning(secretFailure, "Secret lookup failed"));
+                }
+
+                void Register(Action<Logger> registration) { }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "broadCatchWithoutLoggingOrRethrow");
+    }
+
+    [Fact]
+    public void BroadCatchCapturedExceptionNeverLogged_FindsBroadCatchFinding()
+    {
+        const string code = """
+            using System;
+            class C {
+                void Configure() {
+                    Exception? secretFailure = null;
+                    try { }
+                    catch (Exception ex) { secretFailure = ex; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().Contain(f => f.Category == "broadCatchWithoutLoggingOrRethrow");
+    }
+
+    [Fact]
+    public void BroadCatchCapturedExceptionButLogsDifferentValue_FindsBroadCatchFinding()
+    {
+        const string code = """
+            using System;
+            class Logger { public void LogWarning(Exception? ex, string msg) { } }
+            class C {
+                Logger _logger = new Logger();
+                void Configure() {
+                    Exception? secretFailure = null;
+                    Exception? otherFailure = null;
+                    try { }
+                    catch (Exception ex) { secretFailure = ex; }
+
+                    _logger.LogWarning(otherFailure, "A different operation failed");
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().Contain(f => f.Category == "broadCatchWithoutLoggingOrRethrow");
+    }
+
+    [Fact]
     public void BroadCatchWithRethrow_DoesNotFindBroadCatchFinding()
     {
         const string code = """
