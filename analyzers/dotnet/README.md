@@ -122,6 +122,14 @@ public IActionResult Get([FromServices] IReportBuilder reports)
 
 DI registration extension types require no annotation. Static types whose exposed extension methods target `IServiceCollection` or recognized host/application builders are excluded from Architecture hotspot penalties because their coupling is intentional composition-root wiring.
 
+### Passive request and response types
+
+Passive data carriers are identified structurally rather than by names such as `Request`, `Response`, or `Dto`. Records, classes, and structs that only declare state through primary-constructor parameters, auto-properties, fields, or assignment-only constructors are treated as data carriers.
+
+Their raw metrics remain in `metrics.csv`, but they are excluded from the scored Code Quality, Maintainability, and Architecture-hotspot populations. A data carrier still counts as a dependency of code that consumes it.
+
+Types are scored normally as soon as they define behavior, including methods, computed properties, custom accessors, operators, validation logic, or nontrivial constructor logic.
+
 ### Authorization
 
 The Security dimension recognizes `[Authorize]` and `[AllowAnonymous]`, including `Attribute`-suffixed and namespace-qualified forms.

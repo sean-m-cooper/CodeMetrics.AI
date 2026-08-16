@@ -17,11 +17,23 @@ public static class MaintainabilityProbe
             };
         }
 
-        var miValues = types.Select(t => (double)t.MaintainabilityIndex).ToList();
+        var excludedDataCarriers = types.Count(t => t.IsDataCarrier);
+        var eligible = types.Where(t => !t.IsDataCarrier).ToList();
+        if (eligible.Count == 0)
+        {
+            return new DimensionResult
+            {
+                Status = "scored",
+                Score = 10,
+                Basis = $"No behavior-bearing types. Passive data carriers excluded: {excludedDataCarriers}."
+            };
+        }
 
-        double popBelow60 = types.Count(t => t.MaintainabilityIndex < 60) * 100.0 / types.Count;
+        var miValues = eligible.Select(t => (double)t.MaintainabilityIndex).ToList();
+
+        double popBelow60 = eligible.Count(t => t.MaintainabilityIndex < 60) * 100.0 / eligible.Count;
         double p10MI = CodeQualityProbe.Percentile(miValues, 10);
-        double extremeBelow40 = types.Count(t => t.MaintainabilityIndex < 40) * 100.0 / types.Count;
+        double extremeBelow40 = eligible.Count(t => t.MaintainabilityIndex < 40) * 100.0 / eligible.Count;
 
         int popBelow60Score = CodeQualityProbe.ScoreThreshold(popBelow60, [1, 3, 6, 10, 15]);
         int p10Score = ScoreThresholdReverse(p10MI, [75, 70, 65, 58, 52]);
@@ -30,7 +42,7 @@ public static class MaintainabilityProbe
         double finalScore = Math.Round((popBelow60Score + p10Score + extremeBelow40Score) / 3.0, 1);
 
         // Top 5 offenders: sort by MI asc, Type name
-        var offenders = types
+        var offenders = eligible
             .Where(t => !IsEntryPointType(t))
             .OrderBy(t => t.MaintainabilityIndex)
             .ThenBy(t => t.Type)
@@ -50,6 +62,10 @@ public static class MaintainabilityProbe
 
         var metrics = new
         {
+            filtering = new
+            {
+                passiveDataCarriersExcluded = excludedDataCarriers
+            },
             maintainabilityIndex = new
             {
                 populationPercentBelow60 = Math.Round(popBelow60, 2),
@@ -68,7 +84,8 @@ public static class MaintainabilityProbe
             ["topOffenders"] = JsonSerializer.SerializeToElement(offenders)
         };
 
-        var basis = $"Total types: {types.Count}. PopBelow60Score: {popBelow60Score}, P10Score: {p10Score}, ExtremeBelow40Score: {extremeBelow40Score}.";
+        var basis = $"Eligible types: {eligible.Count}. Passive data carriers excluded: {excludedDataCarriers}. " +
+                    $"PopBelow60Score: {popBelow60Score}, P10Score: {p10Score}, ExtremeBelow40Score: {extremeBelow40Score}.";
 
         return new DimensionResult
         {

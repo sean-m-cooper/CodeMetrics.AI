@@ -7,7 +7,8 @@ public static class CodeQualityProbe
 {
     public static DimensionResult Analyze(IReadOnlyList<TypeMetrics> types)
     {
-        var eligible = types.Where(t => t.MemberCount > 0).ToList();
+        var excludedDataCarriers = types.Count(t => t.IsDataCarrier);
+        var eligible = types.Where(t => t.MemberCount > 0 && !t.IsDataCarrier).ToList();
 
         if (eligible.Count == 0)
         {
@@ -15,7 +16,9 @@ public static class CodeQualityProbe
             {
                 Status = "scored",
                 Score = 10,
-                Basis = "No types with members."
+                Basis = excludedDataCarriers > 0
+                    ? $"No behavior-bearing types with members. Passive data carriers excluded: {excludedDataCarriers}."
+                    : "No types with members."
             };
         }
 
@@ -71,6 +74,10 @@ public static class CodeQualityProbe
 
         var metrics = new
         {
+            filtering = new
+            {
+                passiveDataCarriersExcluded = excludedDataCarriers
+            },
             decomposition = new
             {
                 populationPercentOver4 = Math.Round(popOver4, 2),
@@ -99,7 +106,8 @@ public static class CodeQualityProbe
             ["topOffenders"] = JsonSerializer.SerializeToElement(offenders)
         };
 
-        var basis = $"Eligible types: {eligible.Count}. DecompScore: {decompScore}, CCScore: {ccScore}.";
+        var basis = $"Eligible types: {eligible.Count}. Passive data carriers excluded: {excludedDataCarriers}. " +
+                    $"DecompScore: {decompScore}, CCScore: {ccScore}.";
 
         return new DimensionResult
         {

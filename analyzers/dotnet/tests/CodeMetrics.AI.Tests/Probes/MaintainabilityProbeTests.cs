@@ -13,7 +13,8 @@ public class MaintainabilityProbeTests
         int memberCount = 5,
         int classCc = 3,
         int coupling = 2,
-        int loc = 50) =>
+        int loc = 50,
+        bool isDataCarrier = false) =>
         new()
         {
             Project = "Proj",
@@ -24,7 +25,8 @@ public class MaintainabilityProbeTests
             MemberCount = memberCount,
             CyclomaticComplexity = classCc,
             ClassCoupling = coupling,
-            LinesOfSource = loc
+            LinesOfSource = loc,
+            IsDataCarrier = isDataCarrier
         };
 
     [Fact]
@@ -66,6 +68,30 @@ public class MaintainabilityProbeTests
         var result = MaintainabilityProbe.Analyze(types);
 
         result.Score.Should().BeLessThan(10.0);
+    }
+
+    [Fact]
+    public void PassiveDataCarrier_IsExcludedFromScoreAndOffenders()
+    {
+        var types = new List<TypeMetrics>
+        {
+            MakeType("Healthy", mi: 90),
+            MakeType("SearchResponse", mi: 5, isDataCarrier: true)
+        };
+
+        var result = MaintainabilityProbe.Analyze(types);
+
+        result.Score.Should().Be(10);
+        result.Basis.Should().Contain("Passive data carriers excluded: 1");
+
+        var metrics = (JsonElement)result.Extra["metrics"]!;
+        metrics.GetProperty("filtering")
+            .GetProperty("passiveDataCarriersExcluded").GetInt32().Should().Be(1);
+
+        var offenders = (JsonElement)result.Extra["topOffenders"]!;
+        offenders.EnumerateArray()
+            .Select(offender => offender.GetProperty("type").GetString())
+            .Should().NotContain("SearchResponse");
     }
 
     [Fact]

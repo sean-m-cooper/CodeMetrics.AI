@@ -456,6 +456,34 @@ public class ArchitectureProbeTests
             f.Category == "highCyclomaticComplexity" ||
             f.Category == "highCoupling" ||
             f.Category == "largeClass");
+        result.Extra["excludedDependencyInjectionExtensionTypes"].Should().Be(1);
+    }
+
+    [Fact]
+    public void MetricHotspots_PassiveDataCarrier_NoHotspotFindings()
+    {
+        var metrics = new List<TypeMetrics>
+        {
+            new()
+            {
+                Project = "TestProject",
+                Namespace = "MyNs",
+                Type = "LargeResponse",
+                FilePath = "LargeResponse.cs",
+                CyclomaticComplexity = 100,
+                ClassCoupling = 50,
+                LinesOfSource = 600,
+                IsDataCarrier = true
+            }
+        };
+
+        var result = Analyze("namespace MyNs { public sealed record LargeResponse(string Value); }", metrics);
+
+        result.Findings.Should().NotContain(f =>
+            f.Category == "highCyclomaticComplexity" ||
+            f.Category == "highCoupling" ||
+            f.Category == "largeClass");
+        result.Extra["excludedPassiveDataCarriers"].Should().Be(1);
     }
 
     [Fact]

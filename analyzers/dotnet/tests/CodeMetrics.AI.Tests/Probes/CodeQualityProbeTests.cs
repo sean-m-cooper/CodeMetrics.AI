@@ -15,7 +15,8 @@ public class CodeQualityProbeTests
         int mi = 80,
         int classCc = 5,
         int coupling = 2,
-        int loc = 50) =>
+        int loc = 50,
+        bool isDataCarrier = false) =>
         new()
         {
             Project = "Proj",
@@ -28,7 +29,8 @@ public class CodeQualityProbeTests
             MaintainabilityIndex = mi,
             CyclomaticComplexity = classCc,
             ClassCoupling = coupling,
-            LinesOfSource = loc
+            LinesOfSource = loc,
+            IsDataCarrier = isDataCarrier
         };
 
     [Fact]
@@ -110,6 +112,31 @@ public class CodeQualityProbeTests
         var result = CodeQualityProbe.Analyze(types);
 
         result.Score.Should().BeLessThan(10.0);
+    }
+
+    [Fact]
+    public void PassiveDataCarrier_IsExcludedFromScoreAndOffenders()
+    {
+        var types = new List<TypeMetrics>
+        {
+            MakeType("Healthy", memberCount: 5, decompositionRatio: 1, maxMemberCC: 2),
+            MakeType("SearchRequest", memberCount: 10, decompositionRatio: 50,
+                maxMemberCC: 50, isDataCarrier: true)
+        };
+
+        var result = CodeQualityProbe.Analyze(types);
+
+        result.Score.Should().Be(10);
+        result.Basis.Should().Contain("Passive data carriers excluded: 1");
+
+        var metrics = (JsonElement)result.Extra["metrics"]!;
+        metrics.GetProperty("filtering")
+            .GetProperty("passiveDataCarriersExcluded").GetInt32().Should().Be(1);
+
+        var offenders = (JsonElement)result.Extra["topOffenders"]!;
+        offenders.EnumerateArray()
+            .Select(offender => offender.GetProperty("type").GetString())
+            .Should().NotContain("SearchRequest");
     }
 
     [Fact]

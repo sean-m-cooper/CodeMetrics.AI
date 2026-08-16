@@ -128,6 +128,7 @@ public static class MetricsCollector
             MemberCount = memberCount,
             MaxMemberCyclomaticComplexity = maxMemberCC,
             DecompositionRatio = decomp,
+            IsDataCarrier = DataCarrierClassifier.IsPassiveDataCarrier(typeSymbol),
         };
     }
 

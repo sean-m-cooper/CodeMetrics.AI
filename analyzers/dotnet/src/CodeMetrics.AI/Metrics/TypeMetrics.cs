@@ -15,4 +15,5 @@ public sealed class TypeMetrics
     public int MemberCount { get; set; }
     public int MaxMemberCyclomaticComplexity { get; set; }
     public double DecompositionRatio { get; set; }
+    public bool IsDataCarrier { get; set; }
 }

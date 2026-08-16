@@ -75,6 +75,11 @@ public static class ArchitectureProbe
         var hotspots = FindMetricHotspots(typeMetrics, dependencyInjectionExtensionTypes);
         findings.AddRange(hotspots);
 
+        var excludedDataCarrierCount = typeMetrics.Count(metric => metric.IsDataCarrier);
+        var excludedDependencyInjectionExtensionCount = typeMetrics.Count(metric =>
+            dependencyInjectionExtensionTypes.Contains(
+                GetTypeKey(metric.Project, metric.Namespace, metric.Type)));
+
         // 4. Scoring
         var errorFindings = findings.Where(f => f.Severity == "error").ToList();
         var warningFindings = findings.Where(f => f.Severity == "warning").ToList();
@@ -112,7 +117,9 @@ public static class ArchitectureProbe
             score = 10;
 
         var basis = $"Findings: {findings.Count} (errors: {errorFindings.Count}, warnings: {warningFindings.Count}). " +
-                    $"Cycles: {cycles.Count}, hotspots: {hotspots.Count}.";
+                    $"Cycles: {cycles.Count}, hotspots: {hotspots.Count}. " +
+                    $"Excluded passive data carriers: {excludedDataCarrierCount}, " +
+                    $"DI extension types: {excludedDependencyInjectionExtensionCount}.";
 
         // Extra data
         var cycleList = cycles.Select(c => string.Join(" → ", c) + " → " + c[0]).ToList();
@@ -127,7 +134,9 @@ public static class ArchitectureProbe
             Extra =
             {
                 ["cycles"] = cycleList,
-                ["hotspots"] = hotspotSummary
+                ["hotspots"] = hotspotSummary,
+                ["excludedPassiveDataCarriers"] = excludedDataCarrierCount,
+                ["excludedDependencyInjectionExtensionTypes"] = excludedDependencyInjectionExtensionCount
             }
         };
     }
@@ -459,6 +468,9 @@ public static class ArchitectureProbe
 
         foreach (var tm in typeMetrics)
         {
+            if (tm.IsDataCarrier)
+                continue;
+
             if (dependencyInjectionExtensionTypes.Contains(
                     GetTypeKey(tm.Project, tm.Namespace, tm.Type)))
             {
