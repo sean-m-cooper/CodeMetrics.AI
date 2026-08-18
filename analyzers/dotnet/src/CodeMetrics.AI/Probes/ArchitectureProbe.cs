@@ -36,6 +36,14 @@ public static class ArchitectureProbe
         "Microsoft.AspNetCore.Hosting.IWebHostBuilder"
     ];
 
+    // Framework contracts whose required surface makes raw class coupling a poor
+    // architecture signal. Only coupling is suppressed; complexity and size still apply.
+    private static readonly HashSet<string> FrameworkCouplingArchetypes =
+    [
+        "Microsoft.AspNetCore.Authentication.AuthenticationHandler`1",
+        "Microsoft.EntityFrameworkCore.DbContext"
+    ];
+
     public static DimensionResult Analyze(
         IReadOnlyList<(string Name, Compilation Compilation)> projects,
         IReadOnlyList<TypeMetrics> typeMetrics,
@@ -43,6 +51,7 @@ public static class ArchitectureProbe
     {
         var findings = new List<Finding>();
         var dependencyInjectionExtensionTypes = new HashSet<string>(StringComparer.Ordinal);
+        var frameworkCouplingArchetypeTypes = new HashSet<string>(StringComparer.Ordinal);
 
         // 1. Project graph cycle detection
         var cycles = DetectProjectCycles(solutionDir);
@@ -68,16 +77,27 @@ public static class ArchitectureProbe
                 AnalyzeLayeringViolations(root, semanticModel, filePath, projectName, findings);
                 CollectDependencyInjectionExtensionTypes(
                     root, semanticModel, projectName, dependencyInjectionExtensionTypes);
+                CollectFrameworkCouplingArchetypeTypes(
+                    root, semanticModel, projectName, frameworkCouplingArchetypeTypes);
             }
         }
 
         // 3. Static metric hotspots
-        var hotspots = FindMetricHotspots(typeMetrics, dependencyInjectionExtensionTypes);
+        var hotspots = FindMetricHotspots(
+            typeMetrics,
+            dependencyInjectionExtensionTypes,
+            frameworkCouplingArchetypeTypes);
         findings.AddRange(hotspots);
+
+        const int hotspotDisplayLimit = 10;
+        var displayedHotspots = hotspots.Take(hotspotDisplayLimit).ToList();
 
         var excludedDataCarrierCount = typeMetrics.Count(metric => metric.IsDataCarrier);
         var excludedDependencyInjectionExtensionCount = typeMetrics.Count(metric =>
             dependencyInjectionExtensionTypes.Contains(
+                GetTypeKey(metric.Project, metric.Namespace, metric.Type)));
+        var excludedFrameworkCouplingArchetypeCount = typeMetrics.Count(metric =>
+            frameworkCouplingArchetypeTypes.Contains(
                 GetTypeKey(metric.Project, metric.Namespace, metric.Type)));
 
         // 4. Scoring
@@ -116,14 +136,20 @@ public static class ArchitectureProbe
         else
             score = 10;
 
+        var hotspotBasis = hotspots.Count > displayedHotspots.Count
+            ? $"hotspots: {hotspots.Count} (showing {displayedHotspots.Count})"
+            : $"hotspots: {hotspots.Count}";
         var basis = $"Findings: {findings.Count} (errors: {errorFindings.Count}, warnings: {warningFindings.Count}). " +
-                    $"Cycles: {cycles.Count}, hotspots: {hotspots.Count}. " +
+                    $"Cycles: {cycles.Count}, {hotspotBasis}. " +
                     $"Excluded passive data carriers: {excludedDataCarrierCount}, " +
-                    $"DI extension types: {excludedDependencyInjectionExtensionCount}.";
+                    $"DI extension types: {excludedDependencyInjectionExtensionCount}, " +
+                    $"framework coupling archetypes: {excludedFrameworkCouplingArchetypeCount}.";
 
         // Extra data
         var cycleList = cycles.Select(c => string.Join(" → ", c) + " → " + c[0]).ToList();
-        var hotspotSummary = hotspots.Select(h => new { h.Type, h.Category, h.Message }).ToList<object>();
+        var hotspotSummary = displayedHotspots
+            .Select(h => new { h.Project, h.Type, h.Category, h.Message })
+            .ToList<object>();
 
         return new DimensionResult
         {
@@ -135,8 +161,11 @@ public static class ArchitectureProbe
             {
                 ["cycles"] = cycleList,
                 ["hotspots"] = hotspotSummary,
+                ["hotspotCount"] = hotspots.Count,
+                ["hotspotsTruncated"] = hotspots.Count > displayedHotspots.Count,
                 ["excludedPassiveDataCarriers"] = excludedDataCarrierCount,
-                ["excludedDependencyInjectionExtensionTypes"] = excludedDependencyInjectionExtensionCount
+                ["excludedDependencyInjectionExtensionTypes"] = excludedDependencyInjectionExtensionCount,
+                ["excludedFrameworkCouplingArchetypeTypes"] = excludedFrameworkCouplingArchetypeCount
             }
         };
     }
@@ -455,6 +484,33 @@ public static class ArchitectureProbe
                        interfaceType.OriginalDefinition.ToDisplayString()));
     }
 
+    private static void CollectFrameworkCouplingArchetypeTypes(
+        SyntaxNode root,
+        SemanticModel semanticModel,
+        string projectName,
+        HashSet<string> result)
+    {
+        foreach (var typeDecl in root.DescendantNodes().OfType<TypeDeclarationSyntax>())
+        {
+            if (semanticModel.GetDeclaredSymbol(typeDecl) is not INamedTypeSymbol typeSymbol)
+                continue;
+
+            for (var baseType = typeSymbol.BaseType; baseType != null; baseType = baseType.BaseType)
+            {
+                var definition = baseType.OriginalDefinition;
+                var qualifiedMetadataName = $"{definition.ContainingNamespace?.ToDisplayString()}.{definition.MetadataName}";
+                if (!FrameworkCouplingArchetypes.Contains(qualifiedMetadataName))
+                    continue;
+
+                result.Add(GetTypeKey(
+                    projectName,
+                    typeSymbol.ContainingNamespace?.ToDisplayString() ?? "",
+                    typeSymbol.Name));
+                break;
+            }
+        }
+    }
+
     private static string GetTypeKey(string project, string namespaceName, string typeName)
     {
         return $"{project}\0{namespaceName}\0{typeName}";
@@ -462,9 +518,10 @@ public static class ArchitectureProbe
 
     private static List<Finding> FindMetricHotspots(
         IReadOnlyList<TypeMetrics> typeMetrics,
-        IReadOnlySet<string> dependencyInjectionExtensionTypes)
+        IReadOnlySet<string> dependencyInjectionExtensionTypes,
+        IReadOnlySet<string> frameworkCouplingArchetypeTypes)
     {
-        var hotspots = new List<Finding>();
+        var hotspots = new List<(Finding Finding, int Cc, int Coupling, int Loc)>();
 
         foreach (var tm in typeMetrics)
         {
@@ -479,7 +536,7 @@ public static class ArchitectureProbe
 
             if (tm.CyclomaticComplexity >= 80)
             {
-                hotspots.Add(new Finding
+                hotspots.Add((new Finding
                 {
                     Category = "highCyclomaticComplexity",
                     Severity = "warning",
@@ -487,13 +544,15 @@ public static class ArchitectureProbe
                     Project = tm.Project,
                     Type = tm.Type,
                     Message = $"Type '{tm.Type}' has cyclomatic complexity of {tm.CyclomaticComplexity} (threshold: 80)."
-                });
+                }, tm.CyclomaticComplexity, 0, 0));
             }
 
             var couplingThreshold = tm.Type.EndsWith("Controller", StringComparison.Ordinal) ? 50 : 30;
-            if (tm.ClassCoupling >= couplingThreshold)
+            var typeKey = GetTypeKey(tm.Project, tm.Namespace, tm.Type);
+            if (!frameworkCouplingArchetypeTypes.Contains(typeKey) &&
+                tm.ClassCoupling >= couplingThreshold)
             {
-                hotspots.Add(new Finding
+                hotspots.Add((new Finding
                 {
                     Category = "highCoupling",
                     Severity = "warning",
@@ -501,12 +560,12 @@ public static class ArchitectureProbe
                     Project = tm.Project,
                     Type = tm.Type,
                     Message = $"Type '{tm.Type}' has class coupling of {tm.ClassCoupling} (threshold: {couplingThreshold})."
-                });
+                }, 0, tm.ClassCoupling, 0));
             }
 
             if (tm.LinesOfSource >= 500)
             {
-                hotspots.Add(new Finding
+                hotspots.Add((new Finding
                 {
                     Category = "largeClass",
                     Severity = "warning",
@@ -514,19 +573,19 @@ public static class ArchitectureProbe
                     Project = tm.Project,
                     Type = tm.Type,
                     Message = $"Type '{tm.Type}' has {tm.LinesOfSource} lines of source (threshold: 500)."
-                });
+                }, 0, 0, tm.LinesOfSource));
             }
         }
 
-        // Order: CC desc → coupling desc → LinesOfSource desc, take top 10
+        // Preserve the complete census. Presentation limits belong to the output sample,
+        // not to the population used by basis, findings, or scoring.
         return hotspots
-            .OrderByDescending(f => f.Category == "highCyclomaticComplexity"
-                ? typeMetrics.FirstOrDefault(t => t.Type == f.Type)?.CyclomaticComplexity ?? 0 : 0)
-            .ThenByDescending(f => f.Category == "highCoupling"
-                ? typeMetrics.FirstOrDefault(t => t.Type == f.Type)?.ClassCoupling ?? 0 : 0)
-            .ThenByDescending(f => f.Category == "largeClass"
-                ? typeMetrics.FirstOrDefault(t => t.Type == f.Type)?.LinesOfSource ?? 0 : 0)
-            .Take(10)
+            .OrderByDescending(candidate => candidate.Cc)
+            .ThenByDescending(candidate => candidate.Coupling)
+            .ThenByDescending(candidate => candidate.Loc)
+            .ThenBy(candidate => candidate.Finding.Project, StringComparer.Ordinal)
+            .ThenBy(candidate => candidate.Finding.Type, StringComparer.Ordinal)
+            .Select(candidate => candidate.Finding)
             .ToList();
     }
 }

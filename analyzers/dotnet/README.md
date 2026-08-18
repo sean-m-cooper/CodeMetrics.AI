@@ -40,11 +40,11 @@ The tool scores your codebase across 9 quality dimensions (0-10 scale):
 | Code Quality | Statistical — decomposition ratio and max member cyclomatic complexity |
 | Maintainability | Statistical — maintainability index population/tail/extreme analysis |
 | Error Handling | Rule-based — empty catches, throw ex, broad catches, sync blocking |
-| Performance & Async | Rule-based — sync-over-async, Thread.Sleep, SaveChanges in loops |
+| Performance & Async | Rule-based — sync-over-async, sequential I/O, unbounded fan-out, shared-state concurrency |
 | Security | Rule-based — hardcoded secrets, SQL interpolation, unsafe deserialization |
 | Testing | Rule-based — test coverage, assertion density, placeholder detection |
-| Documentation | Deduction-based — README, docs/, XML docs, public API coverage |
-| Dependency Management | Rule-based — vulnerabilities, outdated, deprecated, version drift |
+| Documentation | Deduction-based — README, docs/, XML docs, public API coverage, unresolved `cref` references |
+| Dependency Management | Rule-based — vulnerabilities, outdated, deprecated, version drift; failed commands are unscored |
 | Architecture & SOLID | Rule-based — project cycles, layering violations, metric hotspots |
 
 ## Raw Metrics
@@ -121,6 +121,22 @@ public IActionResult Get([FromServices] IReportBuilder reports)
 `[FromServicesAttribute]` and namespace-qualified forms are also recognized.
 
 DI registration extension types require no annotation. Static types whose exposed extension methods target `IServiceCollection` or recognized host/application builders are excluded from Architecture hotspot penalties because their coupling is intentional composition-root wiring.
+
+Raw coupling is also not used as an Architecture hotspot signal for subclasses of framework contracts whose required surface dominates the metric, currently `AuthenticationHandler<TOptions>` and `DbContext`. Complexity and class-size findings still apply to those types, and their raw coupling remains in `metrics.csv`.
+
+### Async concurrency semantics
+
+`unboundedWhenAll` is reported only when the analyzer can see a deferred task-producing projection over a source whose cardinality is not bounded at the call site. Passing an already-created task collection to `Task.WhenAll` is not itself treated as creating concurrency. Constructor-materialized strategy sets and fixed inline collections are treated as startup- or author-bounded.
+
+Back-pressure is recognized through `ChannelWriter`, `ChannelReader`, and `SemaphoreSlim`, including authored wrapper methods and interface contracts when every analyzed implementation delegates to a recognized back-pressure primitive.
+
+The Performance & Async dimension also reports `sharedStateMutationInFanOut` when a concurrent projection passes captured state to an authored implementation that demonstrably mutates that parameter-reachable object graph.
+
+### Evidence population and samples
+
+Architecture `findings` and `hotspotCount` describe the complete hotspot population. The `hotspots` property remains a top-ten presentation sample; `hotspotsTruncated` states whether additional findings exist. When truncated, `basis` reports both the population and displayed count.
+
+If any `dotnet list package` invocation fails, Dependency Management returns `status: "failed"` without a score. Its basis and `dependencyCommands` diagnostics identify the failing arguments, exit code or exception, and a bounded stderr summary.
 
 ### Passive request and response types
 

@@ -6,15 +6,33 @@ namespace CodeMetrics.AI.Probes;
 
 public static class DependencyProbe
 {
+    public sealed record DependencyCommandResult(
+        string Arguments,
+        string StandardOutput,
+        string StandardError,
+        int? ExitCode,
+        string? ExceptionType = null,
+        string? ExceptionMessage = null)
+    {
+        public bool Failed => ExitCode != 0 || ExceptionType != null;
+    }
+
     public static async Task<DimensionResult> AnalyzeAsync(string solutionPath, string solutionDir)
     {
-        var (vulnerableOutput, vulnerableFailed)  = await RunDotnetListAsync(solutionPath, "--vulnerable --include-transitive");
-        var (outdatedOutput,   outdatedFailed)    = await RunDotnetListAsync(solutionPath, "--outdated");
-        var (deprecatedOutput, deprecatedFailed)  = await RunDotnetListAsync(solutionPath, "--deprecated");
+        var vulnerable = await RunDotnetListAsync(solutionPath, "--vulnerable --include-transitive");
+        var outdated = await RunDotnetListAsync(solutionPath, "--outdated");
+        var deprecated = await RunDotnetListAsync(solutionPath, "--deprecated");
+        DependencyCommandResult[] commands = [vulnerable, outdated, deprecated];
 
-        bool anyCommandFailed = vulnerableFailed || outdatedFailed || deprecatedFailed;
+        bool anyCommandFailed = commands.Any(command => command.Failed);
 
-        return AnalyzeOutput(vulnerableOutput, outdatedOutput, deprecatedOutput, solutionDir, anyCommandFailed);
+        return AnalyzeOutput(
+            vulnerable.StandardOutput,
+            outdated.StandardOutput,
+            deprecated.StandardOutput,
+            solutionDir,
+            anyCommandFailed,
+            commands);
     }
 
     // ── Output processor (public for testability) ─────────────────────────────
@@ -24,8 +42,38 @@ public static class DependencyProbe
         string outdatedOutput,
         string deprecatedOutput,
         string solutionDir,
-        bool anyCommandFailed)
+        bool anyCommandFailed,
+        IReadOnlyList<DependencyCommandResult>? commandResults = null)
     {
+        if (anyCommandFailed)
+        {
+            var failedCommands = commandResults?.Where(command => command.Failed).ToList() ?? [];
+            var diagnostic = failedCommands.Count == 0
+                ? "One or more dotnet list package commands failed; command diagnostics were unavailable."
+                : string.Join("; ", failedCommands.Select(FormatFailure));
+
+            return new DimensionResult
+            {
+                Status = "failed",
+                Basis = $"Dependency probe failed. {diagnostic}",
+                Findings =
+                [
+                    new Finding
+                    {
+                        Category = "dependencyProbeFailure",
+                        Severity = "error",
+                        Confidence = "high",
+                        Message = diagnostic
+                    }
+                ],
+                Extra =
+                {
+                    ["dependencyMetrics"] = new { anyCommandFailed = true },
+                    ["dependencyCommands"] = BuildCommandDiagnostics(commandResults)
+                }
+            };
+        }
+
         var findings = new List<Finding>();
 
         // ── Parse vulnerable output ───────────────────────────────────────────
@@ -131,7 +179,7 @@ public static class DependencyProbe
 
         // ── Scoring ───────────────────────────────────────────────────────────
         double score;
-        if (anyCommandFailed || vulnerableDirect > 0)
+        if (vulnerableDirect > 0)
             score = 0;
         else if (vulnerableTransitive > 0 || unsupportedTFMs > 1)
             score = 2;
@@ -173,7 +221,7 @@ public static class DependencyProbe
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
-    private static async Task<(string Output, bool Failed)> RunDotnetListAsync(
+    private static async Task<DependencyCommandResult> RunDotnetListAsync(
         string solutionPath, string args)
     {
         try
@@ -188,17 +236,67 @@ public static class DependencyProbe
 
             using var process = Process.Start(psi);
             if (process == null)
-                return (string.Empty, true);
+            {
+                return new DependencyCommandResult(
+                    args, string.Empty, string.Empty, null,
+                    nameof(InvalidOperationException), "dotnet process could not be started.");
+            }
 
-            var output = await process.StandardOutput.ReadToEndAsync();
-            await process.WaitForExitAsync();
+            var stdout = process.StandardOutput.ReadToEndAsync();
+            var stderr = process.StandardError.ReadToEndAsync();
+            var exited = process.WaitForExitAsync();
+            await Task.WhenAll(stdout, stderr, exited);
 
-            return (output, process.ExitCode != 0);
+            return new DependencyCommandResult(
+                args, await stdout, await stderr, process.ExitCode);
         }
-        catch
+        catch (Exception ex)
         {
-            return (string.Empty, true);
+            return new DependencyCommandResult(
+                args, string.Empty, string.Empty, null,
+                ex.GetType().Name, ex.Message);
         }
+    }
+
+    private static string FormatFailure(DependencyCommandResult command)
+    {
+        var outcome = command.ExitCode is { } exitCode
+            ? $"exit code {exitCode}"
+            : command.ExceptionType ?? "unknown failure";
+        var detail = FirstDiagnosticLine(command.StandardError)
+                     ?? FirstDiagnosticLine(command.ExceptionMessage);
+        return detail == null
+            ? $"dotnet list package {command.Arguments}: {outcome}"
+            : $"dotnet list package {command.Arguments}: {outcome}: {detail}";
+    }
+
+    private static object[] BuildCommandDiagnostics(
+        IReadOnlyList<DependencyCommandResult>? commandResults)
+    {
+        return commandResults?
+            .Select(command => (object)new
+            {
+                arguments = command.Arguments,
+                command.ExitCode,
+                failed = command.Failed,
+                stderr = FirstDiagnosticLine(command.StandardError),
+                command.ExceptionType,
+                exception = FirstDiagnosticLine(command.ExceptionMessage)
+            })
+            .ToArray() ?? [];
+    }
+
+    private static string? FirstDiagnosticLine(string? value)
+    {
+        var line = value?
+            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+            .Select(candidate => candidate.Trim())
+            .FirstOrDefault(candidate => candidate.Length > 0);
+        if (line == null)
+            return null;
+
+        const int maxLength = 300;
+        return line.Length <= maxLength ? line : line[..maxLength] + "…";
     }
 
     private static string ExtractPackageName(string line)

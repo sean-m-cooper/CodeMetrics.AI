@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace CodeMetrics.AI.Output;
 
 public sealed class EvidenceModel
@@ -14,8 +16,20 @@ public sealed class EvidenceModel
 public sealed class ToolInfo
 {
     public string Name { get; init; } = "CodeMetrics.AI";
-    public string Version { get; init; } = typeof(ToolInfo).Assembly.GetName().Version?.ToString() ?? "1.0.0";
+    public string Version { get; init; } = GetPackageVersion();
     public string Ecosystem { get; init; } = "dotnet";
+
+    private static string GetPackageVersion()
+    {
+        var informationalVersion = typeof(ToolInfo).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion;
+
+        if (!string.IsNullOrWhiteSpace(informationalVersion))
+            return informationalVersion.Split('+', 2)[0];
+
+        return typeof(ToolInfo).Assembly.GetName().Version?.ToString(3) ?? "1.0.0";
+    }
 }
 
 public sealed class SubjectInfo

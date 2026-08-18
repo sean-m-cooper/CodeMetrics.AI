@@ -670,4 +670,72 @@ public class ClassA
             Directory.Delete(tempDir, recursive: true);
         }
     }
+
+
+    [Fact]
+    public void UnresolvedCref_ProducesFindingAndDeduction()
+    {
+        var tempDir = TempDir();
+        try
+        {
+            WriteLines(Path.Combine(tempDir, "README.md"), 20);
+            var docsDir = Path.Combine(tempDir, "docs");
+            Directory.CreateDirectory(docsDir);
+            File.WriteAllText(Path.Combine(docsDir, "architecture.md"), "# Arch");
+            File.WriteAllText(Path.Combine(tempDir, "CLAUDE.md"), "# Instructions");
+
+            const string code = """
+                /// <summary>Uses <see cref="MissingPipelineStage"/>.</summary>
+                public class DocumentedType { }
+                """;
+            var (_, _, compilation) = RoslynTestHelper.CompileCode(code);
+            var projects = new List<(string, Compilation, string?)>
+            {
+                ("Library", compilation, null)
+            };
+
+            var result = DocumentationProbe.Analyze(tempDir, projects);
+
+            result.Findings.Should().ContainSingle(f => f.Category == "unresolvedCref");
+            result.Score.Should().Be(7); // includes the existing -2 for a library without XML output enabled
+            result.Basis.Should().Contain("unresolvedCrefs=1");
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ResolvedCref_DoesNotProduceFinding()
+    {
+        var tempDir = TempDir();
+        try
+        {
+            WriteLines(Path.Combine(tempDir, "README.md"), 20);
+            var docsDir = Path.Combine(tempDir, "docs");
+            Directory.CreateDirectory(docsDir);
+            File.WriteAllText(Path.Combine(docsDir, "architecture.md"), "# Arch");
+            File.WriteAllText(Path.Combine(tempDir, "CLAUDE.md"), "# Instructions");
+
+            const string code = """
+                public class KnownType { }
+                /// <summary>Uses <see cref="KnownType"/>.</summary>
+                public class DocumentedType { }
+                """;
+            var (_, _, compilation) = RoslynTestHelper.CompileCode(code);
+            var projects = new List<(string, Compilation, string?)>
+            {
+                ("Library", compilation, null)
+            };
+
+            var result = DocumentationProbe.Analyze(tempDir, projects);
+
+            result.Findings.Should().NotContain(f => f.Category == "unresolvedCref");
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
 }

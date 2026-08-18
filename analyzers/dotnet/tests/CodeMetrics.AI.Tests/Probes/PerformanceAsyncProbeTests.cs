@@ -924,6 +924,55 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
+    public void BackpressureWrapperInterfaceInsideLoop_DoesNotFindAwaitedIoInsideLoop()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.Threading.Channels;
+            using System.Threading.Tasks;
+            interface IWorkQueue { ValueTask WriteAsync(int item); }
+            sealed class WorkQueue : IWorkQueue {
+                private readonly Channel<int> channel = Channel.CreateBounded<int>(4);
+                public ValueTask WriteAsync(int item) => channel.Writer.WriteAsync(item);
+            }
+            class C {
+                public async Task M(IWorkQueue queue, IEnumerable<int> items) {
+                    foreach (var item in items) await queue.WriteAsync(item);
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true, addChannelsRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
+    public void OrderedPipelineStagesSharingContext_DoNotFindAwaitedIoInsideLoop()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+            interface IPipelineStage { Task ExecuteAsync(Context context); }
+            sealed class Context { }
+            class Pipeline {
+                private readonly IReadOnlyList<IPipelineStage> stages;
+                public Pipeline(IReadOnlyList<IPipelineStage> stages) { this.stages = stages; }
+                public async Task RunAsync(Context context) {
+                    for (var i = 0; i < stages.Count; i++)
+                        await ExecuteStageWithTimingAsync(stages[i], context);
+                }
+                private static Task ExecuteStageWithTimingAsync(IPipelineStage stage, Context context) =>
+                    stage.ExecuteAsync(context);
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
     public void UserTypeNamedLikeAChannel_StillFindsAwaitedIoInsideLoop()
     {
         // Back-pressure is recognised from the resolved framework type, never from the
@@ -973,10 +1022,11 @@ public class PerformanceAsyncProbeTests
     // ── 7. unboundedWhenAll ──────────────────────────────────────────────────
 
     [Fact]
-    public void WhenAllWithUnboundedSequence_FindsUnboundedWhenAll()
+    public void WhenAllWithExistingTaskCollection_DoesNotClaimItCreatesUnboundedConcurrency()
     {
         const string code = """
             using System.Collections.Generic;
+            using System.Linq;
             using System.Threading.Tasks;
             class C {
                 public async Task M(IEnumerable<Task> tasks) {
@@ -987,39 +1037,62 @@ public class PerformanceAsyncProbeTests
 
         var result = Analyze(code, addTasksRef: true);
 
-        result.Findings.Should().Contain(f => f.Category == "unboundedWhenAll");
+        result.Findings.Should().NotContain(f => f.Category == "unboundedWhenAll");
     }
 
     [Fact]
-    public void WhenAllWithToArray_DoesNotFindUnboundedWhenAll()
+    public void WhenAllWithInputSizedProjection_FindsPotentiallyUnboundedWhenAll()
     {
         const string code = """
             using System.Collections.Generic;
             using System.Linq;
             using System.Threading.Tasks;
             class C {
-                public async Task M(IEnumerable<Task> tasks) {
-                    await Task.WhenAll(tasks.ToArray());
+                private Task SendAsync(int item) => Task.CompletedTask;
+                public async Task M(IEnumerable<int> items) {
+                    await Task.WhenAll(items.Select(SendAsync));
                 }
             }
             """;
 
         var result = Analyze(code, addTasksRef: true);
 
-        result.Findings.Should().NotContain(f => f.Category == "unboundedWhenAll");
+        result.Findings.Should().ContainSingle(f => f.Category == "unboundedWhenAll")
+            .Which.Confidence.Should().Be("medium");
     }
 
     [Fact]
-    public void WhenAllWithToList_DoesNotFindUnboundedWhenAll()
+    public void MaterializingInputSizedProjection_DoesNotHideUnboundedFanOut()
     {
         const string code = """
             using System.Collections.Generic;
             using System.Linq;
             using System.Threading.Tasks;
             class C {
-                public async Task M(IEnumerable<Task> tasks) {
-                    await Task.WhenAll(tasks.ToList());
+                private Task SendAsync(int item) => Task.CompletedTask;
+                public async Task M(IEnumerable<int> items) {
+                    await Task.WhenAll(items.Select(SendAsync).ToArray());
                 }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().Contain(f => f.Category == "unboundedWhenAll");
+    }
+
+    [Fact]
+    public void ConstructorMaterializedStrategySet_DoesNotFindUnboundedWhenAll()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Threading.Tasks;
+            interface IEnricher { Task RunAsync(); }
+            class C {
+                private readonly IReadOnlyList<IEnricher> enrichers;
+                public C(IEnumerable<IEnricher> enrichers) { this.enrichers = enrichers.ToList(); }
+                public Task M() => Task.WhenAll(enrichers.Select(enricher => enricher.RunAsync()));
             }
             """;
 
@@ -1052,10 +1125,12 @@ public class PerformanceAsyncProbeTests
     {
         const string code = """
             using System.Collections.Generic;
+            using System.Linq;
             using System.Threading.Tasks;
             class C {
-                public async Task M(IEnumerable<Task> tasks) {
-                    await Task.WhenAll(tasks);
+                private Task SendAsync(int item) => Task.CompletedTask;
+                public async Task M(IEnumerable<int> items) {
+                    await Task.WhenAll(items.Select(SendAsync));
                 }
             }
             """;
@@ -1064,6 +1139,57 @@ public class PerformanceAsyncProbeTests
 
         result.Findings.Where(f => f.Category == "unboundedWhenAll")
             .Should().AllSatisfy(f => f.Severity.Should().Be("info"));
+    }
+
+    [Fact]
+    public void FanOutImplementationMutatesCapturedRequest_FindsSharedStateMutation()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Threading.Tasks;
+            sealed class Request { public List<int> Values { get; } = new(); }
+            interface IEnricher { Task EnrichAsync(Request request); }
+            sealed class Enricher : IEnricher {
+                public Task EnrichAsync(Request request) {
+                    request.Values.Add(1);
+                    return Task.CompletedTask;
+                }
+            }
+            class Orchestrator {
+                public Task RunAsync(IEnumerable<IEnricher> enrichers, Request request) =>
+                    Task.WhenAll(enrichers.Select(enricher => enricher.EnrichAsync(request)));
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().ContainSingle(f => f.Category == "sharedStateMutationInFanOut")
+            .Which.Severity.Should().Be("error");
+    }
+
+    [Fact]
+    public void FanOutReturnsResultsWithoutMutatingRequest_DoesNotFindSharedStateMutation()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Threading.Tasks;
+            sealed class Request { }
+            sealed class Detail { }
+            interface IEnricher { Task<Detail> EnrichAsync(Request request); }
+            sealed class Enricher : IEnricher {
+                public Task<Detail> EnrichAsync(Request request) => Task.FromResult(new Detail());
+            }
+            class Orchestrator {
+                public Task<Detail[]> RunAsync(IEnumerable<IEnricher> enrichers, Request request) =>
+                    Task.WhenAll(enrichers.Select(enricher => enricher.EnrichAsync(request)));
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "sharedStateMutationInFanOut");
     }
 
     // ── Clean code ───────────────────────────────────────────────────────────

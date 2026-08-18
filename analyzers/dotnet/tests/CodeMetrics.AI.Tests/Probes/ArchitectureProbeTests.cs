@@ -830,7 +830,7 @@ public class ArchitectureProbeTests
     }
 
     [Fact]
-    public void MetricHotspots_LimitedToTop10()
+    public void MetricHotspots_ReportsPopulationAndTop10SampleSeparately()
     {
         // Create 12 classes each with CC >= 80
         var metrics = Enumerable.Range(1, 12)
@@ -850,6 +850,47 @@ public class ArchitectureProbeTests
         var result = Analyze(code, metrics);
 
         result.Findings.Where(f => f.Category == "highCyclomaticComplexity")
-            .Should().HaveCountLessThanOrEqualTo(10);
+            .Should().HaveCount(12);
+        result.Extra["hotspotCount"].Should().Be(12);
+        result.Extra["hotspotsTruncated"].Should().Be(true);
+        ((IReadOnlyCollection<object>)result.Extra["hotspots"]!).Should().HaveCount(10);
+        result.Basis.Should().Contain("hotspots: 12 (showing 10)");
+    }
+
+    [Fact]
+    public void MetricHotspots_FrameworkAuthenticationHandler_SuppressesOnlyCoupling()
+    {
+        const string code = """
+            namespace Microsoft.AspNetCore.Authentication
+            {
+                public abstract class AuthenticationHandler<TOptions> { }
+            }
+
+            namespace MyApp
+            {
+                public sealed class ApiKeyHandler
+                    : Microsoft.AspNetCore.Authentication.AuthenticationHandler<string> { }
+            }
+            """;
+        var metrics = new[]
+        {
+            new TypeMetrics
+            {
+                Project = "TestProject",
+                Namespace = "MyApp",
+                Type = "ApiKeyHandler",
+                FilePath = "ApiKeyHandler.cs",
+                CyclomaticComplexity = 80,
+                ClassCoupling = 40,
+                LinesOfSource = 500
+            }
+        };
+
+        var result = Analyze(code, metrics);
+
+        result.Findings.Should().NotContain(f => f.Category == "highCoupling");
+        result.Findings.Should().Contain(f => f.Category == "highCyclomaticComplexity");
+        result.Findings.Should().Contain(f => f.Category == "largeClass");
+        result.Extra["excludedFrameworkCouplingArchetypeTypes"].Should().Be(1);
     }
 }

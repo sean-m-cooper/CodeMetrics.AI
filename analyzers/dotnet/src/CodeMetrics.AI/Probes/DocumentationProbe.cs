@@ -11,6 +11,8 @@ public static class DocumentationProbe
         string solutionDir,
         IReadOnlyList<(string Name, Compilation Compilation, string? ProjectFilePath)> projects)
     {
+        var findings = FindUnresolvedCrefs(projects, solutionDir);
+
         // ── 1. README check ──────────────────────────────────────────────────────
         var readmePath = Path.Combine(solutionDir, "README.md");
         bool hasReadme = File.Exists(readmePath);
@@ -76,6 +78,7 @@ public static class DocumentationProbe
 
         // ── 7. Stale markers ─────────────────────────────────────────────────────
         int staleMarkerCount = CountStaleMarkers(solutionDir, hasReadme, readmePath, hasDocsDir, docsDir);
+        int unresolvedCrefCount = findings.Count;
 
         // ── Scoring ───────────────────────────────────────────────────────────────
         if (!hasReadme && !hasDocsDir)
@@ -84,9 +87,11 @@ public static class DocumentationProbe
             {
                 Status = "scored",
                 Score = 0,
-                Basis = "Neither README.md nor docs/ directory found.",
+                Basis = $"Neither README.md nor docs/ directory found. unresolvedCrefs={unresolvedCrefCount}.",
+                Findings = findings,
                 Extra = BuildExtra(hasReadme, readmeNonBlankLines, hasDocsDir, architectureDocCount,
-                    hasAiInstructions, libraryXmlDocRatio, publicApiDocCoverage, staleMarkerCount)
+                    hasAiInstructions, libraryXmlDocRatio, publicApiDocCoverage, staleMarkerCount,
+                    unresolvedCrefCount)
             };
         }
 
@@ -113,6 +118,9 @@ public static class DocumentationProbe
         if (staleMarkerCount > 0)
             score -= 1;
 
+        if (unresolvedCrefCount > 0)
+            score -= 1;
+
         // Clamp to [0, 10]
         score = Math.Max(0, Math.Min(10, score));
 
@@ -121,15 +129,17 @@ public static class DocumentationProbe
                     $"hasAiInstructions={hasAiInstructions}, " +
                     $"libraryXmlDocRatio={libraryXmlDocRatio:F2}, " +
                     $"publicApiDocCoverage={publicApiDocCoverage:F2}, " +
-                    $"staleMarkers={staleMarkerCount}.";
+                    $"staleMarkers={staleMarkerCount}, unresolvedCrefs={unresolvedCrefCount}.";
 
         return new DimensionResult
         {
             Status = "scored",
             Score = score,
             Basis = basis,
+            Findings = findings,
             Extra = BuildExtra(hasReadme, readmeNonBlankLines, hasDocsDir, architectureDocCount,
-                hasAiInstructions, libraryXmlDocRatio, publicApiDocCoverage, staleMarkerCount)
+                hasAiInstructions, libraryXmlDocRatio, publicApiDocCoverage, staleMarkerCount,
+                unresolvedCrefCount)
         };
     }
 
@@ -228,6 +238,44 @@ public static class DocumentationProbe
             t.IsKind(SyntaxKind.MultiLineDocumentationCommentTrivia));
     }
 
+    private static List<Finding> FindUnresolvedCrefs(
+        IReadOnlyList<(string Name, Compilation Compilation, string? ProjectFilePath)> projects,
+        string solutionDir)
+    {
+        var findings = new List<Finding>();
+
+        foreach (var (projectName, compilation, _) in projects)
+        {
+            foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
+            {
+                var root = tree.GetRoot();
+                var semanticModel = compilation.GetSemanticModel(tree);
+                foreach (var attribute in root.DescendantNodes(descendIntoTrivia: true)
+                             .OfType<XmlCrefAttributeSyntax>())
+                {
+                    var symbolInfo = semanticModel.GetSymbolInfo(attribute.Cref);
+                    if (symbolInfo.Symbol != null)
+                        continue;
+
+                    findings.Add(new Finding
+                    {
+                        Category = "unresolvedCref",
+                        Severity = "warning",
+                        File = tree.FilePath,
+                        Line = attribute.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
+                        Project = projectName,
+                        Type = attribute.Ancestors()
+                            .OfType<TypeDeclarationSyntax>()
+                            .FirstOrDefault()?.Identifier.Text,
+                        Message = $"XML documentation reference '{attribute.Cref}' does not resolve to a symbol."
+                    });
+                }
+            }
+        }
+
+        return findings;
+    }
+
     private static int CountStaleMarkers(
         string solutionDir,
         bool hasReadme,
@@ -272,7 +320,8 @@ public static class DocumentationProbe
         bool hasAiInstructions,
         double libraryXmlDocRatio,
         double publicApiDocCoverage,
-        int staleMarkerCount)
+        int staleMarkerCount,
+        int unresolvedCrefCount)
     {
         var data = new
         {
@@ -283,7 +332,8 @@ public static class DocumentationProbe
             hasAiInstructions,
             libraryXmlDocRatio = Math.Round(libraryXmlDocRatio, 4),
             publicApiDocCoverage = Math.Round(publicApiDocCoverage, 4),
-            staleMarkerCount
+            staleMarkerCount,
+            unresolvedCrefCount
         };
 
         return new Dictionary<string, object?>

@@ -278,10 +278,10 @@ public class DependencyProbeTests
         }
     }
 
-    // ── 8. anyCommandFailed → score 0 ────────────────────────────────────────
+    // ── 8. command failure → failed dimension ────────────────────────────────
 
     [Fact]
-    public void AnyCommandFailed_ScoreIs0()
+    public void AnyCommandFailed_ReturnsFailedDimensionWithoutScore()
     {
         var dir = TempDir();
         try
@@ -292,7 +292,36 @@ public class DependencyProbeTests
                 string.Empty, string.Empty, string.Empty,
                 dir, anyCommandFailed: true);
 
-            result.Score.Should().Be(0);
+            result.Status.Should().Be("failed");
+            result.Score.Should().BeNull();
+            result.Findings.Should().ContainSingle(f => f.Category == "dependencyProbeFailure");
+        }
+        finally
+        {
+            Directory.Delete(dir, true);
+        }
+    }
+
+    [Fact]
+    public void FailedCommand_ReportsCommandExitCodeAndStderr()
+    {
+        var dir = TempDir();
+        try
+        {
+            var commands = new[]
+            {
+                new DependencyProbe.DependencyCommandResult(
+                    "--outdated", string.Empty, "NU1301: feed authentication failed\nmore detail", 1)
+            };
+
+            var result = DependencyProbe.AnalyzeOutput(
+                string.Empty, string.Empty, string.Empty,
+                dir, anyCommandFailed: true, commandResults: commands);
+
+            result.Status.Should().Be("failed");
+            result.Basis.Should().Contain("--outdated");
+            result.Basis.Should().Contain("exit code 1");
+            result.Basis.Should().Contain("NU1301: feed authentication failed");
         }
         finally
         {

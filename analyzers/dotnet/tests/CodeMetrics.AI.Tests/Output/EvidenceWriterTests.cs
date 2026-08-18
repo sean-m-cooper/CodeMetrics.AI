@@ -136,6 +136,14 @@ public class EvidenceWriterTests
     }
 
     [Fact]
+    public void ToolInfo_UsesPackageVersion()
+    {
+        var tool = new ToolInfo();
+
+        tool.Version.Should().Be("1.1.0");
+    }
+
+    [Fact]
     public async Task WriteAsync_OmitsScore_ForSkippedDimensions()
     {
         var tempFile = Path.GetTempFileName();

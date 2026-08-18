@@ -11,6 +11,7 @@ public static class PerformanceAsyncProbe
         string? solutionDir = null)
     {
         var findings = new List<Finding>();
+        var backpressureMethods = BackpressureMethodClassifier.Build(projects, solutionDir);
 
         foreach (var (projectName, compilation) in projects)
         {
@@ -25,10 +26,13 @@ public static class PerformanceAsyncProbe
                 AnalyzeSaveChangesInsideLoop(root, filePath, projectName, findings);
                 AnalyzeMissingCancellationToken(root, filePath, projectName, findings);
                 AnalyzeMaterializationBeforeQueryShape(root, filePath, projectName, findings);
-                AnalyzeAwaitedIoInsideLoop(root, semanticModel, filePath, projectName, findings);
-                AnalyzeUnboundedWhenAll(root, filePath, projectName, findings);
+                AnalyzeAwaitedIoInsideLoop(
+                    root, semanticModel, backpressureMethods, filePath, projectName, findings);
+                AnalyzeUnboundedWhenAll(root, semanticModel, filePath, projectName, findings);
             }
         }
+
+        findings.AddRange(ConcurrentFanOutProbe.Analyze(projects, solutionDir));
 
         var errors = findings.Count(f => f.Severity == "error");
         var warnings = findings.Count(f => f.Severity == "warning");
@@ -65,7 +69,8 @@ public static class PerformanceAsyncProbe
                     $"missingCancellationToken={findings.Count(f => f.Category == "missingCancellationToken")}, " +
                     $"materializationBeforeQueryShape={findings.Count(f => f.Category == "materializationBeforeQueryShape")}, " +
                     $"awaitedIoInsideLoop={findings.Count(f => f.Category == "awaitedIoInsideLoop")}, " +
-                    $"unboundedWhenAll={findings.Count(f => f.Category == "unboundedWhenAll")}.";
+                    $"unboundedWhenAll={findings.Count(f => f.Category == "unboundedWhenAll")}, " +
+                    $"sharedStateMutationInFanOut={findings.Count(f => f.Category == "sharedStateMutationInFanOut")}.";
 
         return new DimensionResult
         {
@@ -287,7 +292,8 @@ public static class PerformanceAsyncProbe
 
     // 6. awaitedIoInsideLoop: await <IoMethod>Async inside a loop
     private static void AnalyzeAwaitedIoInsideLoop(
-        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName,
+        SyntaxNode root, SemanticModel semanticModel, IReadOnlySet<string> backpressureMethods,
+        string filePath, string projectName,
         List<Finding> findings)
     {
         var awaitExpressions = root.DescendantNodes().OfType<AwaitExpressionSyntax>();
@@ -336,7 +342,10 @@ public static class PerformanceAsyncProbe
             if (IsBoundedFallbackSequence(loop))
                 continue;
 
-            if (IsBackpressurePrimitive(semanticModel, awaitExpr))
+            if (IsBackpressurePrimitive(semanticModel, awaitExpr, backpressureMethods))
+                continue;
+
+            if (IsOrderedPipelineStageLoop(loop, awaitExpr, semanticModel))
                 continue;
 
             // Check if name contains one of the IO verbs
@@ -359,9 +368,12 @@ public static class PerformanceAsyncProbe
         }
     }
 
-    // 7. unboundedWhenAll: Task.WhenAll(...) where argument is not array literal, .ToList(), or .ToArray()
+    // 7. unboundedWhenAll: a visible deferred task projection over an input-sized source.
+    // Task.WhenAll over an existing task collection does not create concurrency, so unknown
+    // collection provenance is not evidence of an unbounded fan-out.
     private static void AnalyzeUnboundedWhenAll(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName,
+        List<Finding> findings)
     {
         var invocations = root.DescendantNodes().OfType<InvocationExpressionSyntax>();
         foreach (var inv in invocations)
@@ -380,35 +392,24 @@ public static class PerformanceAsyncProbe
             if (args.Count == 0)
                 continue;
 
-            // Single argument — check what it is
-            if (args.Count == 1)
+            if (args.Count != 1 ||
+                !TryGetTaskProjectionSource(args[0].Expression, out var source) ||
+                IsFixedCardinalitySource(source, semanticModel))
             {
-                var argExpr = args[0].Expression;
-
-                // Array creation expression is fine
-                if (argExpr is ArrayCreationExpressionSyntax or ImplicitArrayCreationExpressionSyntax)
-                    continue;
-
-                // .ToList() or .ToArray() is fine
-                if (argExpr is InvocationExpressionSyntax argInv &&
-                    argInv.Expression is MemberAccessExpressionSyntax argMa)
-                {
-                    var name = argMa.Name.Identifier.Text;
-                    if (name == "ToList" || name == "ToArray")
-                        continue;
-                }
-
-                findings.Add(new Finding
-                {
-                    Category = "unboundedWhenAll",
-                    Severity = "info",
-                    File = filePath,
-                    Line = GetLine(inv),
-                    Project = projectName,
-                    Type = GetContainingTypeName(inv),
-                    Message = "Task.WhenAll called with an unbounded sequence. Consider using a bounded collection to limit concurrency."
-                });
+                continue;
             }
+
+            findings.Add(new Finding
+            {
+                Category = "unboundedWhenAll",
+                Severity = "info",
+                Confidence = "medium",
+                File = filePath,
+                Line = GetLine(inv),
+                Project = projectName,
+                Type = GetContainingTypeName(inv),
+                Message = "Task.WhenAll enumerates a task-producing projection whose input size is not bounded here. Consider explicit concurrency control."
+            });
             // Multiple inline arguments (e.g. Task.WhenAll(t1, t2)) — explicit array of tasks, OK
         }
     }
@@ -539,30 +540,153 @@ public static class PerformanceAsyncProbe
     /// named "…Channel" is not matched.
     /// </para>
     /// </summary>
-    private static bool IsBackpressurePrimitive(SemanticModel semanticModel, AwaitExpressionSyntax awaitExpr)
+    private static bool IsBackpressurePrimitive(
+        SemanticModel semanticModel,
+        AwaitExpressionSyntax awaitExpr,
+        IReadOnlySet<string> backpressureMethods)
     {
         if (awaitExpr.Expression is not InvocationExpressionSyntax invocation)
             return false;
 
-        if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol method)
-            return false;
-
-        var owner = method.ContainingType?.OriginalDefinition;
-        if (owner == null)
-            return false;
-
-        var qualifiedName = $"{owner.ContainingNamespace?.ToDisplayString()}.{owner.Name}";
-        return BackpressureTypes.Contains(qualifiedName);
+        return BackpressureMethodClassifier.IsBackpressureInvocation(
+            semanticModel, invocation, backpressureMethods);
     }
 
     private const int MaxFallbackCandidates = 4;
 
-    private static readonly HashSet<string> BackpressureTypes = new(StringComparer.Ordinal)
+    private static bool IsOrderedPipelineStageLoop(
+        SyntaxNode loop,
+        AwaitExpressionSyntax awaitExpression,
+        SemanticModel semanticModel)
     {
-        "System.Threading.Channels.ChannelWriter",
-        "System.Threading.Channels.ChannelReader",
-        "System.Threading.SemaphoreSlim"
-    };
+        if (awaitExpression.Expression is not InvocationExpressionSyntax invocation)
+            return false;
+
+        if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol awaitedMethod ||
+            awaitedMethod.DeclaringSyntaxReferences.Length == 0)
+        {
+            return false;
+        }
+
+        IEnumerable<ExpressionSyntax> loopElements = loop switch
+        {
+            ForStatementSyntax => invocation.ArgumentList.Arguments
+                .SelectMany(argument => argument.Expression.DescendantNodesAndSelf()
+                    .OfType<ElementAccessExpressionSyntax>()),
+            ForEachStatementSyntax forEach => invocation.ArgumentList.Arguments
+                .SelectMany(argument => argument.Expression.DescendantNodesAndSelf()
+                    .OfType<IdentifierNameSyntax>()
+                    .Where(identifier => identifier.Identifier.Text == forEach.Identifier.Text)),
+            _ => []
+        };
+
+        return loopElements.Any(expression =>
+        {
+            var type = semanticModel.GetTypeInfo(expression).Type as INamedTypeSymbol;
+            return type != null && IsPipelineStageType(type);
+        });
+    }
+
+    private static bool IsPipelineStageType(INamedTypeSymbol type)
+    {
+        return type.Name.EndsWith("PipelineStage", StringComparison.Ordinal) ||
+               type.AllInterfaces.Any(interfaceType =>
+                   interfaceType.Name.EndsWith("PipelineStage", StringComparison.Ordinal));
+    }
+
+    private static bool TryGetTaskProjectionSource(
+        ExpressionSyntax expression,
+        out ExpressionSyntax source)
+    {
+        var current = expression;
+        while (current is InvocationExpressionSyntax invocation &&
+               invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+        {
+            if (memberAccess.Name.Identifier.Text is "Select" or "SelectMany")
+            {
+                source = memberAccess.Expression;
+                return true;
+            }
+
+            current = memberAccess.Expression;
+        }
+
+        source = expression;
+        return false;
+    }
+
+    private static bool IsFixedCardinalitySource(ExpressionSyntax source, SemanticModel semanticModel)
+    {
+        if (InlineLiteralElementCount(source) != null)
+            return true;
+
+        if (semanticModel.GetSymbolInfo(source).Symbol is not IFieldSymbol field)
+            return false;
+
+        return IsStartupMaterializedField(field, semanticModel.Compilation);
+    }
+
+    private static bool IsStartupMaterializedField(IFieldSymbol field, Compilation compilation)
+    {
+        foreach (var typeReference in field.ContainingType.DeclaringSyntaxReferences)
+        {
+            if (typeReference.GetSyntax() is not TypeDeclarationSyntax typeDeclaration)
+                continue;
+
+            var model = compilation.GetSemanticModel(typeDeclaration.SyntaxTree);
+            foreach (var assignment in typeDeclaration.DescendantNodes()
+                         .OfType<AssignmentExpressionSyntax>())
+            {
+                if (!SymbolEqualityComparer.Default.Equals(
+                        model.GetSymbolInfo(assignment.Left).Symbol, field))
+                {
+                    continue;
+                }
+
+                if (IsMaterializedConstructorParameter(assignment.Right, model))
+                    return true;
+            }
+
+            foreach (var declarator in typeDeclaration.DescendantNodes()
+                         .OfType<VariableDeclaratorSyntax>()
+                         .Where(declarator => declarator.Initializer != null))
+            {
+                if (!SymbolEqualityComparer.Default.Equals(
+                        model.GetDeclaredSymbol(declarator), field))
+                {
+                    continue;
+                }
+
+                if (InlineLiteralElementCount(declarator.Initializer!.Value) != null ||
+                    IsMaterializedConstructorParameter(declarator.Initializer.Value, model))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsMaterializedConstructorParameter(
+        ExpressionSyntax expression,
+        SemanticModel semanticModel)
+    {
+        var current = expression;
+        while (current is InvocationExpressionSyntax invocation &&
+               invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+        {
+            if (memberAccess.Name.Identifier.Text is "ToList" or "ToArray")
+            {
+                return semanticModel.GetSymbolInfo(memberAccess.Expression).Symbol is IParameterSymbol parameter &&
+                       parameter.ContainingSymbol is IMethodSymbol { MethodKind: MethodKind.Constructor };
+            }
+
+            current = memberAccess.Expression;
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// Locations in the loop body whose value comes, directly or through a chain of local
