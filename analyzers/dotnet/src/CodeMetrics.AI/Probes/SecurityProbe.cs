@@ -311,49 +311,72 @@ public static class SecurityProbe
     private static void AnalyzeMissingAuthorization(
         Compilation compilation, string projectName, List<Finding> findings, string? solutionDir)
     {
-        // First pass: does the project use [Authorize] at all?
-        bool projectUsesAuthorize = false;
         var allRoots = SourceFileFilter.AnalyzableTrees(compilation, solutionDir)
             .Select(t => t.GetRoot())
             .ToList();
 
-        foreach (var root in allRoots)
-        {
-            var allMembers = root.DescendantNodes().OfType<MemberDeclarationSyntax>();
-            if (allMembers.Any(m => HasAttribute(m, "Authorize")))
-            {
-                projectUsesAuthorize = true;
-                break;
-            }
-        }
+        // Attribute spelling, aliases, and partial declarations are compiler concerns.
+        // Resolve source symbols instead of inferring authorization from syntax text.
+        var sourceMemberSymbols = allRoots
+            .SelectMany(root => root.DescendantNodes().OfType<MemberDeclarationSyntax>())
+            .Select(member => compilation.GetSemanticModel(member.SyntaxTree).GetDeclaredSymbol(member))
+            .Where(symbol => symbol != null)
+            .Cast<ISymbol>()
+            .ToList();
+
+        bool projectUsesAuthorize = sourceMemberSymbols.Any(symbol => HasAttribute(symbol, "Authorize"));
 
         if (!projectUsesAuthorize)
             return;
 
-        // Second pass: find controller classes missing both [Authorize] and [AllowAnonymous].
-        // Partial classes can place attributes on any declaration, so evaluate the union.
-        var controllersByName = allRoots
-            .SelectMany(r => r.DescendantNodes().OfType<ClassDeclarationSyntax>())
-            .Where(c => c.Identifier.Text.EndsWith("Controller", StringComparison.Ordinal))
-            .GroupBy(c => c.Identifier.Text, StringComparer.Ordinal);
-
-        foreach (var controllerGroup in controllersByName)
+        var controllersBySymbol = new Dictionary<INamedTypeSymbol, List<ClassDeclarationSyntax>>(
+            SymbolEqualityComparer.Default);
+        foreach (var declaration in allRoots
+                     .SelectMany(root => root.DescendantNodes().OfType<ClassDeclarationSyntax>())
+                     .Where(candidate => candidate.Identifier.Text.EndsWith("Controller", StringComparison.Ordinal)))
         {
-            bool hasAuthorize = controllerGroup.Any(cls => HasAttribute(cls, "Authorize"));
-            bool hasAllowAnonymous = controllerGroup.Any(cls => HasAttribute(cls, "AllowAnonymous"));
+            var model = compilation.GetSemanticModel(declaration.SyntaxTree);
+            if (model.GetDeclaredSymbol(declaration) is not INamedTypeSymbol controllerSymbol)
+                continue;
 
-            if (!hasAuthorize && !hasAllowAnonymous)
+            if (!controllersBySymbol.TryGetValue(controllerSymbol, out var declarations))
             {
-                var cls = controllerGroup.First();
+                declarations = [];
+                controllersBySymbol.Add(controllerSymbol, declarations);
+            }
+
+            declarations.Add(declaration);
+        }
+
+        foreach (var (controllerSymbol, declarations) in controllersBySymbol)
+        {
+            bool hasAuthorize = HasAttributeInTypeHierarchy(controllerSymbol, "Authorize");
+            bool hasAllowAnonymous = HasAttributeInTypeHierarchy(controllerSymbol, "AllowAnonymous");
+            var actions = controllerSymbol.GetMembers()
+                .OfType<IMethodSymbol>()
+                .Where(IsControllerAction)
+                .ToList();
+            bool everyActionHasExplicitIntent = actions.Count > 0 && actions.All(action =>
+                HasAttribute(action, "Authorize") || HasAttribute(action, "AllowAnonymous"));
+
+            if (!hasAuthorize && !hasAllowAnonymous && !everyActionHasExplicitIntent)
+            {
+                var cls = declarations[0];
+                var unannotatedActionCount = actions.Count(action =>
+                    !HasAttribute(action, "Authorize") && !HasAttribute(action, "AllowAnonymous"));
                 findings.Add(new Finding
                 {
                     Category = "missingAuthorization",
                     Severity = "warning",
+                    Confidence = "medium",
                     File = cls.SyntaxTree.FilePath,
                     Line = GetLine(cls),
                     Project = projectName,
-                    Type = controllerGroup.Key,
-                    Message = $"Controller '{controllerGroup.Key}' has no [Authorize] or [AllowAnonymous] attribute, but the project uses authorization."
+                    Type = controllerSymbol.Name,
+                    Message = $"Controller '{controllerSymbol.ToDisplayString()}' has no explicit class-level " +
+                              $"[Authorize]/[AllowAnonymous] intent and {unannotatedActionCount} public action(s) " +
+                              "also lack an explicit authorization attribute. Global filters or a fallback policy " +
+                              "may still protect the endpoint; verify the effective policy."
                 });
             }
         }
@@ -374,6 +397,35 @@ public static class SecurityProbe
                        name.EndsWith("." + attributeName, StringComparison.Ordinal) ||
                        name.EndsWith("." + attributeName + "Attribute", StringComparison.Ordinal);
             });
+    }
+
+    private static bool HasAttribute(ISymbol symbol, string attributeName)
+    {
+        return symbol.GetAttributes().Any(attribute =>
+        {
+            var name = attribute.AttributeClass?.Name;
+            return name == attributeName || name == attributeName + "Attribute";
+        });
+    }
+
+    private static bool HasAttributeInTypeHierarchy(INamedTypeSymbol type, string attributeName)
+    {
+        for (var current = type; current != null; current = current.BaseType)
+        {
+            if (HasAttribute(current, attributeName))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsControllerAction(IMethodSymbol method)
+    {
+        return method.MethodKind == MethodKind.Ordinary &&
+               method.DeclaredAccessibility == Accessibility.Public &&
+               !method.IsStatic &&
+               !method.IsImplicitlyDeclared &&
+               !HasAttribute(method, "NonAction");
     }
 
     private static string? GetContainingTypeName(SyntaxNode node)

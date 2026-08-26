@@ -44,6 +44,16 @@ public static class ArchitectureProbe
         "Microsoft.EntityFrameworkCore.DbContext"
     ];
 
+    private sealed record ControllerActionObservation(
+        string Project,
+        string Namespace,
+        string Type,
+        string Method,
+        int Line,
+        int TypeCoupling,
+        int FromServicesParameters,
+        IReadOnlyList<string> ConstructorDependencyTypes);
+
     public static DimensionResult Analyze(
         IReadOnlyList<(string Name, Compilation Compilation)> projects,
         IReadOnlyList<TypeMetrics> typeMetrics,
@@ -52,6 +62,7 @@ public static class ArchitectureProbe
         var findings = new List<Finding>();
         var dependencyInjectionExtensionTypes = new HashSet<string>(StringComparer.Ordinal);
         var frameworkCouplingArchetypeTypes = new HashSet<string>(StringComparer.Ordinal);
+        var controllerActionObservations = new List<ControllerActionObservation>();
 
         // 1. Project graph cycle detection
         var cycles = DetectProjectCycles(solutionDir);
@@ -79,6 +90,8 @@ public static class ArchitectureProbe
                     root, semanticModel, projectName, dependencyInjectionExtensionTypes);
                 CollectFrameworkCouplingArchetypeTypes(
                     root, semanticModel, projectName, frameworkCouplingArchetypeTypes);
+                CollectControllerActionCoupling(
+                    root, semanticModel, projectName, controllerActionObservations);
             }
         }
 
@@ -150,6 +163,41 @@ public static class ArchitectureProbe
         var hotspotSummary = displayedHotspots
             .Select(h => new { h.Project, h.Type, h.Category, h.Message })
             .ToList<object>();
+        var controllerActionCoupling = controllerActionObservations
+            .GroupBy(observation => new
+            {
+                observation.Project,
+                observation.Namespace,
+                observation.Type
+            })
+            .Select(group => new
+            {
+                group.Key.Project,
+                group.Key.Namespace,
+                group.Key.Type,
+                ConstructorDependencyCount = group
+                    .SelectMany(observation => observation.ConstructorDependencyTypes)
+                    .Distinct(StringComparer.Ordinal)
+                    .Count(),
+                MaxActionTypeCoupling = group.Max(observation => observation.TypeCoupling),
+                MaxFromServicesParameters = group.Max(observation => observation.FromServicesParameters),
+                Actions = group
+                    .OrderBy(observation => observation.Method, StringComparer.Ordinal)
+                    .ThenBy(observation => observation.Line)
+                    .Select(observation => new
+                    {
+                        observation.Method,
+                        observation.Line,
+                        observation.TypeCoupling,
+                        observation.FromServicesParameters
+                    })
+                    .ToList()
+            })
+            .OrderByDescending(summary => summary.MaxActionTypeCoupling)
+            .ThenBy(summary => summary.Project, StringComparer.Ordinal)
+            .ThenBy(summary => summary.Namespace, StringComparer.Ordinal)
+            .ThenBy(summary => summary.Type, StringComparer.Ordinal)
+            .ToList<object>();
 
         return new DimensionResult
         {
@@ -165,7 +213,10 @@ public static class ArchitectureProbe
                 ["hotspotsTruncated"] = hotspots.Count > displayedHotspots.Count,
                 ["excludedPassiveDataCarriers"] = excludedDataCarrierCount,
                 ["excludedDependencyInjectionExtensionTypes"] = excludedDependencyInjectionExtensionCount,
-                ["excludedFrameworkCouplingArchetypeTypes"] = excludedFrameworkCouplingArchetypeCount
+                ["excludedFrameworkCouplingArchetypeTypes"] = excludedFrameworkCouplingArchetypeCount,
+                // Supplemental evidence only. These values intentionally do not affect
+                // the architecture score until they have been calibrated on a corpus.
+                ["controllerActionCoupling"] = controllerActionCoupling
             }
         };
     }
@@ -298,7 +349,7 @@ public static class ArchitectureProbe
             if (typeName.EndsWith("Controller", StringComparison.Ordinal))
             {
                 // Check for data-layer dependencies in controllers
-                foreach (var (paramTypeName, _, line) in constructorParams)
+                foreach (var (paramTypeName, _, _, line) in constructorParams)
                 {
                     if (IsCrossCuttingType(paramTypeName))
                         continue;
@@ -323,10 +374,14 @@ public static class ArchitectureProbe
             else if (typeName.EndsWith("Service", StringComparison.Ordinal))
             {
                 // Check for concrete infrastructure dependencies in services
-                foreach (var (paramTypeName, paramNamespace, line) in constructorParams)
+                foreach (var (paramTypeName, paramNamespace, paramTypeSymbol, line) in constructorParams)
                 {
-                    // Concrete = does NOT start with "I"
-                    if (GetUnqualifiedTypeName(paramTypeName).StartsWith("I", StringComparison.Ordinal))
+                    // Only concrete classes are actionable. Naming conventions such as an
+                    // I-prefix and namespace fragments such as ".Interfaces" are not type
+                    // facts and can produce both false positives and false negatives.
+                    if (paramTypeSymbol is not INamedTypeSymbol namedType ||
+                        namedType.TypeKind != TypeKind.Class ||
+                        namedType.IsAbstract)
                         continue;
 
                     if (IsFrameworkNamespace(paramNamespace))
@@ -364,18 +419,11 @@ public static class ArchitectureProbe
                namespaceName?.StartsWith("Microsoft.AspNetCore.", StringComparison.Ordinal) == true;
     }
 
-    private static string GetUnqualifiedTypeName(string typeName)
-    {
-        var genericTick = typeName.IndexOf('<');
-        var withoutGeneric = genericTick >= 0 ? typeName[..genericTick] : typeName;
-        var dot = withoutGeneric.LastIndexOf('.');
-        return dot >= 0 ? withoutGeneric[(dot + 1)..] : withoutGeneric;
-    }
-
-    private static List<(string TypeName, string? Namespace, int Line)> GetAllConstructorParameterTypeNames(
+    private static List<(string TypeName, string? Namespace, ITypeSymbol? TypeSymbol, int Line)>
+        GetAllConstructorParameterTypeNames(
         TypeDeclarationSyntax typeDecl, SemanticModel semanticModel)
     {
-        var result = new List<(string, string?, int)>();
+        var result = new List<(string, string?, ITypeSymbol?, int)>();
 
         // Regular constructor parameters
         var constructors = typeDecl.Members.OfType<ConstructorDeclarationSyntax>();
@@ -411,7 +459,7 @@ public static class ArchitectureProbe
     private static void AddParameterType(
         ParameterSyntax parameter,
         SemanticModel semanticModel,
-        List<(string TypeName, string? Namespace, int Line)> result)
+        List<(string TypeName, string? Namespace, ITypeSymbol? TypeSymbol, int Line)> result)
     {
         var typeName = parameter.Type?.ToString();
         if (string.IsNullOrEmpty(typeName))
@@ -420,7 +468,58 @@ public static class ArchitectureProbe
         var typeSymbol = semanticModel.GetTypeInfo(parameter.Type!).Type;
         var namespaceName = typeSymbol?.ContainingNamespace?.ToDisplayString();
         var line = parameter.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
-        result.Add((typeName!, namespaceName, line));
+        result.Add((typeName!, namespaceName, typeSymbol, line));
+    }
+
+    private static void CollectControllerActionCoupling(
+        SyntaxNode root,
+        SemanticModel semanticModel,
+        string projectName,
+        List<ControllerActionObservation> observations)
+    {
+        foreach (var declaration in root.DescendantNodes().OfType<ClassDeclarationSyntax>()
+                     .Where(candidate => candidate.Identifier.Text.EndsWith("Controller", StringComparison.Ordinal)))
+        {
+            if (semanticModel.GetDeclaredSymbol(declaration) is not INamedTypeSymbol controllerSymbol)
+                continue;
+
+            var constructorDependencyTypes = GetAllConstructorParameterTypeNames(declaration, semanticModel)
+                .Select(parameter => parameter.TypeSymbol)
+                .OfType<INamedTypeSymbol>()
+                .Select(type => type.OriginalDefinition.ToDisplayString())
+                .Distinct(StringComparer.Ordinal)
+                .ToList();
+
+            foreach (var action in declaration.Members.OfType<MethodDeclarationSyntax>())
+            {
+                if (semanticModel.GetDeclaredSymbol(action) is not IMethodSymbol actionSymbol ||
+                    actionSymbol.MethodKind != MethodKind.Ordinary ||
+                    actionSymbol.DeclaredAccessibility != Accessibility.Public ||
+                    actionSymbol.IsStatic ||
+                    HasAttribute(actionSymbol, "NonActionAttribute"))
+                {
+                    continue;
+                }
+
+                var fromServicesCount = actionSymbol.Parameters.Count(parameter =>
+                    HasAttribute(parameter, "FromServicesAttribute"));
+                observations.Add(new ControllerActionObservation(
+                    projectName,
+                    controllerSymbol.ContainingNamespace?.ToDisplayString() ?? "",
+                    controllerSymbol.Name,
+                    actionSymbol.Name,
+                    action.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
+                    ClassCouplingCalculator.CalculateAction(action, semanticModel),
+                    fromServicesCount,
+                    constructorDependencyTypes));
+            }
+        }
+    }
+
+    private static bool HasAttribute(ISymbol symbol, string attributeClassName)
+    {
+        return symbol.GetAttributes().Any(attribute =>
+            attribute.AttributeClass?.Name == attributeClassName);
     }
 
     // ── Static metric hotspots ────────────────────────────────────────────────

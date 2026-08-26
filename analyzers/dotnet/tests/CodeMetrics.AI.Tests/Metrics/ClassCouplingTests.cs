@@ -78,9 +78,9 @@ public class ClassCouplingTests
     {
         const string code = """
             namespace Microsoft.AspNetCore.Mvc { public sealed class FromServicesAttribute : System.Attribute { } }
-            public class BigInjectedService { }
+            public class BigInjectedService { public void Run() { } }
             public class MyController {
-                public void Get([Microsoft.AspNetCore.Mvc.FromServices] BigInjectedService svc) { }
+                public void Get([Microsoft.AspNetCore.Mvc.FromServices] BigInjectedService svc) { svc.Run(); }
             }
             """;
 
@@ -89,5 +89,25 @@ public class ClassCouplingTests
             .Single(c => c.Identifier.Text == "MyController");
 
         ClassCouplingCalculator.Calculate(controller, model).Should().Be(0);
+    }
+
+    [Fact]
+    public void CalculateAction_IncludesFromServicesAndActionTypes()
+    {
+        const string code = """
+            namespace Microsoft.AspNetCore.Mvc { public sealed class FromServicesAttribute : System.Attribute { } }
+            public class InjectedService { }
+            public class Response { }
+            public class MyController {
+                public Response Get(
+                    [Microsoft.AspNetCore.Mvc.FromServices] InjectedService service) => new Response();
+            }
+            """;
+
+        var (tree, model, _) = RoslynTestHelper.CompileCode(code);
+        var action = RoslynTestHelper.FindAllNodes<MethodDeclarationSyntax>(tree)
+            .Single(method => method.Identifier.Text == "Get");
+
+        ClassCouplingCalculator.CalculateAction(action, model).Should().Be(2);
     }
 }

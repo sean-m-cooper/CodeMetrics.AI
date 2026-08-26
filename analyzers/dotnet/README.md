@@ -120,6 +120,16 @@ public IActionResult Get([FromServices] IReportBuilder reports)
 
 `[FromServicesAttribute]` and namespace-qualified forms are also recognized.
 
+The Architecture evidence retains that information separately under
+`extra.controllerActionCoupling`. Each controller profile reports constructor dependency
+count, maximum per-action raw type coupling, maximum `[FromServices]` parameter count,
+and an action-by-action breakdown. These values are supplemental evidence and do not
+affect the score until they have been calibrated against a representative corpus.
+
+Service dependencies are classified as interfaces or concrete classes through Roslyn
+symbols. Type-name conventions such as an `I` prefix and namespace fragments such as
+`.Interfaces` are not used to decide whether `concreteInfrastructureDependency` applies.
+
 DI registration extension types require no annotation. Static types whose exposed extension methods target `IServiceCollection` or recognized host/application builders are excluded from Architecture hotspot penalties because their coupling is intentional composition-root wiring.
 
 Raw coupling is also not used as an Architecture hotspot signal for subclasses of framework contracts whose required surface dominates the metric, currently `AuthenticationHandler<TOptions>` and `DbContext`. Complexity and class-size findings still apply to those types, and their raw coupling remains in `metrics.csv`.
@@ -127,6 +137,11 @@ Raw coupling is also not used as an Architecture hotspot signal for subclasses o
 ### Async concurrency semantics
 
 `unboundedWhenAll` is reported only when the analyzer can see a deferred task-producing projection over a source whose cardinality is not bounded at the call site. Passing an already-created task collection to `Task.WhenAll` is not itself treated as creating concurrency. Constructor-materialized strategy sets and fixed inline collections are treated as startup- or author-bounded.
+
+ASP.NET Core middleware entry points are exempt from `missingCancellationToken` when
+their symbols match conventional middleware (`Invoke`/`InvokeAsync` on a `*Middleware`
+type with `HttpContext` first) or an `IMiddleware` implementation. Request cancellation
+for these entry points is provided through `HttpContext.RequestAborted`.
 
 Back-pressure is recognized through `ChannelWriter`, `ChannelReader`, and `SemaphoreSlim`, including authored wrapper methods and interface contracts when every analyzed implementation delegates to a recognized back-pressure primitive.
 
@@ -146,16 +161,25 @@ Their raw metrics remain in `metrics.csv`, but they are excluded from the scored
 
 Types are scored normally as soon as they define behavior, including methods, computed properties, custom accessors, operators, validation logic, or nontrivial constructor logic.
 
+`Program` and `Startup` composition-root types remain in `metrics.csv` and in the scored
+Maintainability population, but receive a 10-point MI adjustment when thresholds are
+evaluated and stay out of the general offender sample. This gives their expected
+registration density more room without hiding a severely degraded composition root.
+
 ### Authorization
 
 The Security dimension recognizes `[Authorize]` and `[AllowAnonymous]`, including `Attribute`-suffixed and namespace-qualified forms.
 
-- The presence of `[Authorize]` signals that the project uses authorization.
-- A controller-level `[Authorize]` prevents a `missingAuthorization` finding for that controller.
-- A controller-level `[AllowAnonymous]` also prevents `missingAuthorization`, but produces an `allowAnonymous` warning for manual review.
+- The presence of a symbol-resolved `[Authorize]` signals that the project uses authorization.
+- A controller- or base-type `[Authorize]` prevents a `missingAuthorization` finding for that controller.
+- A controller- or base-type `[AllowAnonymous]` also prevents `missingAuthorization`, but produces an `allowAnonymous` warning for manual review when present in source.
+- A controller without a class-level attribute is not flagged when every public action explicitly declares `[Authorize]` or `[AllowAnonymous]` intent.
 - `[AllowAnonymous]` on an individual member likewise produces an `allowAnonymous` warning.
 
-Attributes across partial declarations of the same controller are evaluated together.
+Attributes across partial declarations of the same controller are evaluated through the
+controller's Roslyn symbol, so same-named controllers in different namespaces are not
+merged. Because global MVC filters and fallback policies may still protect a controller,
+`missingAuthorization` findings carry medium confidence and explicitly request effective-policy verification.
 
 ### Test frameworks
 

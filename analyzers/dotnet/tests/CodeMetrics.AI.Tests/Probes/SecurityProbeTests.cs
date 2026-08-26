@@ -475,6 +475,83 @@ public class SecurityProbeTests
     }
 
     [Fact]
+    public void MissingAuthorization_SameControllerNameInDifferentNamespaces_EvaluatedSeparately()
+    {
+        const string code = """
+            public class AuthorizeAttribute : System.Attribute { }
+            namespace Admin {
+                [Authorize] public class OrdersController {
+                    public void Get() { }
+                }
+            }
+            namespace PublicApi {
+                public class OrdersController {
+                    public void Get() { }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().ContainSingle(f =>
+            f.Category == "missingAuthorization" && f.Type == "OrdersController");
+    }
+
+    [Fact]
+    public void MissingAuthorization_AuthorizeOnBaseController_NotFound()
+    {
+        const string code = """
+            public class AuthorizeAttribute : System.Attribute { }
+            [Authorize] public abstract class SecureControllerBase { }
+            public class OrdersController : SecureControllerBase {
+                public void Get() { }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f =>
+            f.Category == "missingAuthorization" && f.Type == "OrdersController");
+    }
+
+    [Fact]
+    public void MissingAuthorization_AllActionsHaveExplicitIntent_NotFound()
+    {
+        const string code = """
+            public class AuthorizeAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute { }
+            [Authorize] public class AuthController { }
+            public class OrdersController {
+                [Authorize] public void GetPrivate() { }
+                [AllowAnonymous] public void GetPublic() { }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f =>
+            f.Category == "missingAuthorization" && f.Type == "OrdersController");
+    }
+
+    [Fact]
+    public void MissingAuthorization_UnannotatedActionAmongExplicitActions_Found()
+    {
+        const string code = """
+            public class AuthorizeAttribute : System.Attribute { }
+            [Authorize] public class AuthController { }
+            public class OrdersController {
+                [Authorize] public void GetPrivate() { }
+                public void GetUnspecified() { }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().ContainSingle(f =>
+            f.Category == "missingAuthorization" && f.Type == "OrdersController");
+    }
+
+    [Fact]
     public void MissingAuthorization_ProjectDoesNotUseAuthorize_NotFound()
     {
         // Project uses no [Authorize] anywhere → rule does not apply

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using CodeMetrics.AI.Metrics;
 using CodeMetrics.AI.Probes;
 using CodeMetrics.AI.Tests.Helpers;
@@ -247,6 +248,52 @@ public class ArchitectureProbeTests
     }
 
     [Fact]
+    public void ConcreteInfrastructureDependency_AliasedInterfaceWithoutIPrefix_NoFinding()
+    {
+        const string code = """
+            using CRM = Contracts;
+            namespace Contracts { public interface AccountRepository { } }
+            public class CustomerSearchService {
+                public CustomerSearchService(CRM.AccountRepository repository) { }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "concreteInfrastructureDependency");
+    }
+
+    [Fact]
+    public void ConcreteInfrastructureDependency_IPrefixedConcreteGateway_FindsFinding()
+    {
+        const string code = """
+            public class ISqlGateway { }
+            public class MyService {
+                public MyService(ISqlGateway gateway) { }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().ContainSingle(f => f.Category == "concreteInfrastructureDependency");
+    }
+
+    [Fact]
+    public void ConcreteInfrastructureDependency_AbstractGateway_NoFinding()
+    {
+        const string code = """
+            public abstract class SqlGateway { }
+            public class MyService {
+                public MyService(SqlGateway gateway) { }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "concreteInfrastructureDependency");
+    }
+
+    [Fact]
     public void ConcreteInfrastructureDependency_ServiceWithMicrosoftExtensionsContext_NoFinding()
     {
         const string code = """
@@ -368,6 +415,49 @@ public class ArchitectureProbeTests
         var result = Analyze("class Placeholder { }", metrics);
 
         result.Findings.Should().NotContain(f => f.Category == "highCoupling");
+    }
+
+    [Fact]
+    public void ControllerActionCoupling_IsReportedAsSupplementalEvidence()
+    {
+        const string code = """
+            namespace Microsoft.AspNetCore.Mvc {
+                public sealed class FromServicesAttribute : System.Attribute { }
+                public sealed class NonActionAttribute : System.Attribute { }
+            }
+            public interface IControllerDependency { }
+            public interface ILogger { }
+            public class ActionService { }
+            public class Response { }
+            public class OrdersController {
+                private readonly IControllerDependency dependency;
+                public OrdersController(IControllerDependency dependency, ILogger logger) {
+                    this.dependency = dependency;
+                }
+                public Response Save(
+                    [Microsoft.AspNetCore.Mvc.FromServices] ActionService service) {
+                    _ = dependency;
+                    return new Response();
+                }
+                [Microsoft.AspNetCore.Mvc.NonAction]
+                public Response Helper() => new Response();
+            }
+            """;
+
+        var result = Analyze(code);
+
+        var summaries = JsonSerializer.SerializeToElement(
+            result.Extra["controllerActionCoupling"]);
+        var summaryItems = summaries.EnumerateArray().ToList();
+        summaryItems.Should().ContainSingle();
+        var summary = summaryItems[0];
+        summary.GetProperty("ConstructorDependencyCount").GetInt32().Should().Be(2);
+        summary.GetProperty("MaxFromServicesParameters").GetInt32().Should().Be(1);
+        summary.GetProperty("MaxActionTypeCoupling").GetInt32().Should().BeGreaterThanOrEqualTo(3);
+
+        var actions = summary.GetProperty("Actions").EnumerateArray().ToList();
+        actions.Should().ContainSingle();
+        actions[0].GetProperty("Method").GetString().Should().Be("Save");
     }
 
     [Fact]

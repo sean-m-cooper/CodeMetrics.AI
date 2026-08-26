@@ -482,6 +482,80 @@ public class PerformanceAsyncProbeTests
         result.Findings.Should().NotContain(f => f.Category == "missingCancellationToken");
     }
 
+    [Fact]
+    public void ConventionalMiddlewareWithPerRequestService_DoesNotFindMissingCancellationToken()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            using Context = Microsoft.AspNetCore.Http.HttpContext;
+            namespace Microsoft.AspNetCore.Http { public class HttpContext { } }
+            class FakeClient {
+                public Task<string> GetAsync(string url) => Task.FromResult("");
+            }
+            class MyMiddleware {
+                public async Task InvokeAsync(Context context, FakeClient client) {
+                    var result = await client.GetAsync("http://example.com");
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "missingCancellationToken");
+    }
+
+    [Fact]
+    public void IMiddlewareEntryPoint_DoesNotFindMissingCancellationToken()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            namespace Microsoft.AspNetCore.Http {
+                public class HttpContext { }
+                public delegate Task RequestDelegate(HttpContext context);
+                public interface IMiddleware {
+                    Task InvokeAsync(HttpContext context, RequestDelegate next);
+                }
+            }
+            class FakeClient {
+                public Task<string> GetAsync(string url) => Task.FromResult("");
+            }
+            class RequestHandler : Microsoft.AspNetCore.Http.IMiddleware {
+                public async Task InvokeAsync(
+                    Microsoft.AspNetCore.Http.HttpContext context,
+                    Microsoft.AspNetCore.Http.RequestDelegate next) {
+                    var client = new FakeClient();
+                    var result = await client.GetAsync("http://example.com");
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "missingCancellationToken");
+    }
+
+    [Fact]
+    public void NonMiddlewareInvokeAsyncWithHttpContext_FindsMissingCancellationToken()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            namespace Microsoft.AspNetCore.Http { public class HttpContext { } }
+            class FakeClient {
+                public Task<string> GetAsync(string url) => Task.FromResult("");
+            }
+            class RequestHandler {
+                public async Task InvokeAsync(Microsoft.AspNetCore.Http.HttpContext context) {
+                    var client = new FakeClient();
+                    var result = await client.GetAsync("http://example.com");
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().ContainSingle(f => f.Category == "missingCancellationToken");
+    }
+
     // ── 5. materializationBeforeQueryShape ───────────────────────────────────
 
     [Fact]

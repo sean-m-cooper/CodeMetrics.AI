@@ -24,7 +24,7 @@ public static class PerformanceAsyncProbe
                 AnalyzeSyncOverAsync(root, semanticModel, filePath, projectName, findings);
                 AnalyzeThreadSleep(root, filePath, projectName, findings);
                 AnalyzeSaveChangesInsideLoop(root, filePath, projectName, findings);
-                AnalyzeMissingCancellationToken(root, filePath, projectName, findings);
+                AnalyzeMissingCancellationToken(root, semanticModel, filePath, projectName, findings);
                 AnalyzeMaterializationBeforeQueryShape(root, filePath, projectName, findings);
                 AnalyzeAwaitedIoInsideLoop(
                     root, semanticModel, backpressureMethods, filePath, projectName, findings);
@@ -205,7 +205,8 @@ public static class PerformanceAsyncProbe
 
     // 4. missingCancellationToken: public async/Task-returning/*Async method with async I/O but no CancellationToken
     private static void AnalyzeMissingCancellationToken(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName,
+        List<Finding> findings)
     {
         var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
         foreach (var method in methods)
@@ -214,7 +215,7 @@ public static class PerformanceAsyncProbe
             if (!method.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword)))
                 continue;
 
-            if (IsAspNetCoreMiddlewareInvokeAsync(method))
+            if (IsAspNetCoreMiddlewareEntryPoint(method, semanticModel))
                 continue;
 
             // Must be async OR return Task/Task<T> OR have *Async suffix
@@ -435,17 +436,28 @@ public static class PerformanceAsyncProbe
             DoStatementSyntax);
     }
 
-    private static bool IsAspNetCoreMiddlewareInvokeAsync(MethodDeclarationSyntax method)
+    private static bool IsAspNetCoreMiddlewareEntryPoint(
+        MethodDeclarationSyntax method, SemanticModel semanticModel)
     {
-        if (method.Identifier.Text != "InvokeAsync")
+        if (method.Identifier.Text is not ("Invoke" or "InvokeAsync"))
             return false;
 
-        if (method.ParameterList.Parameters.Count != 1)
+        if (semanticModel.GetDeclaredSymbol(method) is not IMethodSymbol methodSymbol ||
+            methodSymbol.Parameters.Length == 0 ||
+            methodSymbol.Parameters[0].Type.ToDisplayString() != "Microsoft.AspNetCore.Http.HttpContext")
+        {
             return false;
+        }
 
-        var typeName = method.ParameterList.Parameters[0].Type?.ToString();
-        return typeName == "HttpContext" ||
-               typeName?.EndsWith(".HttpContext", StringComparison.Ordinal) == true;
+        var containingType = methodSymbol.ContainingType;
+        var implementsMiddleware = containingType.AllInterfaces.Any(interfaceType =>
+            interfaceType.ToDisplayString() == "Microsoft.AspNetCore.Http.IMiddleware");
+
+        // Conventional middleware is identified by the framework entry-point shape and
+        // the conventional type suffix. Additional parameters are per-request services,
+        // so a one-parameter syntax check is too narrow.
+        return implementsMiddleware ||
+               containingType.Name.EndsWith("Middleware", StringComparison.Ordinal);
     }
 
     private static string SyncOverAsyncSeverity(SyntaxNode node)

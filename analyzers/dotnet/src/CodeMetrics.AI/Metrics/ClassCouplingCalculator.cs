@@ -19,11 +19,21 @@ public static class ClassCouplingCalculator
     {
         var selfSymbol = model.GetDeclaredSymbol(typeDecl) as INamedTypeSymbol;
         var coupled = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+        var fromServicesParameters = typeDecl.DescendantNodes()
+            .OfType<ParameterSyntax>()
+            .Where(IsFromServicesParameter)
+            .Select(parameter => model.GetDeclaredSymbol(parameter))
+            .OfType<IParameterSymbol>()
+            .ToHashSet<IParameterSymbol>(SymbolEqualityComparer.Default);
 
         foreach (var node in typeDecl.DescendantNodesAndSelf())
         {
-            if (IsInsideFromServicesParameter(node))
+            if (IsInsideFromServicesParameter(node) ||
+                model.GetSymbolInfo(node).Symbol is IParameterSymbol parameterSymbol &&
+                fromServicesParameters.Contains(parameterSymbol))
+            {
                 continue;
+            }
 
             CollectFromTypeInfo(model.GetTypeInfo(node).Type, coupled, selfSymbol);
             CollectFromTypeInfo(model.GetTypeInfo(node).ConvertedType, coupled, selfSymbol);
@@ -57,6 +67,35 @@ public static class ClassCouplingCalculator
             foreach (var attrList in member.AttributeLists)
                 foreach (var attr in attrList.Attributes)
                     CollectFromTypeInfo(model.GetTypeInfo(attr).Type, coupled, selfSymbol);
+
+        return coupled.Count;
+    }
+
+    /// <summary>
+    /// Calculates raw type coupling for one action method. Unlike class coupling,
+    /// action coupling intentionally includes <c>[FromServices]</c> parameters so
+    /// concentrated per-request coordination remains visible as supplemental evidence.
+    /// </summary>
+    public static int CalculateAction(MethodDeclarationSyntax methodDecl, SemanticModel model)
+    {
+        var selfSymbol = model.GetDeclaredSymbol(methodDecl)?.ContainingType;
+        var coupled = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+
+        foreach (var node in methodDecl.DescendantNodesAndSelf())
+        {
+            if (node.AncestorsAndSelf().OfType<AttributeSyntax>().Any())
+                continue;
+
+            CollectFromTypeInfo(model.GetTypeInfo(node).Type, coupled, selfSymbol);
+            CollectFromTypeInfo(model.GetTypeInfo(node).ConvertedType, coupled, selfSymbol);
+
+            if (model.GetSymbolInfo(node).Symbol is not IMethodSymbol method)
+                continue;
+
+            CollectFromTypeInfo(method.ReturnType, coupled, selfSymbol);
+            foreach (var parameter in method.Parameters)
+                CollectFromTypeInfo(parameter.Type, coupled, selfSymbol);
+        }
 
         return coupled.Count;
     }

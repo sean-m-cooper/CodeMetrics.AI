@@ -150,9 +150,9 @@ public class MaintainabilityProbeTests
     }
 
     [Fact]
-    public void TopOffenders_ExcludesProgramAndStartup()
+    public void EntryPointTypes_UseLenientThresholdAndStayOutOfOffenders()
     {
-        var program = MakeType("Program", mi: 5);
+        var program = MakeType("Program", mi: 50);
         program = new TypeMetrics
         {
             Project = program.Project,
@@ -166,7 +166,7 @@ public class MaintainabilityProbeTests
             LinesOfSource = program.LinesOfSource
         };
 
-        var startup = MakeType("Startup", mi: 10);
+        var startup = MakeType("Startup", mi: 50);
         startup = new TypeMetrics
         {
             Project = startup.Project,
@@ -180,15 +180,27 @@ public class MaintainabilityProbeTests
             LinesOfSource = startup.LinesOfSource
         };
 
+        var realHotspot = MakeType("RealHotspot", mi: 20);
+        var healthy = MakeType("Healthy", mi: 90);
         var types = new List<TypeMetrics>
         {
             program,
             startup,
-            MakeType("RealHotspot", mi: 20),
-            MakeType("Healthy", mi: 90)
+            realHotspot,
+            healthy
         };
 
         var result = MaintainabilityProbe.Analyze(types);
+        var metrics = (JsonElement)result.Extra["metrics"]!;
+        metrics.GetProperty("filtering")
+            .GetProperty("entryPointTypesWithAdjustedThreshold")
+            .GetInt32().Should().Be(2);
+        metrics.GetProperty("filtering")
+            .GetProperty("entryPointMiAdjustment")
+            .GetInt32().Should().Be(10);
+        metrics.GetProperty("maintainabilityIndex")
+            .GetProperty("populationPercentBelow60")
+            .GetDouble().Should().Be(25);
 
         var offenders = (JsonElement)result.Extra["topOffenders"]!;
         var offenderTypes = offenders.EnumerateArray()
@@ -198,6 +210,32 @@ public class MaintainabilityProbeTests
         offenderTypes.Should().NotContain("Program");
         offenderTypes.Should().NotContain("Startup");
         offenderTypes.Should().Contain("RealHotspot");
+    }
+
+    [Fact]
+    public void SeverelyDegradedEntryPoint_StillAffectsScore()
+    {
+        var healthy = Enumerable.Range(1, 19)
+            .Select(i => MakeType($"Healthy{i}", mi: 90))
+            .ToList();
+        var degradedProgram = MakeType("Program", mi: 20);
+        degradedProgram = new TypeMetrics
+        {
+            Project = degradedProgram.Project,
+            Namespace = degradedProgram.Namespace,
+            Type = degradedProgram.Type,
+            FilePath = "Program.cs",
+            MaintainabilityIndex = degradedProgram.MaintainabilityIndex,
+            MemberCount = degradedProgram.MemberCount,
+            CyclomaticComplexity = degradedProgram.CyclomaticComplexity,
+            ClassCoupling = degradedProgram.ClassCoupling,
+            LinesOfSource = degradedProgram.LinesOfSource
+        };
+
+        var result = MaintainabilityProbe.Analyze([.. healthy, degradedProgram]);
+        var baseline = MaintainabilityProbe.Analyze(healthy);
+
+        result.Score.Should().BeLessThan(baseline.Score!.Value);
     }
 
     [Fact]

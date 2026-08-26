@@ -22,5 +22,23 @@ jobs:
       - name: Pack
         run: dotnet pack analyzers/dotnet/src/CodeMetrics.AI/CodeMetrics.AI.csproj -c Release -o ./nupkg /p:Version=${GITHUB_REF_NAME#v}
 
+      - name: Verify packaged tool identity
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          dotnet tool install --tool-path ./tool-smoke CodeMetrics.AI \
+            --version "$version" --add-source ./nupkg
+
+          actual_version="$(./tool-smoke/code-metrics --version)"
+          test "$actual_version" = "$version+$GITHUB_SHA"
+
+          ./tool-smoke/code-metrics \
+            --solution analyzers/dotnet/CodeMetrics.AI.slnx \
+            --output /tmp/code-metrics.csv \
+            --scorecard-output /tmp/code-metrics-evidence.json \
+            --skip-dependency-probe
+
+          python3 -c 'import json,sys; actual=json.load(open("/tmp/code-metrics-evidence.json"))["tool"]["version"]; expected=sys.argv[1]; assert actual == expected, f"evidence version {actual!r} != package version {expected!r}"' "$version"
+
       - name: Push to NuGet
         run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate

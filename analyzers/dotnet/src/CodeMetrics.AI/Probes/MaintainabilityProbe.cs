@@ -5,6 +5,8 @@ namespace CodeMetrics.AI.Probes;
 
 public static class MaintainabilityProbe
 {
+    private const int EntryPointMiAdjustment = 10;
+
     public static DimensionResult Analyze(IReadOnlyList<TypeMetrics> types)
     {
         if (types.Count == 0)
@@ -19,6 +21,7 @@ public static class MaintainabilityProbe
 
         var excludedDataCarriers = types.Count(t => t.IsDataCarrier);
         var eligible = types.Where(t => !t.IsDataCarrier).ToList();
+        var adjustedEntryPoints = eligible.Count(IsEntryPointType);
         if (eligible.Count == 0)
         {
             return new DimensionResult
@@ -29,11 +32,20 @@ public static class MaintainabilityProbe
             };
         }
 
-        var miValues = eligible.Select(t => (double)t.MaintainabilityIndex).ToList();
+        var scoredTypes = eligible
+            .Select(type => new
+            {
+                Type = type,
+                ScoredMi = IsEntryPointType(type)
+                    ? Math.Min(100, type.MaintainabilityIndex + EntryPointMiAdjustment)
+                    : type.MaintainabilityIndex
+            })
+            .ToList();
+        var miValues = scoredTypes.Select(item => (double)item.ScoredMi).ToList();
 
-        double popBelow60 = eligible.Count(t => t.MaintainabilityIndex < 60) * 100.0 / eligible.Count;
+        double popBelow60 = scoredTypes.Count(item => item.ScoredMi < 60) * 100.0 / scoredTypes.Count;
         double p10MI = CodeQualityProbe.Percentile(miValues, 10);
-        double extremeBelow40 = eligible.Count(t => t.MaintainabilityIndex < 40) * 100.0 / eligible.Count;
+        double extremeBelow40 = scoredTypes.Count(item => item.ScoredMi < 40) * 100.0 / scoredTypes.Count;
 
         int popBelow60Score = CodeQualityProbe.ScoreThreshold(popBelow60, [1, 3, 6, 10, 15]);
         int p10Score = ScoreThresholdReverse(p10MI, [75, 70, 65, 58, 52]);
@@ -64,7 +76,9 @@ public static class MaintainabilityProbe
         {
             filtering = new
             {
-                passiveDataCarriersExcluded = excludedDataCarriers
+                passiveDataCarriersExcluded = excludedDataCarriers,
+                entryPointTypesWithAdjustedThreshold = adjustedEntryPoints,
+                entryPointMiAdjustment = EntryPointMiAdjustment
             },
             maintainabilityIndex = new
             {
@@ -85,6 +99,7 @@ public static class MaintainabilityProbe
         };
 
         var basis = $"Eligible types: {eligible.Count}. Passive data carriers excluded: {excludedDataCarriers}. " +
+                    $"Program/Startup entry points adjusted by +{EntryPointMiAdjustment} MI: {adjustedEntryPoints}. " +
                     $"PopBelow60Score: {popBelow60Score}, P10Score: {p10Score}, ExtremeBelow40Score: {extremeBelow40Score}.";
 
         return new DimensionResult
