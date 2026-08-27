@@ -53,6 +53,50 @@ public class ErrorHandlingProbeTests
             .Should().AllSatisfy(f => f.Severity.Should().Be("error"));
     }
 
+    [Fact]
+    public void DocumentedNarrowCatchWithImmediateFallbackReturn_DoesNotFindEmptyCatch()
+    {
+        const string code = """
+            using System;
+            class C {
+                string Parse(string value) {
+                    try {
+                        if (value == "structured") return "parsed";
+                    }
+                    catch (FormatException) {
+                        // Expected alternate input shape; use the literal fallback below.
+                    }
+                    return value;
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "emptyCatch");
+    }
+
+    [Fact]
+    public void DocumentedBroadCatchWithFallbackReturn_StillFindsEmptyCatch()
+    {
+        const string code = """
+            using System;
+            class C {
+                string Parse(string value) {
+                    try { return value.Trim(); }
+                    catch (Exception) {
+                        // This is too broad to establish an expected alternate shape.
+                    }
+                    return value;
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().Contain(f => f.Category == "emptyCatch");
+    }
+
     // ── 2. throwEx ────────────────────────────────────────────────────────────
 
     [Fact]
@@ -549,6 +593,26 @@ public class ErrorHandlingProbeTests
         var result = Analyze(code);
 
         result.Findings.Should().Contain(f => f.Category == "syncBlockingCall");
+    }
+
+    [Fact]
+    public void ResultAfterAwaitedWhenAll_DoesNotFindSyncBlockingCall()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class C {
+                async Task<int> M() {
+                    var first = Task.FromResult(1);
+                    var second = Task.FromResult(2);
+                    await Task.WhenAll(first, second);
+                    return first.Result + second.Result;
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f => f.Category == "syncBlockingCall");
     }
 
     [Fact]

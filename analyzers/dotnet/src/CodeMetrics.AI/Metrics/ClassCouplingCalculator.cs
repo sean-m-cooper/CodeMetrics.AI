@@ -17,6 +17,13 @@ public static class ClassCouplingCalculator
 
     public static int Calculate(TypeDeclarationSyntax typeDecl, SemanticModel model)
     {
+        return CalculateTypes(typeDecl, model).Count;
+    }
+
+    public static IReadOnlyList<string> CalculateTypes(
+        TypeDeclarationSyntax typeDecl,
+        SemanticModel model)
+    {
         var selfSymbol = model.GetDeclaredSymbol(typeDecl) as INamedTypeSymbol;
         var coupled = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
         var fromServicesParameters = typeDecl.DescendantNodes()
@@ -68,7 +75,10 @@ public static class ClassCouplingCalculator
                 foreach (var attr in attrList.Attributes)
                     CollectFromTypeInfo(model.GetTypeInfo(attr).Type, coupled, selfSymbol);
 
-        return coupled.Count;
+        return coupled
+            .Select(type => type.ToDisplayString())
+            .OrderBy(type => type, StringComparer.Ordinal)
+            .ToList();
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 using CodeMetrics.AI.Probes;
 using FluentAssertions;
+using System.Text.Json;
 
 namespace CodeMetrics.AI.Tests.Probes;
 
@@ -399,6 +400,89 @@ public class DependencyProbeTests
                 dir, anyCommandFailed: false);
 
             result.Score.Should().Be(6);
+        }
+        finally
+        {
+            Directory.Delete(dir, true);
+        }
+    }
+
+    [Fact]
+    public void AspireAppHostOutdatedPackages_AreExcludedFromUpgradePenalty()
+    {
+        var dir = TempDir();
+        try
+        {
+            WriteCsproj(dir, "Shop.AppHost.csproj",
+                """
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <Sdk Name="Aspire.AppHost.Sdk" Version="13.0.0" />
+                  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+                  <ItemGroup>
+                    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.0.0" />
+                  </ItemGroup>
+                </Project>
+                """);
+            WriteCsproj(dir, "Shop.Api.csproj", SimpleCsproj());
+
+            const string outdatedOutput = """
+                Project `Shop.AppHost` has the following updates to its packages
+                   [net10.0]:
+                   > Aspire.Hosting.AppHost  13.0.0  13.1.0
+                   > Aspire.Hosting.Redis    13.0.0  13.1.0
+
+                Project `Shop.Api` has the following updates to its packages
+                   [net10.0]:
+                   > Newtonsoft.Json         13.0.3  13.0.4
+                """;
+
+            var result = DependencyProbe.AnalyzeOutput(
+                EmptyVulnerableOutput, outdatedOutput, EmptyDeprecatedOutput,
+                dir, anyCommandFailed: false);
+
+            result.Score.Should().Be(8);
+            result.Basis.Should().Contain("outdated=1");
+            result.Basis.Should().Contain("outdatedAspireExcluded=2");
+            var metrics = JsonSerializer.SerializeToElement(
+                result.Extra["dependencyMetrics"]);
+            metrics.GetProperty("aspireProjectsExcludedFromOutdated")
+                .EnumerateArray()
+                .Select(item => item.GetString())
+                .Should().Contain("Shop.AppHost");
+        }
+        finally
+        {
+            Directory.Delete(dir, true);
+        }
+    }
+
+    [Fact]
+    public void AspireAppHostVulnerability_IsStillScored()
+    {
+        var dir = TempDir();
+        try
+        {
+            WriteCsproj(dir, "Shop.AppHost.csproj",
+                """
+                <Project Sdk="Aspire.AppHost.Sdk/13.0.0">
+                  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+                </Project>
+                """);
+            const string vulnerableOutput = """
+                Project `Shop.AppHost` has the following vulnerable packages
+                   [net10.0]:
+                   Top-level Package Requested Resolved Severity Advisory URL
+                   > Aspire.Hosting.AppHost 13.0.0 13.0.0 High https://example.com
+                """;
+
+            var result = DependencyProbe.AnalyzeOutput(
+                vulnerableOutput, EmptyOutdatedOutput, EmptyDeprecatedOutput,
+                dir, anyCommandFailed: false);
+
+            result.Score.Should().Be(0);
+            result.Findings.Should().Contain(f =>
+                f.Category == "vulnerableDirectDependency" &&
+                f.Package == "Aspire.Hosting.AppHost");
         }
         finally
         {

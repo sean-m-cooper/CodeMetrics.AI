@@ -10,6 +10,7 @@ public sealed class TypeMetrics
     public int MaintainabilityIndex { get; set; }
     public int DepthOfInheritance { get; set; }
     public int ClassCoupling { get; set; }
+    public IReadOnlyList<string> CoupledTypes { get; set; } = [];
     public int LinesOfSource { get; set; }
     public int LinesOfExecutable { get; set; }
     public int MemberCount { get; set; }

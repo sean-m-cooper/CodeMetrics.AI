@@ -127,7 +127,12 @@ public static class DependencyProbe
         }
 
         // ── Parse outdated output ─────────────────────────────────────────────
-        int outdated = SplitLines(outdatedOutput).Count(l => l.TrimStart().StartsWith(">"));
+        // Aspire AppHost projects are local orchestration infrastructure. Keep their
+        // packages visible to vulnerability/deprecation checks, but do not let routine
+        // local-tooling upgrades reduce the production dependency score.
+        var aspireProjects = FindAspireProjectNames(solutionDir);
+        var (outdated, outdatedAspireExcluded) = CountOutdatedPackages(
+            outdatedOutput, aspireProjects);
 
         // ── Parse deprecated output ───────────────────────────────────────────
         int deprecated = SplitLines(deprecatedOutput).Count(l => l.TrimStart().StartsWith(">"));
@@ -193,7 +198,8 @@ public static class DependencyProbe
             score = 8;
 
         var basis = $"vulnerableDirect={vulnerableDirect}, vulnerableTransitive={vulnerableTransitive}, " +
-                    $"outdated={outdated}, deprecated={deprecated}, unsupportedTFMs={unsupportedTFMs}, " +
+                    $"outdated={outdated}, outdatedAspireExcluded={outdatedAspireExcluded}, " +
+                    $"deprecated={deprecated}, unsupportedTFMs={unsupportedTFMs}, " +
                     $"versionDrift={versionDrift}, cpmEnabled={cpmEnabled}, anyCommandFailed={anyCommandFailed}.";
 
         return new DimensionResult
@@ -209,6 +215,10 @@ public static class DependencyProbe
                     vulnerableDirect,
                     vulnerableTransitive,
                     outdated,
+                    outdatedAspireExcluded,
+                    aspireProjectsExcludedFromOutdated = aspireProjects
+                        .OrderBy(project => project, StringComparer.OrdinalIgnoreCase)
+                        .ToArray(),
                     deprecated,
                     unsupportedTFMs,
                     versionDrift,
@@ -311,6 +321,99 @@ public static class DependencyProbe
         if (string.IsNullOrEmpty(text))
             return [];
         return text.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+    }
+
+    private static (int Included, int AspireExcluded) CountOutdatedPackages(
+        string output,
+        IReadOnlySet<string> aspireProjects)
+    {
+        var included = 0;
+        var aspireExcluded = 0;
+        string? currentProject = null;
+
+        foreach (var line in SplitLines(output))
+        {
+            var trimmed = line.Trim();
+            var projectMatch = Regex.Match(
+                trimmed,
+                "^Project\\s+(?:[`'\"](?<quoted>.+?)[`'\"]|(?<plain>\\S+))\\s+has\\b",
+                RegexOptions.IgnoreCase);
+            if (projectMatch.Success)
+            {
+                currentProject = projectMatch.Groups["quoted"].Success
+                    ? projectMatch.Groups["quoted"].Value
+                    : projectMatch.Groups["plain"].Value;
+                continue;
+            }
+
+            if (!trimmed.StartsWith('>'))
+                continue;
+
+            if (currentProject != null && IsAspireProjectSection(currentProject, aspireProjects))
+                aspireExcluded++;
+            else
+                included++;
+        }
+
+        return (included, aspireExcluded);
+    }
+
+    private static bool IsAspireProjectSection(
+        string projectSection,
+        IReadOnlySet<string> aspireProjects)
+    {
+        return aspireProjects.Contains(projectSection) ||
+               aspireProjects.Contains(Path.GetFileNameWithoutExtension(projectSection));
+    }
+
+    private static HashSet<string> FindAspireProjectNames(string solutionDir)
+    {
+        var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (string.IsNullOrEmpty(solutionDir) || !Directory.Exists(solutionDir))
+            return result;
+
+        foreach (var csproj in Directory.GetFiles(solutionDir, "*.csproj", SearchOption.AllDirectories))
+        {
+            try
+            {
+                var document = XDocument.Load(csproj);
+                if (!IsAspireAppHost(document))
+                    continue;
+
+                result.Add(Path.GetFileNameWithoutExtension(csproj));
+                var assemblyName = document.Descendants()
+                    .FirstOrDefault(element => element.Name.LocalName == "AssemblyName")
+                    ?.Value.Trim();
+                if (!string.IsNullOrEmpty(assemblyName))
+                    result.Add(assemblyName);
+            }
+            catch
+            {
+                // Skip malformed csproj files; the command output remains scored.
+            }
+        }
+
+        return result;
+    }
+
+    private static bool IsAspireAppHost(XDocument document)
+    {
+        var rootSdk = document.Root?.Attribute("Sdk")?.Value;
+        if (rootSdk?.Contains("Aspire.AppHost.Sdk", StringComparison.OrdinalIgnoreCase) == true)
+            return true;
+
+        if (document.Descendants().Any(element =>
+                element.Name.LocalName == "Sdk" &&
+                (element.Attribute("Name")?.Value ?? element.Value)
+                .Contains("Aspire.AppHost.Sdk", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        return document.Descendants().Any(element =>
+            element.Name.LocalName == "PackageReference" &&
+            element.Attribute("Include")?.Value.Equals(
+                "Aspire.Hosting.AppHost", StringComparison.OrdinalIgnoreCase) == true);
     }
 
     // Returns (count, list of TFM strings) for unsupported target frameworks

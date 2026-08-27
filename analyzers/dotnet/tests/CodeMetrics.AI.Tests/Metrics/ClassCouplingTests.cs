@@ -89,6 +89,7 @@ public class ClassCouplingTests
             .Single(c => c.Identifier.Text == "MyController");
 
         ClassCouplingCalculator.Calculate(controller, model).Should().Be(0);
+        ClassCouplingCalculator.CalculateTypes(controller, model).Should().BeEmpty();
     }
 
     [Fact]
@@ -107,7 +108,12 @@ public class ClassCouplingTests
         var (tree, model, _) = RoslynTestHelper.CompileCode(code);
         var action = RoslynTestHelper.FindAllNodes<MethodDeclarationSyntax>(tree)
             .Single(method => method.Identifier.Text == "Get");
+        var controller = RoslynTestHelper.FindAllNodes<ClassDeclarationSyntax>(tree)
+            .Single(type => type.Identifier.Text == "MyController");
 
         ClassCouplingCalculator.CalculateAction(action, model).Should().Be(2);
+        var classTypes = ClassCouplingCalculator.CalculateTypes(controller, model);
+        classTypes.Should().ContainSingle().Which.Should().Be("Response");
+        ClassCouplingCalculator.Calculate(controller, model).Should().Be(classTypes.Count);
     }
 }

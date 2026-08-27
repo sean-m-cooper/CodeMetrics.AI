@@ -63,6 +63,10 @@ public static class ArchitectureProbe
         var dependencyInjectionExtensionTypes = new HashSet<string>(StringComparer.Ordinal);
         var frameworkCouplingArchetypeTypes = new HashSet<string>(StringComparer.Ordinal);
         var controllerActionObservations = new List<ControllerActionObservation>();
+        var applicationProjects = projects
+            .Where(project => project.Compilation.Options.OutputKind == OutputKind.ConsoleApplication)
+            .Select(project => project.Name)
+            .ToHashSet(StringComparer.Ordinal);
 
         // 1. Project graph cycle detection
         var cycles = DetectProjectCycles(solutionDir);
@@ -99,7 +103,8 @@ public static class ArchitectureProbe
         var hotspots = FindMetricHotspots(
             typeMetrics,
             dependencyInjectionExtensionTypes,
-            frameworkCouplingArchetypeTypes);
+            frameworkCouplingArchetypeTypes,
+            applicationProjects);
         findings.AddRange(hotspots);
 
         const int hotspotDisplayLimit = 10;
@@ -112,6 +117,8 @@ public static class ArchitectureProbe
         var excludedFrameworkCouplingArchetypeCount = typeMetrics.Count(metric =>
             frameworkCouplingArchetypeTypes.Contains(
                 GetTypeKey(metric.Project, metric.Namespace, metric.Type)));
+        var excludedCompositionRootCouplingCount = typeMetrics.Count(metric =>
+            IsApplicationCompositionRoot(metric, applicationProjects));
 
         // 4. Scoring
         var errorFindings = findings.Where(f => f.Severity == "error").ToList();
@@ -156,7 +163,8 @@ public static class ArchitectureProbe
                     $"Cycles: {cycles.Count}, {hotspotBasis}. " +
                     $"Excluded passive data carriers: {excludedDataCarrierCount}, " +
                     $"DI extension types: {excludedDependencyInjectionExtensionCount}, " +
-                    $"framework coupling archetypes: {excludedFrameworkCouplingArchetypeCount}.";
+                    $"framework coupling archetypes: {excludedFrameworkCouplingArchetypeCount}, " +
+                    $"application composition roots: {excludedCompositionRootCouplingCount}.";
 
         // Extra data
         var cycleList = cycles.Select(c => string.Join(" → ", c) + " → " + c[0]).ToList();
@@ -198,6 +206,25 @@ public static class ArchitectureProbe
             .ThenBy(summary => summary.Namespace, StringComparer.Ordinal)
             .ThenBy(summary => summary.Type, StringComparer.Ordinal)
             .ToList<object>();
+        var couplingProvenance = typeMetrics
+            .Where(metric => IsCouplingHotspot(
+                metric,
+                dependencyInjectionExtensionTypes,
+                frameworkCouplingArchetypeTypes,
+                applicationProjects))
+            .OrderByDescending(metric => metric.ClassCoupling)
+            .ThenBy(metric => metric.Project, StringComparer.Ordinal)
+            .ThenBy(metric => metric.Namespace, StringComparer.Ordinal)
+            .ThenBy(metric => metric.Type, StringComparer.Ordinal)
+            .Select(metric => new
+            {
+                metric.Project,
+                metric.Namespace,
+                metric.Type,
+                metric.ClassCoupling,
+                CoupledTypes = metric.CoupledTypes
+            })
+            .ToList<object>();
 
         return new DimensionResult
         {
@@ -214,6 +241,8 @@ public static class ArchitectureProbe
                 ["excludedPassiveDataCarriers"] = excludedDataCarrierCount,
                 ["excludedDependencyInjectionExtensionTypes"] = excludedDependencyInjectionExtensionCount,
                 ["excludedFrameworkCouplingArchetypeTypes"] = excludedFrameworkCouplingArchetypeCount,
+                ["excludedApplicationCompositionRoots"] = excludedCompositionRootCouplingCount,
+                ["couplingProvenance"] = couplingProvenance,
                 // Supplemental evidence only. These values intentionally do not affect
                 // the architecture score until they have been calibrated on a corpus.
                 ["controllerActionCoupling"] = controllerActionCoupling
@@ -618,7 +647,8 @@ public static class ArchitectureProbe
     private static List<Finding> FindMetricHotspots(
         IReadOnlyList<TypeMetrics> typeMetrics,
         IReadOnlySet<string> dependencyInjectionExtensionTypes,
-        IReadOnlySet<string> frameworkCouplingArchetypeTypes)
+        IReadOnlySet<string> frameworkCouplingArchetypeTypes,
+        IReadOnlySet<string> applicationProjects)
     {
         var hotspots = new List<(Finding Finding, int Cc, int Coupling, int Loc)>();
 
@@ -646,10 +676,12 @@ public static class ArchitectureProbe
                 }, tm.CyclomaticComplexity, 0, 0));
             }
 
-            var couplingThreshold = tm.Type.EndsWith("Controller", StringComparison.Ordinal) ? 50 : 30;
-            var typeKey = GetTypeKey(tm.Project, tm.Namespace, tm.Type);
-            if (!frameworkCouplingArchetypeTypes.Contains(typeKey) &&
-                tm.ClassCoupling >= couplingThreshold)
+            var couplingThreshold = CouplingThreshold(tm);
+            if (IsCouplingHotspot(
+                    tm,
+                    dependencyInjectionExtensionTypes,
+                    frameworkCouplingArchetypeTypes,
+                    applicationProjects))
             {
                 hotspots.Add((new Finding
                 {
@@ -686,5 +718,34 @@ public static class ArchitectureProbe
             .ThenBy(candidate => candidate.Finding.Type, StringComparer.Ordinal)
             .Select(candidate => candidate.Finding)
             .ToList();
+    }
+
+    private static bool IsCouplingHotspot(
+        TypeMetrics metric,
+        IReadOnlySet<string> dependencyInjectionExtensionTypes,
+        IReadOnlySet<string> frameworkCouplingArchetypeTypes,
+        IReadOnlySet<string> applicationProjects)
+    {
+        var typeKey = GetTypeKey(metric.Project, metric.Namespace, metric.Type);
+        return !metric.IsDataCarrier &&
+               !dependencyInjectionExtensionTypes.Contains(typeKey) &&
+               !frameworkCouplingArchetypeTypes.Contains(typeKey) &&
+               !IsApplicationCompositionRoot(metric, applicationProjects) &&
+               metric.ClassCoupling >= CouplingThreshold(metric);
+    }
+
+    private static int CouplingThreshold(TypeMetrics metric)
+    {
+        return metric.Type.EndsWith("Controller", StringComparison.Ordinal) ? 50 : 30;
+    }
+
+    private static bool IsApplicationCompositionRoot(
+        TypeMetrics metric,
+        IReadOnlySet<string> applicationProjects)
+    {
+        return applicationProjects.Contains(metric.Project) &&
+               (metric.Type is "Program" or "Startup" ||
+                metric.FilePath.EndsWith("Program.cs", StringComparison.OrdinalIgnoreCase) ||
+                metric.FilePath.EndsWith("Startup.cs", StringComparison.OrdinalIgnoreCase));
     }
 }

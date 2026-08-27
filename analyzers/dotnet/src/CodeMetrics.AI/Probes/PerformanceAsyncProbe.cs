@@ -94,6 +94,12 @@ public static class PerformanceAsyncProbe
 
             if (memberName == "Result" && IsTaskLikeReceiver(semanticModel, ma.Expression))
             {
+                if (CompletedTaskAccess.IsKnownCompleted(ma, ma.Expression, semanticModel) ||
+                    FindingSuppression.IsSuppressed(ma, "syncOverAsync"))
+                {
+                    continue;
+                }
+
                 findings.Add(new Finding
                 {
                     Category = "syncOverAsync",
@@ -112,6 +118,12 @@ public static class PerformanceAsyncProbe
                     innerMa.Name.Identifier.Text == "GetAwaiter" &&
                     IsTaskLikeReceiver(semanticModel, innerMa.Expression))
                 {
+                    if (CompletedTaskAccess.IsKnownCompleted(ma, innerMa.Expression, semanticModel) ||
+                        FindingSuppression.IsSuppressed(ma, "syncOverAsync"))
+                    {
+                        continue;
+                    }
+
                     findings.Add(new Finding
                     {
                         Category = "syncOverAsync",
@@ -133,6 +145,12 @@ public static class PerformanceAsyncProbe
                 ma2.Name.Identifier.Text == "Wait" &&
                 IsTaskLikeReceiver(semanticModel, ma2.Expression))
             {
+                if (CompletedTaskAccess.IsKnownCompleted(inv, ma2.Expression, semanticModel) ||
+                    FindingSuppression.IsSuppressed(inv, "syncOverAsync"))
+                {
+                    continue;
+                }
+
                 findings.Add(new Finding
                 {
                     Category = "syncOverAsync",
@@ -313,7 +331,8 @@ public static class PerformanceAsyncProbe
                 continue;
 
             var containingMethod = awaitExpr.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault();
-            if (containingMethod != null && HasSyncRequiredSuppression(containingMethod))
+            if (FindingSuppression.IsSuppressed(awaitExpr, "awaitedIoInsideLoop") ||
+                containingMethod != null && HasSyncRequiredSuppression(containingMethod))
                 continue;
 
             // Get the method name being awaited

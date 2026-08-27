@@ -86,11 +86,29 @@ The tool automatically skips non-production projects:
 
 ## Code annotations and recognized attributes
 
-CodeMetrics.AI provides one analyzer-specific comment annotation and recognizes selected framework attributes whose meaning affects a scorecard dimension. It does not require a CodeMetrics.AI package reference in the analyzed solution.
+CodeMetrics.AI recognizes category-scoped suppression comments and selected framework attributes whose meaning affects a scorecard dimension. It does not require a CodeMetrics.AI package reference in the analyzed solution.
+
+### Category-scoped suppression
+
+Place a directive immediately before the affected statement, loop, catch, or method:
+
+```csharp
+// codemetrics-ignore: awaitedIoInsideLoop — shared DbContext; sequential by design
+foreach (var item in items)
+{
+    await repository.GetAsync(item.Id, ct);
+}
+```
+
+The supported categories are `awaitedIoInsideLoop`, `syncOverAsync`,
+`syncBlockingCall`, and `emptyCatch`. Use `all` or `*` only when every supported
+finding in that scope has been reviewed. The optional text after `—` or `--` records
+the reason without affecting matching.
 
 ### Intentional synchronous code
 
-Place `// amp-metrics: sync-required` immediately before a method when a synchronous boundary is intentional and cannot safely be converted to async:
+The legacy `// amp-metrics: sync-required` method annotation remains recognized for
+backward compatibility when a synchronous boundary cannot safely be converted to async:
 
 ```csharp
 // amp-metrics: sync-required
@@ -134,9 +152,19 @@ DI registration extension types require no annotation. Static types whose expose
 
 Raw coupling is also not used as an Architecture hotspot signal for subclasses of framework contracts whose required surface dominates the metric, currently `AuthenticationHandler<TOptions>` and `DbContext`. Complexity and class-size findings still apply to those types, and their raw coupling remains in `metrics.csv`.
 
+Executable `Program` and `Startup` composition roots are likewise excluded only from
+the Architecture `highCoupling` hotspot. Raw coupling, complexity, and size remain
+available. For every scored coupling hotspot, `extra.couplingProvenance` lists the
+fully-qualified type symbols contributing to the count.
+
 ### Async concurrency semantics
 
 `unboundedWhenAll` is reported only when the analyzer can see a deferred task-producing projection over a source whose cardinality is not bounded at the call site. Passing an already-created task collection to `Task.WhenAll` is not itself treated as creating concurrency. Constructor-materialized strategy sets and fixed inline collections are treated as startup- or author-bounded.
+
+Accessing `.Result`, `.Wait()`, or `.GetAwaiter().GetResult()` is not reported when the
+same task symbol is provably complete after a dominating `await Task.WhenAll(...)` in
+the same block. A task returned by `await Task.WhenAny(...)` is also known complete;
+merely being passed into `WhenAny` is not sufficient.
 
 ASP.NET Core middleware entry points are exempt from `missingCancellationToken` when
 their symbols match conventional middleware (`Invoke`/`InvokeAsync` on a `*Middleware`
@@ -153,6 +181,12 @@ Architecture `findings` and `hotspotCount` describe the complete hotspot populat
 
 If any `dotnet list package` invocation fails, Dependency Management returns `status: "failed"` without a score. Its basis and `dependencyCommands` diagnostics identify the failing arguments, exit code or exception, and a bounded stderr summary.
 
+Outdated packages belonging to projects identified by `Aspire.AppHost.Sdk` or
+`Aspire.Hosting.AppHost` do not contribute to the package-upgrade penalty because the
+AppHost is local orchestration infrastructure. The excluded count is reported as
+`outdatedAspireExcluded`. Vulnerable and deprecated Aspire dependencies remain visible
+and scored.
+
 ### Passive request and response types
 
 Passive data carriers are identified structurally rather than by names such as `Request`, `Response`, or `Dto`. Records, classes, and structs that only declare state through primary-constructor parameters, auto-properties, fields, or assignment-only constructors are treated as data carriers.
@@ -165,6 +199,11 @@ Types are scored normally as soon as they define behavior, including methods, co
 Maintainability population, but receive a 10-point MI adjustment when thresholds are
 evaluated and stay out of the general offender sample. This gives their expected
 registration density more room without hiding a severely degraded composition root.
+
+Documented empty catches are exempt only for a narrow exception type in a conservative
+try/fallback shape: the catch contains an explanatory comment, the try has a success
+return, and the immediately following statement returns the fallback value. Broad or
+undocumented empty catches remain errors.
 
 ### Authorization
 

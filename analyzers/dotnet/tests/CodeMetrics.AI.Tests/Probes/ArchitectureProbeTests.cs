@@ -4,6 +4,7 @@ using CodeMetrics.AI.Probes;
 using CodeMetrics.AI.Tests.Helpers;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace CodeMetrics.AI.Tests.Probes;
 
@@ -415,6 +416,66 @@ public class ArchitectureProbeTests
         var result = Analyze("class Placeholder { }", metrics);
 
         result.Findings.Should().NotContain(f => f.Category == "highCoupling");
+    }
+
+    [Fact]
+    public void MetricHotspots_ExecutableProgram_ExcludesOnlyHighCoupling()
+    {
+        var metrics = new List<TypeMetrics>
+        {
+            new()
+            {
+                Project = "TestProject",
+                Namespace = "",
+                Type = "Program",
+                FilePath = "Program.cs",
+                CyclomaticComplexity = 100,
+                ClassCoupling = 85,
+                LinesOfSource = 50
+            }
+        };
+        var (_, _, compilation) = RoslynTestHelper.CompileCode(
+            "class Program { static void Main() { } }");
+        var executableCompilation = compilation.WithOptions(
+            ((CSharpCompilationOptions)compilation.Options)
+            .WithOutputKind(OutputKind.ConsoleApplication));
+
+        var result = ArchitectureProbe.Analyze(
+            [("TestProject", executableCompilation)],
+            metrics,
+            CreateIsolatedTempDir());
+
+        result.Findings.Should().NotContain(f => f.Category == "highCoupling");
+        result.Findings.Should().Contain(f => f.Category == "highCyclomaticComplexity");
+        result.Extra["excludedApplicationCompositionRoots"].Should().Be(1);
+    }
+
+    [Fact]
+    public void HighCouplingEvidence_ListsContributingTypeSymbols()
+    {
+        var metrics = new List<TypeMetrics>
+        {
+            new()
+            {
+                Project = "TestProject",
+                Namespace = "MyNs",
+                Type = "CoupledClass",
+                FilePath = "CoupledClass.cs",
+                CyclomaticComplexity = 5,
+                ClassCoupling = 35,
+                CoupledTypes = ["MyNs.FirstDependency", "MyNs.SecondDependency"],
+                LinesOfSource = 50
+            }
+        };
+
+        var result = Analyze("class Placeholder { }", metrics);
+
+        var provenance = JsonSerializer.SerializeToElement(
+            result.Extra["couplingProvenance"]);
+        provenance.GetArrayLength().Should().Be(1);
+        provenance[0].GetProperty("CoupledTypes").EnumerateArray()
+            .Select(item => item.GetString())
+            .Should().Equal("MyNs.FirstDependency", "MyNs.SecondDependency");
     }
 
     [Fact]

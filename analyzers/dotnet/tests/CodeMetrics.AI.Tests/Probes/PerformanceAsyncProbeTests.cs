@@ -247,6 +247,104 @@ public class PerformanceAsyncProbeTests
         result.Findings.Should().Contain(f => f.Category == "syncOverAsync");
     }
 
+    [Fact]
+    public void ResultAfterAwaitedWhenAll_DoesNotFindSyncOverAsync()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class C {
+                async Task<int> M() {
+                    var first = Task.FromResult(1);
+                    var second = Task.FromResult(2);
+                    await Task.WhenAll(first, second);
+                    return first.Result + second.Result;
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "syncOverAsync");
+    }
+
+    [Fact]
+    public void ReassignedTaskAfterAwaitedWhenAll_StillFindsSyncOverAsync()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class C {
+                async Task<int> M() {
+                    var task = Task.FromResult(1);
+                    await Task.WhenAll(task);
+                    task = Task.Run(() => 2);
+                    return task.Result;
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().ContainSingle(f => f.Category == "syncOverAsync");
+    }
+
+    [Fact]
+    public void InputToAwaitedWhenAny_StillFindsSyncOverAsync()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class C {
+                async Task<int> M() {
+                    var first = Task.Run(() => 1);
+                    var second = Task.Run(() => 2);
+                    await Task.WhenAny(first, second);
+                    return first.Result;
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().ContainSingle(f => f.Category == "syncOverAsync");
+    }
+
+    [Fact]
+    public void ResultFromTaskReturnedByAwaitedWhenAny_DoesNotFindSyncOverAsync()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class C {
+                async Task<int> M() {
+                    var first = Task.Run(() => 1);
+                    var second = Task.Run(() => 2);
+                    var completed = await Task.WhenAny(first, second);
+                    return completed.Result;
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "syncOverAsync");
+    }
+
+    [Fact]
+    public void CategoryDirective_SuppressesSyncOverAsync()
+    {
+        const string code = """
+            using System.Threading.Tasks;
+            class C {
+                // codemetrics-ignore: syncOverAsync -- synchronous boundary
+                void M() {
+                    var value = Task.FromResult(1).Result;
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "syncOverAsync");
+    }
+
     // ── 2. threadSleep ───────────────────────────────────────────────────────
 
     [Fact]
@@ -1017,6 +1115,31 @@ public class PerformanceAsyncProbeTests
             """;
 
         var result = Analyze(code, addTasksRef: true, addChannelsRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
+    public void CategoryDirectiveOnLoop_SuppressesAwaitedIoInsideLoop()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.Threading.Tasks;
+            class FakeClient {
+                public Task<string> GetAsync(string url) => Task.FromResult("");
+            }
+            class C {
+                public async Task M(IEnumerable<string> urls) {
+                    var client = new FakeClient();
+                    // codemetrics-ignore: awaitedIoInsideLoop — shared DbContext; sequential by design
+                    foreach (var url in urls) {
+                        var result = await client.GetAsync(url);
+                    }
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
 
         result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
     }

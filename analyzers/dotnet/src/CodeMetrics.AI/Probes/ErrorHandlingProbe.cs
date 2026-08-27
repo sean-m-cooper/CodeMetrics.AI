@@ -84,16 +84,20 @@ public static class ErrorHandlingProbe
             // 1. emptyCatch
             if (stmts.Count == 0)
             {
-                findings.Add(new Finding
+                if (!FindingSuppression.IsSuppressed(catchClause, "emptyCatch") &&
+                    !IsDocumentedNarrowFallbackCatch(catchClause, semanticModel))
                 {
-                    Category = "emptyCatch",
-                    Severity = "error",
-                    File = filePath,
-                    Line = GetLine(catchClause),
-                    Project = projectName,
-                    Type = containingType,
-                    Message = "Empty catch block suppresses exceptions silently."
-                });
+                    findings.Add(new Finding
+                    {
+                        Category = "emptyCatch",
+                        Severity = "error",
+                        File = filePath,
+                        Line = GetLine(catchClause),
+                        Project = projectName,
+                        Type = containingType,
+                        Message = "Empty catch block suppresses exceptions silently."
+                    });
+                }
                 continue; // no further analysis on an empty block
             }
 
@@ -165,6 +169,49 @@ public static class ErrorHandlingProbe
         }
     }
 
+    private static bool IsDocumentedNarrowFallbackCatch(
+        CatchClauseSyntax catchClause,
+        SemanticModel semanticModel)
+    {
+        if (catchClause.Declaration?.Type is not { } catchType ||
+            catchClause.Parent is not TryStatementSyntax tryStatement ||
+            tryStatement.Parent is not BlockSyntax containingBlock)
+        {
+            return false;
+        }
+
+        if (semanticModel.GetTypeInfo(catchType).Type is not INamedTypeSymbol caughtType ||
+            caughtType.ToDisplayString() is "System.Exception" or "System.SystemException" ||
+            !DerivesFromException(caughtType))
+            return false;
+
+        var hasExplanation = catchClause.Block.DescendantTrivia(descendIntoTrivia: true)
+            .Any(trivia =>
+                trivia.IsKind(SyntaxKind.SingleLineCommentTrivia) ||
+                trivia.IsKind(SyntaxKind.MultiLineCommentTrivia));
+        if (!hasExplanation ||
+            !tryStatement.Block.DescendantNodes().OfType<ReturnStatementSyntax>().Any())
+        {
+            return false;
+        }
+
+        var tryIndex = containingBlock.Statements.IndexOf(tryStatement);
+        return tryIndex >= 0 &&
+               tryIndex + 1 < containingBlock.Statements.Count &&
+               containingBlock.Statements[tryIndex + 1] is ReturnStatementSyntax;
+    }
+
+    private static bool DerivesFromException(INamedTypeSymbol type)
+    {
+        for (var current = type; current != null; current = current.BaseType)
+        {
+            if (current.ToDisplayString() == "System.Exception")
+                return true;
+        }
+
+        return false;
+    }
+
     private static void AnalyzeSyncBlockingCalls(
         SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName,
         List<Finding> findings)
@@ -179,6 +226,12 @@ public static class ErrorHandlingProbe
             // .Result
             if (memberName == "Result" && IsTaskLikeReceiver(semanticModel, ma.Expression))
             {
+                if (CompletedTaskAccess.IsKnownCompleted(ma, ma.Expression, semanticModel) ||
+                    FindingSuppression.IsSuppressed(ma, "syncBlockingCall"))
+                {
+                    continue;
+                }
+
                 findings.Add(new Finding
                 {
                     Category = "syncBlockingCall",
@@ -199,6 +252,12 @@ public static class ErrorHandlingProbe
                     innerMa.Name.Identifier.Text == "GetAwaiter" &&
                     IsTaskLikeReceiver(semanticModel, innerMa.Expression))
                 {
+                    if (CompletedTaskAccess.IsKnownCompleted(ma, innerMa.Expression, semanticModel) ||
+                        FindingSuppression.IsSuppressed(ma, "syncBlockingCall"))
+                    {
+                        continue;
+                    }
+
                     findings.Add(new Finding
                     {
                         Category = "syncBlockingCall",
@@ -221,6 +280,12 @@ public static class ErrorHandlingProbe
                 ma2.Name.Identifier.Text == "Wait" &&
                 IsTaskLikeReceiver(semanticModel, ma2.Expression))
             {
+                if (CompletedTaskAccess.IsKnownCompleted(inv, ma2.Expression, semanticModel) ||
+                    FindingSuppression.IsSuppressed(inv, "syncBlockingCall"))
+                {
+                    continue;
+                }
+
                 findings.Add(new Finding
                 {
                     Category = "syncBlockingCall",
