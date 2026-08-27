@@ -338,6 +338,8 @@ public class ArchitectureProbeTests
                 Type = "BigClass",
                 FilePath = "BigClass.cs",
                 CyclomaticComplexity = 100,
+                MemberCount = 5,
+                DecompositionRatio = 20,
                 ClassCoupling = 5,
                 LinesOfSource = 50
             }
@@ -516,6 +518,8 @@ public class ArchitectureProbeTests
                 Type = "Program",
                 FilePath = "Program.cs",
                 CyclomaticComplexity = 100,
+                MemberCount = 5,
+                DecompositionRatio = 20,
                 ClassCoupling = 85,
                 LinesOfSource = 50
             }
@@ -744,6 +748,8 @@ public class ArchitectureProbeTests
                 Type = "StringExtensions",
                 FilePath = "StringExtensions.cs",
                 CyclomaticComplexity = 100,
+                MemberCount = 5,
+                DecompositionRatio = 20,
                 ClassCoupling = 5,
                 LinesOfSource = 50
             }
@@ -752,6 +758,30 @@ public class ArchitectureProbeTests
         var result = Analyze(code, metrics);
 
         result.Findings.Should().Contain(f => f.Category == "highCyclomaticComplexity");
+    }
+
+    [Fact]
+    public void MetricHotspots_DistributedComplexity_IsNotHighComplexity()
+    {
+        var metrics = new List<TypeMetrics>
+        {
+            new()
+            {
+                Project = "TestProject",
+                Namespace = "MyNs",
+                Type = "RuleSet",
+                FilePath = "RuleSet.cs",
+                CyclomaticComplexity = 100,
+                MemberCount = 20,
+                DecompositionRatio = 5,
+                ClassCoupling = 5,
+                LinesOfSource = 300
+            }
+        };
+
+        var result = Analyze("class Placeholder { }", metrics);
+
+        result.Findings.Should().NotContain(f => f.Category == "highCyclomaticComplexity");
     }
 
     [Fact]
@@ -866,6 +896,8 @@ public class ArchitectureProbeTests
             Type = "BigClass",
             FilePath = "BigClass.cs",
             CyclomaticComplexity = 100,
+            MemberCount = 5,
+            DecompositionRatio = 20,
             ClassCoupling = 5,
             LinesOfSource = 50
         };
@@ -1080,6 +1112,8 @@ public class ArchitectureProbeTests
                 Type = $"BigClass{i}",
                 FilePath = $"BigClass{i}.cs",
                 CyclomaticComplexity = 80 + i,
+                MemberCount = 5,
+                DecompositionRatio = (80 + i) / 5d,
                 ClassCoupling = 5,
                 LinesOfSource = 50
             })
@@ -1120,6 +1154,8 @@ public class ArchitectureProbeTests
                 Type = "ApiKeyHandler",
                 FilePath = "ApiKeyHandler.cs",
                 CyclomaticComplexity = 80,
+                MemberCount = 5,
+                DecompositionRatio = 16,
                 ClassCoupling = 40,
                 LinesOfSource = 500
             }

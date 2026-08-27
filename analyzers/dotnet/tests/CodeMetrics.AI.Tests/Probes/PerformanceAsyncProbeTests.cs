@@ -1120,6 +1120,34 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
+    public void StreamOperationsInsideLoop_DoNotFindAwaitedIoInsideLoop()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.IO;
+            using System.Threading.Tasks;
+            class C {
+                public async Task CopyAsync(Stream input, Stream output) {
+                    var buffer = new byte[1024];
+                    while (true) {
+                        var read = await input.ReadAsync(buffer, 0, buffer.Length);
+                        if (read == 0) break;
+                        await output.WriteAsync(buffer, 0, read);
+                    }
+                }
+                public async Task WriteAsync(TextWriter writer, IEnumerable<string> lines) {
+                    foreach (var line in lines)
+                        await writer.WriteLineAsync(line);
+                }
+            }
+            """;
+
+        var result = Analyze(code, addTasksRef: true);
+
+        result.Findings.Should().NotContain(f => f.Category == "awaitedIoInsideLoop");
+    }
+
+    [Fact]
     public void CategoryDirectiveOnLoop_SuppressesAwaitedIoInsideLoop()
     {
         const string code = """

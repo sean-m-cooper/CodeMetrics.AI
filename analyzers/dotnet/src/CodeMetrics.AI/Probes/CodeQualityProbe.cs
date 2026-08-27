@@ -9,69 +9,104 @@ public static class CodeQualityProbe
     {
         var excludedDataCarriers = types.Count(t => t.IsDataCarrier);
         var eligible = types.Where(t => t.MemberCount > 0 && !t.IsDataCarrier).ToList();
-
         if (eligible.Count == 0)
-        {
-            return new DimensionResult
-            {
-                Status = "scored",
-                Score = 10,
-                Basis = excludedDataCarriers > 0
-                    ? $"No behavior-bearing types with members. Passive data carriers excluded: {excludedDataCarriers}."
-                    : "No types with members."
-            };
-        }
+            return CreateEmptyResult(excludedDataCarriers);
 
-        // --- Decomposition signals ---
+        var decomposition = AnalyzeDecomposition(eligible);
+        var complexity = AnalyzeComplexity(eligible);
+        return CreateResult(
+            eligible,
+            excludedDataCarriers,
+            decomposition,
+            complexity);
+    }
+
+    private static DimensionResult CreateEmptyResult(int excludedDataCarriers)
+    {
+        return new DimensionResult
+        {
+            Status = "scored",
+            Score = 10,
+            Basis = excludedDataCarriers > 0
+                ? $"No behavior-bearing types with members. Passive data carriers excluded: {excludedDataCarriers}."
+                : "No types with members."
+        };
+    }
+
+    private static DecompositionScores AnalyzeDecomposition(IReadOnlyList<TypeMetrics> eligible)
+    {
         var decompositionEligible = eligible.Where(t => t.MemberCount >= 2).ToList();
         var ratios = decompositionEligible.Select(t => t.DecompositionRatio).ToList();
-        double popOver4 = decompositionEligible.Count > 0
+        var populationOver4 = decompositionEligible.Count > 0
             ? decompositionEligible.Count(t => t.DecompositionRatio > 4) * 100.0 / decompositionEligible.Count
             : 0.0;
-        double p90Ratio = Percentile(ratios, 90);
-        double extremeOver15 = decompositionEligible.Count > 0
+        var p90Ratio = Percentile(ratios, 90);
+        var extremeOver15 = decompositionEligible.Count > 0
             ? decompositionEligible.Count(t => t.DecompositionRatio > 15) * 100.0 / decompositionEligible.Count
             : 0.0;
+        var populationScore = ScoreThreshold(populationOver4, [1, 3, 6, 10, 15]);
+        var p90Score = ScoreThreshold(p90Ratio, [2.0, 2.5, 3.5, 5.0, 7.0]);
+        var extremeScore = ScoreThreshold(extremeOver15, [0.1, 0.5, 1.0, 2.0, 4.0]);
+        return new DecompositionScores(
+            populationOver4,
+            populationScore,
+            p90Ratio,
+            p90Score,
+            extremeOver15,
+            extremeScore,
+            Math.Round((populationScore + p90Score + extremeScore) / 3.0, 1));
+    }
 
-        int popOver4Score = ScoreThreshold(popOver4, [1, 3, 6, 10, 15]);
-        int p90RatioScore = ScoreThreshold(p90Ratio, [2.0, 2.5, 3.5, 5.0, 7.0]);
-        int extremeOver15Score = ScoreThreshold(extremeOver15, [0.1, 0.5, 1.0, 2.0, 4.0]);
-        double decompScore = Math.Round((popOver4Score + p90RatioScore + extremeOver15Score) / 3.0, 1);
-
-        // --- MaxMemberCC signals ---
+    private static ComplexityScores AnalyzeComplexity(IReadOnlyList<TypeMetrics> eligible)
+    {
         var maxCCs = eligible.Select(t => (double)t.MaxMemberCyclomaticComplexity).ToList();
-        double popOver15 = eligible.Count(t => t.MaxMemberCyclomaticComplexity > 15) * 100.0 / eligible.Count;
-        double p90MaxCC = Percentile(maxCCs, 90);
-        double extremeOver30 = eligible.Count(t => t.MaxMemberCyclomaticComplexity > 30) * 100.0 / eligible.Count;
+        var populationOver15 = eligible.Count(t => t.MaxMemberCyclomaticComplexity > 15) * 100.0 / eligible.Count;
+        var p90MaxCc = Percentile(maxCCs, 90);
+        var extremeOver30 = eligible.Count(t => t.MaxMemberCyclomaticComplexity > 30) * 100.0 / eligible.Count;
+        var populationScore = ScoreThreshold(populationOver15, [0.5, 2, 4, 7, 10]);
+        var p90Score = ScoreThreshold(p90MaxCc, [4, 6, 9, 12, 16]);
+        var extremeScore = ScoreThreshold(extremeOver30, [0.2, 0.6, 1.2, 2.5, 4.0]);
+        return new ComplexityScores(
+            populationOver15,
+            populationScore,
+            p90MaxCc,
+            p90Score,
+            extremeOver30,
+            extremeScore,
+            Math.Round((populationScore + p90Score + extremeScore) / 3.0, 1));
+    }
 
-        int popOver15Score = ScoreThreshold(popOver15, [0.5, 2, 4, 7, 10]);
-        int p90MaxCCScore = ScoreThreshold(p90MaxCC, [4, 6, 9, 12, 16]);
-        int extremeOver30Score = ScoreThreshold(extremeOver30, [0.2, 0.6, 1.2, 2.5, 4.0]);
-        double ccScore = Math.Round((popOver15Score + p90MaxCCScore + extremeOver30Score) / 3.0, 1);
-
-        double finalScore = Math.Round((decompScore + ccScore) / 2.0, 1);
-
-        // Top 5 offenders: sort by DecompositionRatio desc, MaxMemberCC desc, Type name
-        var offenders = decompositionEligible
-            .OrderByDescending(t => t.DecompositionRatio)
-            .ThenByDescending(t => t.MaxMemberCyclomaticComplexity)
-            .ThenBy(t => t.Type)
+    private static object CreateOffenders(IEnumerable<TypeMetrics> eligible)
+    {
+        return eligible
+            .Where(type => type.MemberCount >= 2)
+            .OrderByDescending(type => type.DecompositionRatio)
+            .ThenByDescending(type => type.MaxMemberCyclomaticComplexity)
+            .ThenBy(type => type.Type)
             .Take(5)
-            .Select(t => new
+            .Select(type => new
             {
-                project = t.Project,
-                @namespace = t.Namespace,
-                type = t.Type,
-                decompositionRatio = t.DecompositionRatio,
-                maxMemberCc = t.MaxMemberCyclomaticComplexity,
-                classCc = t.CyclomaticComplexity,
-                memberCount = t.MemberCount,
-                mi = t.MaintainabilityIndex,
-                coupling = t.ClassCoupling,
-                loc = t.LinesOfSource
+                project = type.Project,
+                @namespace = type.Namespace,
+                type = type.Type,
+                decompositionRatio = type.DecompositionRatio,
+                maxMemberCc = type.MaxMemberCyclomaticComplexity,
+                classCc = type.CyclomaticComplexity,
+                memberCount = type.MemberCount,
+                mi = type.MaintainabilityIndex,
+                coupling = type.ClassCoupling,
+                loc = type.LinesOfSource
             })
             .ToList();
+    }
 
+    private static DimensionResult CreateResult(
+        IReadOnlyList<TypeMetrics> eligible,
+        int excludedDataCarriers,
+        DecompositionScores decomposition,
+        ComplexityScores complexity)
+    {
+        var finalScore = Math.Round((decomposition.Score + complexity.Score) / 2.0, 1);
         var metrics = new
         {
             filtering = new
@@ -80,34 +115,34 @@ public static class CodeQualityProbe
             },
             decomposition = new
             {
-                populationPercentOver4 = Math.Round(popOver4, 2),
-                populationPercentOver4Score = popOver4Score,
-                p90Ratio = Math.Round(p90Ratio, 2),
-                p90RatioScore = p90RatioScore,
-                extremePercentOver15 = Math.Round(extremeOver15, 2),
-                extremePercentOver15Score = extremeOver15Score,
-                decompScore
+                populationPercentOver4 = Math.Round(decomposition.PopulationPercent, 2),
+                populationPercentOver4Score = decomposition.PopulationScore,
+                p90Ratio = Math.Round(decomposition.P90, 2),
+                p90RatioScore = decomposition.P90Score,
+                extremePercentOver15 = Math.Round(decomposition.ExtremePercent, 2),
+                extremePercentOver15Score = decomposition.ExtremeScore,
+                decompScore = decomposition.Score
             },
             maxMemberCyclomaticComplexity = new
             {
-                populationPercentOver15 = Math.Round(popOver15, 2),
-                populationPercentOver15Score = popOver15Score,
-                p90MaxCC = Math.Round(p90MaxCC, 2),
-                p90MaxCCScore = p90MaxCCScore,
-                extremePercentOver30 = Math.Round(extremeOver30, 2),
-                extremePercentOver30Score = extremeOver30Score,
-                ccScore
+                populationPercentOver15 = Math.Round(complexity.PopulationPercent, 2),
+                populationPercentOver15Score = complexity.PopulationScore,
+                p90MaxCC = Math.Round(complexity.P90, 2),
+                p90MaxCCScore = complexity.P90Score,
+                extremePercentOver30 = Math.Round(complexity.ExtremePercent, 2),
+                extremePercentOver30Score = complexity.ExtremeScore,
+                ccScore = complexity.Score
             }
         };
 
         var extra = new Dictionary<string, object?>
         {
             ["metrics"] = JsonSerializer.SerializeToElement(metrics),
-            ["topOffenders"] = JsonSerializer.SerializeToElement(offenders)
+            ["topOffenders"] = JsonSerializer.SerializeToElement(CreateOffenders(eligible))
         };
 
         var basis = $"Eligible types: {eligible.Count}. Passive data carriers excluded: {excludedDataCarriers}. " +
-                    $"DecompScore: {decompScore}, CCScore: {ccScore}.";
+                    $"DecompScore: {decomposition.Score}, CCScore: {complexity.Score}.";
 
         return new DimensionResult
         {
@@ -117,6 +152,24 @@ public static class CodeQualityProbe
             Extra = extra
         };
     }
+
+    private sealed record DecompositionScores(
+        double PopulationPercent,
+        int PopulationScore,
+        double P90,
+        int P90Score,
+        double ExtremePercent,
+        int ExtremeScore,
+        double Score);
+
+    private sealed record ComplexityScores(
+        double PopulationPercent,
+        int PopulationScore,
+        double P90,
+        int P90Score,
+        double ExtremePercent,
+        int ExtremeScore,
+        double Score);
 
     /// <summary>
     /// Scores a value against ascending thresholds [t10, t8, t6, t4, t2].

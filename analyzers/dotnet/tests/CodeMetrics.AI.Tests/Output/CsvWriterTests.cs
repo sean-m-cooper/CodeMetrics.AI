@@ -21,9 +21,9 @@ public class CsvWriterTests
             };
             var members = new List<MemberMetrics>();
 
-            await CsvWriter.WriteAsync(tempFile, types, members);
+            await CsvWriter.WriteAsync(tempFile, types, members, TestContext.Current.CancellationToken);
 
-            var lines = await File.ReadAllLinesAsync(tempFile);
+            var lines = await File.ReadAllLinesAsync(tempFile, TestContext.Current.CancellationToken);
             lines[0].Should().Be(ExpectedHeader);
         }
         finally
@@ -56,9 +56,9 @@ public class CsvWriterTests
             };
             var members = new List<MemberMetrics>();
 
-            await CsvWriter.WriteAsync(tempFile, types, members);
+            await CsvWriter.WriteAsync(tempFile, types, members, TestContext.Current.CancellationToken);
 
-            var lines = await File.ReadAllLinesAsync(tempFile);
+            var lines = await File.ReadAllLinesAsync(tempFile, TestContext.Current.CancellationToken);
             // Line 0 is header, line 1 is the type row
             lines[1].Should().Be("Type,MyProj,MyNS,MyType,,85,3,2,5,100,60");
         }
@@ -80,9 +80,9 @@ public class CsvWriterTests
             };
             var members = new List<MemberMetrics>();
 
-            await CsvWriter.WriteAsync(tempFile, types, members);
+            await CsvWriter.WriteAsync(tempFile, types, members, TestContext.Current.CancellationToken);
 
-            var lines = await File.ReadAllLinesAsync(tempFile);
+            var lines = await File.ReadAllLinesAsync(tempFile, TestContext.Current.CancellationToken);
             var cols = lines[1].Split(',');
             // Scope=Type, Project=P, Namespace=N, Type=T, Member="" (empty), then metrics
             cols[0].Should().Be("Type");
@@ -131,9 +131,9 @@ public class CsvWriterTests
                 }
             };
 
-            await CsvWriter.WriteAsync(tempFile, types, members);
+            await CsvWriter.WriteAsync(tempFile, types, members, TestContext.Current.CancellationToken);
 
-            var lines = await File.ReadAllLinesAsync(tempFile);
+            var lines = await File.ReadAllLinesAsync(tempFile, TestContext.Current.CancellationToken);
             // Line 0=header, Line 1=type, Line 2=member
             lines[2].Should().Be("Member,MyProj,MyNS,MyType,MyMethod(),75,4,0,0,20,15");
         }
@@ -168,9 +168,9 @@ public class CsvWriterTests
                 }
             };
 
-            await CsvWriter.WriteAsync(tempFile, types, members);
+            await CsvWriter.WriteAsync(tempFile, types, members, TestContext.Current.CancellationToken);
 
-            var lines = await File.ReadAllLinesAsync(tempFile);
+            var lines = await File.ReadAllLinesAsync(tempFile, TestContext.Current.CancellationToken);
             var memberLine = lines[2];
             var cols = memberLine.Split(',');
             // cols: Scope, Project, Namespace, Type, Member, MI, CC, DOI, ClassCoupling, LoS, LoE
@@ -201,9 +201,9 @@ public class CsvWriterTests
                 new() { Project = "ProjectA", Namespace = "NS1", Type = "TypeB", Member = "MethodA()", LinesOfSource = 1, LinesOfExecutable = 1 },
             };
 
-            await CsvWriter.WriteAsync(tempFile, types, members);
+            await CsvWriter.WriteAsync(tempFile, types, members, TestContext.Current.CancellationToken);
 
-            var lines = await File.ReadAllLinesAsync(tempFile);
+            var lines = await File.ReadAllLinesAsync(tempFile, TestContext.Current.CancellationToken);
             // Skip header (line 0)
             // Expected order: ProjectA/NS1/TypeB, then ProjectA/NS2/TypeC, then ProjectB/NS1/TypeA
             lines[1].Should().Contain("ProjectA").And.Contain("NS1").And.Contain("TypeB");
@@ -230,9 +230,9 @@ public class CsvWriterTests
             };
             var members = new List<MemberMetrics>();
 
-            await CsvWriter.WriteAsync(tempFile, types, members);
+            await CsvWriter.WriteAsync(tempFile, types, members, TestContext.Current.CancellationToken);
 
-            var lines = await File.ReadAllLinesAsync(tempFile);
+            var lines = await File.ReadAllLinesAsync(tempFile, TestContext.Current.CancellationToken);
             lines[1].Should().Contain("\"My,Project\"");
         }
         finally
@@ -247,9 +247,9 @@ public class CsvWriterTests
         var tempFile = Path.GetTempFileName();
         try
         {
-            await CsvWriter.WriteAsync(tempFile, new List<TypeMetrics>(), new List<MemberMetrics>());
+            await CsvWriter.WriteAsync(tempFile, new List<TypeMetrics>(), new List<MemberMetrics>(), TestContext.Current.CancellationToken);
 
-            var lines = await File.ReadAllLinesAsync(tempFile);
+            var lines = await File.ReadAllLinesAsync(tempFile, TestContext.Current.CancellationToken);
             lines.Should().HaveCount(1);
             lines[0].Should().Be(ExpectedHeader);
         }

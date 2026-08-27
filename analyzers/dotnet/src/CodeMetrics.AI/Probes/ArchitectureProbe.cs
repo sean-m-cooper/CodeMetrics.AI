@@ -1,4 +1,3 @@
-using System.Xml.Linq;
 using CodeMetrics.AI.Metrics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -9,6 +8,7 @@ public static class ArchitectureProbe
 {
     private const int StructuralCouplingThreshold = 10;
     private const int ControllerStructuralCouplingThreshold = 8;
+    private const double HighComplexityDensityThreshold = 8;
     private const int LegacyRawCouplingThresholdValue = 30;
     private const int LegacyControllerRawCouplingThreshold = 50;
 
@@ -75,7 +75,7 @@ public static class ArchitectureProbe
             .ToHashSet(StringComparer.Ordinal);
 
         // 1. Project graph cycle detection
-        var cycles = DetectProjectCycles(solutionDir);
+        var cycles = ProjectCycleDetector.Find(solutionDir);
         foreach (var cycle in cycles)
         {
             findings.Add(new Finding
@@ -276,115 +276,6 @@ public static class ArchitectureProbe
     }
 
     // ── Project cycle detection ───────────────────────────────────────────────
-
-    private static List<List<string>> DetectProjectCycles(string solutionDir)
-    {
-        if (!Directory.Exists(solutionDir))
-            return [];
-
-        // Find all .csproj files, skipping inaccessible directories
-        var enumOptions = new EnumerationOptions
-        {
-            RecurseSubdirectories = true,
-            IgnoreInaccessible = true,
-        };
-        var csprojFiles = Directory.GetFiles(solutionDir, "*.csproj", enumOptions);
-
-        // Build adjacency list: projectName → list of referenced project names
-        var adjacency = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var csprojFile in csprojFiles)
-        {
-            var projectName = Path.GetFileNameWithoutExtension(csprojFile);
-            if (!adjacency.ContainsKey(projectName))
-                adjacency[projectName] = [];
-
-            try
-            {
-                var doc = XDocument.Load(csprojFile);
-                var projectRefs = doc.Descendants()
-                    .Where(e => e.Name.LocalName == "ProjectReference")
-                    .Select(e => e.Attribute("Include")?.Value)
-                    .Where(v => v != null)
-                    .Select(v => Path.GetFileNameWithoutExtension(v!.Replace('\\', '/')))
-                    .Where(n => !string.IsNullOrEmpty(n));
-
-                foreach (var refName in projectRefs)
-                {
-                    if (!adjacency[projectName].Contains(refName!, StringComparer.OrdinalIgnoreCase))
-                        adjacency[projectName].Add(refName!);
-                }
-            }
-            catch
-            {
-                // Skip malformed .csproj files
-            }
-        }
-
-        // DFS cycle detection with white/gray/black coloring
-        // white = 0 (unvisited), gray = 1 (in progress), black = 2 (done)
-        var color = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        var parent = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
-        var allCycles = new List<List<string>>();
-        var cycleSignatures = new HashSet<string>();
-
-        foreach (var node in adjacency.Keys)
-        {
-            color[node] = 0;
-            parent[node] = null;
-        }
-
-        var stack = new List<string>();
-
-        void Dfs(string node)
-        {
-            color[node] = 1; // gray
-            stack.Add(node);
-
-            if (adjacency.TryGetValue(node, out var neighbors))
-            {
-                foreach (var neighbor in neighbors)
-                {
-                    if (!color.ContainsKey(neighbor))
-                    {
-                        // Neighbor not in graph (external), skip
-                        continue;
-                    }
-
-                    if (color[neighbor] == 1) // gray → cycle found
-                    {
-                        // Extract cycle path from stack
-                        var cycleStart = stack.IndexOf(neighbor);
-                        if (cycleStart >= 0)
-                        {
-                            var cycle = stack.Skip(cycleStart).ToList();
-                            var signature = string.Join(",", cycle.OrderBy(x => x));
-                            if (cycleSignatures.Add(signature))
-                            {
-                                allCycles.Add(cycle);
-                            }
-                        }
-                    }
-                    else if (color[neighbor] == 0) // white → visit
-                    {
-                        parent[neighbor] = node;
-                        Dfs(neighbor);
-                    }
-                }
-            }
-
-            stack.RemoveAt(stack.Count - 1);
-            color[node] = 2; // black
-        }
-
-        foreach (var node in adjacency.Keys)
-        {
-            if (color[node] == 0)
-                Dfs(node);
-        }
-
-        return allCycles;
-    }
 
     // ── Layering violation detection ──────────────────────────────────────────
 
@@ -689,7 +580,8 @@ public static class ArchitectureProbe
                 continue;
             }
 
-            if (tm.CyclomaticComplexity >= 80)
+            if (tm.CyclomaticComplexity >= 80 &&
+                tm.DecompositionRatio >= HighComplexityDensityThreshold)
             {
                 hotspots.Add((new Finding
                 {
@@ -698,7 +590,9 @@ public static class ArchitectureProbe
                     File = tm.FilePath,
                     Project = tm.Project,
                     Type = tm.Type,
-                    Message = $"Type '{tm.Type}' has cyclomatic complexity of {tm.CyclomaticComplexity} (threshold: 80)."
+                    Message = $"Type '{tm.Type}' has cyclomatic complexity of {tm.CyclomaticComplexity} " +
+                              $"and complexity density {tm.DecompositionRatio:F1} " +
+                              $"(thresholds: 80 and {HighComplexityDensityThreshold:F1})."
                 }, tm.CyclomaticComplexity, 0, 0));
             }
 

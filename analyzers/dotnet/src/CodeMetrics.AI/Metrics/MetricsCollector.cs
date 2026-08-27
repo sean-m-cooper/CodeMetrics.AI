@@ -12,81 +12,120 @@ public static class MetricsCollector
         var members = new List<MemberMetrics>();
 
         foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
-        {
-            var semanticModel = compilation.GetSemanticModel(tree);
-            var root = tree.GetRoot();
-            var filePath = tree.FilePath;
-
-            foreach (var typeDecl in root.DescendantNodes().OfType<TypeDeclarationSyntax>())
-            {
-                var typeSymbol = semanticModel.GetDeclaredSymbol(typeDecl) as INamedTypeSymbol;
-                if (typeSymbol == null) continue;
-
-                var namespaceName = typeSymbol.ContainingNamespace?.ToDisplayString() ?? "";
-                var typeName = typeSymbol.Name;
-
-                var memberMetricsList = CollectMemberMetrics(
-                    typeDecl, projectName, namespaceName, typeName);
-                members.AddRange(memberMetricsList);
-
-                var typeMetric = BuildTypeMetrics(
-                    typeDecl, typeSymbol, semanticModel,
-                    projectName, namespaceName, typeName, filePath,
-                    memberMetricsList);
-                types.Add(typeMetric);
-            }
-        }
+            CollectTree(projectName, compilation, tree, types, members);
 
         return (types, members);
     }
 
+    private static void CollectTree(
+        string projectName,
+        Compilation compilation,
+        SyntaxTree tree,
+        List<TypeMetrics> types,
+        List<MemberMetrics> members)
+    {
+        var semanticModel = compilation.GetSemanticModel(tree);
+        var root = tree.GetRoot();
+        foreach (var typeDeclaration in root.DescendantNodes().OfType<TypeDeclarationSyntax>())
+            CollectType(projectName, tree.FilePath, typeDeclaration, semanticModel, types, members);
+    }
+
+    private static void CollectType(
+        string projectName,
+        string filePath,
+        TypeDeclarationSyntax typeDeclaration,
+        SemanticModel semanticModel,
+        List<TypeMetrics> types,
+        List<MemberMetrics> members)
+    {
+        if (semanticModel.GetDeclaredSymbol(typeDeclaration) is not INamedTypeSymbol typeSymbol)
+            return;
+
+        var namespaceName = typeSymbol.ContainingNamespace?.ToDisplayString() ?? "";
+        var typeName = typeSymbol.Name;
+        var memberMetrics = CollectMemberMetrics(
+            typeDeclaration,
+            semanticModel,
+            projectName,
+            namespaceName,
+            typeName);
+        members.AddRange(memberMetrics);
+        types.Add(BuildTypeMetrics(
+            typeDeclaration,
+            typeSymbol,
+            semanticModel,
+            projectName,
+            namespaceName,
+            typeName,
+            filePath,
+            memberMetrics));
+    }
+
     private static List<MemberMetrics> CollectMemberMetrics(
-        TypeDeclarationSyntax typeDecl, string project, string ns, string type)
+        TypeDeclarationSyntax typeDecl,
+        SemanticModel semanticModel,
+        string project,
+        string ns,
+        string type)
     {
         var result = new List<MemberMetrics>();
 
         foreach (var member in typeDecl.Members)
         {
-            if (member is TypeDeclarationSyntax) continue; // skip nested types
-
-            var memberName = GetMemberName(member);
-            if (memberName == null) continue;
-
-            bool hasBody = HasMethodBody(member);
-
-            int cc = 1;
-            int srcLines = 0;
-            int execLines = 0;
-            int mi = 100;
-
-            if (hasBody)
-            {
-                var ccWalker = new CyclomaticComplexityWalker();
-                ccWalker.Visit(member);
-                cc = ccWalker.Complexity;
-
-                srcLines = LinesOfCodeCounter.CountSourceLines(member);
-                execLines = LinesOfCodeCounter.CountExecutableLines(member);
-
-                var hv = HalsteadCalculator.ComputeVolume(member);
-                mi = MaintainabilityIndexCalculator.Calculate(cc, srcLines, hv);
-            }
-
-            result.Add(new MemberMetrics
-            {
-                Project = project,
-                Namespace = ns,
-                Type = type,
-                Member = memberName,
-                CyclomaticComplexity = cc,
-                LinesOfSource = srcLines,
-                LinesOfExecutable = execLines,
-                MaintainabilityIndex = mi,
-                HasBody = hasBody,
-            });
+            var metrics = BuildMemberMetrics(member, semanticModel, project, ns, type);
+            if (metrics != null)
+                result.Add(metrics);
         }
 
         return result;
+    }
+
+    private static MemberMetrics? BuildMemberMetrics(
+        MemberDeclarationSyntax member,
+        SemanticModel semanticModel,
+        string project,
+        string ns,
+        string type)
+    {
+        if (member is TypeDeclarationSyntax)
+            return null;
+
+        var memberName = GetMemberName(member, semanticModel);
+        if (memberName == null)
+            return null;
+
+        var hasBody = HasMethodBody(member);
+        var (complexity, sourceLines, executableLines, maintainabilityIndex) = hasBody
+            ? CalculateBodyMetrics(member)
+            : (1, 0, 0, 100);
+        return new MemberMetrics
+        {
+            Project = project,
+            Namespace = ns,
+            Type = type,
+            Member = memberName,
+            CyclomaticComplexity = complexity,
+            LinesOfSource = sourceLines,
+            LinesOfExecutable = executableLines,
+            MaintainabilityIndex = maintainabilityIndex,
+            HasBody = hasBody,
+        };
+    }
+
+    private static (int Complexity, int SourceLines, int ExecutableLines, int MaintainabilityIndex)
+        CalculateBodyMetrics(MemberDeclarationSyntax member)
+    {
+        var complexityWalker = new CyclomaticComplexityWalker();
+        complexityWalker.Visit(member);
+        var sourceLines = LinesOfCodeCounter.CountSourceLines(member);
+        return (
+            complexityWalker.Complexity,
+            sourceLines,
+            LinesOfCodeCounter.CountExecutableLines(member),
+            MaintainabilityIndexCalculator.Calculate(
+                complexityWalker.Complexity,
+                sourceLines,
+                HalsteadCalculator.ComputeVolume(member)));
     }
 
     private static TypeMetrics BuildTypeMetrics(
@@ -94,74 +133,91 @@ public static class MetricsCollector
         SemanticModel model, string project, string ns, string type,
         string filePath, List<MemberMetrics> memberMetrics)
     {
-        var bodiedMembers = memberMetrics.Where(m => m.HasBody).ToList();
-
-        int typeCC = 1 + bodiedMembers.Sum(m => m.CyclomaticComplexity);
-        int memberCount = memberMetrics.Count;
-        int maxMemberCC = bodiedMembers.Count > 0
-            ? bodiedMembers.Max(m => m.CyclomaticComplexity) : 0;
-
-        int avgMI = memberMetrics.Count > 0
-            ? (int)Math.Round(memberMetrics.Average(m => (double)m.MaintainabilityIndex))
-            : 100;
-
+        var aggregate = CalculateAggregates(memberMetrics);
         var coupling = ClassCouplingCalculator.Analyze(typeDecl, model);
-        int doi = DepthOfInheritanceCalculator.Calculate(typeSymbol);
-        int srcLines = LinesOfCodeCounter.CountSourceLines(typeDecl);
-        int execLines = LinesOfCodeCounter.CountExecutableLines(typeDecl);
-
-        double decomp = memberCount > 0
-            ? Math.Round((double)typeCC / memberCount, 4) : 0;
-
         return new TypeMetrics
         {
             Project = project,
             Namespace = ns,
             Type = type,
             FilePath = filePath,
-            CyclomaticComplexity = typeCC,
-            MaintainabilityIndex = avgMI,
-            DepthOfInheritance = doi,
+            CyclomaticComplexity = aggregate.CyclomaticComplexity,
+            MaintainabilityIndex = aggregate.MaintainabilityIndex,
+            DepthOfInheritance = DepthOfInheritanceCalculator.Calculate(typeSymbol),
             ClassCoupling = coupling.RawTypes.Count,
             CoupledTypes = coupling.RawTypes,
             StructuralClassCoupling = coupling.StructuralTypes.Count,
             StructuralCoupledTypes = coupling.StructuralTypes,
             CouplingExclusions = coupling.ExcludedTypes,
-            LinesOfSource = srcLines,
-            LinesOfExecutable = execLines,
-            MemberCount = memberCount,
-            MaxMemberCyclomaticComplexity = maxMemberCC,
-            DecompositionRatio = decomp,
+            LinesOfSource = LinesOfCodeCounter.CountSourceLines(typeDecl),
+            LinesOfExecutable = LinesOfCodeCounter.CountExecutableLines(typeDecl),
+            MemberCount = aggregate.MemberCount,
+            MaxMemberCyclomaticComplexity = aggregate.MaxMemberCyclomaticComplexity,
+            DecompositionRatio = aggregate.DecompositionRatio,
             IsDataCarrier = DataCarrierClassifier.IsPassiveDataCarrier(typeSymbol),
         };
     }
 
-    private static string? GetMemberName(MemberDeclarationSyntax member) => member switch
+    private static TypeMetricAggregates CalculateAggregates(
+        IReadOnlyList<MemberMetrics> memberMetrics)
     {
-        MethodDeclarationSyntax m => m.Identifier.Text,
-        ConstructorDeclarationSyntax c => c.Identifier.Text,
-        PropertyDeclarationSyntax p => p.Identifier.Text,
-        EventDeclarationSyntax e => e.Identifier.Text,
-        FieldDeclarationSyntax f => f.Declaration.Variables.FirstOrDefault()?.Identifier.Text,
-        EventFieldDeclarationSyntax ef => ef.Declaration.Variables.FirstOrDefault()?.Identifier.Text,
-        OperatorDeclarationSyntax o => $"operator {o.OperatorToken.Text}",
-        ConversionOperatorDeclarationSyntax co => $"operator {co.Type}",
-        IndexerDeclarationSyntax => "this[]",
-        DestructorDeclarationSyntax d => $"~{d.Identifier.Text}",
-        _ => null
-    };
+        var bodiedMembers = memberMetrics.Where(member => member.HasBody).ToList();
+        var complexity = 1 + bodiedMembers.Sum(member => member.CyclomaticComplexity);
+        var maxMemberComplexity = bodiedMembers.Count > 0
+            ? bodiedMembers.Max(member => member.CyclomaticComplexity)
+            : 0;
+        var maintainabilityIndex = memberMetrics.Count > 0
+            ? (int)Math.Round(memberMetrics.Average(member => (double)member.MaintainabilityIndex))
+            : 100;
+        var decompositionRatio = memberMetrics.Count > 0
+            ? Math.Round((double)complexity / memberMetrics.Count, 4)
+            : 0;
+        return new TypeMetricAggregates(
+            complexity,
+            maintainabilityIndex,
+            memberMetrics.Count,
+            maxMemberComplexity,
+            decompositionRatio);
+    }
 
-    private static bool HasMethodBody(MemberDeclarationSyntax member) => member switch
+    private sealed record TypeMetricAggregates(
+        int CyclomaticComplexity,
+        int MaintainabilityIndex,
+        int MemberCount,
+        int MaxMemberCyclomaticComplexity,
+        double DecompositionRatio);
+
+    private static string? GetMemberName(
+        MemberDeclarationSyntax member,
+        SemanticModel semanticModel)
     {
-        MethodDeclarationSyntax m => m.Body != null || m.ExpressionBody != null,
-        ConstructorDeclarationSyntax c => c.Body != null || c.ExpressionBody != null,
-        PropertyDeclarationSyntax p => p.AccessorList?.Accessors.Any(a => a.Body != null || a.ExpressionBody != null) == true
-                                       || p.ExpressionBody != null,
-        IndexerDeclarationSyntax i => i.AccessorList?.Accessors.Any(a => a.Body != null || a.ExpressionBody != null) == true
-                                      || i.ExpressionBody != null,
-        OperatorDeclarationSyntax o => o.Body != null || o.ExpressionBody != null,
-        ConversionOperatorDeclarationSyntax co => co.Body != null || co.ExpressionBody != null,
-        DestructorDeclarationSyntax d => d.Body != null || d.ExpressionBody != null,
-        _ => false
-    };
+        var variable = member switch
+        {
+            FieldDeclarationSyntax field => field.Declaration.Variables.FirstOrDefault(),
+            EventFieldDeclarationSyntax field => field.Declaration.Variables.FirstOrDefault(),
+            _ => null
+        };
+        if (variable != null)
+            return semanticModel.GetDeclaredSymbol(variable)?.Name;
+
+        return semanticModel.GetDeclaredSymbol(member) switch
+        {
+            IMethodSymbol { MethodKind: MethodKind.Constructor, ContainingType: { } owner } => owner.Name,
+            IMethodSymbol { MethodKind: MethodKind.Destructor, ContainingType: { } owner } => $"~{owner.Name}",
+            IMethodSymbol { MethodKind: MethodKind.UserDefinedOperator } method => method.ToDisplayString(),
+            IMethodSymbol { MethodKind: MethodKind.Conversion } method => method.ToDisplayString(),
+            IPropertySymbol { IsIndexer: true } => "this[]",
+            { } symbol => symbol.Name,
+            _ => null
+        };
+    }
+
+    private static bool HasMethodBody(MemberDeclarationSyntax member)
+    {
+        if (member is FieldDeclarationSyntax or EventFieldDeclarationSyntax)
+            return false;
+
+        return member.DescendantNodes(node => node is not TypeDeclarationSyntax)
+            .Any(node => node is BlockSyntax or ArrowExpressionClauseSyntax);
+    }
 }

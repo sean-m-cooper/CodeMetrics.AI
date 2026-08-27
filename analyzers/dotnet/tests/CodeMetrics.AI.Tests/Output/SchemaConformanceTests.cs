@@ -23,7 +23,7 @@ public class SchemaConformanceTests
             "examples",
             exampleFile);
 
-        using var json = JsonDocument.Parse(await File.ReadAllTextAsync(examplePath));
+        using var json = JsonDocument.Parse(await File.ReadAllTextAsync(examplePath, TestContext.Current.CancellationToken));
         var result = schema.Evaluate(json.RootElement, new EvaluationOptions
         {
             OutputFormat = OutputFormat.List
@@ -61,8 +61,8 @@ public class SchemaConformanceTests
         var tempFile = Path.GetTempFileName();
         try
         {
-            await EvidenceWriter.WriteAsync(tempFile, model);
-            using var json = JsonDocument.Parse(await File.ReadAllTextAsync(tempFile));
+            await EvidenceWriter.WriteAsync(tempFile, model, TestContext.Current.CancellationToken);
+            using var json = JsonDocument.Parse(await File.ReadAllTextAsync(tempFile, TestContext.Current.CancellationToken));
 
             var result = schema.Evaluate(json.RootElement, new EvaluationOptions
             {

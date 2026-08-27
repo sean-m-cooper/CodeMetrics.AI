@@ -803,6 +803,26 @@ public class ErrorHandlingProbeTests
     }
 
     [Fact]
+    public void MultipleFallbackCatches_DoNotRequireLogger()
+    {
+        const string code = """
+            using System;
+            class C {
+                string? M(bool first) {
+                    try { return "ok"; }
+                    catch (ArgumentNullException) { if (first) return null; throw; }
+                    catch (InvalidOperationException) { return null; }
+                }
+            }
+            """;
+
+        var result = Analyze(code);
+
+        result.Findings.Should().NotContain(f =>
+            f.Category == "missingLoggerForMultipleCatches");
+    }
+
+    [Fact]
     public void MultipleCatchesWithILoggerField_DoesNotFindMissingLogger()
     {
         const string code = """

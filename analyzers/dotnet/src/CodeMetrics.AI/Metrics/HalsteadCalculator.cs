@@ -18,16 +18,12 @@ public static class HalsteadCalculator
             if (kind == SyntaxKind.EndOfFileToken || kind == SyntaxKind.None)
                 continue;
 
-            if (IsOperand(kind))
-            {
-                operands.Add(token.ValueText);
-                totalOperands++;
-            }
-            else
-            {
-                operators.Add(token.Text);
-                totalOperators++;
-            }
+            AddToken(
+                token,
+                operators,
+                operands,
+                ref totalOperators,
+                ref totalOperands);
         }
 
         int vocabulary = operators.Count + operands.Count;
@@ -36,6 +32,24 @@ public static class HalsteadCalculator
         if (vocabulary <= 1) return 0;
 
         return length * Math.Log2(vocabulary);
+    }
+
+    private static void AddToken(
+        SyntaxToken token,
+        ISet<string> operators,
+        ISet<string> operands,
+        ref int totalOperators,
+        ref int totalOperands)
+    {
+        if (IsOperand(token.Kind()))
+        {
+            operands.Add(token.ValueText);
+            totalOperands++;
+            return;
+        }
+
+        operators.Add(token.Text);
+        totalOperators++;
     }
 
     private static bool IsOperand(SyntaxKind kind) => kind is

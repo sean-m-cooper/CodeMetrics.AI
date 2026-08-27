@@ -128,6 +128,24 @@ public class MyTests {
         result.Findings.Should().Contain(f => f.Category == "placeholderTest");
     }
 
+    [Fact]
+    public void PlaceholderNamedTest_WithRealAssertion_IsNotDetected()
+    {
+        var testCode = AttributePreamble + @"
+public class MyTests {
+    [Fact] public void PlaceholderRegression() { Assert.True(true); }
+}
+";
+        var testProject = Project("MyApp.Core.Tests", testCode);
+
+        var result = TestingProbe.Analyze(
+            new List<(string, Compilation)> { testProject },
+            new List<string>(),
+            TempDir());
+
+        result.Findings.Should().NotContain(f => f.Category == "placeholderTest");
+    }
+
     // ── 4. Skipped test with Skip named argument → detected ───────────────────
 
     [Fact]
@@ -167,8 +185,8 @@ public class CoreTests {
 ";
         // Test project only covers MyApp.Core; MyApp.Api has no matching test project
         var testProject = Project("MyApp.Core.Tests", testCode);
-        var prodCore    = Project("MyApp.Core", @"public class CoreService { }");
-        var prodApi     = Project("MyApp.Api",  @"public class ApiController { }");
+        var prodCore = Project("MyApp.Core", @"public class CoreService { }");
+        var prodApi = Project("MyApp.Api", @"public class ApiController { }");
 
         var allProjects = new List<(string, Compilation)> { prodCore, prodApi, testProject };
         var analyzedNames = new List<string> { "MyApp.Core", "MyApp.Api" };
@@ -188,8 +206,8 @@ public class CoreTests {
 }
 ";
         var testProject = Project("MyApp.Core.Tests", testCode);
-        var prodCore    = Project("MyApp.Core", @"public class CoreService { }");
-        var prodApi     = Project("MyApp.Api",  @"public class ApiController { }");
+        var prodCore = Project("MyApp.Core", @"public class CoreService { }");
+        var prodApi = Project("MyApp.Api", @"public class ApiController { }");
 
         var allProjects = new List<(string, Compilation)> { prodCore, prodApi, testProject };
         var analyzedNames = new List<string> { "MyApp.Core", "MyApp.Api" };

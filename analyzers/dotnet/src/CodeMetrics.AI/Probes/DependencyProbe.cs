@@ -17,11 +17,17 @@ public static class DependencyProbe
         public bool Failed => ExitCode != 0 || ExceptionType != null;
     }
 
-    public static async Task<DimensionResult> AnalyzeAsync(string solutionPath, string solutionDir)
+    public static async Task<DimensionResult> AnalyzeAsync(
+        string solutionPath,
+        string solutionDir,
+        CancellationToken cancellationToken = default)
     {
-        var vulnerable = await RunDotnetListAsync(solutionPath, "--vulnerable --include-transitive");
-        var outdated = await RunDotnetListAsync(solutionPath, "--outdated");
-        var deprecated = await RunDotnetListAsync(solutionPath, "--deprecated");
+        var vulnerable = await RunDotnetListAsync(
+            solutionPath, "--vulnerable --include-transitive", cancellationToken);
+        var outdated = await RunDotnetListAsync(
+            solutionPath, "--outdated", cancellationToken);
+        var deprecated = await RunDotnetListAsync(
+            solutionPath, "--deprecated", cancellationToken);
         DependencyCommandResult[] commands = [vulnerable, outdated, deprecated];
 
         bool anyCommandFailed = commands.Any(command => command.Failed);
@@ -37,7 +43,8 @@ public static class DependencyProbe
                 .ToList();
             frameworkCompatibility = await PackageFrameworkCompatibility.AssessAsync(
                 assessableUpgrades,
-                outdated.StandardOutput);
+                outdated.StandardOutput,
+                cancellationToken);
         }
 
         return AnalyzeOutput(
@@ -62,125 +69,158 @@ public static class DependencyProbe
         IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? frameworkCompatibility = null)
     {
         if (anyCommandFailed)
-        {
-            var failedCommands = commandResults?.Where(command => command.Failed).ToList() ?? [];
-            var diagnostic = failedCommands.Count == 0
-                ? "One or more dotnet list package commands failed; command diagnostics were unavailable."
-                : string.Join("; ", failedCommands.Select(FormatFailure));
-
-            return new DimensionResult
-            {
-                Status = "failed",
-                Basis = $"Dependency probe failed. {diagnostic}",
-                Findings =
-                [
-                    new Finding
-                    {
-                        Category = "dependencyProbeFailure",
-                        Severity = "error",
-                        Confidence = "high",
-                        Message = diagnostic
-                    }
-                ],
-                Extra =
-                {
-                    ["dependencyMetrics"] = new { anyCommandFailed = true },
-                    ["dependencyCommands"] = BuildCommandDiagnostics(commandResults)
-                }
-            };
-        }
+            return CreateFailureResult(commandResults);
 
         var findings = new List<Finding>();
-
-        // ── Parse vulnerable output ───────────────────────────────────────────
-        int vulnerableDirect = 0;
-        int vulnerableTransitive = 0;
-        bool inTransitiveSection = false;
-
-        foreach (var line in SplitLines(vulnerableOutput))
-        {
-            var trimmed = line.Trim();
-
-            if (trimmed.Equals("Transitive Package", StringComparison.OrdinalIgnoreCase) ||
-                trimmed.StartsWith("Transitive Package", StringComparison.OrdinalIgnoreCase) ||
-                trimmed.IndexOf("Transitive", StringComparison.OrdinalIgnoreCase) >= 0 &&
-                !trimmed.StartsWith(">"))
-            {
-                inTransitiveSection = true;
-            }
-            else if (trimmed.IndexOf("Top-level Package", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                     trimmed.IndexOf("Direct Package", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                inTransitiveSection = false;
-            }
-
-            if (trimmed.StartsWith(">"))
-            {
-                var packageName = ExtractPackageName(trimmed);
-                if (inTransitiveSection)
-                {
-                    vulnerableTransitive++;
-                    findings.Add(new Finding
-                    {
-                        Category = "vulnerableTransitiveDependency",
-                        Severity = "warning",
-                        Package = packageName,
-                        Message = $"Transitive dependency '{packageName}' has a known vulnerability."
-                    });
-                }
-                else
-                {
-                    vulnerableDirect++;
-                    findings.Add(new Finding
-                    {
-                        Category = "vulnerableDirectDependency",
-                        Severity = "error",
-                        Package = packageName,
-                        Message = $"Direct dependency '{packageName}' has a known vulnerability."
-                    });
-                }
-            }
-        }
-
-        // ── Parse outdated output ─────────────────────────────────────────────
-        // Aspire AppHost projects are local orchestration infrastructure. Keep their
-        // packages visible to vulnerability/deprecation checks, but do not let routine
-        // local-tooling upgrades reduce the production dependency score.
+        var (vulnerableDirect, vulnerableTransitive) = AnalyzeVulnerabilities(
+            vulnerableOutput,
+            findings);
         var aspireProjects = FindAspireProjectNames(solutionDir);
         var outdatedCounts = CountOutdatedPackages(
             outdatedOutput,
             aspireProjects,
             frameworkCompatibility);
-        var outdated = outdatedCounts.Included;
-        var outdatedAspireExcluded = outdatedCounts.AspireExcluded;
-        var outdatedFrameworkIncompatibleExcluded = outdatedCounts.FrameworkIncompatible.Count;
-        var outdatedFrameworkCompatibilityUnknown = outdatedCounts.CompatibilityUnknown.Count;
+        var deprecated = CountDeprecatedPackages(deprecatedOutput, findings);
+        var (unsupportedTFMs, unsupportedTFMList) = FindUnsupportedTargetFrameworks(solutionDir);
+        var cpmEnabled = FindCpm(solutionDir);
+        var versionDrift = cpmEnabled ? 0 : FindVersionDrift(solutionDir);
+        AddStaticFindings(findings, unsupportedTFMList, versionDrift, cpmEnabled);
 
-        // ── Parse deprecated output ───────────────────────────────────────────
-        int deprecated = SplitLines(deprecatedOutput).Count(l => l.TrimStart().StartsWith(">"));
+        var metrics = new DependencyMetrics(
+            vulnerableDirect,
+            vulnerableTransitive,
+            outdatedCounts,
+            aspireProjects,
+            deprecated,
+            unsupportedTFMs,
+            versionDrift,
+            cpmEnabled);
+        return CreateSuccessResult(metrics, findings);
+    }
 
-        if (deprecated > 0)
+    private static DimensionResult CreateFailureResult(
+        IReadOnlyList<DependencyCommandResult>? commandResults)
+    {
+        var failedCommands = commandResults?.Where(command => command.Failed).ToList() ?? [];
+        var diagnostic = failedCommands.Count == 0
+            ? "One or more dotnet list package commands failed; command diagnostics were unavailable."
+            : string.Join("; ", failedCommands.Select(FormatFailure));
+
+        return new DimensionResult
+        {
+            Status = "failed",
+            Basis = $"Dependency probe failed. {diagnostic}",
+            Findings =
+            [
+                new Finding
+                {
+                    Category = "dependencyProbeFailure",
+                    Severity = "error",
+                    Confidence = "high",
+                    Message = diagnostic
+                }
+            ],
+            Extra =
+            {
+                ["dependencyMetrics"] = new { anyCommandFailed = true },
+                ["dependencyCommands"] = BuildCommandDiagnostics(commandResults)
+            }
+        };
+    }
+
+    private static (int Direct, int Transitive) AnalyzeVulnerabilities(
+        string output,
+        ICollection<Finding> findings)
+    {
+        var direct = 0;
+        var transitive = 0;
+        var inTransitiveSection = false;
+
+        foreach (var line in SplitLines(output))
+        {
+            var trimmed = line.Trim();
+            if (IsTransitiveHeader(trimmed))
+                inTransitiveSection = true;
+            else if (IsDirectHeader(trimmed))
+                inTransitiveSection = false;
+
+            if (!trimmed.StartsWith('>'))
+                continue;
+
+            var packageName = ExtractPackageName(trimmed);
+            if (inTransitiveSection)
+            {
+                transitive++;
+                findings.Add(CreateVulnerabilityFinding(packageName, isTransitive: true));
+            }
+            else
+            {
+                direct++;
+                findings.Add(CreateVulnerabilityFinding(packageName, isTransitive: false));
+            }
+        }
+
+        return (direct, transitive);
+    }
+
+    private static bool IsTransitiveHeader(string line)
+    {
+        return !line.StartsWith('>') &&
+               line.Contains("Transitive", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsDirectHeader(string line)
+    {
+        return line.Contains("Top-level Package", StringComparison.OrdinalIgnoreCase) ||
+               line.Contains("Direct Package", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static Finding CreateVulnerabilityFinding(string packageName, bool isTransitive)
+    {
+        return new Finding
+        {
+            Category = isTransitive
+                ? "vulnerableTransitiveDependency"
+                : "vulnerableDirectDependency",
+            Severity = isTransitive ? "warning" : "error",
+            Package = packageName,
+            Message = isTransitive
+                ? $"Transitive dependency '{packageName}' has a known vulnerability."
+                : $"Direct dependency '{packageName}' has a known vulnerability."
+        };
+    }
+
+    private static int CountDeprecatedPackages(
+        string output,
+        ICollection<Finding> findings)
+    {
+        var count = SplitLines(output).Count(line => line.TrimStart().StartsWith('>'));
+        if (count > 0)
         {
             findings.Add(new Finding
             {
                 Category = "deprecatedDependency",
                 Severity = "warning",
-                Message = $"{deprecated} deprecated package(s) found."
+                Message = $"{count} deprecated package(s) found."
             });
         }
 
-        // ── Static checks ─────────────────────────────────────────────────────
-        var (unsupportedTFMs, unsupportedTFMList) = FindUnsupportedTargetFrameworks(solutionDir);
-        bool cpmEnabled = FindCpm(solutionDir);
-        int versionDrift = cpmEnabled ? 0 : FindVersionDrift(solutionDir);
+        return count;
+    }
 
-        foreach (var tfm in unsupportedTFMList)
+    private static void AddStaticFindings(
+        ICollection<Finding> findings,
+        IEnumerable<string> unsupportedFrameworks,
+        int versionDrift,
+        bool cpmEnabled)
+    {
+        foreach (var framework in unsupportedFrameworks)
         {
             findings.Add(new Finding
             {
                 Category = "unsupportedTargetFramework",
                 Severity = "warning",
-                Message = $"Project targets unsupported framework '{tfm}'."
+                Message = $"Project targets unsupported framework '{framework}'."
             });
         }
 
@@ -203,80 +243,104 @@ public static class DependencyProbe
                 Message = "Directory.Packages.props not found — central package management (CPM) is not enabled."
             });
         }
+    }
 
-        // ── Scoring ───────────────────────────────────────────────────────────
-        double score;
-        if (vulnerableDirect > 0)
-            score = 0;
-        else if (vulnerableTransitive > 0 || unsupportedTFMs > 1)
-            score = 2;
-        else if (deprecated > 0 || versionDrift > 2 || outdated > 10)
-            score = 4;
-        else if (outdated > 5 || unsupportedTFMs == 1)
-            score = 6;
-        else if (cpmEnabled && versionDrift == 0 && outdated == 0)
-            score = 10;
-        else
-            score = 8;
-
-        var basis = $"vulnerableDirect={vulnerableDirect}, vulnerableTransitive={vulnerableTransitive}, " +
-                    $"outdated={outdated}, outdatedAspireExcluded={outdatedAspireExcluded}, " +
-                    $"outdatedFrameworkIncompatibleExcluded={outdatedFrameworkIncompatibleExcluded}, " +
-                    $"outdatedFrameworkCompatibilityUnknown={outdatedFrameworkCompatibilityUnknown}, " +
-                    $"deprecated={deprecated}, unsupportedTFMs={unsupportedTFMs}, " +
-                    $"versionDrift={versionDrift}, cpmEnabled={cpmEnabled}, anyCommandFailed={anyCommandFailed}.";
+    private static DimensionResult CreateSuccessResult(
+        DependencyMetrics metrics,
+        List<Finding> findings)
+    {
+        var outdated = metrics.OutdatedCounts.Included;
+        var frameworkIncompatible = metrics.OutdatedCounts.FrameworkIncompatible;
+        var compatibilityUnknown = metrics.OutdatedCounts.CompatibilityUnknown;
+        var basis = $"vulnerableDirect={metrics.VulnerableDirect}, " +
+                    $"vulnerableTransitive={metrics.VulnerableTransitive}, " +
+                    $"outdated={outdated}, outdatedAspireExcluded={metrics.OutdatedCounts.AspireExcluded}, " +
+                    $"outdatedFrameworkIncompatibleExcluded={frameworkIncompatible.Count}, " +
+                    $"outdatedFrameworkCompatibilityUnknown={compatibilityUnknown.Count}, " +
+                    $"deprecated={metrics.Deprecated}, unsupportedTFMs={metrics.UnsupportedTfms}, " +
+                    $"versionDrift={metrics.VersionDrift}, cpmEnabled={metrics.CpmEnabled}, " +
+                    "anyCommandFailed=False.";
 
         return new DimensionResult
         {
             Status = "scored",
-            Score = score,
+            Score = CalculateScore(metrics),
             Basis = basis,
             Findings = findings,
             Extra =
             {
                 ["dependencyMetrics"] = new
                 {
-                    vulnerableDirect,
-                    vulnerableTransitive,
+                    vulnerableDirect = metrics.VulnerableDirect,
+                    vulnerableTransitive = metrics.VulnerableTransitive,
                     outdated,
-                    outdatedAspireExcluded,
-                    outdatedFrameworkIncompatibleExcluded,
-                    outdatedFrameworkCompatibilityUnknown,
-                    frameworkIncompatibleUpgradesExcluded = outdatedCounts.FrameworkIncompatible
-                        .Select(upgrade => new
-                        {
-                            upgrade.Project,
-                            upgrade.TargetFramework,
-                            upgrade.Package,
-                            upgrade.LatestVersion
-                        })
-                        .ToArray(),
-                    frameworkCompatibilityUnknown = outdatedCounts.CompatibilityUnknown
-                        .Select(upgrade => new
-                        {
-                            upgrade.Project,
-                            upgrade.TargetFramework,
-                            upgrade.Package,
-                            upgrade.LatestVersion
-                        })
-                        .ToArray(),
-                    aspireProjectsExcludedFromOutdated = aspireProjects
+                    outdatedAspireExcluded = metrics.OutdatedCounts.AspireExcluded,
+                    outdatedFrameworkIncompatibleExcluded = frameworkIncompatible.Count,
+                    outdatedFrameworkCompatibilityUnknown = compatibilityUnknown.Count,
+                    frameworkIncompatibleUpgradesExcluded = CreateUpgradeEvidence(frameworkIncompatible),
+                    frameworkCompatibilityUnknown = CreateUpgradeEvidence(compatibilityUnknown),
+                    aspireProjectsExcludedFromOutdated = metrics.AspireProjects
                         .OrderBy(project => project, StringComparer.OrdinalIgnoreCase)
                         .ToArray(),
-                    deprecated,
-                    unsupportedTFMs,
-                    versionDrift,
-                    cpmEnabled,
-                    anyCommandFailed
+                    deprecated = metrics.Deprecated,
+                    unsupportedTFMs = metrics.UnsupportedTfms,
+                    versionDrift = metrics.VersionDrift,
+                    cpmEnabled = metrics.CpmEnabled,
+                    anyCommandFailed = false
                 }
             }
         };
     }
 
+    private static object[] CreateUpgradeEvidence(IEnumerable<OutdatedPackageUpgrade> upgrades)
+    {
+        return upgrades
+            .Select(upgrade => (object)new
+            {
+                upgrade.Project,
+                upgrade.TargetFramework,
+                upgrade.Package,
+                upgrade.LatestVersion
+            })
+            .ToArray();
+    }
+
+    private static double CalculateScore(DependencyMetrics metrics)
+    {
+        if (metrics.VulnerableDirect > 0)
+            return 0;
+        if (metrics.VulnerableTransitive > 0 || metrics.UnsupportedTfms > 1)
+            return 2;
+        if (metrics.Deprecated > 0 ||
+            metrics.VersionDrift > 2 ||
+            metrics.OutdatedCounts.Included > 10)
+        {
+            return 4;
+        }
+
+        if (metrics.OutdatedCounts.Included > 5 || metrics.UnsupportedTfms == 1)
+            return 6;
+        return metrics.CpmEnabled &&
+               metrics.VersionDrift == 0 &&
+               metrics.OutdatedCounts.Included == 0
+            ? 10
+            : 8;
+    }
+
+    private sealed record DependencyMetrics(
+        int VulnerableDirect,
+        int VulnerableTransitive,
+        OutdatedPackageCounts OutdatedCounts,
+        IReadOnlySet<string> AspireProjects,
+        int Deprecated,
+        int UnsupportedTfms,
+        int VersionDrift,
+        bool CpmEnabled);
+
     // ── Private helpers ───────────────────────────────────────────────────────
 
     private static async Task<DependencyCommandResult> RunDotnetListAsync(
-        string solutionPath, string args)
+        string solutionPath, string args, CancellationToken cancellationToken)
     {
         try
         {
@@ -296,13 +360,17 @@ public static class DependencyProbe
                     nameof(InvalidOperationException), "dotnet process could not be started.");
             }
 
-            var stdout = process.StandardOutput.ReadToEndAsync();
-            var stderr = process.StandardError.ReadToEndAsync();
-            var exited = process.WaitForExitAsync();
+            var stdout = process.StandardOutput.ReadToEndAsync(cancellationToken);
+            var stderr = process.StandardError.ReadToEndAsync(cancellationToken);
+            var exited = process.WaitForExitAsync(cancellationToken);
             await Task.WhenAll(stdout, stderr, exited);
 
             return new DependencyCommandResult(
                 args, await stdout, await stderr, process.ExitCode);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
         }
         catch (Exception ex)
         {
@@ -447,9 +515,11 @@ public static class DependencyProbe
                 if (!string.IsNullOrEmpty(assemblyName))
                     result.Add(assemblyName);
             }
-            catch
+            catch (Exception ex) when (
+                ex is IOException or UnauthorizedAccessException or System.Xml.XmlException)
             {
                 // Skip malformed csproj files; the command output remains scored.
+                continue;
             }
         }
 
@@ -506,9 +576,11 @@ public static class DependencyProbe
                     }
                 }
             }
-            catch
+            catch (Exception ex) when (
+                ex is IOException or UnauthorizedAccessException or System.Xml.XmlException)
             {
                 // Skip malformed csproj
+                continue;
             }
         }
 
@@ -584,9 +656,11 @@ public static class DependencyProbe
                     versions.Add(version);
                 }
             }
-            catch
+            catch (Exception ex) when (
+                ex is IOException or UnauthorizedAccessException or System.Xml.XmlException)
             {
                 // Skip malformed csproj
+                continue;
             }
         }
 

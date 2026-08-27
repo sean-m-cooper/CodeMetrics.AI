@@ -37,9 +37,9 @@ public class EvidenceWriterTests
                 }
             };
 
-            await EvidenceWriter.WriteAsync(tempFile, model);
+            await EvidenceWriter.WriteAsync(tempFile, model, TestContext.Current.CancellationToken);
 
-            var json = await File.ReadAllTextAsync(tempFile);
+            var json = await File.ReadAllTextAsync(tempFile, TestContext.Current.CancellationToken);
             json.Should().NotBeNullOrWhiteSpace();
 
             using var doc = JsonDocument.Parse(json);
@@ -70,7 +70,7 @@ public class EvidenceWriterTests
         {
             var model = new EvidenceModel();
 
-            await EvidenceWriter.WriteAsync(outputPath, model);
+            await EvidenceWriter.WriteAsync(outputPath, model, TestContext.Current.CancellationToken);
 
             File.Exists(outputPath).Should().BeTrue();
         }
@@ -92,9 +92,9 @@ public class EvidenceWriterTests
                 Population = new PopulationInfo { Types = 5, Members = 10 }
             };
 
-            await EvidenceWriter.WriteAsync(tempFile, model);
+            await EvidenceWriter.WriteAsync(tempFile, model, TestContext.Current.CancellationToken);
 
-            var json = await File.ReadAllTextAsync(tempFile);
+            var json = await File.ReadAllTextAsync(tempFile, TestContext.Current.CancellationToken);
 
             // Verify camelCase keys exist
             json.Should().Contain("\"schemaVersion\"");
@@ -119,9 +119,9 @@ public class EvidenceWriterTests
         {
             var model = new EvidenceModel();
 
-            await EvidenceWriter.WriteAsync(tempFile, model);
+            await EvidenceWriter.WriteAsync(tempFile, model, TestContext.Current.CancellationToken);
 
-            var json = await File.ReadAllTextAsync(tempFile);
+            var json = await File.ReadAllTextAsync(tempFile, TestContext.Current.CancellationToken);
             using var doc = JsonDocument.Parse(json);
             var tool = doc.RootElement.GetProperty("tool");
 
@@ -162,9 +162,9 @@ public class EvidenceWriterTests
                 }
             };
 
-            await EvidenceWriter.WriteAsync(tempFile, model);
+            await EvidenceWriter.WriteAsync(tempFile, model, TestContext.Current.CancellationToken);
 
-            var json = await File.ReadAllTextAsync(tempFile);
+            var json = await File.ReadAllTextAsync(tempFile, TestContext.Current.CancellationToken);
             using var doc = JsonDocument.Parse(json);
             var dimension = doc.RootElement
                 .GetProperty("dimensions")

@@ -216,87 +216,28 @@ public static class ErrorHandlingProbe
         SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName,
         List<Finding> findings)
     {
-        // .Result and .Wait() via member access expressions
-        var memberAccesses = root.DescendantNodes().OfType<MemberAccessExpressionSyntax>();
-
-        foreach (var ma in memberAccesses)
+        foreach (var access in SyncBlockingDetector.Find(
+                     root,
+                     semanticModel,
+                     "syncBlockingCall"))
         {
-            var memberName = ma.Name.Identifier.Text;
-
-            // .Result
-            if (memberName == "Result" && IsTaskLikeReceiver(semanticModel, ma.Expression))
+            var operation = access.Kind switch
             {
-                if (CompletedTaskAccess.IsKnownCompleted(ma, ma.Expression, semanticModel) ||
-                    FindingSuppression.IsSuppressed(ma, "syncBlockingCall"))
-                {
-                    continue;
-                }
-
-                findings.Add(new Finding
-                {
-                    Category = "syncBlockingCall",
-                    Severity = "warning",
-                    File = filePath,
-                    Line = GetLine(ma),
-                    Project = projectName,
-                    Type = GetContainingTypeName(ma),
-                    Message = "'.Result' blocks the calling thread and can cause deadlocks. Use 'await' instead."
-                });
-            }
-            // .GetAwaiter().GetResult() — the outer .GetResult() member access
-            else if (memberName == "GetResult")
+                SyncBlockingKind.Result => ".Result",
+                SyncBlockingKind.GetAwaiterGetResult => ".GetAwaiter().GetResult()",
+                SyncBlockingKind.Wait => ".Wait()",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            findings.Add(new Finding
             {
-                // Check that the expression is GetAwaiter()
-                if (ma.Expression is InvocationExpressionSyntax inv &&
-                    inv.Expression is MemberAccessExpressionSyntax innerMa &&
-                    innerMa.Name.Identifier.Text == "GetAwaiter" &&
-                    IsTaskLikeReceiver(semanticModel, innerMa.Expression))
-                {
-                    if (CompletedTaskAccess.IsKnownCompleted(ma, innerMa.Expression, semanticModel) ||
-                        FindingSuppression.IsSuppressed(ma, "syncBlockingCall"))
-                    {
-                        continue;
-                    }
-
-                    findings.Add(new Finding
-                    {
-                        Category = "syncBlockingCall",
-                        Severity = "warning",
-                        File = filePath,
-                        Line = GetLine(ma),
-                        Project = projectName,
-                        Type = GetContainingTypeName(ma),
-                        Message = "'.GetAwaiter().GetResult()' blocks the calling thread and can cause deadlocks. Use 'await' instead."
-                    });
-                }
-            }
-        }
-
-        // .Wait() via invocations
-        var invocations = root.DescendantNodes().OfType<InvocationExpressionSyntax>();
-        foreach (var inv in invocations)
-        {
-            if (inv.Expression is MemberAccessExpressionSyntax ma2 &&
-                ma2.Name.Identifier.Text == "Wait" &&
-                IsTaskLikeReceiver(semanticModel, ma2.Expression))
-            {
-                if (CompletedTaskAccess.IsKnownCompleted(inv, ma2.Expression, semanticModel) ||
-                    FindingSuppression.IsSuppressed(inv, "syncBlockingCall"))
-                {
-                    continue;
-                }
-
-                findings.Add(new Finding
-                {
-                    Category = "syncBlockingCall",
-                    Severity = "warning",
-                    File = filePath,
-                    Line = GetLine(inv),
-                    Project = projectName,
-                    Type = GetContainingTypeName(inv),
-                    Message = "'.Wait()' blocks the calling thread and can cause deadlocks. Use 'await' instead."
-                });
-            }
+                Category = "syncBlockingCall",
+                Severity = "warning",
+                File = filePath,
+                Line = GetLine(access.Node),
+                Project = projectName,
+                Type = GetContainingTypeName(access.Node),
+                Message = $"'{operation}' blocks the calling thread and can cause deadlocks. Use 'await' instead."
+            });
         }
     }
 
@@ -332,7 +273,9 @@ public static class ErrorHandlingProbe
 
         foreach (var typeDecl in typeDeclarations)
         {
-            var catchCount = typeDecl.DescendantNodes().OfType<CatchClauseSyntax>().Count();
+            var catchCount = typeDecl.DescendantNodes()
+                .OfType<CatchClauseSyntax>()
+                .Count(RequiresLoggingSupport);
             if (catchCount < 2)
                 continue;
 
@@ -353,12 +296,19 @@ public static class ErrorHandlingProbe
         }
     }
 
-    // --- Helpers ---
-
-    private static bool IsTaskLikeReceiver(SemanticModel semanticModel, ExpressionSyntax receiver)
+    private static bool RequiresLoggingSupport(CatchClauseSyntax catchClause)
     {
-        return TaskTypes.IsTaskLike(semanticModel.GetTypeInfo(receiver).Type);
+        return !catchClause.Block.DescendantNodes(ShouldDescendIntoCatchNode).Any(node =>
+            node is ReturnStatementSyntax or ContinueStatementSyntax or ThrowStatementSyntax);
     }
+
+    private static bool ShouldDescendIntoCatchNode(SyntaxNode node)
+    {
+        return node is not LocalFunctionStatementSyntax and
+               not AnonymousFunctionExpressionSyntax;
+    }
+
+    // --- Helpers ---
 
     private static bool IsBroadCatch(CatchClauseSyntax catchClause)
     {

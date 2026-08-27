@@ -12,136 +12,143 @@ public static class DocumentationProbe
         IReadOnlyList<(string Name, Compilation Compilation, string? ProjectFilePath)> projects)
     {
         var findings = FindUnresolvedCrefs(projects, solutionDir);
-
-        // ── 1. README check ──────────────────────────────────────────────────────
-        var readmePath = Path.Combine(solutionDir, "README.md");
-        bool hasReadme = File.Exists(readmePath);
-        int readmeNonBlankLines = 0;
-
-        if (hasReadme)
-        {
-            var lines = File.ReadAllLines(readmePath);
-            readmeNonBlankLines = lines.Count(l => !string.IsNullOrWhiteSpace(l));
-        }
-
-        // ── 2. docs/ directory check ─────────────────────────────────────────────
+        var (readmePath, hasReadme, readmeNonBlankLines) = InspectReadme(solutionDir);
         var docsDir = FindDocsDirectory(solutionDir);
-        bool hasDocsDir = docsDir != null;
+        var libraryDocumentation = InspectLibraryDocumentation(projects, solutionDir);
+        var snapshot = new DocumentationSnapshot(
+            hasReadme,
+            readmeNonBlankLines,
+            docsDir != null,
+            CountArchitectureDocuments(docsDir),
+            HasAiInstructions(solutionDir),
+            libraryDocumentation.XmlDocRatio,
+            libraryDocumentation.AllHaveXmlDocs,
+            libraryDocumentation.PublicApiCoverage,
+            CountStaleMarkers(solutionDir, hasReadme, readmePath, docsDir != null, docsDir),
+            findings.Count);
+        return CreateResult(snapshot, findings);
+    }
 
-        // ── 3. Architecture/design docs ──────────────────────────────────────────
-        int architectureDocCount = 0;
-        if (hasDocsDir)
-        {
-            var mdFiles = Directory.GetFiles(docsDir!, "*.md", SearchOption.AllDirectories);
-            architectureDocCount = mdFiles.Count(f =>
+    private static (string Path, bool Exists, int NonBlankLines) InspectReadme(string solutionDir)
+    {
+        var path = Path.Combine(solutionDir, "README.md");
+        var exists = File.Exists(path);
+        var nonBlankLines = exists
+            ? File.ReadLines(path).Count(line => !string.IsNullOrWhiteSpace(line))
+            : 0;
+        return (path, exists, nonBlankLines);
+    }
+
+    private static int CountArchitectureDocuments(string? docsDirectory)
+    {
+        if (docsDirectory == null)
+            return 0;
+
+        return Directory.GetFiles(docsDirectory, "*.md", SearchOption.AllDirectories)
+            .Count(file =>
             {
-                var name = Path.GetFileNameWithoutExtension(f);
-                return name.IndexOf("architecture", StringComparison.OrdinalIgnoreCase) >= 0
-                    || name.IndexOf("design", StringComparison.OrdinalIgnoreCase) >= 0;
+                var name = Path.GetFileNameWithoutExtension(file);
+                return name.Contains("architecture", StringComparison.OrdinalIgnoreCase) ||
+                       name.Contains("design", StringComparison.OrdinalIgnoreCase);
             });
-        }
+    }
 
-        // ── 4. AI/onboarding instructions ────────────────────────────────────────
-        bool hasAiInstructions = File.Exists(Path.Combine(solutionDir, "AGENTS.md"))
-            || File.Exists(Path.Combine(solutionDir, ".github", "copilot-instructions.md"))
-            || File.Exists(Path.Combine(solutionDir, "CLAUDE.md"));
+    private static bool HasAiInstructions(string solutionDir)
+    {
+        return File.Exists(Path.Combine(solutionDir, "AGENTS.md")) ||
+               File.Exists(Path.Combine(solutionDir, ".github", "copilot-instructions.md")) ||
+               File.Exists(Path.Combine(solutionDir, "CLAUDE.md"));
+    }
 
-        // ── 5. Library projects XML docs ─────────────────────────────────────────
+    private static LibraryDocumentation InspectLibraryDocumentation(
+        IReadOnlyList<(string Name, Compilation Compilation, string? ProjectFilePath)> projects,
+        string solutionDir)
+    {
         var libraryProjects = GetLibraryProjects(projects);
-        int libraryProjectCount = libraryProjects.Count;
-        int libraryXmlDocEnabledCount = 0;
+        var xmlDocEnabledCount = libraryProjects.Count(project =>
+            HasXmlDocumentationEnabled(project.ProjectFilePath));
+        var xmlDocRatio = libraryProjects.Count > 0
+            ? (double)xmlDocEnabledCount / libraryProjects.Count
+            : 1.0;
+        var (publicMembers, documentedMembers) = CountPublicApiDocCoverage(
+            libraryProjects,
+            solutionDir);
+        var publicApiCoverage = publicMembers > 0
+            ? (double)documentedMembers / publicMembers
+            : 1.0;
+        return new LibraryDocumentation(
+            xmlDocRatio,
+            libraryProjects.Count == xmlDocEnabledCount,
+            publicApiCoverage);
+    }
 
-        foreach (var (_, _, projectFilePath) in libraryProjects)
-        {
-            if (projectFilePath != null && File.Exists(projectFilePath))
-            {
-                var csprojContent = File.ReadAllText(projectFilePath);
-                if (csprojContent.Contains("<GenerateDocumentationFile>true</GenerateDocumentationFile>", StringComparison.OrdinalIgnoreCase)
-                    || csprojContent.Contains("<DocumentationFile>", StringComparison.OrdinalIgnoreCase))
-                {
-                    libraryXmlDocEnabledCount++;
-                }
-            }
-        }
+    private static bool HasXmlDocumentationEnabled(string? projectFilePath)
+    {
+        if (projectFilePath == null || !File.Exists(projectFilePath))
+            return false;
 
-        double libraryXmlDocRatio = libraryProjectCount > 0
-            ? (double)libraryXmlDocEnabledCount / libraryProjectCount
-            : 1.0; // no library projects → not penalized
+        var content = File.ReadAllText(projectFilePath);
+        return content.Contains(
+                   "<GenerateDocumentationFile>true</GenerateDocumentationFile>",
+                   StringComparison.OrdinalIgnoreCase) ||
+               content.Contains("<DocumentationFile>", StringComparison.OrdinalIgnoreCase);
+    }
 
-        bool allLibraryProjectsHaveXmlDocs = libraryProjectCount == 0 || libraryXmlDocEnabledCount == libraryProjectCount;
-
-        // ── 6. Public API doc coverage ───────────────────────────────────────────
-        var (publicMemberCount, documentedMemberCount) = CountPublicApiDocCoverage(libraryProjects, solutionDir);
-        double publicApiDocCoverage = publicMemberCount > 0
-            ? (double)documentedMemberCount / publicMemberCount
-            : 1.0; // no public members → not penalized
-
-        // ── 7. Stale markers ─────────────────────────────────────────────────────
-        int staleMarkerCount = CountStaleMarkers(solutionDir, hasReadme, readmePath, hasDocsDir, docsDir);
-        int unresolvedCrefCount = findings.Count;
-
-        // ── Scoring ───────────────────────────────────────────────────────────────
-        if (!hasReadme && !hasDocsDir)
-        {
-            return new DimensionResult
-            {
-                Status = "scored",
-                Score = 0,
-                Basis = $"Neither README.md nor docs/ directory found. unresolvedCrefs={unresolvedCrefCount}.",
-                Findings = findings,
-                Extra = BuildExtra(hasReadme, readmeNonBlankLines, hasDocsDir, architectureDocCount,
-                    hasAiInstructions, libraryXmlDocRatio, publicApiDocCoverage, staleMarkerCount,
-                    unresolvedCrefCount)
-            };
-        }
-
-        double score = 10.0;
-
-        if (readmeNonBlankLines < 20)
-            score -= 3;
-
-        if (!hasDocsDir)
-            score -= 2;
-
-        if (architectureDocCount == 0)
-            score -= 1;
-
-        if (!hasAiInstructions)
-            score -= 1;
-
-        if (!allLibraryProjectsHaveXmlDocs)
-            score -= 2;
-
-        if (publicApiDocCoverage < 0.5)
-            score -= 1;
-
-        if (staleMarkerCount > 0)
-            score -= 1;
-
-        if (unresolvedCrefCount > 0)
-            score -= 1;
-
-        // Clamp to [0, 10]
-        score = Math.Max(0, Math.Min(10, score));
-
-        var basis = $"hasReadme={hasReadme}, readmeNonBlankLines={readmeNonBlankLines}, " +
-                    $"hasDocsDir={hasDocsDir}, architectureDocs={architectureDocCount}, " +
-                    $"hasAiInstructions={hasAiInstructions}, " +
-                    $"libraryXmlDocRatio={libraryXmlDocRatio:F2}, " +
-                    $"publicApiDocCoverage={publicApiDocCoverage:F2}, " +
-                    $"staleMarkers={staleMarkerCount}, unresolvedCrefs={unresolvedCrefCount}.";
-
+    private static DimensionResult CreateResult(
+        DocumentationSnapshot snapshot,
+        List<Finding> findings)
+    {
+        var basis = !snapshot.HasReadme && !snapshot.HasDocsDirectory
+            ? $"Neither README.md nor docs/ directory found. unresolvedCrefs={snapshot.UnresolvedCrefs}."
+            : $"hasReadme={snapshot.HasReadme}, readmeNonBlankLines={snapshot.ReadmeNonBlankLines}, " +
+              $"hasDocsDir={snapshot.HasDocsDirectory}, architectureDocs={snapshot.ArchitectureDocuments}, " +
+              $"hasAiInstructions={snapshot.HasAiInstructions}, " +
+              $"libraryXmlDocRatio={snapshot.LibraryXmlDocRatio:F2}, " +
+              $"publicApiDocCoverage={snapshot.PublicApiDocCoverage:F2}, " +
+              $"staleMarkers={snapshot.StaleMarkers}, unresolvedCrefs={snapshot.UnresolvedCrefs}.";
         return new DimensionResult
         {
             Status = "scored",
-            Score = score,
+            Score = CalculateScore(snapshot),
             Basis = basis,
             Findings = findings,
-            Extra = BuildExtra(hasReadme, readmeNonBlankLines, hasDocsDir, architectureDocCount,
-                hasAiInstructions, libraryXmlDocRatio, publicApiDocCoverage, staleMarkerCount,
-                unresolvedCrefCount)
+            Extra = BuildExtra(snapshot)
         };
     }
+
+    private static double CalculateScore(DocumentationSnapshot snapshot)
+    {
+        if (!snapshot.HasReadme && !snapshot.HasDocsDirectory)
+            return 0;
+
+        var score = 10.0;
+        if (snapshot.ReadmeNonBlankLines < 20) score -= 3;
+        if (!snapshot.HasDocsDirectory) score -= 2;
+        if (snapshot.ArchitectureDocuments == 0) score -= 1;
+        if (!snapshot.HasAiInstructions) score -= 1;
+        if (!snapshot.AllLibraryProjectsHaveXmlDocs) score -= 2;
+        if (snapshot.PublicApiDocCoverage < 0.5) score -= 1;
+        if (snapshot.StaleMarkers > 0) score -= 1;
+        if (snapshot.UnresolvedCrefs > 0) score -= 1;
+        return Math.Clamp(score, 0, 10);
+    }
+
+    private sealed record LibraryDocumentation(
+        double XmlDocRatio,
+        bool AllHaveXmlDocs,
+        double PublicApiCoverage);
+
+    private sealed record DocumentationSnapshot(
+        bool HasReadme,
+        int ReadmeNonBlankLines,
+        bool HasDocsDirectory,
+        int ArchitectureDocuments,
+        bool HasAiInstructions,
+        double LibraryXmlDocRatio,
+        bool AllLibraryProjectsHaveXmlDocs,
+        double PublicApiDocCoverage,
+        int StaleMarkers,
+        int UnresolvedCrefs);
 
     // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -312,28 +319,19 @@ public static class DocumentationProbe
         return count;
     }
 
-    private static Dictionary<string, object?> BuildExtra(
-        bool hasReadme,
-        int readmeNonBlankLines,
-        bool hasDocsDir,
-        int architectureDocCount,
-        bool hasAiInstructions,
-        double libraryXmlDocRatio,
-        double publicApiDocCoverage,
-        int staleMarkerCount,
-        int unresolvedCrefCount)
+    private static Dictionary<string, object?> BuildExtra(DocumentationSnapshot snapshot)
     {
         var data = new
         {
-            hasReadme,
-            readmeNonBlankLines,
-            hasDocsDir,
-            architectureDocCount,
-            hasAiInstructions,
-            libraryXmlDocRatio = Math.Round(libraryXmlDocRatio, 4),
-            publicApiDocCoverage = Math.Round(publicApiDocCoverage, 4),
-            staleMarkerCount,
-            unresolvedCrefCount
+            hasReadme = snapshot.HasReadme,
+            readmeNonBlankLines = snapshot.ReadmeNonBlankLines,
+            hasDocsDir = snapshot.HasDocsDirectory,
+            architectureDocCount = snapshot.ArchitectureDocuments,
+            hasAiInstructions = snapshot.HasAiInstructions,
+            libraryXmlDocRatio = Math.Round(snapshot.LibraryXmlDocRatio, 4),
+            publicApiDocCoverage = Math.Round(snapshot.PublicApiDocCoverage, 4),
+            staleMarkerCount = snapshot.StaleMarkers,
+            unresolvedCrefCount = snapshot.UnresolvedCrefs
         };
 
         return new Dictionary<string, object?>

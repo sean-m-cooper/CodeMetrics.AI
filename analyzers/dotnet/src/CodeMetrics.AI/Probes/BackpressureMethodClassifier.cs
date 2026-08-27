@@ -17,7 +17,31 @@ internal static class BackpressureMethodClassifier
         "System.Threading.SemaphoreSlim"
     };
 
+    private static readonly HashSet<string> SequentialIoTypes = new(StringComparer.Ordinal)
+    {
+        "System.IO.Stream",
+        "System.IO.TextReader",
+        "System.IO.TextWriter"
+    };
+
     public static HashSet<string> Build(
+        IReadOnlyList<(string ProjectName, Compilation Compilation)> projects,
+        string? solutionDir)
+    {
+        var declarations = CollectDeclarations(projects, solutionDir);
+        var implementations = BuildInterfaceImplementations(declarations.DeclaredTypes);
+        var classified = new HashSet<string>(StringComparer.Ordinal);
+        bool changed;
+        do
+        {
+            changed = ClassifyAuthoredMethods(declarations.Methods, classified);
+            changed |= ClassifyInterfaces(implementations, classified);
+        } while (changed);
+
+        return classified;
+    }
+
+    private static BackpressureDeclarations CollectDeclarations(
         IReadOnlyList<(string ProjectName, Compilation Compilation)> projects,
         string? solutionDir)
     {
@@ -45,57 +69,84 @@ internal static class BackpressureMethodClassifier
             }
         }
 
-        var classified = new HashSet<string>(StringComparer.Ordinal);
-        bool changed;
-        do
+        return new BackpressureDeclarations(methods, declaredTypes);
+    }
+
+    private static bool ClassifyAuthoredMethods(
+        IEnumerable<(IMethodSymbol Symbol, MethodDeclarationSyntax Syntax, SemanticModel Model)> methods,
+        HashSet<string> classified)
+    {
+        var changed = false;
+        foreach (var (symbol, syntax, model) in methods)
         {
-            changed = false;
-            foreach (var (symbol, syntax, model) in methods)
+            var key = MethodKey(symbol);
+            if (classified.Contains(key))
+                continue;
+
+            var callsBackpressure = syntax.DescendantNodes()
+                .OfType<InvocationExpressionSyntax>()
+                .Select(invocation => model.GetSymbolInfo(invocation).Symbol as IMethodSymbol)
+                .Where(method => method != null)
+                .Any(method => IsFrameworkPrimitive(method!) || classified.Contains(MethodKey(method!)));
+            if (callsBackpressure)
+                changed |= classified.Add(key);
+        }
+
+        return changed;
+    }
+
+    private static Dictionary<string, HashSet<string>> BuildInterfaceImplementations(
+        IEnumerable<INamedTypeSymbol> declaredTypes)
+    {
+        var implementations = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+        foreach (var type in declaredTypes)
+        {
+            foreach (var interfaceType in type.AllInterfaces)
             {
-                var key = MethodKey(symbol);
-                if (classified.Contains(key))
-                    continue;
-
-                var callsBackpressure = syntax.DescendantNodes()
-                    .OfType<InvocationExpressionSyntax>()
-                    .Select(invocation => model.GetSymbolInfo(invocation).Symbol as IMethodSymbol)
-                    .Where(method => method != null)
-                    .Any(method => IsFrameworkPrimitive(method!) || classified.Contains(MethodKey(method!)));
-
-                if (callsBackpressure)
-                    changed |= classified.Add(key);
-            }
-
-            var implementations = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
-            foreach (var type in declaredTypes)
-            {
-                foreach (var interfaceType in type.AllInterfaces)
+                foreach (var interfaceMethod in interfaceType.GetMembers().OfType<IMethodSymbol>())
                 {
-                    foreach (var interfaceMethod in interfaceType.GetMembers().OfType<IMethodSymbol>())
-                    {
-                        if (type.FindImplementationForInterfaceMember(interfaceMethod) is not IMethodSymbol implementation ||
-                            implementation.DeclaringSyntaxReferences.Length == 0)
-                        {
-                            continue;
-                        }
-
-                        var interfaceKey = MethodKey(interfaceMethod);
-                        if (!implementations.TryGetValue(interfaceKey, out var implementationKeys))
-                            implementations[interfaceKey] = implementationKeys = [];
-                        implementationKeys.Add(MethodKey(implementation));
-                    }
+                    AddInterfaceImplementation(implementations, type, interfaceMethod);
                 }
             }
+        }
 
-            foreach (var (interfaceKey, implementationKeys) in implementations)
-            {
-                if (implementationKeys.Count > 0 && implementationKeys.All(classified.Contains))
-                    changed |= classified.Add(interfaceKey);
-            }
-        } while (changed);
-
-        return classified;
+        return implementations;
     }
+
+    private static void AddInterfaceImplementation(
+        IDictionary<string, HashSet<string>> implementations,
+        INamedTypeSymbol type,
+        IMethodSymbol interfaceMethod)
+    {
+        if (type.FindImplementationForInterfaceMember(interfaceMethod) is not IMethodSymbol implementation ||
+            implementation.DeclaringSyntaxReferences.Length == 0)
+        {
+            return;
+        }
+
+        var interfaceKey = MethodKey(interfaceMethod);
+        if (!implementations.TryGetValue(interfaceKey, out var implementationKeys))
+            implementations[interfaceKey] = implementationKeys = [];
+        implementationKeys.Add(MethodKey(implementation));
+    }
+
+    private static bool ClassifyInterfaces(
+        IReadOnlyDictionary<string, HashSet<string>> implementations,
+        HashSet<string> classified)
+    {
+        var changed = false;
+        foreach (var (interfaceKey, implementationKeys) in implementations)
+        {
+            if (implementationKeys.Count > 0 && implementationKeys.All(classified.Contains))
+                changed |= classified.Add(interfaceKey);
+        }
+
+        return changed;
+    }
+
+    private sealed record BackpressureDeclarations(
+        IReadOnlyList<(IMethodSymbol Symbol, MethodDeclarationSyntax Syntax, SemanticModel Model)> Methods,
+        IReadOnlyList<INamedTypeSymbol> DeclaredTypes);
 
     public static bool IsBackpressureInvocation(
         SemanticModel semanticModel,
@@ -106,6 +157,23 @@ internal static class BackpressureMethodClassifier
             return false;
 
         return IsFrameworkPrimitive(method) || classifiedMethods.Contains(MethodKey(method));
+    }
+
+    public static bool IsSequentialIoInvocation(
+        SemanticModel semanticModel,
+        InvocationExpressionSyntax invocation)
+    {
+        if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol method)
+            return false;
+
+        for (var owner = method.ContainingType; owner != null; owner = owner.BaseType)
+        {
+            var qualifiedName = $"{owner.ContainingNamespace?.ToDisplayString()}.{owner.Name}";
+            if (SequentialIoTypes.Contains(qualifiedName))
+                return true;
+        }
+
+        return false;
     }
 
     internal static string MethodKey(IMethodSymbol method)

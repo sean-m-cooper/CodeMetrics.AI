@@ -6,6 +6,11 @@ namespace CodeMetrics.AI.Probes;
 
 public static class PerformanceAsyncProbe
 {
+    private static readonly HashSet<string> IoMethodVerbs = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Get", "Read", "Write", "Send", "Post", "Put", "Delete", "Execute", "Query", "Fetch"
+    };
+
     public static DimensionResult Analyze(
         IReadOnlyList<(string ProjectName, Compilation Compilation)> projects,
         string? solutionDir = null)
@@ -86,82 +91,25 @@ public static class PerformanceAsyncProbe
         SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName,
         List<Finding> findings)
     {
-        var memberAccesses = root.DescendantNodes().OfType<MemberAccessExpressionSyntax>();
-
-        foreach (var ma in memberAccesses)
+        foreach (var access in SyncBlockingDetector.Find(root, semanticModel, "syncOverAsync"))
         {
-            var memberName = ma.Name.Identifier.Text;
-
-            if (memberName == "Result" && IsTaskLikeReceiver(semanticModel, ma.Expression))
+            var operation = access.Kind switch
             {
-                if (CompletedTaskAccess.IsKnownCompleted(ma, ma.Expression, semanticModel) ||
-                    FindingSuppression.IsSuppressed(ma, "syncOverAsync"))
-                {
-                    continue;
-                }
-
-                findings.Add(new Finding
-                {
-                    Category = "syncOverAsync",
-                    Severity = SyncOverAsyncSeverity(ma),
-                    File = filePath,
-                    Line = GetLine(ma),
-                    Project = projectName,
-                    Type = GetContainingTypeName(ma),
-                    Message = "'.Result' blocks the calling thread synchronously. Use 'await' instead."
-                });
-            }
-            else if (memberName == "GetResult")
+                SyncBlockingKind.Result => ".Result",
+                SyncBlockingKind.GetAwaiterGetResult => ".GetAwaiter().GetResult()",
+                SyncBlockingKind.Wait => ".Wait()",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            findings.Add(new Finding
             {
-                if (ma.Expression is InvocationExpressionSyntax inv &&
-                    inv.Expression is MemberAccessExpressionSyntax innerMa &&
-                    innerMa.Name.Identifier.Text == "GetAwaiter" &&
-                    IsTaskLikeReceiver(semanticModel, innerMa.Expression))
-                {
-                    if (CompletedTaskAccess.IsKnownCompleted(ma, innerMa.Expression, semanticModel) ||
-                        FindingSuppression.IsSuppressed(ma, "syncOverAsync"))
-                    {
-                        continue;
-                    }
-
-                    findings.Add(new Finding
-                    {
-                        Category = "syncOverAsync",
-                        Severity = SyncOverAsyncSeverity(ma),
-                        File = filePath,
-                        Line = GetLine(ma),
-                        Project = projectName,
-                        Type = GetContainingTypeName(ma),
-                        Message = "'.GetAwaiter().GetResult()' blocks the calling thread synchronously. Use 'await' instead."
-                    });
-                }
-            }
-        }
-
-        var invocations = root.DescendantNodes().OfType<InvocationExpressionSyntax>();
-        foreach (var inv in invocations)
-        {
-            if (inv.Expression is MemberAccessExpressionSyntax ma2 &&
-                ma2.Name.Identifier.Text == "Wait" &&
-                IsTaskLikeReceiver(semanticModel, ma2.Expression))
-            {
-                if (CompletedTaskAccess.IsKnownCompleted(inv, ma2.Expression, semanticModel) ||
-                    FindingSuppression.IsSuppressed(inv, "syncOverAsync"))
-                {
-                    continue;
-                }
-
-                findings.Add(new Finding
-                {
-                    Category = "syncOverAsync",
-                    Severity = SyncOverAsyncSeverity(inv),
-                    File = filePath,
-                    Line = GetLine(inv),
-                    Project = projectName,
-                    Type = GetContainingTypeName(inv),
-                    Message = "'.Wait()' blocks the calling thread synchronously. Use 'await' instead."
-                });
-            }
+                Category = "syncOverAsync",
+                Severity = SyncOverAsyncSeverity(access.Node),
+                File = filePath,
+                Line = GetLine(access.Node),
+                Project = projectName,
+                Type = GetContainingTypeName(access.Node),
+                Message = $"'{operation}' blocks the calling thread synchronously. Use 'await' instead."
+            });
         }
     }
 
@@ -315,77 +263,71 @@ public static class PerformanceAsyncProbe
         string filePath, string projectName,
         List<Finding> findings)
     {
-        var awaitExpressions = root.DescendantNodes().OfType<AwaitExpressionSyntax>();
-        var ioVerbs = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "Get", "Read", "Write", "Send", "Post", "Put", "Delete", "Execute", "Query", "Fetch"
-        };
-
-        foreach (var awaitExpr in awaitExpressions)
+        foreach (var awaitExpression in root.DescendantNodes().OfType<AwaitExpressionSyntax>())
         {
             // The innermost loop is the one whose iterations this await would have to be
             // batched across. Judging the await against an outer loop instead would let a
             // cursor-driven outer loop hide a genuine N+1 nested inside it.
-            var loop = InnermostLoop(awaitExpr);
-            if (loop == null)
-                continue;
-
-            var containingMethod = awaitExpr.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault();
-            if (FindingSuppression.IsSuppressed(awaitExpr, "awaitedIoInsideLoop") ||
-                containingMethod != null && HasSyncRequiredSuppression(containingMethod))
-                continue;
-
-            // Get the method name being awaited
-            string? methodName = null;
-            if (awaitExpr.Expression is InvocationExpressionSyntax inv)
+            var loop = InnermostLoop(awaitExpression);
+            var methodName = AwaitedMethodName(awaitExpression);
+            if (loop == null ||
+                methodName == null ||
+                ShouldExcludeAwaitedIo(
+                    awaitExpression,
+                    loop,
+                    methodName,
+                    semanticModel,
+                    backpressureMethods) ||
+                !IoMethodVerbs.Any(verb =>
+                    methodName.Contains(verb, StringComparison.OrdinalIgnoreCase)))
             {
-                if (inv.Expression is MemberAccessExpressionSyntax ma)
-                    methodName = ma.Name.Identifier.Text;
-                else if (inv.Expression is IdentifierNameSyntax id)
-                    methodName = id.Identifier.Text;
+                continue;
             }
 
-            if (methodName == null || !methodName.EndsWith("Async", StringComparison.Ordinal))
-                continue;
-
-            // Exclude SaveChanges (covered separately)
-            if (methodName == "SaveChangesAsync")
-                continue;
-
-            // The rule's premise is that N sequential awaits should have been one batched
-            // call. Where each iteration causally requires the previous response, or where
-            // the blocking await is itself the mechanism the author wanted, there is nothing
-            // to batch and the finding would be a false positive.
-            if (IsContinuationDependentLoop(loop))
-                continue;
-
-            if (IsBoundedFallbackSequence(loop))
-                continue;
-
-            if (IsBackpressurePrimitive(semanticModel, awaitExpr, backpressureMethods))
-                continue;
-
-            if (IsOrderedPipelineStageLoop(loop, awaitExpr, semanticModel))
-                continue;
-
-            // Check if name contains one of the IO verbs
-            bool hasIoVerb = ioVerbs.Any(verb =>
-                methodName.IndexOf(verb, StringComparison.OrdinalIgnoreCase) >= 0);
-
-            if (hasIoVerb)
+            findings.Add(new Finding
             {
-                findings.Add(new Finding
-                {
-                    Category = "awaitedIoInsideLoop",
-                    Severity = "warning",
-                    File = filePath,
-                    Line = GetLine(awaitExpr),
-                    Project = projectName,
-                    Type = GetContainingTypeName(awaitExpr),
-                    Message = $"'await {methodName}(...)' inside a loop causes sequential I/O. Consider batching or using Task.WhenAll."
-                });
-            }
+                Category = "awaitedIoInsideLoop",
+                Severity = "warning",
+                File = filePath,
+                Line = GetLine(awaitExpression),
+                Project = projectName,
+                Type = GetContainingTypeName(awaitExpression),
+                Message = $"'await {methodName}(...)' inside a loop causes sequential I/O. Consider batching or using Task.WhenAll."
+            });
         }
+    }
+
+    private static string? AwaitedMethodName(AwaitExpressionSyntax awaitExpression)
+    {
+        return awaitExpression.Expression is not InvocationExpressionSyntax invocation
+            ? null
+            : invocation.Expression switch
+            {
+                MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
+                IdentifierNameSyntax identifier => identifier.Identifier.Text,
+                _ => null
+            };
+    }
+
+    private static bool ShouldExcludeAwaitedIo(
+        AwaitExpressionSyntax awaitExpression,
+        SyntaxNode loop,
+        string methodName,
+        SemanticModel semanticModel,
+        IReadOnlySet<string> backpressureMethods)
+    {
+        var containingMethod = awaitExpression.Ancestors()
+            .OfType<MethodDeclarationSyntax>()
+            .FirstOrDefault();
+        return !methodName.EndsWith("Async", StringComparison.Ordinal) ||
+               methodName == "SaveChangesAsync" ||
+               FindingSuppression.IsSuppressed(awaitExpression, "awaitedIoInsideLoop") ||
+               containingMethod != null && HasSyncRequiredSuppression(containingMethod) ||
+               IsContinuationDependentLoop(loop) ||
+               IsBoundedFallbackSequence(loop) ||
+               IsBackpressurePrimitive(semanticModel, awaitExpression, backpressureMethods) ||
+               IsSequentialIoOperation(semanticModel, awaitExpression) ||
+               IsOrderedPipelineStageLoop(loop, awaitExpression, semanticModel);
     }
 
     // 7. unboundedWhenAll: a visible deferred task projection over an input-sized source.
@@ -435,11 +377,6 @@ public static class PerformanceAsyncProbe
     }
 
     // --- Helpers ---
-
-    private static bool IsTaskLikeReceiver(SemanticModel semanticModel, ExpressionSyntax receiver)
-    {
-        return TaskTypes.IsTaskLike(semanticModel.GetTypeInfo(receiver).Type);
-    }
 
     private static bool IsInsideLoop(SyntaxNode node)
     {
@@ -567,7 +504,7 @@ public static class PerformanceAsyncProbe
     /// <c>Task.WhenAll</c> defeats the bound the author asked for.
     /// <para>
     /// Resolved through the semantic model against real framework types, the same way
-    /// <see cref="IsTaskLikeReceiver"/> settles sync-over-async, so a user type merely
+    /// <see cref="SyncBlockingDetector"/> settles sync-over-async, so a user type merely
     /// named "…Channel" is not matched.
     /// </para>
     /// </summary>
@@ -581,6 +518,14 @@ public static class PerformanceAsyncProbe
 
         return BackpressureMethodClassifier.IsBackpressureInvocation(
             semanticModel, invocation, backpressureMethods);
+    }
+
+    private static bool IsSequentialIoOperation(
+        SemanticModel semanticModel,
+        AwaitExpressionSyntax awaitExpression)
+    {
+        return awaitExpression.Expression is InvocationExpressionSyntax invocation &&
+               BackpressureMethodClassifier.IsSequentialIoInvocation(semanticModel, invocation);
     }
 
     private const int MaxFallbackCandidates = 4;

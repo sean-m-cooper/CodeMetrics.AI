@@ -21,7 +21,7 @@ jobs:
         run: dotnet build analyzers/dotnet/CodeMetrics.AI.slnx --verbosity minimal
 
       - name: Test .NET analyzer
-        run: dotnet test analyzers/dotnet/CodeMetrics.AI.slnx --verbosity minimal
+        run: dotnet test --solution analyzers/dotnet/CodeMetrics.AI.slnx --verbosity minimal
 
   javascript-typescript:
     runs-on: ubuntu-latest

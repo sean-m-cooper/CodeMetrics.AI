@@ -20,8 +20,15 @@ public static class ClassCouplingCalculator
     private static readonly HashSet<string> NonStructuralValueTypes =
     [
         "System.DateOnly", "System.DateTime", "System.DateTimeOffset", "System.Guid",
-        "System.TimeOnly", "System.TimeSpan", "System.Type", "System.Uri",
-        "System.Threading.CancellationToken"
+        "System.IO.Path", "System.Math", "System.TimeOnly", "System.TimeSpan", "System.Type", "System.Uri",
+        "System.Threading.CancellationToken", "System.Array", "System.Linq.Enumerable", "System.Linq.Queryable"
+    ];
+
+    private static readonly string[] NonStructuralTypePrefixes =
+    [
+        "System.Action`", "System.Func`", "System.Tuple`", "System.Threading.Tasks.Task",
+        "System.Threading.Tasks.ValueTask", "System.EventHandler", "System.Lazy`",
+        "System.Nullable`", "System.Predicate`"
     ];
 
     private static readonly HashSet<string> FrameworkPresentationTypes =
@@ -194,80 +201,122 @@ public static class ClassCouplingCalculator
         var coupled = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
 
         if (scope is TypeDeclarationSyntax typeDecl)
+            CollectDeclaredDependencies(typeDecl, model, coupled, selfSymbol);
+
+        CollectFromServicesDependencies(scope, model, coupled, selfSymbol);
+        CollectUsageDependencies(scope, model, coupled, selfSymbol);
+        return coupled;
+    }
+
+    private static void CollectDeclaredDependencies(
+        TypeDeclarationSyntax typeDeclaration,
+        SemanticModel model,
+        HashSet<INamedTypeSymbol> coupled,
+        INamedTypeSymbol? selfSymbol)
+    {
+        if (typeDeclaration.BaseList != null)
         {
-            if (typeDecl.BaseList != null)
-            {
-                foreach (var baseType in typeDecl.BaseList.Types)
-                    CollectStructuralType(model.GetTypeInfo(baseType.Type).Type, coupled, selfSymbol);
-            }
-
-            foreach (var member in typeDecl.Members)
-            {
-                switch (member)
-                {
-                    case FieldDeclarationSyntax field:
-                        CollectStructuralType(model.GetTypeInfo(field.Declaration.Type).Type, coupled, selfSymbol);
-                        break;
-                    case EventFieldDeclarationSyntax eventField:
-                        CollectStructuralType(model.GetTypeInfo(eventField.Declaration.Type).Type, coupled, selfSymbol);
-                        break;
-                    case PropertyDeclarationSyntax property:
-                        CollectStructuralType(model.GetTypeInfo(property.Type).Type, coupled, selfSymbol);
-                        break;
-                    case EventDeclarationSyntax eventDeclaration:
-                        CollectStructuralType(model.GetTypeInfo(eventDeclaration.Type).Type, coupled, selfSymbol);
-                        break;
-                    case ConstructorDeclarationSyntax constructor:
-                        foreach (var parameter in constructor.ParameterList.Parameters)
-                            CollectStructuralType(model.GetTypeInfo(parameter.Type!).Type, coupled, selfSymbol);
-                        break;
-                }
-            }
-
-            if (typeDecl is ClassDeclarationSyntax { ParameterList: not null } classDeclaration)
-            {
-                foreach (var parameter in classDeclaration.ParameterList.Parameters)
-                    CollectStructuralType(model.GetTypeInfo(parameter.Type!).Type, coupled, selfSymbol);
-            }
-            else if (typeDecl is RecordDeclarationSyntax { ParameterList: not null } recordDeclaration)
-            {
-                foreach (var parameter in recordDeclaration.ParameterList.Parameters)
-                    CollectStructuralType(model.GetTypeInfo(parameter.Type!).Type, coupled, selfSymbol);
-            }
+            foreach (var baseType in typeDeclaration.BaseList.Types)
+                CollectStructuralType(model.GetTypeInfo(baseType.Type).Type, coupled, selfSymbol);
         }
 
-        foreach (var parameter in DescendantsWithinContainingType(scope).OfType<ParameterSyntax>()
+        foreach (var member in typeDeclaration.Members)
+            CollectMemberDeclarationDependency(member, model, coupled, selfSymbol);
+        foreach (var parameter in GetPrimaryConstructorParameters(typeDeclaration))
+            CollectStructuralType(model.GetTypeInfo(parameter.Type!).Type, coupled, selfSymbol);
+    }
+
+    private static void CollectMemberDeclarationDependency(
+        MemberDeclarationSyntax member,
+        SemanticModel model,
+        HashSet<INamedTypeSymbol> coupled,
+        INamedTypeSymbol? selfSymbol)
+    {
+        switch (member)
+        {
+            case FieldDeclarationSyntax field:
+                CollectStructuralType(model.GetTypeInfo(field.Declaration.Type).Type, coupled, selfSymbol);
+                break;
+            case EventFieldDeclarationSyntax eventField:
+                CollectStructuralType(model.GetTypeInfo(eventField.Declaration.Type).Type, coupled, selfSymbol);
+                break;
+            case PropertyDeclarationSyntax property:
+                CollectStructuralType(model.GetTypeInfo(property.Type).Type, coupled, selfSymbol);
+                break;
+            case EventDeclarationSyntax eventDeclaration:
+                CollectStructuralType(model.GetTypeInfo(eventDeclaration.Type).Type, coupled, selfSymbol);
+                break;
+            case ConstructorDeclarationSyntax constructor:
+                foreach (var parameter in constructor.ParameterList.Parameters)
+                    CollectStructuralType(model.GetTypeInfo(parameter.Type!).Type, coupled, selfSymbol);
+                break;
+        }
+    }
+
+    private static IEnumerable<ParameterSyntax> GetPrimaryConstructorParameters(
+        TypeDeclarationSyntax typeDeclaration)
+    {
+        return typeDeclaration switch
+        {
+            ClassDeclarationSyntax { ParameterList: not null } declaration =>
+                declaration.ParameterList.Parameters,
+            RecordDeclarationSyntax { ParameterList: not null } declaration =>
+                declaration.ParameterList.Parameters,
+            _ => []
+        };
+    }
+
+    private static void CollectFromServicesDependencies(
+        SyntaxNode scope,
+        SemanticModel model,
+        HashSet<INamedTypeSymbol> coupled,
+        INamedTypeSymbol? selfSymbol)
+    {
+        foreach (var parameter in DescendantsWithinContainingType(scope)
+                     .OfType<ParameterSyntax>()
                      .Where(IsFromServicesParameter))
         {
             CollectStructuralType(model.GetTypeInfo(parameter.Type!).Type, coupled, selfSymbol);
         }
+    }
 
+    private static void CollectUsageDependencies(
+        SyntaxNode scope,
+        SemanticModel model,
+        HashSet<INamedTypeSymbol> coupled,
+        INamedTypeSymbol? selfSymbol)
+    {
         foreach (var node in DescendantsWithinContainingType(scope))
-        {
-            switch (node)
-            {
-                case ObjectCreationExpressionSyntax creation:
-                    CollectStructuralType(model.GetTypeInfo(creation).Type, coupled, selfSymbol);
-                    break;
-                case ImplicitObjectCreationExpressionSyntax creation:
-                    CollectStructuralType(model.GetTypeInfo(creation).Type, coupled, selfSymbol);
-                    break;
-                case TypeOfExpressionSyntax typeOfExpression:
-                    CollectStructuralType(model.GetTypeInfo(typeOfExpression.Type).Type, coupled, selfSymbol);
-                    break;
-                case InvocationExpressionSyntax invocation
-                    when GetInvokedMethod(invocation, model) is { } method:
-                    CollectStructuralType(
-                        method.ReducedFrom != null ? method.ReceiverType : method.ContainingType,
-                        coupled,
-                        selfSymbol);
-                    foreach (var typeArgument in method.TypeArguments)
-                        CollectStructuralType(typeArgument, coupled, selfSymbol);
-                    break;
-            }
-        }
+            CollectUsageDependency(node, model, coupled, selfSymbol);
+    }
 
-        return coupled;
+    private static void CollectUsageDependency(
+        SyntaxNode node,
+        SemanticModel model,
+        HashSet<INamedTypeSymbol> coupled,
+        INamedTypeSymbol? selfSymbol)
+    {
+        switch (node)
+        {
+            case ObjectCreationExpressionSyntax creation:
+                CollectStructuralType(model.GetTypeInfo(creation).Type, coupled, selfSymbol);
+                break;
+            case ImplicitObjectCreationExpressionSyntax creation:
+                CollectStructuralType(model.GetTypeInfo(creation).Type, coupled, selfSymbol);
+                break;
+            case TypeOfExpressionSyntax typeOfExpression:
+                CollectStructuralType(model.GetTypeInfo(typeOfExpression.Type).Type, coupled, selfSymbol);
+                break;
+            case InvocationExpressionSyntax invocation
+                when GetInvokedMethod(invocation, model) is { } method:
+                CollectStructuralType(
+                    method.ReducedFrom != null ? method.ReceiverType : method.ContainingType,
+                    coupled,
+                    selfSymbol);
+                foreach (var typeArgument in method.TypeArguments)
+                    CollectStructuralType(typeArgument, coupled, selfSymbol);
+                break;
+        }
     }
 
     private static IEnumerable<SyntaxNode> DescendantsWithinContainingType(SyntaxNode scope)
@@ -291,6 +340,8 @@ public static class ClassCouplingCalculator
             return "compilerGenerated";
         if (DerivesFromQualifiedName(type, "System.Attribute"))
             return "attribute";
+        if (IsFrameworkRepresentation(type))
+            return "frameworkRepresentation";
         if (DataCarrierClassifier.IsPassiveDataCarrier(type))
             return "passiveDataCarrier";
         if (FrameworkPresentationTypes.Contains(QualifiedMetadataName(type)))
@@ -299,6 +350,14 @@ public static class ClassCouplingCalculator
             return "valueOrContainer";
 
         return null;
+    }
+
+    private static bool IsFrameworkRepresentation(INamedTypeSymbol type)
+    {
+        var namespaceName = type.OriginalDefinition.ContainingNamespace?.ToDisplayString() ?? "";
+        return namespaceName.Equals("Microsoft.CodeAnalysis", StringComparison.Ordinal) ||
+               namespaceName.StartsWith("Microsoft.CodeAnalysis.", StringComparison.Ordinal) ||
+               namespaceName.Equals("System.Xml.Linq", StringComparison.Ordinal);
     }
 
     private static bool IsCompilerGeneratedCarrier(INamedTypeSymbol type)
@@ -319,16 +378,9 @@ public static class ClassCouplingCalculator
         return definition.TypeKind == TypeKind.Enum ||
                NonStructuralValueTypes.Contains(qualifiedName) ||
                namespaceName.StartsWith("System.Collections", StringComparison.Ordinal) ||
-               qualifiedName is "System.Array" or "System.Linq.Enumerable" or "System.Linq.Queryable" ||
-               qualifiedName.StartsWith("System.Action`", StringComparison.Ordinal) ||
-               qualifiedName.StartsWith("System.Func`", StringComparison.Ordinal) ||
-               qualifiedName.StartsWith("System.Tuple`", StringComparison.Ordinal) ||
-               qualifiedName.StartsWith("System.Threading.Tasks.Task", StringComparison.Ordinal) ||
-               qualifiedName.StartsWith("System.Threading.Tasks.ValueTask", StringComparison.Ordinal) ||
-               qualifiedName.StartsWith("System.EventHandler", StringComparison.Ordinal) ||
-               qualifiedName.StartsWith("System.Lazy`", StringComparison.Ordinal) ||
-               qualifiedName.StartsWith("System.Nullable`", StringComparison.Ordinal) ||
-               qualifiedName.StartsWith("System.Predicate`", StringComparison.Ordinal) ||
+               namespaceName.StartsWith("System.Linq", StringComparison.Ordinal) ||
+               NonStructuralTypePrefixes.Any(prefix =>
+                   qualifiedName.StartsWith(prefix, StringComparison.Ordinal)) ||
                DerivesFromQualifiedName(type, "System.Exception") ||
                DerivesFromQualifiedName(type, "System.EventArgs");
     }

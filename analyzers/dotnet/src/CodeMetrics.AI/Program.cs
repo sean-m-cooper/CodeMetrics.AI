@@ -1,5 +1,8 @@
 using System.CommandLine;
 using CodeMetrics.AI;
+using CodeMetrics.AI.Output;
+using Microsoft.Build.Locator;
+using Microsoft.CodeAnalysis.MSBuild;
 
 var solutionOption = new Option<string?>("--solution")
 {
@@ -49,8 +52,66 @@ rootCommand.SetAction(async (parseResult, cancellationToken) =>
         SkipDependencyProbe = parseResult.GetValue(skipDepsOption)
     };
 
-    var analyzer = new SolutionAnalyzer();
-    await analyzer.RunAsync(options);
+    await AnalyzeSolutionAsync(options, cancellationToken);
 });
 
 return await rootCommand.Parse(args).InvokeAsync();
+
+static async Task AnalyzeSolutionAsync(CliOptions options, CancellationToken cancellationToken)
+{
+    if (!MSBuildLocator.IsRegistered)
+        MSBuildLocator.RegisterDefaults();
+
+    var solutionPath = ResolveSolutionPath(options.Solution);
+    if (solutionPath == null)
+    {
+        Console.Error.WriteLine("No .sln or .slnx file found.");
+        return;
+    }
+
+    solutionPath = Path.GetFullPath(solutionPath);
+    var solutionDir = Path.GetDirectoryName(solutionPath)!;
+    Console.WriteLine($"Solution: {solutionPath}");
+
+    using var workspace = MSBuildWorkspace.Create();
+    workspace.RegisterWorkspaceFailedHandler(error =>
+        Console.Error.WriteLine($"Workspace warning: {error.Diagnostic.Message}"));
+    var solution = await workspace.OpenSolutionAsync(
+        solutionPath,
+        cancellationToken: cancellationToken);
+    var context = await SolutionCompilationLoader.LoadAsync(
+        solution, solutionDir, cancellationToken);
+
+    Console.WriteLine(
+        $"Projects: {context.TotalProjectCount} total, " +
+        $"{context.AnalyzedProjectNames.Count} analyzed, {context.SkippedProjects.Count} skipped");
+    Console.WriteLine($"Types: {context.TypeMetrics.Count}, Members: {context.MemberMetrics.Count}");
+
+    await CsvWriter.WriteAsync(
+        options.Output, context.TypeMetrics, context.MemberMetrics, cancellationToken);
+    Console.WriteLine($"CSV: {options.Output}");
+
+    var dimensions = await ScorecardProbeRunner.AnalyzeAsync(
+        context,
+        solutionPath,
+        solutionDir,
+        options.SkipDependencyProbe,
+        cancellationToken);
+    var evidence = EvidenceFactory.Create(
+        context, solutionPath, solutionDir, options.Configuration, dimensions);
+
+    await EvidenceWriter.WriteAsync(options.ScorecardOutput, evidence, cancellationToken);
+    Console.WriteLine($"Evidence: {options.ScorecardOutput}");
+    Console.WriteLine("Done.");
+}
+
+static string? ResolveSolutionPath(string? explicitPath)
+{
+    if (!string.IsNullOrEmpty(explicitPath))
+        return File.Exists(explicitPath) ? explicitPath : null;
+
+    var solutionFiles = Directory.GetFiles(".", "*.sln")
+        .Concat(Directory.GetFiles(".", "*.slnx"))
+        .ToList();
+    return solutionFiles.Count == 1 ? solutionFiles[0] : null;
+}

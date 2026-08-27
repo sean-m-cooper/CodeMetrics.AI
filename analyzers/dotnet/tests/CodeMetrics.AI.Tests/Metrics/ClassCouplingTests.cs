@@ -1,6 +1,7 @@
 using CodeMetrics.AI.Metrics;
 using CodeMetrics.AI.Tests.Helpers;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeMetrics.AI.Tests.Metrics;
@@ -234,6 +235,33 @@ public class ClassCouplingTests
 
         analysis.StructuralTypes.Should().Contain("IService");
         analysis.StructuralTypes.Should().NotContain("ServiceExtensions");
+    }
+
+    [Fact]
+    public void Analyze_FrameworkRepresentationTypesRemainRawButAreNotStructural()
+    {
+        const string code = """
+            using Microsoft.CodeAnalysis;
+            public sealed class SyntaxInspector {
+                public void Inspect(SyntaxNode node, SemanticModel model) {
+                    model.GetSymbolInfo(node);
+                    node.DescendantNodes();
+                }
+            }
+            """;
+
+        var (tree, model, _) = RoslynTestHelper.CompileCode(
+            code,
+            MetadataReference.CreateFromFile(typeof(SyntaxNode).Assembly.Location));
+        var inspector = RoslynTestHelper.FindFirstNode<ClassDeclarationSyntax>(tree);
+
+        var analysis = ClassCouplingCalculator.Analyze(inspector, model);
+
+        analysis.RawTypes.Should().Contain(type =>
+            type.StartsWith("Microsoft.CodeAnalysis.", StringComparison.Ordinal));
+        analysis.StructuralTypes.Should().NotContain(type =>
+            type.StartsWith("Microsoft.CodeAnalysis.", StringComparison.Ordinal));
+        analysis.ExcludedTypes.Should().ContainKey("frameworkRepresentation");
     }
 
     [Fact]

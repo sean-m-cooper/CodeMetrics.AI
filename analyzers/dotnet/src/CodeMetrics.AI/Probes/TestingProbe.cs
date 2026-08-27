@@ -19,53 +19,76 @@ public static class TestingProbe
         string solutionDir)
     {
         var findings = new List<Finding>();
+        var testProjects = FindTestProjects(allProjects, solutionDir);
+        var testMetrics = CollectTestMetrics(testProjects, solutionDir, findings);
+        var (coverageFileFound, coverage) = FindCoverage(solutionDir);
+        var testProjectNames = testProjects.Select(p => p.Name).ToList();
+        var uncoveredProjects = FindUncoveredProductionProjects(analyzedProjectNames, testProjectNames);
+        AddUncoveredProjectFindings(findings, uncoveredProjects, coverage != null);
+        var score = CalculateScore(testProjects.Count, testMetrics, uncoveredProjects, coverage);
+        return CreateResult(
+            score,
+            testProjects.Count,
+            analyzedProjectNames.Count,
+            testMetrics,
+            uncoveredProjects,
+            coverageFileFound,
+            coverage,
+            findings);
+    }
 
-        // Identify test projects
-        var testProjects = new List<(string Name, Compilation Compilation)>();
-        var nonTestProjects = new List<(string Name, Compilation Compilation)>();
+    private static List<(string Name, Compilation Compilation)> FindTestProjects(
+        IEnumerable<(string Name, Compilation Compilation)> projects,
+        string solutionDir)
+    {
+        return projects
+            .Where(project => IsTestProject(project.Name, project.Compilation, solutionDir))
+            .ToList();
+    }
 
-        foreach (var project in allProjects)
-        {
-            if (IsTestProject(project.Name, project.Compilation, solutionDir))
-                testProjects.Add(project);
-            else
-                nonTestProjects.Add(project);
-        }
-
-        // Collect metrics across test projects
-        int testMethodCount = 0;
-        int skippedTests = 0;
-        int placeholderTests = 0;
-        int assertionCount = 0;
+    private static TestMetrics CollectTestMetrics(
+        IEnumerable<(string Name, Compilation Compilation)> testProjects,
+        string solutionDir,
+        List<Finding> findings)
+    {
+        var testMethodCount = 0;
+        var skippedTests = 0;
+        var placeholderTests = 0;
+        var assertionCount = 0;
 
         foreach (var (projectName, compilation) in testProjects)
         {
             foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
             {
-                var root = tree.GetRoot();
-                var filePath = tree.FilePath;
-
-                AnalyzeTestMethods(root, filePath, projectName, findings,
-                    ref testMethodCount, ref skippedTests, ref placeholderTests, ref assertionCount);
+                AnalyzeTestMethods(
+                    tree.GetRoot(),
+                    tree.FilePath,
+                    projectName,
+                    findings,
+                    ref testMethodCount,
+                    ref skippedTests,
+                    ref placeholderTests,
+                    ref assertionCount);
             }
         }
 
-        double assertionDensity = testMethodCount > 0
-            ? (double)assertionCount / testMethodCount
-            : 0.0;
+        return new TestMetrics(testMethodCount, skippedTests, placeholderTests, assertionCount);
+    }
 
-        // Coverage report. The file's existence only says a tool ran, so it is recorded
-        // but never scored; the line rate inside it is the actual quality signal.
+    private static (bool Found, CoverageRates? Rates) FindCoverage(string solutionDir)
+    {
         var coveragePath = string.IsNullOrEmpty(solutionDir)
             ? null
             : Path.Combine(solutionDir, ".scorecard", "coverage.cobertura.xml");
-        bool coverageFileFound = coveragePath != null && File.Exists(coveragePath);
-        var coverage = coverageFileFound ? ReadCoverageRates(coveragePath!) : null;
+        var found = coveragePath != null && File.Exists(coveragePath);
+        return (found, found ? ReadCoverageRates(coveragePath!) : null);
+    }
 
-        // Determine uncovered production projects
-        var testProjectNames = testProjects.Select(p => p.Name).ToList();
-        var uncoveredProjects = FindUncoveredProductionProjects(analyzedProjectNames, testProjectNames);
-
+    private static void AddUncoveredProjectFindings(
+        ICollection<Finding> findings,
+        IEnumerable<string> uncoveredProjects,
+        bool hasMeasuredCoverage)
+    {
         foreach (var uncovered in uncoveredProjects)
         {
             // This is a name-matching guess: it flags a production project with no
@@ -76,43 +99,57 @@ public static class TestingProbe
             findings.Add(new Finding
             {
                 Category = "uncoveredProject",
-                Severity = coverage != null ? "info" : "warning",
+                Severity = hasMeasuredCoverage ? "info" : "warning",
                 Project = uncovered,
-                Message = coverage != null
+                Message = hasMeasuredCoverage
                     ? $"Production project '{uncovered}' has no matching test project by name. " +
                       "Measured coverage is available and takes precedence over this heuristic."
                     : $"Production project '{uncovered}' has no matching test project."
             });
         }
+    }
 
-        // Scoring (first match wins)
+    private static double CalculateScore(
+        int testProjectCount,
+        TestMetrics metrics,
+        IReadOnlyCollection<string> uncoveredProjects,
+        CoverageRates? coverage)
+    {
         double score;
-        if (testProjects.Count == 0 || testMethodCount == 0)
+        if (testProjectCount == 0 || metrics.TestMethods == 0)
             score = 0;
-        else if (assertionDensity == 0.0 || placeholderTests >= testMethodCount)
+        else if (metrics.AssertionDensity == 0.0 || metrics.PlaceholderTests >= metrics.TestMethods)
             score = 2;
-        else if (placeholderTests > 0 || skippedTests > 2)
+        else if (metrics.PlaceholderTests > 0 || metrics.SkippedTests > 2)
             score = 4;
-        else if ((coverage == null && uncoveredProjects.Count > 0) || assertionDensity < 1.0)
+        else if ((coverage == null && uncoveredProjects.Count > 0) || metrics.AssertionDensity < 1.0)
             score = 6;
-        else if (skippedTests > 0)
+        else if (metrics.SkippedTests > 0)
             score = 8;
         else
             score = 10;
 
-        // A measured line rate caps the dimension. Applied as a ceiling rather than as
-        // extra rungs so the signals above still pull the score down on their own, and so
-        // solutions with no coverage report keep the previous behaviour exactly.
-        if (coverage != null)
-            score = Math.Min(score, CoverageCeiling(coverage.LineRate));
+        return coverage == null
+            ? score
+            : Math.Min(score, CoverageCeiling(coverage.LineRate));
+    }
 
+    private static DimensionResult CreateResult(
+        double score,
+        int testProjectCount,
+        int productionProjectCount,
+        TestMetrics metrics,
+        IReadOnlyList<string> uncoveredProjects,
+        bool coverageFileFound,
+        CoverageRates? coverage,
+        List<Finding> findings)
+    {
         var coverageBasis = coverage != null
             ? $"lineRate={coverage.LineRate * 100:F1}%, branchRate={coverage.BranchRate * 100:F1}%"
             : "lineRate=n/a";
-
-        var basis = $"testProjects={testProjects.Count}, testMethods={testMethodCount}, " +
-                    $"skipped={skippedTests}, placeholders={placeholderTests}, " +
-                    $"assertions={assertionCount}, assertionDensity={assertionDensity:F2}, " +
+        var basis = $"testProjects={testProjectCount}, testMethods={metrics.TestMethods}, " +
+                    $"skipped={metrics.SkippedTests}, placeholders={metrics.PlaceholderTests}, " +
+                    $"assertions={metrics.Assertions}, assertionDensity={metrics.AssertionDensity:F2}, " +
                     $"uncoveredProjects={uncoveredProjects.Count}, coverageFile={coverageFileFound}, " +
                     $"{coverageBasis}.";
 
@@ -126,13 +163,13 @@ public static class TestingProbe
             {
                 ["testMetrics"] = new
                 {
-                    testProjects = testProjects.Count,
-                    productionProjects = analyzedProjectNames.Count,
-                    testMethods = testMethodCount,
-                    skippedTests,
-                    placeholderTests,
-                    assertions = assertionCount,
-                    assertionDensity,
+                    testProjects = testProjectCount,
+                    productionProjects = productionProjectCount,
+                    testMethods = metrics.TestMethods,
+                    skippedTests = metrics.SkippedTests,
+                    placeholderTests = metrics.PlaceholderTests,
+                    assertions = metrics.Assertions,
+                    assertionDensity = metrics.AssertionDensity,
                     uncoveredProjects,
                     coverageFileFound,
                     lineRate = coverage?.LineRate,
@@ -145,6 +182,17 @@ public static class TestingProbe
     // ── Coverage report ───────────────────────────────────────────────────────
 
     private sealed record CoverageRates(double LineRate, double BranchRate);
+
+    private sealed record TestMetrics(
+        int TestMethods,
+        int SkippedTests,
+        int PlaceholderTests,
+        int Assertions)
+    {
+        public double AssertionDensity => TestMethods > 0
+            ? (double)Assertions / TestMethods
+            : 0.0;
+    }
 
     /// <summary>
     /// Reads the overall <c>line-rate</c> and <c>branch-rate</c> from a Cobertura report's
@@ -315,13 +363,6 @@ public static class TestingProbe
 
     private static bool IsPlaceholderTest(MethodDeclarationSyntax method)
     {
-        var methodName = method.Identifier.Text;
-
-        // Name contains todo or placeholder
-        if (methodName.Contains("todo", StringComparison.OrdinalIgnoreCase) ||
-            methodName.Contains("placeholder", StringComparison.OrdinalIgnoreCase))
-            return true;
-
         var body = method.Body;
         if (body == null)
         {

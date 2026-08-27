@@ -16,47 +16,47 @@ public static class LinesOfCodeCounter
 
         foreach (var rawLine in lines)
         {
-            var line = rawLine.Trim();
-
-            if (inBlockComment)
-            {
-                var endIdx = line.IndexOf("*/", StringComparison.Ordinal);
-                if (endIdx >= 0)
-                {
-                    inBlockComment = false;
-                    line = line[(endIdx + 2)..].Trim();
-                }
-                else continue;
-            }
-
-            // Remove inline block comments
-            while (true)
-            {
-                var blockStart = line.IndexOf("/*", StringComparison.Ordinal);
-                if (blockStart < 0) break;
-                var blockEnd = line.IndexOf("*/", blockStart + 2, StringComparison.Ordinal);
-                if (blockEnd >= 0)
-                    line = (line[..blockStart] + line[(blockEnd + 2)..]).Trim();
-                else
-                {
-                    inBlockComment = true;
-                    line = line[..blockStart].Trim();
-                    break;
-                }
-            }
-
-            // Remove single-line comments
-            var commentIdx = line.IndexOf("//", StringComparison.Ordinal);
-            if (commentIdx >= 0)
-                line = line[..commentIdx].Trim();
-
-            if (string.IsNullOrWhiteSpace(line)) continue;
-            if (line is "{" or "}" or "};") continue;
-
-            count++;
+            var code = RemoveComments(rawLine, ref inBlockComment);
+            if (IsSourceLine(code))
+                count++;
         }
 
         return count;
+    }
+
+    private static string RemoveComments(string rawLine, ref bool inBlockComment)
+    {
+        var line = rawLine.Trim();
+        if (inBlockComment)
+        {
+            var blockEnd = line.IndexOf("*/", StringComparison.Ordinal);
+            if (blockEnd < 0)
+                return "";
+
+            inBlockComment = false;
+            line = line[(blockEnd + 2)..].Trim();
+        }
+
+        while (line.IndexOf("/*", StringComparison.Ordinal) is var blockStart && blockStart >= 0)
+        {
+            var blockEnd = line.IndexOf("*/", blockStart + 2, StringComparison.Ordinal);
+            if (blockEnd < 0)
+            {
+                inBlockComment = true;
+                line = line[..blockStart];
+                break;
+            }
+
+            line = line[..blockStart] + line[(blockEnd + 2)..];
+        }
+
+        var lineComment = line.IndexOf("//", StringComparison.Ordinal);
+        return (lineComment >= 0 ? line[..lineComment] : line).Trim();
+    }
+
+    private static bool IsSourceLine(string line)
+    {
+        return !string.IsNullOrWhiteSpace(line) && line is not ("{" or "}" or "};");
     }
 
     public static int CountExecutableLines(SyntaxNode node)

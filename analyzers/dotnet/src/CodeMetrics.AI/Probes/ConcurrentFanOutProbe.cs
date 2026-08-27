@@ -25,30 +25,10 @@ internal static class ConcurrentFanOutProbe
         IReadOnlyList<(string ProjectName, Compilation Compilation)> projects,
         string? solutionDir)
     {
-        var methods = new List<MethodEntry>();
-        var declaredTypes = new List<INamedTypeSymbol>();
-
-        foreach (var (_, compilation) in projects)
-        {
-            foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
-            {
-                var root = tree.GetRoot();
-                var model = compilation.GetSemanticModel(tree);
-                foreach (var typeDeclaration in root.DescendantNodes().OfType<TypeDeclarationSyntax>())
-                {
-                    if (model.GetDeclaredSymbol(typeDeclaration) is INamedTypeSymbol type)
-                        declaredTypes.Add(type);
-                }
-
-                foreach (var declaration in root.DescendantNodes().OfType<MethodDeclarationSyntax>())
-                {
-                    if (model.GetDeclaredSymbol(declaration) is IMethodSymbol method)
-                        methods.Add(new MethodEntry(method, declaration, model));
-                }
-            }
-        }
-
-        var mutatedParameters = BuildMutationSummaries(methods, declaredTypes);
+        var declarations = CollectDeclarations(projects, solutionDir);
+        var mutatedParameters = BuildMutationSummaries(
+            declarations.Methods,
+            declarations.DeclaredTypes);
         var findings = new List<Finding>();
 
         foreach (var (projectName, compilation) in projects)
@@ -112,6 +92,39 @@ internal static class ConcurrentFanOutProbe
         return findings;
     }
 
+    private static DeclarationIndex CollectDeclarations(
+        IReadOnlyList<(string ProjectName, Compilation Compilation)> projects,
+        string? solutionDir)
+    {
+        var methods = new List<MethodEntry>();
+        var declaredTypes = new List<INamedTypeSymbol>();
+        foreach (var (_, compilation) in projects)
+        {
+            foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
+            {
+                var root = tree.GetRoot();
+                var model = compilation.GetSemanticModel(tree);
+                foreach (var declaration in root.DescendantNodes().OfType<TypeDeclarationSyntax>())
+                {
+                    if (model.GetDeclaredSymbol(declaration) is INamedTypeSymbol type)
+                        declaredTypes.Add(type);
+                }
+
+                foreach (var declaration in root.DescendantNodes().OfType<MethodDeclarationSyntax>())
+                {
+                    if (model.GetDeclaredSymbol(declaration) is IMethodSymbol method)
+                        methods.Add(new MethodEntry(method, declaration, model));
+                }
+            }
+        }
+
+        return new DeclarationIndex(methods, declaredTypes);
+    }
+
+    private sealed record DeclarationIndex(
+        IReadOnlyList<MethodEntry> Methods,
+        IReadOnlyList<INamedTypeSymbol> DeclaredTypes);
+
     private static Dictionary<string, HashSet<int>> BuildMutationSummaries(
         IReadOnlyList<MethodEntry> methods,
         IReadOnlyList<INamedTypeSymbol> declaredTypes)
@@ -128,54 +141,87 @@ internal static class ConcurrentFanOutProbe
         bool changed;
         do
         {
-            changed = false;
-            foreach (var entry in methods)
-            {
-                var aliases = BuildParameterAliases(entry);
-                var target = summaries[BackpressureMethodClassifier.MethodKey(entry.Symbol)];
-                foreach (var invocation in entry.Syntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
-                {
-                    if (entry.Model.GetSymbolInfo(invocation).Symbol is not IMethodSymbol called ||
-                        !summaries.TryGetValue(
-                            BackpressureMethodClassifier.MethodKey(called), out var calledMutations))
-                    {
-                        continue;
-                    }
-
-                    foreach (var index in calledMutations.Where(index => index < invocation.ArgumentList.Arguments.Count))
-                    {
-                        var root = RootIdentifier(invocation.ArgumentList.Arguments[index].Expression);
-                        if (root != null && aliases.TryGetValue(root.Identifier.Text, out var parameterIndex))
-                            changed |= target.Add(parameterIndex);
-                    }
-                }
-            }
-
-            foreach (var type in declaredTypes)
-            {
-                foreach (var interfaceType in type.AllInterfaces)
-                {
-                    foreach (var interfaceMethod in interfaceType.GetMembers().OfType<IMethodSymbol>())
-                    {
-                        if (type.FindImplementationForInterfaceMember(interfaceMethod) is not IMethodSymbol implementation ||
-                            !summaries.TryGetValue(
-                                BackpressureMethodClassifier.MethodKey(implementation), out var implementationMutations))
-                        {
-                            continue;
-                        }
-
-                        var interfaceKey = BackpressureMethodClassifier.MethodKey(interfaceMethod);
-                        if (!summaries.TryGetValue(interfaceKey, out var interfaceMutations))
-                            summaries[interfaceKey] = interfaceMutations = [];
-
-                        foreach (var index in implementationMutations.Where(index => index < interfaceMethod.Parameters.Length))
-                            changed |= interfaceMutations.Add(index);
-                    }
-                }
-            }
+            changed = PropagateMethodMutations(methods, summaries);
+            changed |= PropagateInterfaceMutations(declaredTypes, summaries);
         } while (changed);
 
         return summaries;
+    }
+
+    private static bool PropagateMethodMutations(
+        IEnumerable<MethodEntry> methods,
+        IReadOnlyDictionary<string, HashSet<int>> summaries)
+    {
+        var changed = false;
+        foreach (var entry in methods)
+        {
+            var aliases = BuildParameterAliases(entry);
+            var target = summaries[BackpressureMethodClassifier.MethodKey(entry.Symbol)];
+            foreach (var invocation in entry.Syntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
+            {
+                if (entry.Model.GetSymbolInfo(invocation).Symbol is not IMethodSymbol called ||
+                    !summaries.TryGetValue(
+                        BackpressureMethodClassifier.MethodKey(called), out var calledMutations))
+                {
+                    continue;
+                }
+
+                foreach (var index in calledMutations.Where(index =>
+                             index < invocation.ArgumentList.Arguments.Count))
+                {
+                    var root = RootIdentifier(invocation.ArgumentList.Arguments[index].Expression);
+                    if (root != null && aliases.TryGetValue(root.Identifier.Text, out var parameterIndex))
+                        changed |= target.Add(parameterIndex);
+                }
+            }
+        }
+
+        return changed;
+    }
+
+    private static bool PropagateInterfaceMutations(
+        IEnumerable<INamedTypeSymbol> declaredTypes,
+        IDictionary<string, HashSet<int>> summaries)
+    {
+        var changed = false;
+        foreach (var type in declaredTypes)
+        {
+            foreach (var interfaceType in type.AllInterfaces)
+            {
+                foreach (var interfaceMethod in interfaceType.GetMembers().OfType<IMethodSymbol>())
+                {
+                    changed |= PropagateInterfaceMutation(type, interfaceMethod, summaries);
+                }
+            }
+        }
+
+        return changed;
+    }
+
+    private static bool PropagateInterfaceMutation(
+        INamedTypeSymbol type,
+        IMethodSymbol interfaceMethod,
+        IDictionary<string, HashSet<int>> summaries)
+    {
+        if (type.FindImplementationForInterfaceMember(interfaceMethod) is not IMethodSymbol implementation ||
+            !summaries.TryGetValue(
+                BackpressureMethodClassifier.MethodKey(implementation), out var implementationMutations))
+        {
+            return false;
+        }
+
+        var interfaceKey = BackpressureMethodClassifier.MethodKey(interfaceMethod);
+        if (!summaries.TryGetValue(interfaceKey, out var interfaceMutations))
+            summaries[interfaceKey] = interfaceMutations = [];
+
+        var changed = false;
+        foreach (var index in implementationMutations.Where(index =>
+                     index < interfaceMethod.Parameters.Length))
+        {
+            changed |= interfaceMutations.Add(index);
+        }
+
+        return changed;
     }
 
     private static HashSet<int> FindDirectMutations(MethodEntry entry)
