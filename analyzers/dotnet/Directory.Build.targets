@@ -1,0 +1,14 @@
+<Project>
+  <Target Name="Scorecard">
+    <PropertyGroup>
+      <ScorecardConfiguration Condition="'$(ScorecardConfiguration)' == ''">$(Configuration)</ScorecardConfiguration>
+      <ScorecardSolutionPath Condition="'$(ScorecardSolutionPath)' == ''">$(SolutionPath)</ScorecardSolutionPath>
+      <ScorecardEntryPointPath Condition="'$(ScorecardEntryPointPath)' == ''">$(ScorecardSolutionPath)</ScorecardEntryPointPath>
+      <ScorecardEntryPointPath Condition="'$(ScorecardEntryPointPath)' == ''">$(MSBuildProjectFullPath)</ScorecardEntryPointPath>
+      <ScorecardOutputDir>$(MSBuildThisFileDirectory).scorecard\dotnet\</ScorecardOutputDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(ScorecardOutputDir)" />
+    <Exec Command="code-metrics --solution &quot;$(ScorecardEntryPointPath)&quot; --output &quot;$(ScorecardOutputDir)metrics.csv&quot; --scorecard-output &quot;$(ScorecardOutputDir)evidence.json&quot; --configuration $(ScorecardConfiguration)"
+          WorkingDirectory="$(MSBuildThisFileDirectory)" />
+  </Target>
+</Project>

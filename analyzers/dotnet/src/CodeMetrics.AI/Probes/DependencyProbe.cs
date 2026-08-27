@@ -25,6 +25,20 @@ public static class DependencyProbe
         DependencyCommandResult[] commands = [vulnerable, outdated, deprecated];
 
         bool anyCommandFailed = commands.Any(command => command.Failed);
+        IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? frameworkCompatibility = null;
+        if (!outdated.Failed)
+        {
+            var aspireProjects = FindAspireProjectNames(solutionDir);
+            var assessableUpgrades = PackageFrameworkCompatibility
+                .ParseOutdatedOutput(outdated.StandardOutput)
+                .Where(upgrade =>
+                    upgrade.Project == null ||
+                    !IsAspireProjectSection(upgrade.Project, aspireProjects))
+                .ToList();
+            frameworkCompatibility = await PackageFrameworkCompatibility.AssessAsync(
+                assessableUpgrades,
+                outdated.StandardOutput);
+        }
 
         return AnalyzeOutput(
             vulnerable.StandardOutput,
@@ -32,7 +46,8 @@ public static class DependencyProbe
             deprecated.StandardOutput,
             solutionDir,
             anyCommandFailed,
-            commands);
+            commands,
+            frameworkCompatibility);
     }
 
     // ── Output processor (public for testability) ─────────────────────────────
@@ -43,7 +58,8 @@ public static class DependencyProbe
         string deprecatedOutput,
         string solutionDir,
         bool anyCommandFailed,
-        IReadOnlyList<DependencyCommandResult>? commandResults = null)
+        IReadOnlyList<DependencyCommandResult>? commandResults = null,
+        IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? frameworkCompatibility = null)
     {
         if (anyCommandFailed)
         {
@@ -131,8 +147,14 @@ public static class DependencyProbe
         // packages visible to vulnerability/deprecation checks, but do not let routine
         // local-tooling upgrades reduce the production dependency score.
         var aspireProjects = FindAspireProjectNames(solutionDir);
-        var (outdated, outdatedAspireExcluded) = CountOutdatedPackages(
-            outdatedOutput, aspireProjects);
+        var outdatedCounts = CountOutdatedPackages(
+            outdatedOutput,
+            aspireProjects,
+            frameworkCompatibility);
+        var outdated = outdatedCounts.Included;
+        var outdatedAspireExcluded = outdatedCounts.AspireExcluded;
+        var outdatedFrameworkIncompatibleExcluded = outdatedCounts.FrameworkIncompatible.Count;
+        var outdatedFrameworkCompatibilityUnknown = outdatedCounts.CompatibilityUnknown.Count;
 
         // ── Parse deprecated output ───────────────────────────────────────────
         int deprecated = SplitLines(deprecatedOutput).Count(l => l.TrimStart().StartsWith(">"));
@@ -199,6 +221,8 @@ public static class DependencyProbe
 
         var basis = $"vulnerableDirect={vulnerableDirect}, vulnerableTransitive={vulnerableTransitive}, " +
                     $"outdated={outdated}, outdatedAspireExcluded={outdatedAspireExcluded}, " +
+                    $"outdatedFrameworkIncompatibleExcluded={outdatedFrameworkIncompatibleExcluded}, " +
+                    $"outdatedFrameworkCompatibilityUnknown={outdatedFrameworkCompatibilityUnknown}, " +
                     $"deprecated={deprecated}, unsupportedTFMs={unsupportedTFMs}, " +
                     $"versionDrift={versionDrift}, cpmEnabled={cpmEnabled}, anyCommandFailed={anyCommandFailed}.";
 
@@ -216,6 +240,26 @@ public static class DependencyProbe
                     vulnerableTransitive,
                     outdated,
                     outdatedAspireExcluded,
+                    outdatedFrameworkIncompatibleExcluded,
+                    outdatedFrameworkCompatibilityUnknown,
+                    frameworkIncompatibleUpgradesExcluded = outdatedCounts.FrameworkIncompatible
+                        .Select(upgrade => new
+                        {
+                            upgrade.Project,
+                            upgrade.TargetFramework,
+                            upgrade.Package,
+                            upgrade.LatestVersion
+                        })
+                        .ToArray(),
+                    frameworkCompatibilityUnknown = outdatedCounts.CompatibilityUnknown
+                        .Select(upgrade => new
+                        {
+                            upgrade.Project,
+                            upgrade.TargetFramework,
+                            upgrade.Package,
+                            upgrade.LatestVersion
+                        })
+                        .ToArray(),
                     aspireProjectsExcludedFromOutdated = aspireProjects
                         .OrderBy(project => project, StringComparer.OrdinalIgnoreCase)
                         .ToArray(),
@@ -323,39 +367,55 @@ public static class DependencyProbe
         return text.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
     }
 
-    private static (int Included, int AspireExcluded) CountOutdatedPackages(
+    private sealed record OutdatedPackageCounts(
+        int Included,
+        int AspireExcluded,
+        IReadOnlyList<OutdatedPackageUpgrade> FrameworkIncompatible,
+        IReadOnlyList<OutdatedPackageUpgrade> CompatibilityUnknown);
+
+    private static OutdatedPackageCounts CountOutdatedPackages(
         string output,
-        IReadOnlySet<string> aspireProjects)
+        IReadOnlySet<string> aspireProjects,
+        IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? frameworkCompatibility)
     {
         var included = 0;
         var aspireExcluded = 0;
-        string? currentProject = null;
+        var frameworkIncompatible = new List<OutdatedPackageUpgrade>();
+        var compatibilityUnknown = new List<OutdatedPackageUpgrade>();
 
-        foreach (var line in SplitLines(output))
+        foreach (var upgrade in PackageFrameworkCompatibility.ParseOutdatedOutput(output))
         {
-            var trimmed = line.Trim();
-            var projectMatch = Regex.Match(
-                trimmed,
-                "^Project\\s+(?:[`'\"](?<quoted>.+?)[`'\"]|(?<plain>\\S+))\\s+has\\b",
-                RegexOptions.IgnoreCase);
-            if (projectMatch.Success)
+            if (upgrade.Project != null &&
+                IsAspireProjectSection(upgrade.Project, aspireProjects))
             {
-                currentProject = projectMatch.Groups["quoted"].Success
-                    ? projectMatch.Groups["quoted"].Value
-                    : projectMatch.Groups["plain"].Value;
+                aspireExcluded++;
                 continue;
             }
 
-            if (!trimmed.StartsWith('>'))
-                continue;
-
-            if (currentProject != null && IsAspireProjectSection(currentProject, aspireProjects))
-                aspireExcluded++;
-            else
+            if (frameworkCompatibility == null)
+            {
                 included++;
+                continue;
+            }
+
+            if (!frameworkCompatibility.TryGetValue(upgrade, out var compatible))
+            {
+                included++;
+                compatibilityUnknown.Add(upgrade);
+                continue;
+            }
+
+            if (compatible)
+                included++;
+            else
+                frameworkIncompatible.Add(upgrade);
         }
 
-        return (included, aspireExcluded);
+        return new OutdatedPackageCounts(
+            included,
+            aspireExcluded,
+            frameworkIncompatible,
+            compatibilityUnknown);
     }
 
     private static bool IsAspireProjectSection(

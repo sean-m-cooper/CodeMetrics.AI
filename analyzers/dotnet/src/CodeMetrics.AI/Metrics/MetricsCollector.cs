@@ -105,7 +105,7 @@ public static class MetricsCollector
             ? (int)Math.Round(memberMetrics.Average(m => (double)m.MaintainabilityIndex))
             : 100;
 
-        var coupledTypes = ClassCouplingCalculator.CalculateTypes(typeDecl, model);
+        var coupling = ClassCouplingCalculator.Analyze(typeDecl, model);
         int doi = DepthOfInheritanceCalculator.Calculate(typeSymbol);
         int srcLines = LinesOfCodeCounter.CountSourceLines(typeDecl);
         int execLines = LinesOfCodeCounter.CountExecutableLines(typeDecl);
@@ -122,8 +122,11 @@ public static class MetricsCollector
             CyclomaticComplexity = typeCC,
             MaintainabilityIndex = avgMI,
             DepthOfInheritance = doi,
-            ClassCoupling = coupledTypes.Count,
-            CoupledTypes = coupledTypes,
+            ClassCoupling = coupling.RawTypes.Count,
+            CoupledTypes = coupling.RawTypes,
+            StructuralClassCoupling = coupling.StructuralTypes.Count,
+            StructuralCoupledTypes = coupling.StructuralTypes,
+            CouplingExclusions = coupling.ExcludedTypes,
             LinesOfSource = srcLines,
             LinesOfExecutable = execLines,
             MemberCount = memberCount,

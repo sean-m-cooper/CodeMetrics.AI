@@ -628,4 +628,186 @@ public class DependencyProbeTests
             Directory.Delete(dir, true);
         }
     }
+
+    [Theory]
+    [InlineData("net9.0", "net10.0", false)]
+    [InlineData("net9.0", "net9.0", true)]
+    [InlineData("net9.0", "net8.0", true)]
+    [InlineData("net9.0", "netstandard2.0", true)]
+    [InlineData("net9.0-windows10.0", "net9.0", true)]
+    [InlineData("net9.0", "net9.0-windows10.0", false)]
+    [InlineData("net9.0-windows10.0", "net9.0-windows11.0", false)]
+    [InlineData("net48", "netstandard2.0", true)]
+    [InlineData("net48", "netstandard2.1", false)]
+    public void FrameworkCompatibility_UsesTargetFrameworkSemantics(
+        string projectFramework,
+        string packageFramework,
+        bool expected)
+    {
+        PackageFrameworkCompatibility.IsCompatible(projectFramework, [packageFramework])
+            .Should().Be(expected);
+    }
+
+    [Fact]
+    public void FrameworkCompatibility_UnknownFrameworkIsNotAssumedIncompatible()
+    {
+        PackageFrameworkCompatibility.IsCompatible("xamarinios10", ["net10.0"])
+            .Should().BeNull();
+    }
+
+    [Fact]
+    public void FrameworkCompatibility_UnrecognizedPackageAssetKeepsNegativeResultUnknown()
+    {
+        PackageFrameworkCompatibility.IsCompatible("net9.0", ["net10.0", "uap10.0"])
+            .Should().BeNull();
+    }
+
+    [Fact]
+    public void PackageAssets_Net10OnlyPackageIsIncompatibleWithNet9Project()
+    {
+        PackageFrameworkCompatibility.IsPackageCompatible(
+                "net9.0",
+                ["lib/net10.0/FrameworkBound.dll"])
+            .Should().BeFalse();
+    }
+
+    [Fact]
+    public void PackageAssets_OlderAndNetStandardAssetsRemainCompatible()
+    {
+        PackageFrameworkCompatibility.IsPackageCompatible(
+                "net9.0",
+                ["ref/net8.0/Compatible.dll", "lib/netstandard2.0/Compatible.dll"])
+            .Should().BeTrue();
+    }
+
+    [Fact]
+    public void PackageAssets_DependencyGroupCanDeclareFrameworkRequirement()
+    {
+        const string nuspec = """
+            <package>
+              <metadata>
+                <dependencies>
+                  <group targetFramework="net10.0" />
+                </dependencies>
+              </metadata>
+            </package>
+            """;
+
+        PackageFrameworkCompatibility.IsPackageCompatible("net9.0", [], nuspec)
+            .Should().BeFalse();
+    }
+
+    [Fact]
+    public void PackageAssets_FrameworkAgnosticAnalyzerRemainsCompatible()
+    {
+        PackageFrameworkCompatibility.IsPackageCompatible(
+                "net9.0",
+                ["analyzers/dotnet/cs/Analyzer.dll"])
+            .Should().BeTrue();
+    }
+
+    [Fact]
+    public void FrameworkIncompatibleUpgrade_IsExcludedFromOutdatedPenalty()
+    {
+        var dir = TempDir();
+        try
+        {
+            WriteCsproj(dir, "App.csproj", SimpleCsproj(tfm: "net9.0"));
+            const string outdatedOutput = """
+                Project `App` has the following updates to its packages
+                   [net9.0]:
+                   Top-level Package Requested Resolved Latest
+                   > FrameworkBound 9.0.5 9.0.5 10.0.0
+                """;
+            var upgrade = PackageFrameworkCompatibility.ParseOutdatedOutput(outdatedOutput).Single();
+            var compatibility = new Dictionary<OutdatedPackageUpgrade, bool>
+            {
+                [upgrade] = false
+            };
+
+            var result = DependencyProbe.AnalyzeOutput(
+                EmptyVulnerableOutput,
+                outdatedOutput,
+                EmptyDeprecatedOutput,
+                dir,
+                anyCommandFailed: false,
+                frameworkCompatibility: compatibility);
+
+            result.Basis.Should().Contain("outdated=0");
+            result.Basis.Should().Contain("outdatedFrameworkIncompatibleExcluded=1");
+            var metrics = JsonSerializer.SerializeToElement(result.Extra["dependencyMetrics"]);
+            metrics.GetProperty("frameworkIncompatibleUpgradesExcluded")[0]
+                .GetProperty("Package").GetString().Should().Be("FrameworkBound");
+        }
+        finally
+        {
+            Directory.Delete(dir, true);
+        }
+    }
+
+    [Fact]
+    public void FrameworkCompatibilityUnknown_UpgradeRemainsScored()
+    {
+        var dir = TempDir();
+        try
+        {
+            WriteCsproj(dir, "App.csproj", SimpleCsproj(tfm: "net9.0"));
+            const string outdatedOutput = """
+                Project `App` has the following updates to its packages
+                   [net9.0]:
+                   > PrivatePackage 9.0.0 10.0.0
+                """;
+
+            var result = DependencyProbe.AnalyzeOutput(
+                EmptyVulnerableOutput,
+                outdatedOutput,
+                EmptyDeprecatedOutput,
+                dir,
+                anyCommandFailed: false,
+                frameworkCompatibility: new Dictionary<OutdatedPackageUpgrade, bool>());
+
+            result.Basis.Should().Contain("outdated=1");
+            result.Basis.Should().Contain("outdatedFrameworkCompatibilityUnknown=1");
+        }
+        finally
+        {
+            Directory.Delete(dir, true);
+        }
+    }
+
+    [Fact]
+    public void MultiTargetProject_AssessesEachFrameworkSectionIndependently()
+    {
+        var dir = TempDir();
+        try
+        {
+            WriteCsproj(dir, "App.csproj", SimpleCsproj(tfm: "net9.0;net10.0"));
+            const string outdatedOutput = """
+                Project `App` has the following updates to its packages
+                   [net9.0]:
+                   > FrameworkBound 9.0.5 10.0.0
+                   [net10.0]:
+                   > FrameworkBound 9.0.5 10.0.0
+                """;
+            var upgrades = PackageFrameworkCompatibility.ParseOutdatedOutput(outdatedOutput);
+            var compatibility = upgrades.ToDictionary(
+                upgrade => upgrade,
+                upgrade => upgrade.TargetFramework == "net10.0");
+
+            var result = DependencyProbe.AnalyzeOutput(
+                EmptyVulnerableOutput,
+                outdatedOutput,
+                EmptyDeprecatedOutput,
+                dir,
+                anyCommandFailed: false,
+                frameworkCompatibility: compatibility);
+
+            result.Basis.Should().Contain("outdated=1");
+            result.Basis.Should().Contain("outdatedFrameworkIncompatibleExcluded=1");
+        }
+        finally
+        {
+            Directory.Delete(dir, true);
+        }
+    }
 }

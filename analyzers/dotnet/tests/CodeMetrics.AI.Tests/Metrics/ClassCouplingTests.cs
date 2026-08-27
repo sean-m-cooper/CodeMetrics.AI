@@ -116,4 +116,151 @@ public class ClassCouplingTests
         classTypes.Should().ContainSingle().Which.Should().Be("Response");
         ClassCouplingCalculator.Calculate(controller, model).Should().Be(classTypes.Count);
     }
+
+    [Fact]
+    public void Analyze_ControllerSeparatesBehavioralDependenciesFromTransportNoise()
+    {
+        const string code = """
+            namespace Microsoft.AspNetCore.Mvc {
+                public interface IActionResult { }
+                public class Controller {
+                    protected IActionResult BadRequest(object value) => null!;
+                }
+                public sealed class HttpPostAttribute : System.Attribute { }
+                public sealed class FromServicesAttribute : System.Attribute { }
+            }
+            public interface IServiceA { void Run(); }
+            public interface ILogger { }
+            public interface IActionService { void Run(); }
+            public sealed class RequestDto { public System.Guid Id { get; set; } }
+            public static class StaticHelper { public static void Run() { } }
+
+            public sealed class OrdersController : Microsoft.AspNetCore.Mvc.Controller {
+                private readonly IServiceA service;
+                public OrdersController(IServiceA service, ILogger logger) {
+                    this.service = service;
+                }
+
+                [Microsoft.AspNetCore.Mvc.HttpPost]
+                public Microsoft.AspNetCore.Mvc.IActionResult Save(
+                    RequestDto request,
+                    System.Threading.CancellationToken cancellationToken,
+                    [Microsoft.AspNetCore.Mvc.FromServices] IActionService actionService) {
+                    service.Run();
+                    actionService.Run();
+                    StaticHelper.Run();
+                    return BadRequest(new { success = false, request.Id });
+                }
+            }
+            """;
+
+        var (tree, model, _) = RoslynTestHelper.CompileCode(code);
+        var controller = RoslynTestHelper.FindAllNodes<ClassDeclarationSyntax>(tree)
+            .Single(type => type.Identifier.Text == "OrdersController");
+
+        var analysis = ClassCouplingCalculator.Analyze(controller, model);
+
+        analysis.StructuralTypes.Should().BeEquivalentTo(
+            "IActionService", "ILogger", "IServiceA", "StaticHelper");
+        analysis.RawTypes.Count.Should().BeGreaterThan(analysis.StructuralTypes.Count);
+        analysis.ExcludedTypes.Should().ContainKey("attribute");
+        analysis.ExcludedTypes.Should().ContainKey("compilerGenerated");
+        analysis.ExcludedTypes.Should().ContainKey("frameworkPresentation");
+        analysis.ExcludedTypes.Should().ContainKey("passiveDataCarrier");
+        analysis.ExcludedTypes.Should().ContainKey("valueOrContainer");
+    }
+
+    [Fact]
+    public void Analyze_GenericContainerIsNoiseButBehavioralTypeArgumentIsStructural()
+    {
+        const string code = """
+            public interface IStrategy { void Run(); }
+            public sealed class Coordinator {
+                private readonly System.Collections.Generic.IReadOnlyList<IStrategy> strategies;
+            }
+            """;
+
+        var (tree, model, _) = RoslynTestHelper.CompileCode(code);
+        var coordinator = RoslynTestHelper.FindAllNodes<ClassDeclarationSyntax>(tree)
+            .Single(type => type.Identifier.Text == "Coordinator");
+
+        var analysis = ClassCouplingCalculator.Analyze(coordinator, model);
+
+        analysis.StructuralTypes.Should().Equal("IStrategy");
+        analysis.ExcludedTypes["valueOrContainer"]
+            .Should().Contain("System.Collections.Generic.IReadOnlyList<T>");
+    }
+
+    [Fact]
+    public void Analyze_MethodPayloadOnlyBecomesStructuralWhenBehaviorIsUsed()
+    {
+        const string code = """
+            public sealed class BehavioralRequest { public void Validate() { } }
+            public sealed class Handler {
+                public void PassThrough(BehavioralRequest request) { }
+                public void Validate(BehavioralRequest request) { request.Validate(); }
+            }
+            """;
+
+        var (tree, model, _) = RoslynTestHelper.CompileCode(code);
+        var handler = RoslynTestHelper.FindAllNodes<ClassDeclarationSyntax>(tree)
+            .Single(type => type.Identifier.Text == "Handler");
+
+        var analysis = ClassCouplingCalculator.Analyze(handler, model);
+
+        analysis.StructuralTypes.Should().ContainSingle().Which.Should().Be("BehavioralRequest");
+    }
+
+    [Fact]
+    public void Analyze_ReducedExtensionMethodCountsReceiverWithoutProviderInflation()
+    {
+        const string code = """
+            public interface IService { }
+            public static class ServiceExtensions {
+                public static void Run(this IService service) { }
+            }
+            public sealed class Coordinator {
+                private readonly IService service;
+                public Coordinator(IService service) { this.service = service; }
+                public void Run() { service.Run(); }
+            }
+            """;
+
+        var (tree, model, _) = RoslynTestHelper.CompileCode(code);
+        var coordinator = RoslynTestHelper.FindAllNodes<ClassDeclarationSyntax>(tree)
+            .Single(type => type.Identifier.Text == "Coordinator");
+
+        var analysis = ClassCouplingCalculator.Analyze(coordinator, model);
+
+        analysis.StructuralTypes.Should().Contain("IService");
+        analysis.StructuralTypes.Should().NotContain("ServiceExtensions");
+    }
+
+    [Fact]
+    public void CalculateStructuralAction_ExcludesPayloadAndResultTypes()
+    {
+        const string code = """
+            namespace Microsoft.AspNetCore.Mvc {
+                public interface IActionResult { }
+                public sealed class FromServicesAttribute : System.Attribute { }
+            }
+            public sealed class RequestDto { public int Id { get; set; } }
+            public interface IActionService { void Run(); }
+            public sealed class Controller {
+                public Microsoft.AspNetCore.Mvc.IActionResult Save(
+                    RequestDto request,
+                    [Microsoft.AspNetCore.Mvc.FromServices] IActionService service) {
+                    service.Run();
+                    return null!;
+                }
+            }
+            """;
+
+        var (tree, model, _) = RoslynTestHelper.CompileCode(code);
+        var action = RoslynTestHelper.FindAllNodes<MethodDeclarationSyntax>(tree)
+            .Single(method => method.Identifier.Text == "Save");
+
+        ClassCouplingCalculator.CalculateStructuralAction(action, model).Should().Be(1);
+        ClassCouplingCalculator.CalculateAction(action, model).Should().BeGreaterThan(1);
+    }
 }

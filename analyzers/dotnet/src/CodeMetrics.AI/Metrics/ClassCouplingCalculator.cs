@@ -5,6 +5,8 @@ namespace CodeMetrics.AI.Metrics;
 
 public static class ClassCouplingCalculator
 {
+    private const string NonStructuralUsage = "nonStructuralUsage";
+
     private static readonly HashSet<SpecialType> PrimitiveTypes =
     [
         SpecialType.System_Boolean, SpecialType.System_Byte, SpecialType.System_SByte,
@@ -15,16 +17,128 @@ public static class ClassCouplingCalculator
         SpecialType.System_Void, SpecialType.System_IntPtr, SpecialType.System_UIntPtr
     ];
 
+    private static readonly HashSet<string> NonStructuralValueTypes =
+    [
+        "System.DateOnly", "System.DateTime", "System.DateTimeOffset", "System.Guid",
+        "System.TimeOnly", "System.TimeSpan", "System.Type", "System.Uri",
+        "System.Threading.CancellationToken"
+    ];
+
+    private static readonly HashSet<string> FrameworkPresentationTypes =
+    [
+        "Microsoft.AspNetCore.Http.IResult",
+        "Microsoft.AspNetCore.Mvc.ActionResult",
+        "Microsoft.AspNetCore.Mvc.ActionResult`1",
+        "Microsoft.AspNetCore.Mvc.Controller",
+        "Microsoft.AspNetCore.Mvc.ControllerBase",
+        "Microsoft.AspNetCore.Mvc.IActionResult"
+    ];
+
     public static int Calculate(TypeDeclarationSyntax typeDecl, SemanticModel model)
     {
         return CalculateTypes(typeDecl, model).Count;
     }
 
+    /// <summary>
+    /// Returns the existing broad class-coupling census. This remains the raw evidence
+    /// contract even though Architecture findings use <see cref="Analyze"/> structural coupling.
+    /// </summary>
     public static IReadOnlyList<string> CalculateTypes(
         TypeDeclarationSyntax typeDecl,
         SemanticModel model)
     {
         var selfSymbol = model.GetDeclaredSymbol(typeDecl) as INamedTypeSymbol;
+        return Display(CollectRawTypeSymbols(typeDecl, model, selfSymbol));
+    }
+
+    /// <summary>
+    /// Separates broad raw type references from dependencies that provide behavior to the type.
+    /// Method payloads, return values, attributes, passive data carriers, value/container types,
+    /// and framework presentation contracts remain visible as excluded provenance.
+    /// </summary>
+    public static CouplingAnalysis Analyze(TypeDeclarationSyntax typeDecl, SemanticModel model)
+    {
+        var selfSymbol = model.GetDeclaredSymbol(typeDecl) as INamedTypeSymbol;
+        var raw = CollectRawTypeSymbols(typeDecl, model, selfSymbol);
+        var candidates = CollectStructuralTypeSymbols(typeDecl, model, selfSymbol);
+        var structural = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+        var exclusions = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+
+        foreach (var type in candidates)
+        {
+            var reason = StructuralExclusionReason(type);
+            if (reason == null)
+                structural.Add(type);
+            else
+                AddExclusion(exclusions, reason, type);
+        }
+
+        foreach (var type in raw)
+        {
+            if (structural.Contains(type))
+                continue;
+
+            var reason = StructuralExclusionReason(type) ?? NonStructuralUsage;
+            AddExclusion(exclusions, reason, type);
+        }
+
+        return new CouplingAnalysis(
+            Display(raw),
+            Display(structural),
+            exclusions
+                .OrderBy(pair => pair.Key, StringComparer.Ordinal)
+                .ToDictionary(
+                    pair => pair.Key,
+                    pair => (IReadOnlyList<string>)pair.Value
+                        .OrderBy(type => type, StringComparer.Ordinal)
+                        .ToList(),
+                    StringComparer.Ordinal));
+    }
+
+    /// <summary>
+    /// Calculates raw type coupling for one action method. This compatibility value includes
+    /// payload and result types and remains supplemental evidence.
+    /// </summary>
+    public static int CalculateAction(MethodDeclarationSyntax methodDecl, SemanticModel model)
+    {
+        var selfSymbol = model.GetDeclaredSymbol(methodDecl)?.ContainingType;
+        var coupled = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+
+        foreach (var node in methodDecl.DescendantNodesAndSelf())
+        {
+            if (node.AncestorsAndSelf().OfType<AttributeSyntax>().Any())
+                continue;
+
+            CollectFromTypeInfo(model.GetTypeInfo(node).Type, coupled, selfSymbol);
+            CollectFromTypeInfo(model.GetTypeInfo(node).ConvertedType, coupled, selfSymbol);
+
+            if (model.GetSymbolInfo(node).Symbol is not IMethodSymbol method)
+                continue;
+
+            CollectFromTypeInfo(method.ReturnType, coupled, selfSymbol);
+            foreach (var parameter in method.Parameters)
+                CollectFromTypeInfo(parameter.Type, coupled, selfSymbol);
+        }
+
+        return coupled.Count;
+    }
+
+    /// <summary>
+    /// Counts behavioral dependencies coordinated by one action, including method-injected
+    /// services but excluding payload, result, compiler-generated, and presentation-only types.
+    /// </summary>
+    public static int CalculateStructuralAction(MethodDeclarationSyntax methodDecl, SemanticModel model)
+    {
+        var selfSymbol = model.GetDeclaredSymbol(methodDecl)?.ContainingType;
+        var candidates = CollectStructuralTypeSymbols(methodDecl, model, selfSymbol);
+        return candidates.Count(type => StructuralExclusionReason(type) == null);
+    }
+
+    private static HashSet<INamedTypeSymbol> CollectRawTypeSymbols(
+        TypeDeclarationSyntax typeDecl,
+        SemanticModel model,
+        INamedTypeSymbol? selfSymbol)
+    {
         var coupled = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
         var fromServicesParameters = typeDecl.DescendantNodes()
             .OfType<ParameterSyntax>()
@@ -49,65 +163,216 @@ public static class ClassCouplingCalculator
             if (symbolInfo.Symbol is IMethodSymbol method)
             {
                 CollectFromTypeInfo(method.ReturnType, coupled, selfSymbol);
-                foreach (var p in GetAnalyzableParameters(node, method))
-                    CollectFromTypeInfo(p.Type, coupled, selfSymbol);
+                foreach (var parameter in GetAnalyzableParameters(node, method))
+                    CollectFromTypeInfo(parameter.Type, coupled, selfSymbol);
             }
         }
 
-        // Base types and interfaces
-        if (typeDecl is ClassDeclarationSyntax classDecl && classDecl.BaseList != null)
+        if (typeDecl.BaseList != null)
         {
-            foreach (var baseType in classDecl.BaseList.Types)
-            {
-                var baseSymbol = model.GetTypeInfo(baseType.Type).Type;
-                CollectFromTypeInfo(baseSymbol, coupled, selfSymbol);
-            }
+            foreach (var baseType in typeDecl.BaseList.Types)
+                CollectFromTypeInfo(model.GetTypeInfo(baseType.Type).Type, coupled, selfSymbol);
         }
 
-        // Attributes on the type
         foreach (var attrList in typeDecl.AttributeLists)
             foreach (var attr in attrList.Attributes)
                 CollectFromTypeInfo(model.GetTypeInfo(attr).Type, coupled, selfSymbol);
 
-        // Attributes on members
         foreach (var member in typeDecl.Members)
             foreach (var attrList in member.AttributeLists)
                 foreach (var attr in attrList.Attributes)
                     CollectFromTypeInfo(model.GetTypeInfo(attr).Type, coupled, selfSymbol);
 
-        return coupled
+        return coupled;
+    }
+
+    private static HashSet<INamedTypeSymbol> CollectStructuralTypeSymbols(
+        SyntaxNode scope,
+        SemanticModel model,
+        INamedTypeSymbol? selfSymbol)
+    {
+        var coupled = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+
+        if (scope is TypeDeclarationSyntax typeDecl)
+        {
+            if (typeDecl.BaseList != null)
+            {
+                foreach (var baseType in typeDecl.BaseList.Types)
+                    CollectStructuralType(model.GetTypeInfo(baseType.Type).Type, coupled, selfSymbol);
+            }
+
+            foreach (var member in typeDecl.Members)
+            {
+                switch (member)
+                {
+                    case FieldDeclarationSyntax field:
+                        CollectStructuralType(model.GetTypeInfo(field.Declaration.Type).Type, coupled, selfSymbol);
+                        break;
+                    case EventFieldDeclarationSyntax eventField:
+                        CollectStructuralType(model.GetTypeInfo(eventField.Declaration.Type).Type, coupled, selfSymbol);
+                        break;
+                    case PropertyDeclarationSyntax property:
+                        CollectStructuralType(model.GetTypeInfo(property.Type).Type, coupled, selfSymbol);
+                        break;
+                    case EventDeclarationSyntax eventDeclaration:
+                        CollectStructuralType(model.GetTypeInfo(eventDeclaration.Type).Type, coupled, selfSymbol);
+                        break;
+                    case ConstructorDeclarationSyntax constructor:
+                        foreach (var parameter in constructor.ParameterList.Parameters)
+                            CollectStructuralType(model.GetTypeInfo(parameter.Type!).Type, coupled, selfSymbol);
+                        break;
+                }
+            }
+
+            if (typeDecl is ClassDeclarationSyntax { ParameterList: not null } classDeclaration)
+            {
+                foreach (var parameter in classDeclaration.ParameterList.Parameters)
+                    CollectStructuralType(model.GetTypeInfo(parameter.Type!).Type, coupled, selfSymbol);
+            }
+            else if (typeDecl is RecordDeclarationSyntax { ParameterList: not null } recordDeclaration)
+            {
+                foreach (var parameter in recordDeclaration.ParameterList.Parameters)
+                    CollectStructuralType(model.GetTypeInfo(parameter.Type!).Type, coupled, selfSymbol);
+            }
+        }
+
+        foreach (var parameter in DescendantsWithinContainingType(scope).OfType<ParameterSyntax>()
+                     .Where(IsFromServicesParameter))
+        {
+            CollectStructuralType(model.GetTypeInfo(parameter.Type!).Type, coupled, selfSymbol);
+        }
+
+        foreach (var node in DescendantsWithinContainingType(scope))
+        {
+            switch (node)
+            {
+                case ObjectCreationExpressionSyntax creation:
+                    CollectStructuralType(model.GetTypeInfo(creation).Type, coupled, selfSymbol);
+                    break;
+                case ImplicitObjectCreationExpressionSyntax creation:
+                    CollectStructuralType(model.GetTypeInfo(creation).Type, coupled, selfSymbol);
+                    break;
+                case TypeOfExpressionSyntax typeOfExpression:
+                    CollectStructuralType(model.GetTypeInfo(typeOfExpression.Type).Type, coupled, selfSymbol);
+                    break;
+                case InvocationExpressionSyntax invocation
+                    when GetInvokedMethod(invocation, model) is { } method:
+                    CollectStructuralType(
+                        method.ReducedFrom != null ? method.ReceiverType : method.ContainingType,
+                        coupled,
+                        selfSymbol);
+                    foreach (var typeArgument in method.TypeArguments)
+                        CollectStructuralType(typeArgument, coupled, selfSymbol);
+                    break;
+            }
+        }
+
+        return coupled;
+    }
+
+    private static IEnumerable<SyntaxNode> DescendantsWithinContainingType(SyntaxNode scope)
+    {
+        return scope.DescendantNodesAndSelf(node =>
+            ReferenceEquals(node, scope) || node is not TypeDeclarationSyntax);
+    }
+
+    private static IMethodSymbol? GetInvokedMethod(
+        InvocationExpressionSyntax invocation,
+        SemanticModel model)
+    {
+        var symbolInfo = model.GetSymbolInfo(invocation);
+        return symbolInfo.Symbol as IMethodSymbol ??
+               symbolInfo.CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault();
+    }
+
+    private static string? StructuralExclusionReason(INamedTypeSymbol type)
+    {
+        if (IsCompilerGeneratedCarrier(type))
+            return "compilerGenerated";
+        if (DerivesFromQualifiedName(type, "System.Attribute"))
+            return "attribute";
+        if (DataCarrierClassifier.IsPassiveDataCarrier(type))
+            return "passiveDataCarrier";
+        if (FrameworkPresentationTypes.Contains(QualifiedMetadataName(type)))
+            return "frameworkPresentation";
+        if (IsNonStructuralValueOrContainer(type))
+            return "valueOrContainer";
+
+        return null;
+    }
+
+    private static bool IsCompilerGeneratedCarrier(INamedTypeSymbol type)
+    {
+        var definition = type.OriginalDefinition;
+        return type.IsAnonymousType || type.IsTupleType ||
+               definition.IsAnonymousType || definition.IsTupleType ||
+               definition.MetadataName.StartsWith("<>f__AnonymousType", StringComparison.Ordinal) ||
+               QualifiedMetadataName(definition).StartsWith("System.ValueTuple`", StringComparison.Ordinal);
+    }
+
+    private static bool IsNonStructuralValueOrContainer(INamedTypeSymbol type)
+    {
+        var definition = type.OriginalDefinition;
+        var qualifiedName = QualifiedMetadataName(definition);
+        var namespaceName = definition.ContainingNamespace?.ToDisplayString() ?? "";
+
+        return definition.TypeKind == TypeKind.Enum ||
+               NonStructuralValueTypes.Contains(qualifiedName) ||
+               namespaceName.StartsWith("System.Collections", StringComparison.Ordinal) ||
+               qualifiedName is "System.Array" or "System.Linq.Enumerable" or "System.Linq.Queryable" ||
+               qualifiedName.StartsWith("System.Action`", StringComparison.Ordinal) ||
+               qualifiedName.StartsWith("System.Func`", StringComparison.Ordinal) ||
+               qualifiedName.StartsWith("System.Tuple`", StringComparison.Ordinal) ||
+               qualifiedName.StartsWith("System.Threading.Tasks.Task", StringComparison.Ordinal) ||
+               qualifiedName.StartsWith("System.Threading.Tasks.ValueTask", StringComparison.Ordinal) ||
+               qualifiedName.StartsWith("System.EventHandler", StringComparison.Ordinal) ||
+               qualifiedName.StartsWith("System.Lazy`", StringComparison.Ordinal) ||
+               qualifiedName.StartsWith("System.Nullable`", StringComparison.Ordinal) ||
+               qualifiedName.StartsWith("System.Predicate`", StringComparison.Ordinal) ||
+               DerivesFromQualifiedName(type, "System.Exception") ||
+               DerivesFromQualifiedName(type, "System.EventArgs");
+    }
+
+    private static bool DerivesFromQualifiedName(INamedTypeSymbol type, string qualifiedName)
+    {
+        for (var current = type; current != null; current = current.BaseType)
+        {
+            if (current.ToDisplayString() == qualifiedName)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static string QualifiedMetadataName(INamedTypeSymbol type)
+    {
+        var definition = type.OriginalDefinition;
+        var namespaceName = definition.ContainingNamespace?.ToDisplayString();
+        return string.IsNullOrEmpty(namespaceName)
+            ? definition.MetadataName
+            : $"{namespaceName}.{definition.MetadataName}";
+    }
+
+    private static void AddExclusion(
+        Dictionary<string, HashSet<string>> exclusions,
+        string reason,
+        INamedTypeSymbol type)
+    {
+        if (!exclusions.TryGetValue(reason, out var types))
+        {
+            types = new HashSet<string>(StringComparer.Ordinal);
+            exclusions[reason] = types;
+        }
+
+        types.Add(type.ToDisplayString());
+    }
+
+    private static IReadOnlyList<string> Display(IEnumerable<INamedTypeSymbol> types)
+    {
+        return types
             .Select(type => type.ToDisplayString())
             .OrderBy(type => type, StringComparer.Ordinal)
             .ToList();
-    }
-
-    /// <summary>
-    /// Calculates raw type coupling for one action method. Unlike class coupling,
-    /// action coupling intentionally includes <c>[FromServices]</c> parameters so
-    /// concentrated per-request coordination remains visible as supplemental evidence.
-    /// </summary>
-    public static int CalculateAction(MethodDeclarationSyntax methodDecl, SemanticModel model)
-    {
-        var selfSymbol = model.GetDeclaredSymbol(methodDecl)?.ContainingType;
-        var coupled = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
-
-        foreach (var node in methodDecl.DescendantNodesAndSelf())
-        {
-            if (node.AncestorsAndSelf().OfType<AttributeSyntax>().Any())
-                continue;
-
-            CollectFromTypeInfo(model.GetTypeInfo(node).Type, coupled, selfSymbol);
-            CollectFromTypeInfo(model.GetTypeInfo(node).ConvertedType, coupled, selfSymbol);
-
-            if (model.GetSymbolInfo(node).Symbol is not IMethodSymbol method)
-                continue;
-
-            CollectFromTypeInfo(method.ReturnType, coupled, selfSymbol);
-            foreach (var parameter in method.Parameters)
-                CollectFromTypeInfo(parameter.Type, coupled, selfSymbol);
-        }
-
-        return coupled.Count;
     }
 
     private static IEnumerable<IParameterSymbol> GetAnalyzableParameters(SyntaxNode node, IMethodSymbol method)
@@ -156,31 +421,78 @@ public static class ClassCouplingCalculator
             });
     }
 
-    private static void CollectFromTypeInfo(ITypeSymbol? type, HashSet<INamedTypeSymbol> set,
+    private static void CollectStructuralType(
+        ITypeSymbol? type,
+        HashSet<INamedTypeSymbol> set,
         INamedTypeSymbol? self)
     {
-        if (type is null) return;
+        if (type is null)
+            return;
 
         while (type is IArrayTypeSymbol arrayType)
             type = arrayType.ElementType;
 
-        if (type is ITypeParameterSymbol) return;
-        if (type.TypeKind is TypeKind.Error or TypeKind.Dynamic) return;
+        if (type is ITypeParameterSymbol || type.TypeKind is TypeKind.Error or TypeKind.Dynamic)
+            return;
+
+        if (type is not INamedTypeSymbol named)
+            return;
+
+        var definition = named.OriginalDefinition;
+        if (SymbolEqualityComparer.Default.Equals(definition, self?.OriginalDefinition) ||
+            named.ContainingType != null &&
+            SymbolEqualityComparer.Default.Equals(
+                named.ContainingType.OriginalDefinition, self?.OriginalDefinition) ||
+            PrimitiveTypes.Contains(named.SpecialType))
+        {
+            return;
+        }
+
+        set.Add(definition);
+
+        if (IsCompilerGeneratedCarrier(named) ||
+            DataCarrierClassifier.IsPassiveDataCarrier(definition) ||
+            FrameworkPresentationTypes.Contains(QualifiedMetadataName(definition)))
+        {
+            return;
+        }
+
+        foreach (var typeArgument in named.TypeArguments)
+            CollectStructuralType(typeArgument, set, self);
+    }
+
+    private static void CollectFromTypeInfo(
+        ITypeSymbol? type,
+        HashSet<INamedTypeSymbol> set,
+        INamedTypeSymbol? self)
+    {
+        if (type is null)
+            return;
+
+        while (type is IArrayTypeSymbol arrayType)
+            type = arrayType.ElementType;
+
+        if (type is ITypeParameterSymbol || type.TypeKind is TypeKind.Error or TypeKind.Dynamic)
+            return;
 
         if (type is INamedTypeSymbol named)
         {
             if (SymbolEqualityComparer.Default.Equals(named.OriginalDefinition, self?.OriginalDefinition))
                 return;
             if (named.ContainingType != null &&
-                SymbolEqualityComparer.Default.Equals(named.ContainingType.OriginalDefinition, self?.OriginalDefinition))
+                SymbolEqualityComparer.Default.Equals(
+                    named.ContainingType.OriginalDefinition, self?.OriginalDefinition))
+            {
                 return;
+            }
+
             if (PrimitiveTypes.Contains(named.SpecialType))
                 return;
 
             set.Add(named.OriginalDefinition);
 
-            foreach (var typeArg in named.TypeArguments)
-                CollectFromTypeInfo(typeArg, set, self);
+            foreach (var typeArgument in named.TypeArguments)
+                CollectFromTypeInfo(typeArgument, set, self);
         }
     }
 }

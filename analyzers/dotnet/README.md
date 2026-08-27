@@ -127,7 +127,8 @@ Use it narrowly: the annotation records an architectural constraint; it does not
 
 ### Dependency injection
 
-Parameters decorated with `[FromServices]` are excluded from class-coupling calculations. This prevents action-level dependency injection from making the containing controller appear more coupled than it is:
+Parameters decorated with `[FromServices]` are excluded from the broad raw class-coupling
+census, but included in structural coupling as real method-injected collaborators:
 
 ```csharp
 public IActionResult Get([FromServices] IReportBuilder reports)
@@ -140,9 +141,9 @@ public IActionResult Get([FromServices] IReportBuilder reports)
 
 The Architecture evidence retains that information separately under
 `extra.controllerActionCoupling`. Each controller profile reports constructor dependency
-count, maximum per-action raw type coupling, maximum `[FromServices]` parameter count,
-and an action-by-action breakdown. These values are supplemental evidence and do not
-affect the score until they have been calibrated against a representative corpus.
+count, maximum per-action raw and structural type coupling, maximum `[FromServices]`
+parameter count, and an action-by-action breakdown. Per-action values are supplemental;
+the containing type's structural coupling drives `highCoupling` scoring.
 
 Service dependencies are classified as interfaces or concrete classes through Roslyn
 symbols. Type-name conventions such as an `I` prefix and namespace fragments such as
@@ -150,12 +151,33 @@ symbols. Type-name conventions such as an `I` prefix and namespace fragments suc
 
 DI registration extension types require no annotation. Static types whose exposed extension methods target `IServiceCollection` or recognized host/application builders are excluded from Architecture hotspot penalties because their coupling is intentional composition-root wiring.
 
+Architecture preserves raw `classCoupling` and `coupledTypes` for compatibility and audit
+evidence, but `highCoupling` findings use a separate structural count. Structural coupling
+includes constructor and primary-constructor dependencies, fields and injected properties,
+`[FromServices]` parameters, constructed behavioral types, invoked collaborators, static
+helpers, and reflection targets. It excludes:
+
+- Types used only as method payloads, return values, or local data flow
+- Passive data carriers
+- Attributes, anonymous types, and tuples
+- Common value and container types such as `Guid`, `DateTime`, `CancellationToken`,
+  collections, tasks, and delegates
+- ASP.NET Core presentation contracts such as `ControllerBase` and `IActionResult`
+
+Filtering is role- and symbol-based rather than a blanket `System.*`,
+`Microsoft.AspNetCore.*`, or `Microsoft.Extensions.*` namespace exclusion. Behavioral
+dependencies such as `HttpClient`, `ILogger<T>`, caches, options, and `DbContext` remain
+eligible when structurally referenced. Structural `highCoupling` thresholds are 10 for
+general types and 8 for controllers.
+
 Raw coupling is also not used as an Architecture hotspot signal for subclasses of framework contracts whose required surface dominates the metric, currently `AuthenticationHandler<TOptions>` and `DbContext`. Complexity and class-size findings still apply to those types, and their raw coupling remains in `metrics.csv`.
 
 Executable `Program` and `Startup` composition roots are likewise excluded only from
 the Architecture `highCoupling` hotspot. Raw coupling, complexity, and size remain
-available. For every scored coupling hotspot, `extra.couplingProvenance` lists the
-fully-qualified type symbols contributing to the count.
+available. `extra.couplingProvenance` reports every structural hotspot and every type that
+would have crossed the former raw threshold, including raw and structural symbols, exclusions
+grouped by reason, and whether the raw count alone would have triggered a finding.
+`extra.excludedCouplingReferencesByReason` aggregates those exclusions across the solution.
 
 ### Async concurrency semantics
 
@@ -181,6 +203,19 @@ Architecture `findings` and `hotspotCount` describe the complete hotspot populat
 
 If any `dotnet list package` invocation fails, Dependency Management returns `status: "failed"` without a score. Its basis and `dependencyCommands` diagnostics identify the failing arguments, exit code or exception, and a bounded stderr summary.
 
+Outdated-package scoring inspects the reported latest package version's `ref`, `lib`,
+runtime-library, dependency-group, build, and tool target frameworks. An upgrade is excluded
+when none of those assets are compatible with the consuming project TFM. Each target-framework
+section of a multi-target project is evaluated independently, so a `net10.0`-only package does
+not penalize a `net9.0` target but remains a valid upgrade for a `net10.0` target.
+
+Package metadata is read from the local NuGet cache or the package sources reported by
+`dotnet list package`. Compatibility checks have bounded download size, concurrency, and time.
+If package metadata or a TFM cannot be resolved, the upgrade remains scored rather than being
+silently suppressed. Evidence reports `outdatedFrameworkIncompatibleExcluded`,
+`outdatedFrameworkCompatibilityUnknown`, and the corresponding package/project/TFM details.
+Vulnerability and deprecation checks are unaffected.
+
 Outdated packages belonging to projects identified by `Aspire.AppHost.Sdk` or
 `Aspire.Hosting.AppHost` do not contribute to the package-upgrade penalty because the
 AppHost is local orchestration infrastructure. The excluded count is reported as
@@ -191,7 +226,9 @@ and scored.
 
 Passive data carriers are identified structurally rather than by names such as `Request`, `Response`, or `Dto`. Records, classes, and structs that only declare state through primary-constructor parameters, auto-properties, fields, or assignment-only constructors are treated as data carriers.
 
-Their raw metrics remain in `metrics.csv`, but they are excluded from the scored Code Quality, Maintainability, and Architecture-hotspot populations. A data carrier still counts as a dependency of code that consumes it.
+Their raw metrics remain in `metrics.csv`, but they are excluded from the scored Code Quality,
+Maintainability, and Architecture-hotspot populations. References to them remain visible in raw
+coupling evidence but do not contribute to structural `highCoupling` scoring.
 
 Types are scored normally as soon as they define behavior, including methods, computed properties, custom accessors, operators, validation logic, or nontrivial constructor logic.
 

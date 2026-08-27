@@ -50,4 +50,32 @@ public class MetricsCollectorTests
         types.Should().BeEmpty();
         members.Should().BeEmpty();
     }
+
+    [Fact]
+    public void Collect_PopulatesRawAndStructuralCouplingSeparately()
+    {
+        const string code = """
+            public interface IService { void Run(); }
+            public sealed class RequestDto { public System.Guid Id { get; set; } }
+            public sealed class Coordinator {
+                private readonly IService service;
+                public Coordinator(IService service) { this.service = service; }
+                public RequestDto Handle(
+                    RequestDto request,
+                    System.Threading.CancellationToken cancellationToken) {
+                    service.Run();
+                    return request;
+                }
+            }
+            """;
+
+        var (types, _) = CollectAt(code, "src", "App", "Coordinator.cs");
+        var coordinator = types.Single(type => type.Type == "Coordinator");
+
+        coordinator.ClassCoupling.Should().BeGreaterThan(coordinator.StructuralClassCoupling!.Value);
+        coordinator.StructuralClassCoupling.Should().Be(1);
+        coordinator.StructuralCoupledTypes.Should().Equal("IService");
+        coordinator.CouplingExclusions.Should().ContainKey("passiveDataCarrier");
+        coordinator.CouplingExclusions.Should().ContainKey("valueOrContainer");
+    }
 }

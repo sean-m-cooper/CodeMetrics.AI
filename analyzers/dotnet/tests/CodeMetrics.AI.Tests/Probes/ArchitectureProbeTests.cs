@@ -419,6 +419,92 @@ public class ArchitectureProbeTests
     }
 
     [Fact]
+    public void MetricHotspots_RawControllerNoiseDoesNotDriveStructuralCouplingFinding()
+    {
+        var metrics = new List<TypeMetrics>
+        {
+            new()
+            {
+                Project = "TestProject",
+                Namespace = "MyNs",
+                Type = "OrdersController",
+                FilePath = "OrdersController.cs",
+                CyclomaticComplexity = 5,
+                ClassCoupling = 67,
+                CoupledTypes = ["MyNs.RequestDto", "System.Guid"],
+                StructuralClassCoupling = 4,
+                StructuralCoupledTypes = ["MyNs.IOrderService", "MyNs.ILogger"],
+                CouplingExclusions = new Dictionary<string, IReadOnlyList<string>>
+                {
+                    ["passiveDataCarrier"] = ["MyNs.RequestDto"],
+                    ["valueOrContainer"] = ["System.Guid"]
+                },
+                LinesOfSource = 50
+            }
+        };
+
+        var result = Analyze("class Placeholder { }", metrics);
+
+        result.Findings.Should().NotContain(f => f.Category == "highCoupling");
+        var provenance = JsonSerializer.SerializeToElement(result.Extra["couplingProvenance"]);
+        provenance.GetArrayLength().Should().Be(1);
+        provenance[0].GetProperty("ClassCoupling").GetInt32().Should().Be(67);
+        provenance[0].GetProperty("StructuralClassCoupling").GetInt32().Should().Be(4);
+        provenance[0].GetProperty("WouldExceedRawThreshold").GetBoolean().Should().BeTrue();
+    }
+
+    [Fact]
+    public void MetricHotspots_ControllerStructuralCouplingUsesRecalibratedThreshold()
+    {
+        var metrics = new List<TypeMetrics>
+        {
+            new()
+            {
+                Project = "TestProject",
+                Namespace = "MyNs",
+                Type = "OrdersController",
+                FilePath = "OrdersController.cs",
+                CyclomaticComplexity = 5,
+                ClassCoupling = 20,
+                StructuralClassCoupling = 8,
+                StructuralCoupledTypes = Enumerable.Range(1, 8).Select(i => $"MyNs.IDependency{i}").ToList(),
+                LinesOfSource = 50
+            }
+        };
+
+        var result = Analyze("class Placeholder { }", metrics);
+
+        result.Findings.Should().ContainSingle(f => f.Category == "highCoupling")
+            .Which.Message.Should().Contain("structural coupling of 8")
+            .And.Contain("raw class coupling: 20")
+            .And.Contain("threshold: 8");
+    }
+
+    [Fact]
+    public void MetricHotspots_GeneralStructuralCouplingThresholdIsTen()
+    {
+        var metrics = new List<TypeMetrics>
+        {
+            new()
+            {
+                Project = "TestProject",
+                Namespace = "MyNs",
+                Type = "OrderCoordinator",
+                FilePath = "OrderCoordinator.cs",
+                CyclomaticComplexity = 5,
+                ClassCoupling = 25,
+                StructuralClassCoupling = 10,
+                LinesOfSource = 50
+            }
+        };
+
+        var result = Analyze("class Placeholder { }", metrics);
+
+        result.Findings.Should().ContainSingle(f => f.Category == "highCoupling")
+            .Which.Message.Should().Contain("threshold: 10");
+    }
+
+    [Fact]
     public void MetricHotspots_ExecutableProgram_ExcludesOnlyHighCoupling()
     {
         var metrics = new List<TypeMetrics>
@@ -515,10 +601,12 @@ public class ArchitectureProbeTests
         summary.GetProperty("ConstructorDependencyCount").GetInt32().Should().Be(2);
         summary.GetProperty("MaxFromServicesParameters").GetInt32().Should().Be(1);
         summary.GetProperty("MaxActionTypeCoupling").GetInt32().Should().BeGreaterThanOrEqualTo(3);
+        summary.GetProperty("MaxStructuralActionCoupling").GetInt32().Should().BeGreaterThanOrEqualTo(1);
 
         var actions = summary.GetProperty("Actions").EnumerateArray().ToList();
         actions.Should().ContainSingle();
         actions[0].GetProperty("Method").GetString().Should().Be("Save");
+        actions[0].GetProperty("StructuralTypeCoupling").GetInt32().Should().BeGreaterThanOrEqualTo(1);
     }
 
     [Fact]

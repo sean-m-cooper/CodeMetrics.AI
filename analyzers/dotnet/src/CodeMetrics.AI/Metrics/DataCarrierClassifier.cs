@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Runtime.CompilerServices;
 
 namespace CodeMetrics.AI.Metrics;
 
@@ -8,10 +9,21 @@ namespace CodeMetrics.AI.Metrics;
 /// </summary>
 public static class DataCarrierClassifier
 {
+    private sealed record Classification(bool IsPassive);
+
+    private static readonly ConditionalWeakTable<INamedTypeSymbol, Classification> Cache = new();
+
     /// <summary>
     /// Returns whether a source-declared class, record, or struct only carries state.
     /// </summary>
     public static bool IsPassiveDataCarrier(INamedTypeSymbol typeSymbol)
+    {
+        return Cache.GetValue(
+            typeSymbol,
+            static symbol => new Classification(Classify(symbol))).IsPassive;
+    }
+
+    private static bool Classify(INamedTypeSymbol typeSymbol)
     {
         if (typeSymbol.TypeKind is not (TypeKind.Class or TypeKind.Struct) ||
             typeSymbol.IsStatic ||

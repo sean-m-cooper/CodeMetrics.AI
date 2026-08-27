@@ -11,6 +11,10 @@ public sealed class TypeMetrics
     public int DepthOfInheritance { get; set; }
     public int ClassCoupling { get; set; }
     public IReadOnlyList<string> CoupledTypes { get; set; } = [];
+    public int? StructuralClassCoupling { get; set; }
+    public IReadOnlyList<string> StructuralCoupledTypes { get; set; } = [];
+    public IReadOnlyDictionary<string, IReadOnlyList<string>> CouplingExclusions { get; set; } =
+        new Dictionary<string, IReadOnlyList<string>>();
     public int LinesOfSource { get; set; }
     public int LinesOfExecutable { get; set; }
     public int MemberCount { get; set; }

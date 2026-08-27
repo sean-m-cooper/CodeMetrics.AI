@@ -7,6 +7,11 @@ namespace CodeMetrics.AI.Probes;
 
 public static class ArchitectureProbe
 {
+    private const int StructuralCouplingThreshold = 10;
+    private const int ControllerStructuralCouplingThreshold = 8;
+    private const int LegacyRawCouplingThresholdValue = 30;
+    private const int LegacyControllerRawCouplingThreshold = 50;
+
     // Cross-cutting types that are acceptable in controllers
     private static readonly string[] CrossCuttingPrefixes =
     [
@@ -51,6 +56,7 @@ public static class ArchitectureProbe
         string Method,
         int Line,
         int TypeCoupling,
+        int StructuralTypeCoupling,
         int FromServicesParameters,
         IReadOnlyList<string> ConstructorDependencyTypes);
 
@@ -119,6 +125,14 @@ public static class ArchitectureProbe
                 GetTypeKey(metric.Project, metric.Namespace, metric.Type)));
         var excludedCompositionRootCouplingCount = typeMetrics.Count(metric =>
             IsApplicationCompositionRoot(metric, applicationProjects));
+        var couplingExclusionCounts = typeMetrics
+            .SelectMany(metric => metric.CouplingExclusions)
+            .GroupBy(exclusion => exclusion.Key, StringComparer.Ordinal)
+            .OrderBy(group => group.Key, StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Sum(exclusion => exclusion.Value.Count),
+                StringComparer.Ordinal);
 
         // 4. Scoring
         var errorFindings = findings.Where(f => f.Severity == "error").ToList();
@@ -188,6 +202,7 @@ public static class ArchitectureProbe
                     .Distinct(StringComparer.Ordinal)
                     .Count(),
                 MaxActionTypeCoupling = group.Max(observation => observation.TypeCoupling),
+                MaxStructuralActionCoupling = group.Max(observation => observation.StructuralTypeCoupling),
                 MaxFromServicesParameters = group.Max(observation => observation.FromServicesParameters),
                 Actions = group
                     .OrderBy(observation => observation.Method, StringComparer.Ordinal)
@@ -197,22 +212,27 @@ public static class ArchitectureProbe
                         observation.Method,
                         observation.Line,
                         observation.TypeCoupling,
+                        observation.StructuralTypeCoupling,
                         observation.FromServicesParameters
                     })
                     .ToList()
             })
-            .OrderByDescending(summary => summary.MaxActionTypeCoupling)
+            .OrderByDescending(summary => summary.MaxStructuralActionCoupling)
+            .ThenByDescending(summary => summary.MaxActionTypeCoupling)
             .ThenBy(summary => summary.Project, StringComparer.Ordinal)
             .ThenBy(summary => summary.Namespace, StringComparer.Ordinal)
             .ThenBy(summary => summary.Type, StringComparer.Ordinal)
             .ToList<object>();
         var couplingProvenance = typeMetrics
-            .Where(metric => IsCouplingHotspot(
-                metric,
-                dependencyInjectionExtensionTypes,
-                frameworkCouplingArchetypeTypes,
-                applicationProjects))
-            .OrderByDescending(metric => metric.ClassCoupling)
+            .Where(metric =>
+                metric.ClassCoupling >= LegacyRawCouplingThreshold(metric) ||
+                IsCouplingHotspot(
+                    metric,
+                    dependencyInjectionExtensionTypes,
+                    frameworkCouplingArchetypeTypes,
+                    applicationProjects))
+            .OrderByDescending(ScoredCoupling)
+            .ThenByDescending(metric => metric.ClassCoupling)
             .ThenBy(metric => metric.Project, StringComparer.Ordinal)
             .ThenBy(metric => metric.Namespace, StringComparer.Ordinal)
             .ThenBy(metric => metric.Type, StringComparer.Ordinal)
@@ -222,7 +242,11 @@ public static class ArchitectureProbe
                 metric.Namespace,
                 metric.Type,
                 metric.ClassCoupling,
-                CoupledTypes = metric.CoupledTypes
+                CoupledTypes = metric.CoupledTypes,
+                StructuralClassCoupling = ScoredCoupling(metric),
+                StructuralCoupledTypes = metric.StructuralCoupledTypes,
+                CouplingExclusions = metric.CouplingExclusions,
+                WouldExceedRawThreshold = metric.ClassCoupling >= LegacyRawCouplingThreshold(metric)
             })
             .ToList<object>();
 
@@ -242,6 +266,7 @@ public static class ArchitectureProbe
                 ["excludedDependencyInjectionExtensionTypes"] = excludedDependencyInjectionExtensionCount,
                 ["excludedFrameworkCouplingArchetypeTypes"] = excludedFrameworkCouplingArchetypeCount,
                 ["excludedApplicationCompositionRoots"] = excludedCompositionRootCouplingCount,
+                ["excludedCouplingReferencesByReason"] = couplingExclusionCounts,
                 ["couplingProvenance"] = couplingProvenance,
                 // Supplemental evidence only. These values intentionally do not affect
                 // the architecture score until they have been calibrated on a corpus.
@@ -539,6 +564,7 @@ public static class ArchitectureProbe
                     actionSymbol.Name,
                     action.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
                     ClassCouplingCalculator.CalculateAction(action, semanticModel),
+                    ClassCouplingCalculator.CalculateStructuralAction(action, semanticModel),
                     fromServicesCount,
                     constructorDependencyTypes));
             }
@@ -677,6 +703,7 @@ public static class ArchitectureProbe
             }
 
             var couplingThreshold = CouplingThreshold(tm);
+            var scoredCoupling = ScoredCoupling(tm);
             if (IsCouplingHotspot(
                     tm,
                     dependencyInjectionExtensionTypes,
@@ -690,8 +717,9 @@ public static class ArchitectureProbe
                     File = tm.FilePath,
                     Project = tm.Project,
                     Type = tm.Type,
-                    Message = $"Type '{tm.Type}' has class coupling of {tm.ClassCoupling} (threshold: {couplingThreshold})."
-                }, 0, tm.ClassCoupling, 0));
+                    Message = $"Type '{tm.Type}' has structural coupling of {scoredCoupling} " +
+                              $"(raw class coupling: {tm.ClassCoupling}, threshold: {couplingThreshold})."
+                }, 0, scoredCoupling, 0));
             }
 
             if (tm.LinesOfSource >= 500)
@@ -731,12 +759,33 @@ public static class ArchitectureProbe
                !dependencyInjectionExtensionTypes.Contains(typeKey) &&
                !frameworkCouplingArchetypeTypes.Contains(typeKey) &&
                !IsApplicationCompositionRoot(metric, applicationProjects) &&
-               metric.ClassCoupling >= CouplingThreshold(metric);
+               ScoredCoupling(metric) >= CouplingThreshold(metric);
     }
 
     private static int CouplingThreshold(TypeMetrics metric)
     {
-        return metric.Type.EndsWith("Controller", StringComparison.Ordinal) ? 50 : 30;
+        if (!metric.StructuralClassCoupling.HasValue)
+        {
+            return metric.Type.EndsWith("Controller", StringComparison.Ordinal)
+                ? LegacyControllerRawCouplingThreshold
+                : LegacyRawCouplingThresholdValue;
+        }
+
+        return metric.Type.EndsWith("Controller", StringComparison.Ordinal)
+            ? ControllerStructuralCouplingThreshold
+            : StructuralCouplingThreshold;
+    }
+
+    private static int LegacyRawCouplingThreshold(TypeMetrics metric)
+    {
+        return metric.Type.EndsWith("Controller", StringComparison.Ordinal)
+            ? LegacyControllerRawCouplingThreshold
+            : LegacyRawCouplingThresholdValue;
+    }
+
+    private static int ScoredCoupling(TypeMetrics metric)
+    {
+        return metric.StructuralClassCoupling ?? metric.ClassCoupling;
     }
 
     private static bool IsApplicationCompositionRoot(
