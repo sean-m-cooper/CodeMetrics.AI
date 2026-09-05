@@ -19,6 +19,7 @@ it("inspects canonical v2 without inventing v3 provenance and refuses v2 gates",
 
 it("validates native scope, explicit provenance, unsupported schemas and incomplete evidence", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "reader-"));
+  const alias = root + "-alias";
   try {
     fs.writeFileSync(path.join(root, "package.json"), '{"name":"reader"}');
     fs.writeFileSync(path.join(root, "app.tsx"), "import {useEffect} from 'react'; export function App(){useEffect(async()=>{},[]);return null;}");
@@ -26,6 +27,8 @@ it("validates native scope, explicit provenance, unsupported schemas and incompl
     const file = path.join(root, "evidence.json");
     fs.writeFileSync(file, JSON.stringify(evidence));
     expect(inspectEvidence(file, { version: "0.2.0", entryPoint: path.join(root, "package.json"), root, variant: "source" }).usable).toBe(true);
+    fs.symlinkSync(root, alias, process.platform === "win32" ? "junction" : "dir");
+    expect(inspectEvidence(file, { root: alias, entryPoint: path.join(alias, "package.json") }).usable).toBe(true);
     expect(evidence.dimensions.performanceAsync.scope?.excludes).toContain("general-async");
     for (const expected of [{ version: "9" }, { entryPoint: path.join(root, "wrong.json") }, { variant: "Release" }, { root: path.dirname(root) }])
       expect(() => inspectEvidence(file, expected)).toThrow("Provenance mismatch");
@@ -38,5 +41,5 @@ it("validates native scope, explicit provenance, unsupported schemas and incompl
     expect(inspectEvidence(file).usable).toBe(false);
     fs.writeFileSync(file, '{"schemaVersion":99}');
     expect(() => inspectEvidence(file)).toThrow("Unsupported evidence schema");
-  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+  } finally { fs.rmSync(alias, { recursive: true, force: true }); fs.rmSync(root, { recursive: true, force: true }); }
 });

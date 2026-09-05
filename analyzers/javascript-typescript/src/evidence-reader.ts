@@ -32,7 +32,13 @@ export function inspectEvidence(file: string, expected: { ecosystem?: string; ve
   for (const key of ["ecosystem", "version"] as const)
     if (expected[key] !== undefined && evidence.tool[key] !== expected[key]) throw new Error(`Provenance mismatch: tool.${key}`);
   if (expected.variant !== undefined && evidence.subject.variant !== expected.variant) throw new Error("Provenance mismatch: subject.variant");
-  const normalize = (value: string) => process.platform === "win32" ? path.resolve(value).toLowerCase() : path.resolve(value);
+  const normalize = (value: string) => {
+    const absolute = path.resolve(value);
+    // Native resolution handles Windows 8.3 names as well as junctions/symlinks.
+    // Historical paths may no longer exist; retain lexical matching for those.
+    const resolved = fs.existsSync(absolute) ? fs.realpathSync.native(absolute) : absolute;
+    return process.platform === "win32" ? resolved.toLowerCase() : resolved;
+  };
   if (expected.root !== undefined && normalize(evidence.subject.root) !== normalize(expected.root)) throw new Error("Provenance mismatch: subject.root");
   if (expected.entryPoint !== undefined && normalize(path.resolve(evidence.subject.root, evidence.subject.entryPoint)) !== normalize(expected.entryPoint))
     throw new Error("Provenance mismatch: subject.entryPoint");
