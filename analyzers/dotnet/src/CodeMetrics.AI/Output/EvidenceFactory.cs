@@ -14,7 +14,16 @@ internal static class EvidenceFactory
             Subject = CreateSubject(solutionPath, solutionDir, configuration),
             Filters = CreateFilters(context),
             Population = CreatePopulation(context),
-            Dimensions = dimensions
+            Dimensions = dimensions,
+            Analysis = new AnalysisInfo
+            {
+                Status = context.Diagnostics.Count == 0 ? "complete" : "incomplete",
+                Diagnostics = context.Diagnostics,
+                ConfigurationFingerprint = EvidenceEnricher.Hash(configuration + "|" +
+                    ((Probes.DimensionResult)dimensions["dependencyManagement"]).Status + "|" +
+                    ((Probes.DimensionResult)dimensions["testing"]).Extra.GetValueOrDefault("coverageMode", "auto")),
+                Suppressions = EvidenceEnricher.FindSuppressionDeclarations(context, solutionDir)
+            }
         };
     }
 
@@ -25,7 +34,7 @@ internal static class EvidenceFactory
     {
         return new SubjectInfo
         {
-            Root = solutionDir,
+            Root = EvidenceEnricher.RepositoryRoot(solutionDir),
             EntryPoint = solutionPath,
             Name = Path.GetFileNameWithoutExtension(solutionPath),
             Variant = configuration

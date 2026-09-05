@@ -1,27 +1,35 @@
 {
   "name": "codemetrics-ai",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Deterministic code metrics and scorecard evidence for JavaScript, TypeScript, and React projects",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "codemetrics-ai": "./dist/cli.js"
+    "codemetrics-ai": "./dist/cli.js",
+    "codemetrics-evidence": "./dist/evidence-cli.js"
   },
   "files": [
     "dist",
     "README.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node scripts/copy-schema.mjs",
     "prepack": "npm run build",
-    "test": "vitest run"
+    "test": "npm run build && vitest run",
+    "test:package": "node scripts/package-smoke.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",
-    "typescript": "^5.8.3",
     "vitest": "^3.2.2"
-  }
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "typescript": "5.8.3"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts"
 }

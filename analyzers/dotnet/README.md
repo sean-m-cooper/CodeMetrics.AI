@@ -29,7 +29,7 @@ code-metrics --output ./results/metrics.csv --scorecard-output ./results/evidenc
 | File | Description |
 |------|-------------|
 | `.scorecard/dotnet/metrics.csv` | VS-compatible raw metrics (same format as Visual Studio's Code Metrics Results) |
-| `.scorecard/dotnet/evidence.json` | Scored evidence across 9 dimensions (schema v2) |
+| `.scorecard/dotnet/evidence.json` | Scored evidence across 9 dimensions (schema v3) |
 
 ## Dimensions
 
@@ -294,3 +294,11 @@ CodeMetrics.AI does not provide a custom attribute for excluding arbitrary produ
 ## License
 
 [MIT](../../LICENSE)
+
+## Evidence v3 and execution status
+
+Version 2.0 emits schema v3. See the [migration guide](../../shared/scorecard-schema/migration-v3.md) and [comparison/CI guide](../../docs/evidence-workflows.md). Raw CSV columns remain unchanged. `--configuration` controls the actual Roslyn/MSBuild load. Missing or ambiguous solutions, workspace/compilation failures, and explicit unusable coverage return exit code 2. Incomplete source analysis produces partial findings with failed, unscored source dimensions. Cancellation returns 130.
+
+## Coverage inputs
+
+Use `--coverage path/to/coverage.cobertura.xml` for an explicit report. Otherwise the analyzer checks `.scorecard/coverage.cobertura.xml` beneath the solution directory. Evidence records the report path, content SHA-256, matching status, matched/unmatched files, and nullable branch rate. When file-level observations exist, only matching production files contribute line coverage. Root-only reports retain aggregate compatibility and are labeled `aggregateUnverified`; they cannot establish project coverage. An explicitly requested missing, invalid, or unmatched report fails the testing dimension. The analyzer reads coverage; it does not execute tests or generate coverage.

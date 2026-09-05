@@ -8,7 +8,10 @@ on:
 
 jobs:
   dotnet:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -18,13 +21,19 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Build .NET analyzer
-        run: dotnet build analyzers/dotnet/CodeMetrics.AI.slnx --verbosity minimal
+        run: dotnet build analyzers/dotnet/CodeMetrics.AI.slnx --configuration Release --verbosity minimal
 
       - name: Test .NET analyzer
-        run: dotnet test --solution analyzers/dotnet/CodeMetrics.AI.slnx --verbosity minimal
+        run: dotnet test --solution analyzers/dotnet/CodeMetrics.AI.slnx --configuration Release --no-build --verbosity minimal
+
+      - name: Verify formatting
+        run: dotnet format analyzers/dotnet/CodeMetrics.AI.slnx --no-restore --verify-no-changes
 
   javascript-typescript:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['20', '22']
     defaults:
       run:
         working-directory: analyzers/javascript-typescript
@@ -34,7 +43,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node }}
           cache: npm
           cache-dependency-path: analyzers/javascript-typescript/package-lock.json
 
@@ -46,3 +55,31 @@ jobs:
 
       - name: Test JS/TS analyzer
         run: npm test
+
+      - name: Verify installed package
+        run: npm run test:package
+
+  calibration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: analyzers/javascript-typescript/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --prefix analyzers/javascript-typescript
+      - run: npm run build --prefix analyzers/javascript-typescript
+      - run: dotnet build analyzers/dotnet/CodeMetrics.AI.slnx --configuration Release --verbosity minimal
+      - name: Verify pinned corpus, accuracy labels, and frozen distributions
+        run: python shared/calibration/run.py --output TestResults/calibration/report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calibration-report
+          path: TestResults/calibration/report.json

@@ -12,7 +12,10 @@ internal sealed record SolutionAnalysisContext(
     IReadOnlyList<(string ProjectName, Compilation Compilation)> AnalyzedProjectCompilations,
     IReadOnlyList<(string Name, Compilation Compilation, string? ProjectFilePath)> ProjectsWithPaths,
     IReadOnlyList<TypeMetrics> TypeMetrics,
-    IReadOnlyList<MemberMetrics> MemberMetrics);
+    IReadOnlyList<MemberMetrics> MemberMetrics)
+{
+    public List<AnalysisDiagnostic> Diagnostics { get; } = [];
+}
 
 internal static class SolutionCompilationLoader
 {
@@ -26,17 +29,33 @@ internal static class SolutionCompilationLoader
         var compiledProjects = await CompileAsync(projects, cancellationToken);
         var loaded = CollectMetrics(compiledProjects, analyzedProjectIds, solutionDir);
 
-        return new SolutionAnalysisContext(
+        var context = new SolutionAnalysisContext(
             projects.Count,
-            projects.Where(project => analyzedProjectIds.Contains(project.Id))
-                .Select(project => project.Name)
-                .ToList(),
+            loaded.AnalyzedCompilations.Select(project => project.ProjectName).ToList(),
             skipped,
             loaded.AllCompilations,
             loaded.AnalyzedCompilations,
             loaded.ProjectsWithPaths,
             loaded.Types,
             loaded.Members);
+        foreach (var (project, compilation) in compiledProjects)
+        {
+            if (compilation == null)
+            {
+                context.Diagnostics.Add(new AnalysisDiagnostic("compilationUnavailable", "No compilation was available.", project.Name));
+                if (analyzedProjectIds.Contains(project.Id))
+                    skipped.Add(new SkippedProjectInfo { Name = project.Name, Reason = "Compilation unavailable" });
+            }
+            else
+            {
+                foreach (var diagnostic in compilation.GetDiagnostics(cancellationToken)
+                    .Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error).Take(20))
+                    context.Diagnostics.Add(new AnalysisDiagnostic("compilationError", diagnostic.ToString(), project.Name));
+            }
+        }
+        if (context.AnalyzedProjectNames.Count == 0)
+            context.Diagnostics.Add(new AnalysisDiagnostic("emptyPopulation", "No production projects could be analyzed."));
+        return context;
     }
 
     private static (
@@ -60,8 +79,13 @@ internal static class SolutionCompilationLoader
         IEnumerable<Project> projects,
         CancellationToken cancellationToken)
     {
+        using var concurrency = new SemaphoreSlim(Math.Min(Environment.ProcessorCount, 4));
         var compilationTasks = projects.Select(async project =>
-            (Project: project, Compilation: await project.GetCompilationAsync(cancellationToken)));
+        {
+            await concurrency.WaitAsync(cancellationToken);
+            try { return (Project: project, Compilation: await project.GetCompilationAsync(cancellationToken)); }
+            finally { concurrency.Release(); }
+        });
         return await Task.WhenAll(compilationTasks);
     }
 

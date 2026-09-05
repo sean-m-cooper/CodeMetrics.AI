@@ -22,4 +22,4 @@ This keeps polyglot repositories collision-free: each analyzer owns its subdirec
 
 ## `subject.variant`
 
-`variant` captures the analyzer-specific build/config flavor: the build configuration (`Debug`/`Release`) for `dotnet`, the tsconfig path for `javascript-typescript`. It is optional; omit it when the ecosystem has no meaningful variant.
+`variant` captures the analyzer-specific build/config flavor: the build configuration (`Debug`/`Release`) for `dotnet`, `source` for `javascript-typescript` (compiler configuration is captured by `analysis.configurationFingerprint`). It is optional; omit it when the ecosystem has no meaningful variant.

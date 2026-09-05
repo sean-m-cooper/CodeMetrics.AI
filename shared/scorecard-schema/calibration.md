@@ -26,3 +26,7 @@ Until an ecosystem completes this procedure:
 - Its analyzer README must state that scores are uncalibrated across ecosystems.
 - Consumers render its scores with an explicit caveat and never average them with other ecosystems' scores.
 - The dotnet CSV fallback procedure must not be applied to its CSV output.
+
+## Executable regression checks
+
+See `../calibration/README.md` and `../calibration/baselines/` for the pinned labeled fixture corpus, measured .NET reference distribution, JS/TS distributions, and release checks. These fixtures supplement the public-repository procedure above; they do not establish cross-ecosystem comparability. Always evaluate labeled false positives and false negatives alongside distribution similarity.

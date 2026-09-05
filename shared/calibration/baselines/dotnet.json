@@ -1,0 +1,207 @@
+{
+  "corpusKind": "labeled-regression-fixtures",
+  "corpusSha256": "2e439e89ff5833b0567c2f74faabe6b4cafb5bcaf3482778ae004fa34197d1b0",
+  "tool": {
+    "name": "CodeMetrics.AI",
+    "version": "2.0.0",
+    "ecosystem": "dotnet"
+  },
+  "ruleset": "dotnet-2026-09-05",
+  "scope": "Only listed rules have accuracy labels. Fixture distributions do not establish cross-ecosystem comparability.",
+  "accuracy": {
+    "errorHandling/emptyCatch": {
+      "truePositive": 1,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "negativeCases": 5
+    },
+    "performanceAsync/syncOverAsync": {
+      "truePositive": 1,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "negativeCases": 5
+    }
+  },
+  "distributions": {
+    "codeQuality": {
+      "count": 6,
+      "median": 10.0,
+      "p25": 10.0,
+      "p10": 9.3
+    },
+    "maintainability": {
+      "count": 6,
+      "median": 10.0,
+      "p25": 10.0,
+      "p10": 10.0
+    },
+    "errorHandling": {
+      "count": 6,
+      "median": 10.0,
+      "p25": 5.5,
+      "p10": 3.0
+    },
+    "performanceAsync": {
+      "count": 6,
+      "median": 10.0,
+      "p25": 10.0,
+      "p10": 6.0
+    },
+    "dependencyManagement": null,
+    "security": {
+      "count": 6,
+      "median": 10.0,
+      "p25": 10.0,
+      "p10": 10.0
+    },
+    "testing": {
+      "count": 6,
+      "median": 0.0,
+      "p25": 0.0,
+      "p10": 0.0
+    },
+    "documentation": {
+      "count": 6,
+      "median": 0.0,
+      "p25": 0.0,
+      "p10": 0.0
+    },
+    "architecture": {
+      "count": 6,
+      "median": 10.0,
+      "p25": 10.0,
+      "p10": 10.0
+    }
+  },
+  "samples": [
+    {
+      "id": "clean",
+      "population": {
+        "types": 1,
+        "members": 1
+      },
+      "scores": {
+        "codeQuality": 10,
+        "maintainability": 10,
+        "errorHandling": 10,
+        "performanceAsync": 10,
+        "dependencyManagement": null,
+        "security": 10,
+        "testing": 0,
+        "documentation": 0,
+        "architecture": 10
+      },
+      "findings": {
+        "testing/uncoveredProject": 1
+      }
+    },
+    {
+      "id": "empty-catch",
+      "population": {
+        "types": 1,
+        "members": 1
+      },
+      "scores": {
+        "codeQuality": 10,
+        "maintainability": 10,
+        "errorHandling": 2,
+        "performanceAsync": 10,
+        "dependencyManagement": null,
+        "security": 10,
+        "testing": 0,
+        "documentation": 0,
+        "architecture": 10
+      },
+      "findings": {
+        "errorHandling/emptyCatch": 1,
+        "testing/uncoveredProject": 1
+      }
+    },
+    {
+      "id": "sync-boundary",
+      "population": {
+        "types": 1,
+        "members": 2
+      },
+      "scores": {
+        "codeQuality": 10,
+        "maintainability": 10,
+        "errorHandling": 4,
+        "performanceAsync": 2,
+        "dependencyManagement": null,
+        "security": 10,
+        "testing": 0,
+        "documentation": 0,
+        "architecture": 10
+      },
+      "findings": {
+        "errorHandling/syncBlockingCall": 1,
+        "performanceAsync/syncOverAsync": 1,
+        "testing/uncoveredProject": 1
+      }
+    },
+    {
+      "id": "intentional-catch",
+      "population": {
+        "types": 1,
+        "members": 1
+      },
+      "scores": {
+        "codeQuality": 10,
+        "maintainability": 10,
+        "errorHandling": 10,
+        "performanceAsync": 10,
+        "dependencyManagement": null,
+        "security": 10,
+        "testing": 0,
+        "documentation": 0,
+        "architecture": 10
+      },
+      "findings": {
+        "testing/uncoveredProject": 1
+      }
+    },
+    {
+      "id": "decisions",
+      "population": {
+        "types": 1,
+        "members": 1
+      },
+      "scores": {
+        "codeQuality": 8.6,
+        "maintainability": 10,
+        "errorHandling": 10,
+        "performanceAsync": 10,
+        "dependencyManagement": null,
+        "security": 10,
+        "testing": 0,
+        "documentation": 0,
+        "architecture": 10
+      },
+      "findings": {
+        "testing/uncoveredProject": 1
+      }
+    },
+    {
+      "id": "payload",
+      "population": {
+        "types": 1,
+        "members": 0
+      },
+      "scores": {
+        "codeQuality": 10,
+        "maintainability": 10,
+        "errorHandling": 10,
+        "performanceAsync": 10,
+        "dependencyManagement": null,
+        "security": 10,
+        "testing": 0,
+        "documentation": 0,
+        "architecture": 10
+      },
+      "findings": {
+        "testing/uncoveredProject": 1
+      }
+    }
+  ]
+}

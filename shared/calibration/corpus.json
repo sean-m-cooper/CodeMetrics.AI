@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "kind": "labeled-regression-fixtures",
+  "description": "Pinned local fixtures; not a representative public-repository calibration corpus.",
+  "entries": [
+    {
+      "id": "clean",
+      "ecosystem": "dotnet",
+      "path": "fixtures/dotnet/clean",
+      "entryPoint": "Sample.slnx",
+      "labels": {
+        "errorHandling/emptyCatch": 0,
+        "performanceAsync/syncOverAsync": 0
+      },
+      "sha256": {
+        "Sample.csproj": "91275edd3790c4f0cb484653195ccd8ad6af2f1a0a69b84fdb26b88c0b52407f",
+        "Sample.slnx": "c0ea0caed058dfef1960b725054ce2c0f889fd63f1c39fa7e5b5321f16362070",
+        "Source.cs": "98d2c6a5be6af74f960a42ff368b8050beed558e704483479f11c3c1660a7c9c"
+      }
+    },
+    {
+      "id": "empty-catch",
+      "ecosystem": "dotnet",
+      "path": "fixtures/dotnet/empty-catch",
+      "entryPoint": "Sample.slnx",
+      "labels": {
+        "errorHandling/emptyCatch": 1,
+        "performanceAsync/syncOverAsync": 0
+      },
+      "sha256": {
+        "Sample.csproj": "91275edd3790c4f0cb484653195ccd8ad6af2f1a0a69b84fdb26b88c0b52407f",
+        "Sample.slnx": "c0ea0caed058dfef1960b725054ce2c0f889fd63f1c39fa7e5b5321f16362070",
+        "Source.cs": "194219b90b3d38200d499d669050aa1f1f03dc7158cdbae81ecdc41a7ea9523b"
+      }
+    },
+    {
+      "id": "sync-boundary",
+      "ecosystem": "dotnet",
+      "path": "fixtures/dotnet/sync-boundary",
+      "entryPoint": "Sample.slnx",
+      "labels": {
+        "errorHandling/emptyCatch": 0,
+        "performanceAsync/syncOverAsync": 1
+      },
+      "sha256": {
+        "Sample.csproj": "91275edd3790c4f0cb484653195ccd8ad6af2f1a0a69b84fdb26b88c0b52407f",
+        "Sample.slnx": "c0ea0caed058dfef1960b725054ce2c0f889fd63f1c39fa7e5b5321f16362070",
+        "Source.cs": "881568010f5709a8b395c4dc3fea72ca9f082b4d172e1f030aff252407815715"
+      }
+    },
+    {
+      "id": "intentional-catch",
+      "ecosystem": "dotnet",
+      "path": "fixtures/dotnet/intentional-catch",
+      "entryPoint": "Sample.slnx",
+      "labels": {
+        "errorHandling/emptyCatch": 0,
+        "performanceAsync/syncOverAsync": 0
+      },
+      "sha256": {
+        "Sample.csproj": "91275edd3790c4f0cb484653195ccd8ad6af2f1a0a69b84fdb26b88c0b52407f",
+        "Sample.slnx": "c0ea0caed058dfef1960b725054ce2c0f889fd63f1c39fa7e5b5321f16362070",
+        "Source.cs": "4e71dca5e39058647d6844fe8b4d18241288eb94aed6d26d9d45c6df57d43e7b"
+      }
+    },
+    {
+      "id": "decisions",
+      "ecosystem": "dotnet",
+      "path": "fixtures/dotnet/decisions",
+      "entryPoint": "Sample.slnx",
+      "labels": {
+        "errorHandling/emptyCatch": 0,
+        "performanceAsync/syncOverAsync": 0
+      },
+      "sha256": {
+        "Sample.csproj": "91275edd3790c4f0cb484653195ccd8ad6af2f1a0a69b84fdb26b88c0b52407f",
+        "Sample.slnx": "c0ea0caed058dfef1960b725054ce2c0f889fd63f1c39fa7e5b5321f16362070",
+        "Source.cs": "354ec7a0d5ef9e9a13f3cf06cff4cabba001dd5663a01480bd7a8b6b74bcc0b1"
+      }
+    },
+    {
+      "id": "payload",
+      "ecosystem": "dotnet",
+      "path": "fixtures/dotnet/payload",
+      "entryPoint": "Sample.slnx",
+      "labels": {
+        "errorHandling/emptyCatch": 0,
+        "performanceAsync/syncOverAsync": 0
+      },
+      "sha256": {
+        "Sample.csproj": "91275edd3790c4f0cb484653195ccd8ad6af2f1a0a69b84fdb26b88c0b52407f",
+        "Sample.slnx": "c0ea0caed058dfef1960b725054ce2c0f889fd63f1c39fa7e5b5321f16362070",
+        "Source.cs": "3f91d4858c0612d6a63e47452166bf388e9bce36b864105aca329e8a536298c8"
+      }
+    },
+    {
+      "id": "clean",
+      "ecosystem": "javascript-typescript",
+      "path": "fixtures/javascript-typescript/clean",
+      "entryPoint": "package.json",
+      "labels": {
+        "codeQuality/highFunctionComplexity": 0,
+        "performanceAsync/asyncEffectCallback": 0,
+        "performanceAsync/conditionalHook": 0
+      },
+      "sha256": {
+        "package.json": "5664a8c0b60dc9510d497c7cb9f266244eaf71ab5ab3871fba0a54d0607eacf5",
+        "src/code.ts": "d0ea6f33d17132678d4ecd944c2a2dd48dc55a7f7063c21c10d19320645bd2c4"
+      }
+    },
+    {
+      "id": "decisions",
+      "ecosystem": "javascript-typescript",
+      "path": "fixtures/javascript-typescript/decisions",
+      "entryPoint": "package.json",
+      "labels": {
+        "codeQuality/highFunctionComplexity": 1,
+        "performanceAsync/asyncEffectCallback": 0,
+        "performanceAsync/conditionalHook": 0
+      },
+      "sha256": {
+        "package.json": "fdb9e6363686062ca7d3146448e1aec45ee43d0308b6b444d310dd539f2fcdfb",
+        "src/code.ts": "71438f5a4fd15fe69d2e58773fd5ed20785941f8332bbb2eafeaba36b50348c4"
+      }
+    },
+    {
+      "id": "async-effect",
+      "ecosystem": "javascript-typescript",
+      "path": "fixtures/javascript-typescript/async-effect",
+      "entryPoint": "package.json",
+      "labels": {
+        "codeQuality/highFunctionComplexity": 0,
+        "performanceAsync/asyncEffectCallback": 1,
+        "performanceAsync/conditionalHook": 0
+      },
+      "sha256": {
+        "package.json": "59001fbc518208f625f2762cab0f20d6cfa771c003600bb5a4b8be5f1a9ade51",
+        "src/App.tsx": "8eac2f8c161678d7443f95cb8ea96aa878bf775c4ee2207c1d26f1e962812f5e"
+      }
+    },
+    {
+      "id": "conditional-hook",
+      "ecosystem": "javascript-typescript",
+      "path": "fixtures/javascript-typescript/conditional-hook",
+      "entryPoint": "package.json",
+      "labels": {
+        "codeQuality/highFunctionComplexity": 0,
+        "performanceAsync/asyncEffectCallback": 0,
+        "performanceAsync/conditionalHook": 1
+      },
+      "sha256": {
+        "package.json": "9ff3ceeef5c610694207b03de249aa8370fba3fe31aa2a769efd752e80c4c56b",
+        "src/App.tsx": "a75b088928019f0c6ed8dff0af996859734054f009220546a25a35ebff24dd0e"
+      }
+    },
+    {
+      "id": "intentional-effect",
+      "ecosystem": "javascript-typescript",
+      "path": "fixtures/javascript-typescript/intentional-effect",
+      "entryPoint": "package.json",
+      "labels": {
+        "codeQuality/highFunctionComplexity": 0,
+        "performanceAsync/asyncEffectCallback": 0,
+        "performanceAsync/conditionalHook": 0
+      },
+      "sha256": {
+        "package.json": "c68b8e08141fb212481a91b950510b5d5e4f6c9048055928fdd36db59256a833",
+        "src/App.tsx": "018df02f019e2f61d4916c731d71be3c00a79677089408b65b39f495aad9cb75"
+      }
+    },
+    {
+      "id": "nested-functions",
+      "ecosystem": "javascript-typescript",
+      "path": "fixtures/javascript-typescript/nested-functions",
+      "entryPoint": "package.json",
+      "labels": {
+        "codeQuality/highFunctionComplexity": 0,
+        "performanceAsync/asyncEffectCallback": 0,
+        "performanceAsync/conditionalHook": 0
+      },
+      "sha256": {
+        "package.json": "74746d955724cf9193fe88a7ad8ae90226e2242ef560cb2f1d5860ff2c808447",
+        "src/code.js": "e93e6840129ee13de24a381b3dda4ae6ee60ed1a8f24ec68d3c85bcdd8f45bd3"
+      }
+    }
+  ]
+}
