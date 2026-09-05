@@ -4,13 +4,28 @@ namespace CodeMetrics.AI.Output;
 
 public sealed class EvidenceModel
 {
-    public int SchemaVersion { get; init; } = 2;
+    public int SchemaVersion { get; init; } = 3;
     public string GeneratedAtUtc { get; init; } = DateTime.UtcNow.ToString("O");
     public ToolInfo Tool { get; init; } = new();
     public SubjectInfo Subject { get; init; } = new();
     public FilterInfo Filters { get; init; } = new();
     public PopulationInfo Population { get; init; } = new();
     public Dictionary<string, object> Dimensions { get; init; } = [];
+    public AnalysisInfo Analysis { get; init; } = new();
+}
+
+public sealed record AnalysisDiagnostic(string Kind, string Message, string? Project = null);
+
+public sealed class AnalysisInfo
+{
+    public string RunId { get; init; } = Guid.NewGuid().ToString("D");
+    public string? AuditId { get; init; }
+    public string Status { get; init; } = "complete";
+    public string Ruleset { get; init; } = "dotnet-2026-09-05";
+    public string Calibration { get; init; } = "baseline";
+    public string ConfigurationFingerprint { get; init; } = "default";
+    public List<AnalysisDiagnostic> Diagnostics { get; init; } = [];
+    public List<object> Suppressions { get; init; } = [];
 }
 
 public sealed class ToolInfo

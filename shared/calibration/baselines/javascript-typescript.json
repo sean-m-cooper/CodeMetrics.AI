@@ -1,0 +1,181 @@
+{
+  "corpusKind": "labeled-regression-fixtures",
+  "corpusSha256": "2e439e89ff5833b0567c2f74faabe6b4cafb5bcaf3482778ae004fa34197d1b0",
+  "tool": {
+    "name": "codemetrics-ai",
+    "version": "0.2.0",
+    "ecosystem": "javascript-typescript"
+  },
+  "ruleset": "javascript-typescript-2026-09-05",
+  "scope": "Only listed rules have accuracy labels. Fixture distributions do not establish cross-ecosystem comparability.",
+  "accuracy": {
+    "codeQuality/highFunctionComplexity": {
+      "truePositive": 1,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "negativeCases": 5
+    },
+    "performanceAsync/asyncEffectCallback": {
+      "truePositive": 1,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "negativeCases": 5
+    },
+    "performanceAsync/conditionalHook": {
+      "truePositive": 1,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "negativeCases": 5
+    }
+  },
+  "distributions": {
+    "codeQuality": {
+      "count": 6,
+      "median": 10.0,
+      "p25": 10.0,
+      "p10": 8.0
+    },
+    "maintainability": {
+      "count": 6,
+      "median": 10.0,
+      "p25": 10.0,
+      "p10": 9.0
+    },
+    "errorHandling": null,
+    "performanceAsync": {
+      "count": 3,
+      "median": 6.0,
+      "p25": 6.0,
+      "p10": 6.0
+    },
+    "security": null,
+    "testing": null,
+    "documentation": null,
+    "dependencyManagement": null,
+    "architecture": null
+  },
+  "samples": [
+    {
+      "id": "clean",
+      "population": {
+        "types": 1,
+        "members": 1
+      },
+      "scores": {
+        "codeQuality": 10,
+        "maintainability": 10,
+        "errorHandling": null,
+        "performanceAsync": null,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "dependencyManagement": null,
+        "architecture": null
+      },
+      "findings": {}
+    },
+    {
+      "id": "decisions",
+      "population": {
+        "types": 1,
+        "members": 1
+      },
+      "scores": {
+        "codeQuality": 6,
+        "maintainability": 8,
+        "errorHandling": null,
+        "performanceAsync": null,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "dependencyManagement": null,
+        "architecture": null
+      },
+      "findings": {
+        "codeQuality/highFunctionComplexity": 1
+      }
+    },
+    {
+      "id": "async-effect",
+      "population": {
+        "types": 1,
+        "members": 2
+      },
+      "scores": {
+        "codeQuality": 10,
+        "maintainability": 10,
+        "errorHandling": null,
+        "performanceAsync": 6,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "dependencyManagement": null,
+        "architecture": null
+      },
+      "findings": {
+        "performanceAsync/asyncEffectCallback": 1
+      }
+    },
+    {
+      "id": "conditional-hook",
+      "population": {
+        "types": 1,
+        "members": 1
+      },
+      "scores": {
+        "codeQuality": 10,
+        "maintainability": 10,
+        "errorHandling": null,
+        "performanceAsync": 6,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "dependencyManagement": null,
+        "architecture": null
+      },
+      "findings": {
+        "performanceAsync/conditionalHook": 1
+      }
+    },
+    {
+      "id": "intentional-effect",
+      "population": {
+        "types": 1,
+        "members": 2
+      },
+      "scores": {
+        "codeQuality": 10,
+        "maintainability": 10,
+        "errorHandling": null,
+        "performanceAsync": 10,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "dependencyManagement": null,
+        "architecture": null
+      },
+      "findings": {
+        "performanceAsync/effectWithoutDependencies": 1
+      }
+    },
+    {
+      "id": "nested-functions",
+      "population": {
+        "types": 1,
+        "members": 2
+      },
+      "scores": {
+        "codeQuality": 10,
+        "maintainability": 10,
+        "errorHandling": null,
+        "performanceAsync": null,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "dependencyManagement": null,
+        "architecture": null
+      },
+      "findings": {}
+    }
+  ]
+}

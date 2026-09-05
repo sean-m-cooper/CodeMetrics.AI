@@ -586,6 +586,7 @@ public static class ArchitectureProbe
                 hotspots.Add((new Finding
                 {
                     Category = "highCyclomaticComplexity",
+                    Observations = { ["measured"] = tm.CyclomaticComplexity, ["threshold"] = 80, ["density"] = tm.DecompositionRatio, ["densityThreshold"] = HighComplexityDensityThreshold },
                     Severity = "warning",
                     File = tm.FilePath,
                     Project = tm.Project,
@@ -607,6 +608,7 @@ public static class ArchitectureProbe
                 hotspots.Add((new Finding
                 {
                     Category = "highCoupling",
+                    Observations = { ["measured"] = scoredCoupling, ["threshold"] = couplingThreshold, ["rawCoupling"] = tm.ClassCoupling, ["provenance"] = "architecture.couplingProvenance" },
                     Severity = "warning",
                     File = tm.FilePath,
                     Project = tm.Project,
@@ -621,6 +623,7 @@ public static class ArchitectureProbe
                 hotspots.Add((new Finding
                 {
                     Category = "largeClass",
+                    Observations = { ["measured"] = tm.LinesOfSource, ["threshold"] = 500, ["metric"] = "linesOfSource" },
                     Severity = "warning",
                     File = tm.FilePath,
                     Project = tm.Project,

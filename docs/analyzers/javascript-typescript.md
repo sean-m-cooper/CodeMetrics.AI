@@ -26,3 +26,5 @@ TypeScript type-only declarations do not add runtime complexity. JSX markup does
 ## React
 
 React components and custom hooks are first-class analysis targets. React-specific findings are mapped into the stable scorecard dimensions.
+
+The implementation currently scores codeQuality, maintainability, and imported React hook/effect checks. Other dimensions are explicitly skipped. Scores are uncalibrated across ecosystems. See the [analyzer README](../../analyzers/javascript-typescript/README.md) for discovery, metric definitions, exclusions, and comparison options.

@@ -14,7 +14,7 @@ Each analyzer runs in the package ecosystem natural to its target language, then
 | Ecosystem | Location | Package | Status |
 |-----------|----------|---------|--------|
 | .NET / C# | `analyzers/dotnet` | `CodeMetrics.AI` NuGet global tool | Available |
-| JavaScript / TypeScript / React | `analyzers/javascript-typescript` | `codemetrics-ai` NPM package | Scaffolded |
+| JavaScript / TypeScript / React | `analyzers/javascript-typescript` | `codemetrics-ai` NPM package | Implemented; scores uncalibrated |
 | Python | `analyzers/python` | Python package | Planned next wave |
 | Rust | `analyzers/rust` | Rust crate | Planned next wave |
 
@@ -61,7 +61,11 @@ for exact placement, supported spellings, and scoring effects.
 npx codemetrics-ai
 ```
 
-The JS/TS analyzer scaffold lives in `analyzers/javascript-typescript`.
+The JS/TS analyzer implements source metrics and React hook/effect checks. Other dimensions are explicitly skipped. See its [README](analyzers/javascript-typescript/README.md) for scope and scoring policy.
+
+## Evidence and release verification
+
+Analyzers now emit schema v3; see the [migration guide](shared/scorecard-schema/migration-v3.md). Use the shared [evidence CLI](docs/evidence-workflows.md) for baseline comparisons, optional CI gates, and SARIF export. The [pinned regression corpus](shared/calibration/README.md) checks accuracy labels and score distributions on every CI run.
 
 ## License
 

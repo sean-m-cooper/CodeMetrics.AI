@@ -33,9 +33,9 @@ public class SchemaConformanceTests
     }
 
     [Fact]
-    public async Task GeneratedDotnetEvidence_ValidatesAgainstEvidenceSchemaV2()
+    public async Task GeneratedDotnetEvidence_ValidatesAgainstEvidenceSchemaV3()
     {
-        var schema = await LoadSchemaAsync();
+        var schema = JsonSchema.FromText(await File.ReadAllTextAsync(Path.Combine(FindRepositoryRoot(), "shared", "scorecard-schema", "evidence.schema.v3.json"), TestContext.Current.CancellationToken));
         var model = new EvidenceModel
         {
             Subject = new SubjectInfo

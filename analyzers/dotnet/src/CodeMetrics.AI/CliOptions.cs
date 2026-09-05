@@ -7,4 +7,7 @@ public sealed class CliOptions
     public string ScorecardOutput { get; set; } = ".scorecard/dotnet/evidence.json";
     public string Configuration { get; set; } = "Debug";
     public bool SkipDependencyProbe { get; set; }
+    public string? Coverage { get; set; }
+    public string? RunId { get; set; }
+    public string? AuditId { get; set; }
 }

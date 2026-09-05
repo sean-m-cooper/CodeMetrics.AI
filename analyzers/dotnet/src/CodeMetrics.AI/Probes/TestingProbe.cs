@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -16,17 +14,24 @@ public static class TestingProbe
     public static DimensionResult Analyze(
         IReadOnlyList<(string Name, Compilation Compilation)> allProjects,
         IReadOnlyList<string> analyzedProjectNames,
-        string solutionDir)
+        string solutionDir,
+        string? coveragePath = null)
     {
         var findings = new List<Finding>();
         var testProjects = FindTestProjects(allProjects, solutionDir);
         var testMetrics = CollectTestMetrics(testProjects, solutionDir, findings);
-        var (coverageFileFound, coverage) = FindCoverage(solutionDir);
+        var selectedCoveragePath = coveragePath ?? Path.Combine(solutionDir, ".scorecard", "coverage.cobertura.xml");
+        var coverageFileFound = File.Exists(selectedCoveragePath);
+        var productionFiles = allProjects.Where(project => analyzedProjectNames.Contains(project.Name))
+            .SelectMany(project => SourceFileFilter.AnalyzableTrees(project.Compilation, solutionDir))
+            .Select(tree => tree.FilePath).Where(path => !string.IsNullOrEmpty(path)).ToArray();
+        var report = coverageFileFound ? CoverageReport.Read(selectedCoveragePath, productionFiles, solutionDir) : null;
+        var coverage = report?.LineRate is double rate ? new CoverageRates(rate, report.BranchRate) : null;
         var testProjectNames = testProjects.Select(p => p.Name).ToList();
         var uncoveredProjects = FindUncoveredProductionProjects(analyzedProjectNames, testProjectNames);
         AddUncoveredProjectFindings(findings, uncoveredProjects, coverage != null);
         var score = CalculateScore(testProjects.Count, testMetrics, uncoveredProjects, coverage);
-        return CreateResult(
+        var result = CreateResult(
             score,
             testProjects.Count,
             analyzedProjectNames.Count,
@@ -35,6 +40,11 @@ public static class TestingProbe
             coverageFileFound,
             coverage,
             findings);
+        result.Extra["coverageMode"] = coveragePath == null ? "auto" : "explicit";
+        result.Extra["coverage"] = report ?? (object)new { status = "missing", path = selectedCoveragePath };
+        if (coveragePath != null && coverage == null)
+            return new DimensionResult { Status = "failed", Basis = "The requested coverage report is missing, invalid, or does not match production files.", Findings = findings, Extra = result.Extra };
+        return result;
     }
 
     private static List<(string Name, Compilation Compilation)> FindTestProjects(
@@ -73,15 +83,6 @@ public static class TestingProbe
         }
 
         return new TestMetrics(testMethodCount, skippedTests, placeholderTests, assertionCount);
-    }
-
-    private static (bool Found, CoverageRates? Rates) FindCoverage(string solutionDir)
-    {
-        var coveragePath = string.IsNullOrEmpty(solutionDir)
-            ? null
-            : Path.Combine(solutionDir, ".scorecard", "coverage.cobertura.xml");
-        var found = coveragePath != null && File.Exists(coveragePath);
-        return (found, found ? ReadCoverageRates(coveragePath!) : null);
     }
 
     private static void AddUncoveredProjectFindings(
@@ -145,7 +146,7 @@ public static class TestingProbe
         List<Finding> findings)
     {
         var coverageBasis = coverage != null
-            ? $"lineRate={coverage.LineRate * 100:F1}%, branchRate={coverage.BranchRate * 100:F1}%"
+            ? $"lineRate={coverage.LineRate * 100:F1}%, branchRate={(coverage.BranchRate.HasValue ? (coverage.BranchRate.Value * 100).ToString("F1") + "%" : "n/a")}"
             : "lineRate=n/a";
         var basis = $"testProjects={testProjectCount}, testMethods={metrics.TestMethods}, " +
                     $"skipped={metrics.SkippedTests}, placeholders={metrics.PlaceholderTests}, " +
@@ -181,7 +182,7 @@ public static class TestingProbe
 
     // ── Coverage report ───────────────────────────────────────────────────────
 
-    private sealed record CoverageRates(double LineRate, double BranchRate);
+    private sealed record CoverageRates(double LineRate, double? BranchRate);
 
     private sealed record TestMetrics(
         int TestMethods,
@@ -192,44 +193,6 @@ public static class TestingProbe
         public double AssertionDensity => TestMethods > 0
             ? (double)Assertions / TestMethods
             : 0.0;
-    }
-
-    /// <summary>
-    /// Reads the overall <c>line-rate</c> and <c>branch-rate</c> from a Cobertura report's
-    /// root element. Returns null when the report is unreadable, malformed, or carries no
-    /// usable rate, so the caller falls back to treating coverage as unknown rather than
-    /// inventing a number.
-    /// </summary>
-    private static CoverageRates? ReadCoverageRates(string coveragePath)
-    {
-        try
-        {
-            var root = XDocument.Load(coveragePath).Root;
-            if (root == null)
-                return null;
-
-            var lineRate = ParseRate(root.Attribute("line-rate")?.Value);
-            if (lineRate == null)
-                return null;
-
-            return new CoverageRates(
-                lineRate.Value,
-                ParseRate(root.Attribute("branch-rate")?.Value) ?? 0.0);
-        }
-        catch (Exception ex) when (ex is IOException
-                                      or UnauthorizedAccessException
-                                      or System.Xml.XmlException)
-        {
-            return null;
-        }
-    }
-
-    private static double? ParseRate(string? value)
-    {
-        return double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var rate)
-               && rate is >= 0.0 and <= 1.0
-            ? rate
-            : null;
     }
 
     /// <summary>

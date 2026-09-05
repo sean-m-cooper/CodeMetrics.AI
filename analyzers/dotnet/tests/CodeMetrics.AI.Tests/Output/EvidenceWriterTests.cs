@@ -45,7 +45,7 @@ public class EvidenceWriterTests
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
 
-            root.GetProperty("schemaVersion").GetInt32().Should().Be(2);
+            root.GetProperty("schemaVersion").GetInt32().Should().Be(3);
             root.GetProperty("subject").GetProperty("root").GetString().Should().Be("C:/test");
             root.GetProperty("subject").GetProperty("entryPoint").GetString().Should().Be("C:/test/my.sln");
             root.GetProperty("subject").GetProperty("name").GetString().Should().Be("my");
@@ -140,7 +140,7 @@ public class EvidenceWriterTests
     {
         var tool = new ToolInfo();
 
-        tool.Version.Should().Be("1.1.0");
+        tool.Version.Should().Be("2.0.0");
     }
 
     [Fact]

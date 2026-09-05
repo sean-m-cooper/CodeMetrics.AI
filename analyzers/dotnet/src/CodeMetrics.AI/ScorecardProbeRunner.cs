@@ -9,7 +9,8 @@ internal static class ScorecardProbeRunner
         string solutionPath,
         string solutionDir,
         bool skipDependencyProbe,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? coveragePath = null)
     {
         var dimensions = CreateCoreDimensions(context, solutionDir);
         var dependency = await AnalyzeDependenciesAsync(
@@ -18,7 +19,24 @@ internal static class ScorecardProbeRunner
             skipDependencyProbe,
             cancellationToken);
         dimensions["dependencyManagement"] = dependency;
-        AddDependentDimensions(dimensions, context, dependency, solutionDir);
+        AddDependentDimensions(dimensions, context, dependency, solutionDir, coveragePath);
+        Output.EvidenceEnricher.Enrich(dimensions, context, solutionDir);
+        if (context.Diagnostics.Count > 0)
+        {
+            foreach (var key in dimensions.Keys.Where(key => key != "dependencyManagement").ToList())
+            {
+                var previous = (DimensionResult)dimensions[key];
+                previous.Extra.Remove("scoring");
+                dimensions[key] = new DimensionResult
+                {
+                    Status = "failed",
+                    Basis = "Incomplete source analysis; findings are partial and no score is assigned.",
+                    Findings = previous.Findings,
+                    Extra = previous.Extra
+                };
+            }
+        }
+        Output.DimensionScopes.Apply(dimensions);
         return dimensions;
     }
 
@@ -57,14 +75,15 @@ internal static class ScorecardProbeRunner
         IDictionary<string, object> dimensions,
         SolutionAnalysisContext context,
         DimensionResult dependency,
-        string solutionDir)
+        string solutionDir,
+        string? coveragePath)
     {
         var vulnerabilityCount = dependency.Findings.Count(finding =>
             finding.Category.Contains("vulnerable", StringComparison.OrdinalIgnoreCase));
         dimensions["security"] = SecurityProbe.Analyze(
             context.AnalyzedProjectCompilations, vulnerabilityCount, solutionDir);
         dimensions["testing"] = TestingProbe.Analyze(
-            context.AllProjectCompilations, context.AnalyzedProjectNames, solutionDir);
+            context.AllProjectCompilations, context.AnalyzedProjectNames, solutionDir, coveragePath);
         dimensions["documentation"] = DocumentationProbe.Analyze(
             solutionDir, context.ProjectsWithPaths);
         dimensions["architecture"] = ArchitectureProbe.Analyze(
