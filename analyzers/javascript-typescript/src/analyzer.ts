@@ -48,6 +48,11 @@ export function analyze(options: { project?: string; tsconfig?: string }, versio
   }
   if (diagnostics.length) for (const key of ["codeQuality", "maintainability", "performanceAsync"] as const)
     dimensions[key] = { status: "failed", basis: "Incomplete source analysis; partial findings are unscored.", findings: dimensions[key].findings };
+  for (const [key, includes, excludes] of [
+    ["codeQuality", ["maximum-member-cyclomatic-complexity"], ["design-quality", "runtime-behavior"]],
+    ["maintainability", ["median-member-maintainability-index"], ["change-cost", "comprehensive-human-review"]],
+    ["performanceAsync", ["react-hook-placement", "react-effect-callbacks"], ["general-async", "concurrency", "runtime-performance"]]
+  ] as const) dimensions[key].scope = { id: `javascript-typescript/${key}/v1`, coverage: "partial", includes: [...includes], excludes: [...excludes] };
   const evidence: Evidence = {
     schemaVersion: 3, generatedAtUtc: new Date().toISOString(), tool: { name: "codemetrics-ai", version, ecosystem: "javascript-typescript" },
     subject: { root: discovery.repositoryRoot, entryPoint: discovery.entryPoint, name: discovery.name, variant: "source" },

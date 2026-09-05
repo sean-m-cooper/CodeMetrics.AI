@@ -9,6 +9,7 @@ export interface Finding {
   package?: string; observations: Record<string, unknown>;
 }
 export interface Dimension {
+  scope?: { id: string; coverage: "partial" | "unsupported"; includes: string[]; excludes: string[] };
   status: "scored" | "skipped" | "failed"; score?: number; basis: string; findings: Finding[];
   [key: string]: unknown;
 }
@@ -27,7 +28,8 @@ export interface Evidence {
 }
 export function skippedDimensions(): Record<DimensionKey, Dimension> {
   return Object.fromEntries(dimensionKeys.map(key => [key, {
-    status: "skipped", basis: "Not implemented by this analyzer version.", findings: []
+    status: "skipped", basis: "Not implemented by this analyzer version.", findings: [],
+    scope: { id: `javascript-typescript/${key}/unsupported`, coverage: "unsupported", includes: [], excludes: [key] }
   }])) as unknown as Record<DimensionKey, Dimension>;
 }
 export function scored(score: number, basis: string, findings: Finding[], observations: Record<string, unknown>): Dimension {

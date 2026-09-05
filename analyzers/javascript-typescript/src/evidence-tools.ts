@@ -40,6 +40,9 @@ export function compare(current: Evidence, baseline: Evidence, allowIncompatible
   if (current.analysis.status !== "complete" || baseline.analysis.status !== "complete") reasons.push("Analysis is incomplete");
   if (dimensionKeys.some(key => current.dimensions[key].status === "failed" || baseline.dimensions[key].status === "failed")) reasons.push("A dimension failed");
   if (dimensionKeys.some(key => current.dimensions[key].status !== baseline.dimensions[key].status)) reasons.push("Dimension availability differs");
+  const scopeIdentity = (scope: Evidence["dimensions"]["codeQuality"]["scope"]) => scope === undefined ? "unknown" :
+    JSON.stringify([scope.id, scope.coverage, [...scope.includes].sort(), [...scope.excludes].sort()]);
+  if (dimensionKeys.some(key => scopeIdentity(current.dimensions[key].scope) !== scopeIdentity(baseline.dimensions[key].scope))) reasons.push("Dimension scope differs");
   if (reasons.length && !allowIncompatible) throw new Error("Incompatible baseline: " + reasons.join("; "));
   const before = new Map(findings(baseline).map(finding => [finding.fingerprint, finding]));
   const after = new Map(findings(current).map(finding => [finding.fingerprint, finding]));

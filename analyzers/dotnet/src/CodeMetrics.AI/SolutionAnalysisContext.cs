@@ -22,9 +22,11 @@ internal static class SolutionCompilationLoader
     public static async Task<SolutionAnalysisContext> LoadAsync(
         Solution solution,
         string solutionDir,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        ProjectId? entryProjectId = null)
     {
-        var projects = solution.Projects.ToList();
+        // References remain in the workspace for semantic resolution; project entry points score only that project.
+        var projects = solution.Projects.Where(project => entryProjectId == null || project.Id == entryProjectId).ToList();
         var (skipped, analyzedProjectIds) = ClassifyProjects(projects);
         var compiledProjects = await CompileAsync(projects, cancellationToken);
         var loaded = CollectMetrics(compiledProjects, analyzedProjectIds, solutionDir);

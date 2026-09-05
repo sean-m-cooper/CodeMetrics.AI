@@ -36,6 +36,7 @@ internal static class ScorecardProbeRunner
                 };
             }
         }
+        Output.DimensionScopes.Apply(dimensions);
         return dimensions;
     }
 

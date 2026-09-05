@@ -8,7 +8,7 @@ System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureIn
 
 var solutionOption = new Option<string?>("--solution")
 {
-    Description = "Path to .sln or .slnx file"
+    Description = "Path to .sln, .slnx, or .csproj file"
 };
 
 var outputOption = new Option<string>("--output")
@@ -83,7 +83,7 @@ static async Task<int> AnalyzeSolutionAsync(CliOptions options, CancellationToke
     var solutionPath = ResolveSolutionPath(options.Solution);
     if (solutionPath == null)
     {
-        Console.Error.WriteLine("Select one existing .sln or .slnx file with --solution (discovery requires exactly one solution).");
+        Console.Error.WriteLine("Select one existing .sln, .slnx, or .csproj file with --solution (automatic discovery requires exactly one solution).");
         return 2;
     }
 
@@ -102,14 +102,16 @@ static async Task<int> AnalyzeSolutionAsync(CliOptions options, CancellationToke
         if (error.Diagnostic.Kind == Microsoft.CodeAnalysis.WorkspaceDiagnosticKind.Failure)
             workspaceFailures.Enqueue(new AnalysisDiagnostic("workspace", error.Diagnostic.Message));
     });
-    var solution = await workspace.OpenSolutionAsync(
-        solutionPath,
-        cancellationToken: cancellationToken);
+    var project = Path.GetExtension(solutionPath).Equals(".csproj", StringComparison.OrdinalIgnoreCase)
+        ? await workspace.OpenProjectAsync(solutionPath, cancellationToken: cancellationToken) : null;
+    var solution = project?.Solution ?? await workspace.OpenSolutionAsync(
+        solutionPath, cancellationToken: cancellationToken);
     var context = await SolutionCompilationLoader.LoadAsync(
-        solution, solutionDir, cancellationToken);
+        solution, solutionDir, cancellationToken, project?.Id);
     context.Diagnostics.AddRange(workspaceFailures);
     var comparer = OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
     var inputs = solution.Projects.Select(project => project.FilePath)
+        .Concat(solution.Projects.SelectMany(project => project.Documents).Select(document => document.FilePath))
         .Concat(context.AllProjectCompilations.SelectMany(project => project.Compilation.SyntaxTrees).Select(tree => tree.FilePath))
         .Append(solutionPath).Append(options.Coverage)
         .Where(path => !string.IsNullOrEmpty(path)).Select(path => Path.GetFullPath(path!)).ToHashSet(comparer);
@@ -146,7 +148,8 @@ static async Task<int> AnalyzeSolutionAsync(CliOptions options, CancellationToke
 static string? ResolveSolutionPath(string? explicitPath)
 {
     if (!string.IsNullOrEmpty(explicitPath))
-        return File.Exists(explicitPath) ? explicitPath : null;
+        return File.Exists(explicitPath) && new[] { ".sln", ".slnx", ".csproj" }
+            .Contains(Path.GetExtension(explicitPath), StringComparer.OrdinalIgnoreCase) ? explicitPath : null;
 
     var solutionFiles = Directory.GetFiles(".", "*.sln")
         .Concat(Directory.GetFiles(".", "*.slnx"))

@@ -43,6 +43,12 @@ public class CliIntegrationTests
             using var release = await Analyze("Release");
             debug.RootElement.GetProperty("population").GetProperty("members").GetInt32().Should().Be(2);
             release.RootElement.GetProperty("population").GetProperty("members").GetInt32().Should().Be(1);
+            var projectResult = await Run(root, tool, "--solution", "Sample.csproj", "--configuration", "Release", "--skip-dependency-probe", "--scorecard-output", "project.json");
+            projectResult.Code.Should().Be(0, projectResult.Output);
+            using var projectEvidence = JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(root, "project.json"), TestContext.Current.CancellationToken));
+            projectEvidence.RootElement.GetProperty("subject").GetProperty("entryPoint").GetString().Should().EndWith("Sample.csproj");
+            projectEvidence.RootElement.GetProperty("population").GetProperty("members").GetInt32().Should().Be(1);
+            projectEvidence.RootElement.GetProperty("dimensions").GetProperty("performanceAsync").GetProperty("scope").GetProperty("coverage").GetString().Should().Be("partial");
             await File.WriteAllTextAsync(Path.Combine(root, "Other.slnx"), "<Solution/>", TestContext.Current.CancellationToken);
             (await Run(root, tool)).Code.Should().Be(2);
             await File.AppendAllTextAsync(Path.Combine(root, "Sample.cs"), "\npublic class Broken { MissingType value; }", TestContext.Current.CancellationToken);
@@ -64,6 +70,17 @@ public class CliIntegrationTests
             nested.RootElement.GetProperty("dimensions").GetProperty("errorHandling").GetProperty("findings").EnumerateArray()
                 .First(finding => finding.GetProperty("category").GetString() == "emptyCatch")
                 .GetProperty("file").GetString().Should().Be("nested/Source.cs");
+            Directory.CreateDirectory(Path.Combine(root, "referenced"));
+            File.Copy(Path.Combine(root, "Sample.csproj"), Path.Combine(root, "referenced", "Referenced.csproj"));
+            var referencedSource = Path.Combine(root, "referenced", "Referenced.cs");
+            await File.WriteAllTextAsync(referencedSource, "public class Referenced { }", TestContext.Current.CancellationToken);
+            var nestedProject = Path.Combine(root, "nested", "Sample.csproj");
+            var projectXml = await File.ReadAllTextAsync(nestedProject, TestContext.Current.CancellationToken);
+            await File.WriteAllTextAsync(nestedProject, projectXml.Replace("</Project>", "<ItemGroup><ProjectReference Include='../referenced/Referenced.csproj'/></ItemGroup></Project>"), TestContext.Current.CancellationToken);
+            (await Run(root, "restore", nestedProject, "--ignore-failed-sources")).Code.Should().Be(0);
+            var overwriteReference = await Run(root, tool, "--solution", nestedProject, "--skip-dependency-probe", "--output", referencedSource);
+            overwriteReference.Code.Should().Be(2, overwriteReference.Output);
+            (await File.ReadAllTextAsync(referencedSource, TestContext.Current.CancellationToken)).Should().Be("public class Referenced { }");
         }
         finally { Directory.Delete(root, recursive: true); }
     }

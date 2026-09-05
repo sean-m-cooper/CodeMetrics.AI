@@ -302,3 +302,5 @@ Version 2.0 emits schema v3. See the [migration guide](../../shared/scorecard-sc
 ## Coverage inputs
 
 Use `--coverage path/to/coverage.cobertura.xml` for an explicit report. Otherwise the analyzer checks `.scorecard/coverage.cobertura.xml` beneath the solution directory. Evidence records the report path, content SHA-256, matching status, matched/unmatched files, and nullable branch rate. When file-level observations exist, only matching production files contribute line coverage. Root-only reports retain aggregate compatibility and are labeled `aggregateUnverified`; they cannot establish project coverage. An explicitly requested missing, invalid, or unmatched report fails the testing dimension. The analyzer reads coverage; it does not execute tests or generate coverage.
+
+`--solution` also accepts an explicit `.csproj`; this scores only that project, with references available for semantic resolution. Source filtering remains bounded by the entry point directory. See [consumer integration](../../docs/evidence-workflows.md#skill-and-other-evidence-consumers) for structured scope and validated v2/v3 reads.

@@ -66,3 +66,5 @@ npm run test:package
 ```
 
 Tests include parser/React/workspace fixtures, formula assertions, schema validation, comparison compatibility, gate behavior, and compiled CLI execution. The package smoke test packs and installs the package with production dependencies in an isolated directory and exercises analysis, comparison and SARIF. The shared corpus adds pinned accuracy and score-distribution checks.
+
+The packaged `codemetrics-evidence --inspect-output <path>` command reads v2/v3 and validates optional expected provenance; historical v2 cannot be compared, gated or exported as SARIF. Structured dimension scope identifies implemented coverage, including React-hook-only performance checks. See [consumer integration](../../docs/evidence-workflows.md#skill-and-other-evidence-consumers).

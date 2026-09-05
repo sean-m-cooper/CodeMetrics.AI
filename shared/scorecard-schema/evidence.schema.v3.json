@@ -303,6 +303,42 @@
           "items": {
             "$ref": "#/$defs/finding"
           }
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "coverage",
+            "includes",
+            "excludes"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "coverage": {
+              "enum": [
+                "partial",
+                "unsupported"
+              ]
+            },
+            "includes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "excludes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
         }
       },
       "additionalProperties": true,

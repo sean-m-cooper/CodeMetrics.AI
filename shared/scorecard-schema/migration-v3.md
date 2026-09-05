@@ -13,3 +13,7 @@ Suppression entries currently record declarations, their location, categories, a
 Failed and skipped dimensions must omit `score`. Incomplete .NET source analysis preserves partial findings but removes source-derived scores. Dependency command failures remain dimension failures. Consumers must never interpret an unavailable score as zero or ten.
 
 `calibration: baseline` identifies .NET as the reference implementation; it does not assert that every rule has been empirically validated. JS/TS remains `uncalibrated`. The checked-in fixture distributions are regression baselines, not evidence that ecosystem scores can be averaged or ranked against each other.
+
+New outputs also include structured dimension `scope`: stable `id`, `coverage` (`partial`/`unsupported`), `includes`, and `excludes`. This is optional in the v3 schema so existing v3 files remain readable. A missing scope is unknown. Comparison requires matching scopes; consumers must label scoped scores and keep broader qualitative commentary separate.
+
+The packaged evidence CLI supports v2 compatibility reads through `--inspect-output`. It preserves the historical document and reports unknown completeness/scope rather than synthesizing v3 metadata. Only v3 supports comparisons, quality gates and SARIF. Consumers can use `--expected-ecosystem`, `--expected-version`, `--expected-entry-point`, `--expected-root`, and `--expected-variant` to validate a requested run's provenance.

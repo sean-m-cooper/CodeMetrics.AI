@@ -1,11 +1,11 @@
 # CodeMetrics.AI architecture
 
-CodeMetrics.AI is a deterministic, read-only analyzer. It loads a .NET solution with Roslyn, collects production metrics, runs nine independent scorecard probes, and writes CSV metrics plus schema-v3 JSON evidence.
+CodeMetrics.AI is a deterministic, read-only analyzer. It loads a .NET solution or explicit project with Roslyn, collects production metrics, runs nine independent scorecard probes, and writes CSV metrics plus schema-v3 JSON evidence.
 
 ## Analysis flow
 
 1. `Program.cs` parses command-line options and passes cancellation to the analysis pipeline.
-2. `Program` loads the solution with the selected MSBuild configuration. `SolutionCompilationLoader` classifies projects, bounds concurrent compilations to four, and records missing compilations and compiler errors.
+2. `Program` loads the solution or project with the selected MSBuild configuration. Project mode scores only the selected project while keeping references in the workspace for semantic resolution. `SolutionCompilationLoader` classifies projects, bounds concurrent compilations to four, and records missing compilations and compiler errors.
 3. `MetricsCollector` calculates type/member metrics from production syntax and symbols.
 4. Each class in `Probes/` evaluates one scorecard dimension. Probes receive immutable metric or compilation inputs and return a `DimensionResult`.
 5. `CsvWriter` and `EvidenceWriter` persist the two public output formats.
