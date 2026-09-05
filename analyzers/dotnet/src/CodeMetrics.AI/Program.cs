@@ -44,6 +44,10 @@ var rootCommand = new RootCommand("CodeMetrics.AI — deterministic code metrics
 };
 var coverageOption = new Option<string?>("--coverage") { Description = "Path to a Cobertura coverage report" };
 rootCommand.Options.Add(coverageOption);
+var runIdOption = new Option<string?>("--run-id") { Description = "UUID identifying this analysis invocation (generated when omitted)" };
+var auditIdOption = new Option<string?>("--audit-id") { Description = "UUID shared by ecosystem runs in one audit (defaults to run ID)" };
+rootCommand.Options.Add(runIdOption);
+rootCommand.Options.Add(auditIdOption);
 
 rootCommand.SetAction(async (parseResult, cancellationToken) =>
 {
@@ -54,7 +58,9 @@ rootCommand.SetAction(async (parseResult, cancellationToken) =>
         ScorecardOutput = parseResult.GetValue(scorecardOutputOption)!,
         Configuration = parseResult.GetValue(configOption)!,
         SkipDependencyProbe = parseResult.GetValue(skipDepsOption),
-        Coverage = parseResult.GetValue(coverageOption)
+        Coverage = parseResult.GetValue(coverageOption),
+        RunId = parseResult.GetValue(runIdOption),
+        AuditId = parseResult.GetValue(auditIdOption)
     };
 
     try
@@ -77,6 +83,8 @@ return await rootCommand.Parse(args).InvokeAsync();
 
 static async Task<int> AnalyzeSolutionAsync(CliOptions options, CancellationToken cancellationToken)
 {
+    var runId = NormalizeId(options.RunId, "--run-id") ?? Guid.NewGuid().ToString("D");
+    var auditId = NormalizeId(options.AuditId, "--audit-id") ?? runId;
     if (!MSBuildLocator.IsRegistered)
         MSBuildLocator.RegisterDefaults();
 
@@ -136,13 +144,20 @@ static async Task<int> AnalyzeSolutionAsync(CliOptions options, CancellationToke
         cancellationToken,
         options.Coverage);
     var evidence = EvidenceFactory.Create(
-        context, solutionPath, solutionDir, options.Configuration, dimensions);
+        context, solutionPath, solutionDir, options.Configuration, dimensions, runId, auditId);
 
     await EvidenceWriter.WriteAsync(options.ScorecardOutput, evidence, cancellationToken);
     Console.WriteLine($"Evidence: {options.ScorecardOutput}");
     Console.WriteLine("Done.");
     return context.Diagnostics.Count > 0 || dimensions.Values.OfType<CodeMetrics.AI.Probes.DimensionResult>()
         .Any(dimension => dimension.Status == "failed") ? 2 : 0;
+}
+
+static string? NormalizeId(string? value, string option)
+{
+    if (value == null) return null;
+    if (!Guid.TryParseExact(value, "D", out var id)) throw new ArgumentException($"{option} must be a UUID.");
+    return id.ToString("D");
 }
 
 static string? ResolveSolutionPath(string? explicitPath)

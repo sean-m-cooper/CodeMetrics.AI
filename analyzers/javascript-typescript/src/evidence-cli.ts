@@ -7,7 +7,7 @@ try {
   const { values } = parseArgs({ options: { input: { type: "string" }, baseline: { type: "string" }, output: { type: "string" },
     sarif: { type: "string" }, "allow-incompatible": { type: "boolean" }, "fail-on-new": { type: "string" },
     "max-score-drop": { type: "string" }, "inspect-output": { type: "string" },
-    "expected-ecosystem": { type: "string" }, "expected-version": { type: "string" },
+    "expected-ecosystem": { type: "string" }, "expected-version": { type: "string" }, "expected-run-id": { type: "string" }, "expected-audit-id": { type: "string" },
     "expected-entry-point": { type: "string" }, "expected-variant": { type: "string" }, "expected-root": { type: "string" },
     help: { type: "boolean", short: "h" } } });
   if (values.help) console.log([
@@ -16,6 +16,7 @@ try {
     "--sarif <results.sarif> --fail-on-new <info|warning|error> --max-score-drop <number>",
     "--inspect-output <inspection.json> reads v2/v3 without upgrading historical evidence.",
     "--expected-ecosystem <id> --expected-version <version> --expected-entry-point <path> --expected-variant <variant> --expected-root <path>",
+    "--expected-run-id <uuid> --expected-audit-id <uuid> reject findings from another invocation, including files with missing IDs.",
     "--allow-incompatible permits exploratory comparison with null score deltas; gates remain disabled.",
     "Exit codes: 0 success, 1 quality gate, 2 invalid/incompatible/incomplete evidence."
   ].join("\n"));
@@ -23,7 +24,8 @@ try {
     if (!values.input) throw new Error("--input is required.");
     distinctOutputs([values.input, values.baseline], [values.output, values.sarif, values["inspect-output"]]);
     const inspection = inspectEvidence(values.input, { ecosystem: values["expected-ecosystem"], version: values["expected-version"],
-      entryPoint: values["expected-entry-point"], variant: values["expected-variant"], root: values["expected-root"] });
+      entryPoint: values["expected-entry-point"], variant: values["expected-variant"], root: values["expected-root"],
+      runId: values["expected-run-id"], auditId: values["expected-audit-id"] });
     if (values["inspect-output"]) write(values["inspect-output"], inspection);
     if (inspection.evidence.schemaVersion === 2) {
       if (values.baseline || values.output || values.sarif || values["fail-on-new"] !== undefined || values["max-score-drop"] !== undefined)

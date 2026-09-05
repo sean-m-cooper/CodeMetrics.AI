@@ -18,6 +18,8 @@ public sealed record AnalysisDiagnostic(string Kind, string Message, string? Pro
 
 public sealed class AnalysisInfo
 {
+    public string RunId { get; init; } = Guid.NewGuid().ToString("D");
+    public string? AuditId { get; init; }
     public string Status { get; init; } = "complete";
     public string Ruleset { get; init; } = "dotnet-2026-09-05";
     public string Calibration { get; init; } = "baseline";

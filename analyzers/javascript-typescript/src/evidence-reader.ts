@@ -27,8 +27,11 @@ export function readCompatibleEvidence(file: string): Evidence | LegacyEvidence 
   return value;
 }
 
-export function inspectEvidence(file: string, expected: { ecosystem?: string; version?: string; entryPoint?: string; variant?: string; root?: string } = {}) {
+export function inspectEvidence(file: string, expected: { ecosystem?: string; version?: string; entryPoint?: string; variant?: string; root?: string; runId?: string; auditId?: string } = {}) {
   const evidence = readCompatibleEvidence(file);
+  for (const key of ["runId", "auditId"] as const)
+    if (expected[key] !== undefined && (evidence as Evidence).analysis?.[key]?.toLowerCase() !== expected[key]?.toLowerCase())
+      throw new Error(`Stale or unrelated evidence: analysis.${key} does not match this invocation.`);
   for (const key of ["ecosystem", "version"] as const)
     if (expected[key] !== undefined && evidence.tool[key] !== expected[key]) throw new Error(`Provenance mismatch: tool.${key}`);
   if (expected.variant !== undefined && evidence.subject.variant !== expected.variant) throw new Error("Provenance mismatch: subject.variant");

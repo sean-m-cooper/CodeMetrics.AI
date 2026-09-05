@@ -45,3 +45,13 @@ The .NET `--solution` option also accepts an explicit `.csproj`. Project mode sc
 Dimension `scope` has a stable `id`, `coverage` (`partial` or `unsupported`), `includes` and `excludes`. Status separately says whether a probe ran successfully. All current static probes cover only part of the broader quality dimension. JS/TS performance scope explicitly covers React hooks/effects and excludes general async, concurrency and runtime performance. Missing scope in historical v3 means unknown, not comprehensive. Changed scope rejects baseline comparisons.
 
 For coordinated changes, test the skill against local `.nupkg` and `.tgz` artifacts from an exact CodeMetrics.AI revision before publication. Release the packages before merging a consumer update that installs those versions by default; do not substitute `latest` when a release is unavailable.
+
+## Invocation identity and stale findings
+
+Both analyzers generate `analysis.runId` and `analysis.auditId` UUIDs. An orchestrator can supply `--run-id <uuid>` and `--audit-id <uuid>` before launching analysis. Standalone invocations generate a new run ID and default the audit ID to it. A polyglot audit uses one audit ID and distinct run IDs for its ecosystem runs.
+
+Validate findings with `codemetrics-evidence --input evidence.json --expected-run-id <current-run-uuid> --expected-audit-id <current-audit-uuid> --inspect-output inspection.json`. The expected IDs must come from the invocation that requested analysis, never from the file being checked. Missing or mismatched IDs return exit 2 before writing an inspection, comparison or SARIF output. An old findings file copied into a new run directory therefore fails validation even when its schema, version, entry point and configuration match.
+
+Comparison JSON records `currentRun` and `baselineRun`; SARIF records IDs in each run's `properties`. Finding fingerprints and comparison compatibility deliberately exclude invocation IDs so findings remain trackable across distinct runs. Retain the enclosing IDs when extracting findings into another report. CSV remains a raw metrics export with its existing header, not independent proof of fresh findings.
+
+The v3 schema keeps these fields optional for historical compatibility. Older evidence without IDs is readable as historical data but cannot satisfy an expected current run ID. Identity binds an artifact to a requested run; source changes after that run still require fresh analysis.

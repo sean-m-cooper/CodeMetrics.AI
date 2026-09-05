@@ -269,6 +269,14 @@
             },
             "additionalProperties": false
           }
+        },
+        "runId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "auditId": {
+          "type": "string",
+          "format": "uuid"
         }
       }
     }

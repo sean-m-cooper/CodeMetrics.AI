@@ -41,13 +41,21 @@ public class CliIntegrationTests
             }
             using var debug = await Analyze("Debug");
             using var release = await Analyze("Release");
+            var debugId = debug.RootElement.GetProperty("analysis").GetProperty("runId").GetString();
+            Guid.TryParseExact(debugId, "D", out _).Should().BeTrue();
+            release.RootElement.GetProperty("analysis").GetProperty("runId").GetString().Should().NotBe(debugId);
+            var suppliedRunId = Guid.NewGuid().ToString("D");
+            var suppliedAuditId = Guid.NewGuid().ToString("D");
             debug.RootElement.GetProperty("population").GetProperty("members").GetInt32().Should().Be(2);
             release.RootElement.GetProperty("population").GetProperty("members").GetInt32().Should().Be(1);
-            var projectResult = await Run(root, tool, "--solution", "Sample.csproj", "--configuration", "Release", "--skip-dependency-probe", "--scorecard-output", "project.json");
+            var projectResult = await Run(root, tool, "--solution", "Sample.csproj", "--configuration", "Release", "--skip-dependency-probe", "--scorecard-output", "project.json", "--run-id", suppliedRunId, "--audit-id", suppliedAuditId);
             projectResult.Code.Should().Be(0, projectResult.Output);
             using var projectEvidence = JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(root, "project.json"), TestContext.Current.CancellationToken));
             projectEvidence.RootElement.GetProperty("subject").GetProperty("entryPoint").GetString().Should().EndWith("Sample.csproj");
             projectEvidence.RootElement.GetProperty("population").GetProperty("members").GetInt32().Should().Be(1);
+            projectEvidence.RootElement.GetProperty("analysis").GetProperty("runId").GetString().Should().Be(suppliedRunId);
+            projectEvidence.RootElement.GetProperty("analysis").GetProperty("auditId").GetString().Should().Be(suppliedAuditId);
+            (await Run(root, tool, "--run-id", "invalid")).Code.Should().Be(2);
             projectEvidence.RootElement.GetProperty("dimensions").GetProperty("performanceAsync").GetProperty("scope").GetProperty("coverage").GetString().Should().Be("partial");
             await File.WriteAllTextAsync(Path.Combine(root, "Other.slnx"), "<Solution/>", TestContext.Current.CancellationToken);
             (await Run(root, tool)).Code.Should().Be(2);

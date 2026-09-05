@@ -1,10 +1,11 @@
 import ts from "typescript";
 import { discover } from "./discovery.js";
 import { analyzeFile, type Metric } from "./metrics.js";
-import { hash, scored, skippedDimensions, type Evidence } from "./evidence.js";
+import { hash, invocationIds, scored, skippedDimensions, type Evidence } from "./evidence.js";
 import { metricsCsvHeader } from "./scorecard-contract.js";
 
-export function analyze(options: { project?: string; tsconfig?: string }, version: string): { evidence: Evidence; metrics: Metric[]; csv: string; inputs: string[] } {
+export function analyze(options: { project?: string; tsconfig?: string; runId?: string; auditId?: string }, version: string): { evidence: Evidence; metrics: Metric[]; csv: string; inputs: string[] } {
+  const identity = invocationIds(options.runId, options.auditId);
   const discovery = discover(options.project, options.tsconfig);
   const dimensions = skippedDimensions();
   const diagnostics: Evidence["analysis"]["diagnostics"] = [];
@@ -59,7 +60,7 @@ export function analyze(options: { project?: string; tsconfig?: string }, versio
     filters: { totalUnits: discovery.packages.reduce((sum,pkg) => sum + pkg.files.length, 0) + discovery.skipped.length,
       analyzedUnits: analyzedFiles, skipped: discovery.skipped },
     population: { types: new Set(metrics.map(metric => `${metric.project}|${metric.file}|${metric.type}`)).size, members: metrics.length },
-    dimensions, analysis: { status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-09-05",
+    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-09-05",
       calibration: "uncalibrated", configurationFingerprint: hash(JSON.stringify(canonicalConfiguration(discovery.packages.map(pkg => ({ name: pkg.name,
         options: pkg.options, selection: pkg.selection })), discovery.repositoryRoot))), diagnostics, suppressions: [] }
   };

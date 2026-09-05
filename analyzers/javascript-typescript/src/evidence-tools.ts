@@ -49,6 +49,8 @@ export function compare(current: Evidence, baseline: Evidence, allowIncompatible
   const changed = findings(current).filter(finding => before.has(finding.fingerprint) &&
     (before.get(finding.fingerprint)!.severity !== finding.severity || before.get(finding.fingerprint)!.confidence !== finding.confidence));
   return { compatible: reasons.length === 0, reasons,
+    currentRun: { runId: current.analysis.runId ?? null, auditId: current.analysis.auditId ?? null },
+    baselineRun: { runId: baseline.analysis.runId ?? null, auditId: baseline.analysis.auditId ?? null },
     new: findings(current).filter(finding => !before.has(finding.fingerprint)),
     resolved: findings(baseline).filter(finding => !after.has(finding.fingerprint)), changed,
     severityIncreases: changed.filter(finding => ranks[finding.severity] > ranks[before.get(finding.fingerprint)!.severity]),
@@ -69,7 +71,8 @@ export function sarif(evidence: Evidence) {
   const all = findings(evidence);
   const ids = [...new Set(all.map(finding => finding.ruleId))].sort();
   return { $schema: "https://json.schemastore.org/sarif-2.1.0.json", version: "2.1.0",
-    runs: [{ tool: { driver: { name: evidence.tool.name, version: evidence.tool.version,
+    runs: [{ properties: { runId: evidence.analysis.runId ?? null, auditId: evidence.analysis.auditId ?? null },
+      tool: { driver: { name: evidence.tool.name, version: evidence.tool.version,
       rules: ids.map(id => ({ id, shortDescription: { text: id.split("/").at(-1)! },
         help: { text: "Review observations and source context. Scores use aggregate dimension policies; findings are not independent deductions." } })) } },
       invocations: [{ workingDirectory: { uri: pathToFileURL(evidence.subject.root + path.sep).href },

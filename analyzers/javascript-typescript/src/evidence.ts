@@ -1,7 +1,12 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { dimensionKeys, type DimensionKey } from "./scorecard-contract.js";
 
 export const hash = (text: string) => createHash("sha256").update(text).digest("hex");
+export function invocationIds(runId = randomUUID() as string, auditId = runId) {
+  for (const [name, value] of Object.entries({ runId, auditId }))
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)) throw new Error(`${name} must be a UUID.`);
+  return { runId: runId.toLowerCase(), auditId: auditId.toLowerCase() };
+}
 export interface Finding {
   category: string; ruleId: string; fingerprint: string;
   severity: "info" | "warning" | "error"; confidence: "high" | "medium" | "low";
@@ -21,6 +26,7 @@ export interface Evidence {
   population: { types: number; members: number };
   dimensions: Record<DimensionKey, Dimension>;
   analysis: {
+    runId?: string; auditId?: string;
     status: "complete" | "incomplete"; ruleset: string; calibration: string;
     configurationFingerprint: string; diagnostics: { kind: string; message: string; project?: string }[];
     suppressions: { file: string; line: number; categories: string[]; reason?: string; status: string }[];
