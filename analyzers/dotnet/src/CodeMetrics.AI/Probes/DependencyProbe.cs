@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -71,6 +72,18 @@ public static class DependencyProbe
         if (anyCommandFailed)
             return CreateFailureResult(commandResults);
 
+        // Runtime commands always request JSON. Keep text support for callers replaying old reports.
+        try
+        {
+            foreach (var output in new[] { vulnerableOutput, outdatedOutput, deprecatedOutput }.Where(PackageReport.IsJson))
+                PackageReport.Parse(output);
+        }
+        catch (Exception exception) when (exception is JsonException or InvalidOperationException)
+        {
+            return CreateFailureResult([new DependencyCommandResult("parse package report", "", "", null,
+                nameof(JsonException), exception.Message)]);
+        }
+
         var findings = new List<Finding>();
         var (vulnerableDirect, vulnerableTransitive) = AnalyzeVulnerabilities(
             vulnerableOutput,
@@ -80,6 +93,7 @@ public static class DependencyProbe
             outdatedOutput,
             aspireProjects,
             frameworkCompatibility);
+        AddOutdatedFindings(outdatedOutput, aspireProjects, frameworkCompatibility, findings);
         var deprecated = CountDeprecatedPackages(deprecatedOutput, findings);
         var (unsupportedTFMs, unsupportedTFMList) = FindUnsupportedTargetFrameworks(solutionDir);
         var cpmEnabled = FindCpm(solutionDir);
@@ -132,6 +146,25 @@ public static class DependencyProbe
         string output,
         ICollection<Finding> findings)
     {
+        if (PackageReport.IsJson(output))
+        {
+            var packages = PackageReport.Parse(output);
+            foreach (var package in packages)
+            {
+                findings.Add(new Finding
+                {
+                    Category = package.Transitive ? "vulnerableTransitiveDependency" : "vulnerableDirectDependency",
+                    Severity = package.Transitive ? "warning" : "error",
+                    Confidence = "high",
+                    Project = package.Project,
+                    Package = package.Package,
+                    Message = $"{(package.Transitive ? "Transitive" : "Direct")} dependency '{package.Package}' {package.ResolvedVersion} ({package.TargetFramework}) has known vulnerabilities; see advisory details.",
+                    Observations = package.Observations()
+                });
+            }
+            return (packages.Count(package => !package.Transitive), packages.Count(package => package.Transitive));
+        }
+
         var direct = 0;
         var transitive = 0;
         var inTransitiveSection = false;
@@ -194,18 +227,66 @@ public static class DependencyProbe
         string output,
         ICollection<Finding> findings)
     {
-        var count = SplitLines(output).Count(line => line.TrimStart().StartsWith('>'));
-        if (count > 0)
+        if (PackageReport.IsJson(output))
+        {
+            var packages = PackageReport.Parse(output);
+            foreach (var package in packages)
+            {
+                findings.Add(new Finding
+                {
+                    Category = "deprecatedDependency",
+                    Severity = "warning",
+                    Confidence = "high",
+                    Project = package.Project,
+                    Package = package.Package,
+                    Message = $"Package '{package.Package}' {package.ResolvedVersion} ({package.TargetFramework}) is deprecated; review the reported reasons and alternative package when provided.",
+                    Observations = package.Observations()
+                });
+            }
+            return packages.Count;
+        }
+
+        var packagesFromText = SplitLines(output).Where(line => line.TrimStart().StartsWith('>')).Select(ExtractPackageName).ToList();
+        foreach (var package in packagesFromText)
         {
             findings.Add(new Finding
             {
                 Category = "deprecatedDependency",
                 Severity = "warning",
-                Message = $"{count} deprecated package(s) found."
+                Package = package,
+                Message = $"Package '{package}' is deprecated (legacy text report)."
             });
         }
 
-        return count;
+        return packagesFromText.Count;
+    }
+
+    private static void AddOutdatedFindings(string output, IReadOnlySet<string> aspireProjects,
+        IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? compatibility, ICollection<Finding> findings)
+    {
+        if (!PackageReport.IsJson(output)) return;
+        foreach (var package in PackageReport.Parse(output))
+        {
+            var aspire = IsAspireProjectSection(package.Project, aspireProjects);
+            var assessed = compatibility != null && compatibility.TryGetValue(package.Upgrade, out _);
+            var incompatible = assessed && !compatibility![package.Upgrade];
+            var disposition = aspire ? "excludedAspire" : incompatible ? "excludedFrameworkIncompatible" : "included";
+            var observations = package.Observations();
+            observations["scoreDisposition"] = disposition;
+            observations["frameworkCompatibility"] = aspire || !assessed ? "unknown" : incompatible ? "incompatible" : "compatible";
+            findings.Add(new Finding
+            {
+                Category = "outdatedDependency",
+                Severity = disposition == "included" ? "warning" : "info",
+                Confidence = "high",
+                Project = package.Project,
+                Package = package.Package,
+                Message = $"Package '{package.Package}' {package.ResolvedVersion} ({package.TargetFramework}) has latest version {package.LatestVersion}. " +
+                    (aspire ? "Excluded from outdated scoring by Aspire policy." : incompatible ? "Latest version is incompatible with this target framework; excluded from scoring." :
+                        assessed ? "Latest version has compatible framework assets; review breaking changes before upgrading." : "Framework compatibility is unknown; review before upgrading."),
+                Observations = observations
+            });
+        }
     }
 
     private static void AddStaticFindings(
@@ -271,6 +352,7 @@ public static class DependencyProbe
             {
                 ["dependencyMetrics"] = new
                 {
+                    countUnit = "package occurrences per project and target framework; not unique package IDs",
                     vulnerableDirect = metrics.VulnerableDirect,
                     vulnerableTransitive = metrics.VulnerableTransitive,
                     outdated,
@@ -344,7 +426,7 @@ public static class DependencyProbe
     {
         try
         {
-            var psi = new ProcessStartInfo("dotnet", $"list \"{solutionPath}\" package {args}")
+            var psi = new ProcessStartInfo("dotnet", $"list \"{solutionPath}\" package {args} --format json --output-version 1")
             {
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -365,8 +447,11 @@ public static class DependencyProbe
             var exited = process.WaitForExitAsync(cancellationToken);
             await Task.WhenAll(stdout, stderr, exited);
 
+            var output = await stdout;
+            if (process.ExitCode == 0)
+                PackageReport.Parse(output); // Never turn missing or malformed output into a clean score.
             return new DependencyCommandResult(
-                args, await stdout, await stderr, process.ExitCode);
+                args, output, await stderr, process.ExitCode);
         }
         catch (OperationCanceledException)
         {

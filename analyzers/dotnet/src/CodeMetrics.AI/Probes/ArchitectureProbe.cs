@@ -138,37 +138,37 @@ public static class ArchitectureProbe
         var errorFindings = findings.Where(f => f.Severity == "error").ToList();
         var warningFindings = findings.Where(f => f.Severity == "warning").ToList();
         var hasErrors = errorFindings.Count > 0;
-        var hasHotspots = hotspots.Count > 0;
-        var warningCount = warningFindings.Count;
+        var warningCount = warningFindings.Count - hotspots.Count;
 
-        // Ladder rungs. The warning tail spans 4/6/8 for the same reason as
-        // PerformanceAsyncProbe: rung 4 has no structural condition of its own.
-        //   0  broken   — a circular project reference
-        //   2  errors   — layering errors or metric hotspots
-        //   4  noisy    — more than two advisory warnings
-        //   6  several   — two advisory warnings
-        //   8  minor    — a single advisory warning, no errors or hotspots
-        //  10  clean    — no findings
-        // Cycles get rung 0 of their own rather than sharing 2 with everything else. A
-        // cyclic project graph is not a poor architecture but an absent one: the
-        // dependency direction the layering rules are checked against does not exist, so
-        // the remaining findings are measured against nothing. Without this rung the
-        // worst achievable score was 2, leaving a catastrophically broken architecture
-        // indistinguishable from a merely untidy one — the mirror of the missing-8 bug.
+        // Preserve graph/layering caps; metric warnings have their own population policy.
         var hasCycles = cycles.Count > 0;
-        double score;
+        double layeringCap;
         if (hasCycles)
-            score = 0;
-        else if (hasErrors || hasHotspots)
-            score = 2;
+            layeringCap = 0;
+        else if (hasErrors)
+            layeringCap = 2;
         else if (warningCount > 2)
-            score = 4;
+            layeringCap = 4;
         else if (warningCount > 1)
-            score = 6;
+            layeringCap = 6;
         else if (warningCount >= 1)
-            score = 8;
+            layeringCap = 8;
         else
-            score = 10;
+            layeringCap = 10;
+
+        var eligibleTypes = typeMetrics.Where(metric => !metric.IsDataCarrier &&
+            !dependencyInjectionExtensionTypes.Contains(GetTypeKey(metric.Project, metric.Namespace, metric.Type))).ToList();
+        var components = new[]
+        {
+            ScoreMetricPopulation("coupling", eligibleTypes.Where(metric => IsCouplingEligible(
+                metric, dependencyInjectionExtensionTypes, frameworkCouplingArchetypeTypes, applicationProjects)),
+                metric => (double)ScoredCoupling(metric) / CouplingThreshold(metric)),
+            ScoreMetricPopulation("complexity", eligibleTypes,
+                metric => Math.Min(metric.CyclomaticComplexity / 80d, metric.DecompositionRatio / HighComplexityDensityThreshold)),
+            ScoreMetricPopulation("size", eligibleTypes, metric => metric.LinesOfSource / 500d)
+        };
+        var metricScore = components.Min(component => component.Score);
+        var score = Math.Round(Math.Min(metricScore, layeringCap), 1, MidpointRounding.AwayFromZero);
 
         var hotspotBasis = hotspots.Count > displayedHotspots.Count
             ? $"hotspots: {hotspots.Count} (showing {displayedHotspots.Count})"
@@ -178,7 +178,10 @@ public static class ArchitectureProbe
                     $"Excluded passive data carriers: {excludedDataCarrierCount}, " +
                     $"DI extension types: {excludedDependencyInjectionExtensionCount}, " +
                     $"framework coupling archetypes: {excludedFrameworkCouplingArchetypeCount}, " +
-                    $"application composition roots: {excludedCompositionRootCouplingCount}.";
+                    $"application composition roots: {excludedCompositionRootCouplingCount}. " +
+                    string.Join("; ", components.Select(component =>
+                        FormattableString.Invariant($"{component.Metric}: {component.HotspotCount}/{component.EligibleTypeCount} eligible types, score {component.Score:F2}"))) +
+                    FormattableString.Invariant($". Final = min(metric score {metricScore:F2}, graph/layering cap {layeringCap:F1}), rounded to 1 decimal.");
 
         // Extra data
         var cycleList = cycles.Select(c => string.Join(" → ", c) + " → " + c[0]).ToList();
@@ -258,6 +261,16 @@ public static class ArchitectureProbe
             Findings = findings,
             Extra =
             {
+                ["architectureMetrics"] = new
+                {
+                    policy = "population-severity-v1",
+                    formula = "component = 10 - min(6, 12 * hotspotRate) - min(4, 2 * max(0, worstThresholdRatio - 1)); final = round(min(components, graphLayeringCap), 1, awayFromZero)",
+                    components,
+                    metricScore,
+                    graphLayeringCap = layeringCap,
+                    graphLayeringReason = hasCycles ? "projectCycle" : hasErrors ? "layeringError" : warningCount > 0 ? "layeringWarnings" : "none",
+                    finalScore = score
+                },
                 ["cycles"] = cycleList,
                 ["hotspots"] = hotspotSummary,
                 ["hotspotCount"] = hotspots.Count,
@@ -651,12 +664,38 @@ public static class ArchitectureProbe
         IReadOnlySet<string> frameworkCouplingArchetypeTypes,
         IReadOnlySet<string> applicationProjects)
     {
+        return IsCouplingEligible(metric, dependencyInjectionExtensionTypes, frameworkCouplingArchetypeTypes, applicationProjects) &&
+               ScoredCoupling(metric) >= CouplingThreshold(metric);
+    }
+
+    private static bool IsCouplingEligible(
+        TypeMetrics metric,
+        IReadOnlySet<string> dependencyInjectionExtensionTypes,
+        IReadOnlySet<string> frameworkCouplingArchetypeTypes,
+        IReadOnlySet<string> applicationProjects)
+    {
         var typeKey = GetTypeKey(metric.Project, metric.Namespace, metric.Type);
         return !metric.IsDataCarrier &&
                !dependencyInjectionExtensionTypes.Contains(typeKey) &&
                !frameworkCouplingArchetypeTypes.Contains(typeKey) &&
-               !IsApplicationCompositionRoot(metric, applicationProjects) &&
-               ScoredCoupling(metric) >= CouplingThreshold(metric);
+               !IsApplicationCompositionRoot(metric, applicationProjects);
+    }
+
+    private sealed record MetricPopulationScore(
+        string Metric, int EligibleTypeCount, int HotspotCount, double HotspotRate,
+        double WorstThresholdRatio, double PopulationPenalty, double SeverityPenalty, double Score);
+
+    private static MetricPopulationScore ScoreMetricPopulation(
+        string metric, IEnumerable<TypeMetrics> population, Func<TypeMetrics, double> thresholdRatio)
+    {
+        var ratios = population.Select(thresholdRatio).ToArray();
+        var count = ratios.Count(ratio => ratio >= 1);
+        var rate = ratios.Length == 0 ? 0 : (double)count / ratios.Length;
+        var worst = ratios.DefaultIfEmpty(0).Max();
+        var populationPenalty = Math.Min(6, 12 * rate);
+        var severityPenalty = Math.Min(4, 2 * Math.Max(0, worst - 1));
+        return new MetricPopulationScore(metric, ratios.Length, count, rate, worst,
+            populationPenalty, severityPenalty, 10 - populationPenalty - severityPenalty);
     }
 
     private static int CouplingThreshold(TypeMetrics metric)

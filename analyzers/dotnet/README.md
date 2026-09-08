@@ -199,9 +199,28 @@ The Performance & Async dimension also reports `sharedStateMutationInFanOut` whe
 
 ### Evidence population and samples
 
+Starting with 2.1.0 (`dotnet-2026-09-08`), Architecture metric hotspots use a population/severity policy. Coupling, complexity, and size each have a component score:
+
+```text
+population penalty = min(6, 12 × hotspot count / eligible type count)
+severity penalty   = min(4, 2 × max(0, worst threshold ratio − 1))
+component score    = 10 − population penalty − severity penalty
+architecture score = min(component scores, graph/layering cap), rounded to 1 decimal
+```
+
+The population penalty reaches six points when at least half the eligible types are hotspots. The severity penalty reaches four points when the worst type reaches three times its threshold. Using the worst component avoids adding three penalties for one type that is large, complex, and coupled. One mildly coupled type among 100 eligible types (11 dependencies, threshold 10) scores 9.7; 50 types at the threshold score 4.0. These are explicit heuristic policy choices, covered by regression tests, not empirically calibrated universal quality thresholds.
+
+Each component counts its entire eligible population, including types below the hotspot threshold. Passive data carriers and DI extension types are excluded from all three components; framework archetypes and application composition roots are excluded from coupling only. Coupling uses each type's structural threshold (10, or 8 for controllers), with the existing raw fallback when structural metrics are unavailable. Complexity uses the smaller of `CC / 80` and `density / 8`, so both thresholds must be reached. Size uses source lines / 500. Empty eligible populations contribute no metric penalty and are explicitly recorded with count zero.
+
+Project cycles still cap the score at 0; layering errors cap it at 2; one, two, or more advisory layering warnings cap it at 8, 6, or 4. Metric warnings do not also count toward these caps. `architectureMetrics` records the formula, denominators, rates, worst ratios, penalties, and cap. High confidence in a metric means confidence in the measurement; a hotspot remains a lead for design review.
+
 Architecture `findings` and `hotspotCount` describe the complete hotspot population. The `hotspots` property remains a top-ten presentation sample; `hotspotsTruncated` states whether additional findings exist. When truncated, `basis` reports both the population and displayed count.
 
 If any `dotnet list package` invocation fails, Dependency Management returns `status: "failed"` without a score. Its basis and `dependencyCommands` diagnostics identify the failing arguments, exit code or exception, and a bounded stderr summary.
+
+The CLI requests NuGet JSON output version 1. Missing, malformed, or unsupported reports also fail the dependency probe. Each vulnerable, deprecated, or outdated package occurrence has a finding identifying its project and target framework. `observations` preserves requested/resolved/latest versions when provided, dependency kind, deprecation reasons, suggested alternative package/version range, and vulnerability severities/advisory URLs. Missing metadata remains null. Counts mean package occurrences per project and target framework, not distinct package IDs or advisory counts. Dependency score thresholds are unchanged.
+
+Outdated findings distinguish scored candidates, framework-incompatible exclusions, and Aspire exclusions. Framework compatibility can be `compatible`, `incompatible`, or `unknown`; compatible assets do not guarantee an upgrade has no breaking changes. Excluded candidates are informational and do not restore an outdated penalty.
 
 Outdated-package scoring inspects the reported latest package version's `ref`, `lib`,
 runtime-library, dependency-group, build, and tool target frameworks. An upgrade is excluded

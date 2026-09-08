@@ -12,6 +12,9 @@ public static class PackageFrameworkCompatibility
 {
     public static IReadOnlyList<OutdatedPackageUpgrade> ParseOutdatedOutput(string output)
     {
+        if (PackageReport.IsJson(output))
+            return PackageReport.Parse(output).Select(package => package.Upgrade).ToArray();
+
         var upgrades = new List<OutdatedPackageUpgrade>();
         string? currentProject = null;
         string? currentFramework = null;
