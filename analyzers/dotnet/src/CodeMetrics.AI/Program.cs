@@ -65,6 +65,9 @@ rootCommand.SetAction(async (parseResult, cancellationToken) =>
 
     try
     {
+        // Register before JIT-loading the analysis code that references MSBuild logging types.
+        if (!MSBuildLocator.IsRegistered)
+            MSBuildLocator.RegisterDefaults();
         return await AnalyzeSolutionAsync(options, cancellationToken);
     }
     catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -85,8 +88,6 @@ static async Task<int> AnalyzeSolutionAsync(CliOptions options, CancellationToke
 {
     var runId = NormalizeId(options.RunId, "--run-id") ?? Guid.NewGuid().ToString("D");
     var auditId = NormalizeId(options.AuditId, "--audit-id") ?? runId;
-    if (!MSBuildLocator.IsRegistered)
-        MSBuildLocator.RegisterDefaults();
 
     var solutionPath = ResolveSolutionPath(options.Solution);
     if (solutionPath == null)
@@ -103,20 +104,20 @@ static async Task<int> AnalyzeSolutionAsync(CliOptions options, CancellationToke
     {
         ["Configuration"] = options.Configuration
     });
-    var workspaceFailures = new System.Collections.Concurrent.ConcurrentQueue<AnalysisDiagnostic>();
+    using var workspaceDiagnostics = new WorkspaceDiagnostics();
     workspace.RegisterWorkspaceFailedHandler(error =>
     {
-        Console.Error.WriteLine($"Workspace warning: {error.Diagnostic.Message}");
-        if (error.Diagnostic.Kind == Microsoft.CodeAnalysis.WorkspaceDiagnosticKind.Failure)
-            workspaceFailures.Enqueue(new AnalysisDiagnostic("workspace", error.Diagnostic.Message));
+        Console.Error.WriteLine($"Workspace diagnostic: {error.Diagnostic.Message}");
+        workspaceDiagnostics.Record(error.Diagnostic);
     });
+    var logger = workspaceDiagnostics.CreateLogger();
     var project = Path.GetExtension(solutionPath).Equals(".csproj", StringComparison.OrdinalIgnoreCase)
-        ? await workspace.OpenProjectAsync(solutionPath, cancellationToken: cancellationToken) : null;
+        ? await workspace.OpenProjectAsync(solutionPath, logger, cancellationToken: cancellationToken) : null;
     var solution = project?.Solution ?? await workspace.OpenSolutionAsync(
-        solutionPath, cancellationToken: cancellationToken);
+        solutionPath, logger, cancellationToken: cancellationToken);
     var context = await SolutionCompilationLoader.LoadAsync(
         solution, solutionDir, cancellationToken, project?.Id);
-    context.Diagnostics.AddRange(workspaceFailures);
+    context.Diagnostics.AddRange(workspaceDiagnostics.Read(cancellationToken));
     var comparer = OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
     var inputs = solution.Projects.Select(project => project.FilePath)
         .Concat(solution.Projects.SelectMany(project => project.Documents).Select(document => document.FilePath))
@@ -149,7 +150,7 @@ static async Task<int> AnalyzeSolutionAsync(CliOptions options, CancellationToke
     await EvidenceWriter.WriteAsync(options.ScorecardOutput, evidence, cancellationToken);
     Console.WriteLine($"Evidence: {options.ScorecardOutput}");
     Console.WriteLine("Done.");
-    return context.Diagnostics.Count > 0 || dimensions.Values.OfType<CodeMetrics.AI.Probes.DimensionResult>()
+    return context.HasErrors || dimensions.Values.OfType<CodeMetrics.AI.Probes.DimensionResult>()
         .Any(dimension => dimension.Status == "failed") ? 2 : 0;
 }
 

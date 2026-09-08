@@ -42,3 +42,5 @@ dotnet analyzers/dotnet/src/CodeMetrics.AI/bin/Debug/net10.0/CodeMetrics.AI.dll 
 The final command refreshes `.scorecard/dotnet/metrics.csv` and `.scorecard/dotnet/evidence.json` beneath `analyzers/dotnet`.
 
 EvidenceEnricher assigns rule identities, relative member locations, fingerprints, confidence, and aggregate scoring explanations. Incomplete source analysis retains findings but removes source-derived scores and returns exit code 2. CoverageReport attributes Cobertura line observations to matching production files and preserves unknown branch rates.
+
+`WorkspaceDiagnostics` records the exact MSBuild design-time load in temporary binary logs because Roslyn 5.9 flattens MSBuild warning/error severity in workspace callbacks. Only callbacks matched to recorded warning events (and no matching error) become nonblocking `workspaceWarning` diagnostics. Explicit errors and unknown failures remain blocking. Logs are replayed with cancellation and removed after analysis; the evidence schema and CSV columns are unchanged.

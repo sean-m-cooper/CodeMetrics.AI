@@ -140,7 +140,7 @@ public class EvidenceWriterTests
     {
         var tool = new ToolInfo();
 
-        tool.Version.Should().Be("2.0.0");
+        tool.Version.Should().Be("2.0.1");
     }
 
     [Fact]

@@ -6,6 +6,57 @@ namespace CodeMetrics.AI.Tests;
 
 public class CliIntegrationTests
 {
+    [Theory]
+    [InlineData("Warning", false, false, 0)]
+    [InlineData("Error", false, false, 2)]
+    [InlineData("Warning", true, false, 2)]
+    [InlineData("Warning", false, true, 2)]
+    public async Task Cli_PreservesBuildWarnings_ButRejectsErrors(string task, bool promoteWarning, bool compilerError, int expectedExit)
+    {
+        var root = Directory.CreateTempSubdirectory("codemetrics-warning-").FullName;
+        try
+        {
+            var repository = new DirectoryInfo(AppContext.BaseDirectory);
+            while (repository != null && !Directory.Exists(Path.Combine(repository.FullName, "shared", "scorecard-schema"))) repository = repository.Parent;
+            repository.Should().NotBeNull();
+            var configuration = new DirectoryInfo(AppContext.BaseDirectory).Parent!.Name;
+            var tool = Path.Combine(repository!.FullName, "analyzers", "dotnet", "src", "CodeMetrics.AI", "bin", configuration, "net10.0", "CodeMetrics.AI.dll");
+            // A deterministic NuGet-shaped diagnostic from the real design-time build;
+            // no vulnerable package download or live advisory feed is needed.
+            await File.WriteAllTextAsync(Path.Combine(root, "Sample.csproj"), $$"""
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <PropertyGroup>
+                    <TargetFramework>net10.0</TargetFramework>
+                    <MSBuildWarningsAsErrors>{{(promoteWarning ? "NU1903" : "")}}</MSBuildWarningsAsErrors>
+                  </PropertyGroup>
+                  <Target Name="AuditDiagnostic" BeforeTargets="CoreCompile">
+                    <{{task}} Code="NU1903" Text="Package 'Example.Package' 1.0.0 has a known high severity vulnerability, https://example.invalid/advisory" />
+                  </Target>
+                </Project>
+                """, TestContext.Current.CancellationToken);
+            await File.WriteAllTextAsync(Path.Combine(root, "Sample.cs"),
+                compilerError ? "public class Sample { MissingType value; }" : "public class Sample { public int Run() => 1; }", TestContext.Current.CancellationToken);
+            await File.WriteAllTextAsync(Path.Combine(root, "Sample.slnx"), "<Solution><Project Path='Sample.csproj'/></Solution>", TestContext.Current.CancellationToken);
+            (await Run(root, "restore", "Sample.csproj", "--ignore-failed-sources")).Code.Should().Be(0);
+            foreach (var entry in new[] { "Sample.csproj", "Sample.slnx" })
+            {
+                var result = await Run(root, tool, "--solution", entry, "--configuration", "Release", "--skip-dependency-probe", "--scorecard-output", "evidence.json");
+                result.Code.Should().Be(expectedExit, result.Output);
+                using var evidence = JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(root, "evidence.json"), TestContext.Current.CancellationToken));
+                var analysis = evidence.RootElement.GetProperty("analysis");
+                analysis.GetProperty("status").GetString().Should().Be(expectedExit == 0 ? "complete" : "incomplete");
+                var diagnostics = analysis.GetProperty("diagnostics").EnumerateArray().ToList();
+                diagnostics.Should().Contain(d => d.GetProperty("message").GetString()!.Contains("Example.Package"));
+                if (task == "Warning" && !promoteWarning)
+                    diagnostics.Should().Contain(d => d.GetProperty("kind").GetString() == "workspaceWarning");
+                else
+                    diagnostics.Should().Contain(d => d.GetProperty("kind").GetString() == "workspace");
+                evidence.RootElement.GetProperty("dimensions").GetProperty("codeQuality").TryGetProperty("score", out _).Should().Be(expectedExit == 0);
+            }
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
     [Fact]
     public async Task Cli_ValidatesInput_HonorsConfiguration_AndReportsIncompleteCompilations()
     {
