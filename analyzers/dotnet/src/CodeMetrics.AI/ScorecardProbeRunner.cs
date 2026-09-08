@@ -21,7 +21,7 @@ internal static class ScorecardProbeRunner
         dimensions["dependencyManagement"] = dependency;
         AddDependentDimensions(dimensions, context, dependency, solutionDir, coveragePath);
         Output.EvidenceEnricher.Enrich(dimensions, context, solutionDir);
-        if (context.Diagnostics.Count > 0)
+        if (context.HasErrors)
         {
             foreach (var key in dimensions.Keys.Where(key => key != "dependencyManagement").ToList())
             {

@@ -15,6 +15,7 @@ internal sealed record SolutionAnalysisContext(
     IReadOnlyList<MemberMetrics> MemberMetrics)
 {
     public List<AnalysisDiagnostic> Diagnostics { get; } = [];
+    public bool HasErrors => Diagnostics.Any(diagnostic => diagnostic.Kind != "workspaceWarning");
 }
 
 internal static class SolutionCompilationLoader

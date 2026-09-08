@@ -22,7 +22,7 @@ internal static class EvidenceFactory
             {
                 RunId = runId,
                 AuditId = auditId ?? runId,
-                Status = context.Diagnostics.Count == 0 ? "complete" : "incomplete",
+                Status = context.HasErrors ? "incomplete" : "complete",
                 Diagnostics = context.Diagnostics,
                 ConfigurationFingerprint = EvidenceEnricher.Hash(configuration + "|" +
                     ((Probes.DimensionResult)dimensions["dependencyManagement"]).Status + "|" +
