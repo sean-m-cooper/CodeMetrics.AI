@@ -7,7 +7,7 @@ public sealed class Finding
     public string? File { get; set; }
     public int? Line { get; set; }
     public string? Member { get; set; }
-    public string? Project { get; init; }
+    public string? Project { get; set; }
     public string? Type { get; init; }
     public string? Package { get; init; }
     public required string Message { get; init; }

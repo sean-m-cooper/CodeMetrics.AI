@@ -53,6 +53,13 @@ internal static class PackageSourceParser
         var sourceLines = SplitLines(commandOutput)
             .Select(line => line.Trim())
             .ToList();
+        if (PackageReport.IsJson(commandOutput))
+        {
+            using var document = PackageReport.ParseDocument(commandOutput);
+            sourceLines = document.RootElement.TryGetProperty("sources", out var sources)
+                ? sources.EnumerateArray().Select(source => source.GetString() ?? "").ToList()
+                : [];
+        }
         var httpSources = sourceLines
             .Select(line => Uri.TryCreate(line, UriKind.Absolute, out var uri) ? uri : null)
             .Where(uri => uri?.Scheme is "http" or "https")

@@ -886,9 +886,9 @@ public class ArchitectureProbeTests
     }
 
     [Fact]
-    public void Scoring_WithHotspotsButNoCycles_ReturnsScore2()
+    public void Scoring_WithHotspotsButNoCycles_UsesPopulationAndSeverity()
     {
-        // Rung 2 stays reachable on its own terms now that cycles have moved to 0.
+        // All eligible types are hotspots; complexity exceeds both thresholds by at least 25%.
         var hotspot = new TypeMetrics
         {
             Project = "TestProject",
@@ -905,7 +905,7 @@ public class ArchitectureProbeTests
         var result = Analyze("public class GodClass { }", [hotspot]);
 
         result.Findings.Should().NotContain(f => f.Category == "projectCycle");
-        result.Score.Should().Be(2);
+        result.Score.Should().Be(3.5);
     }
 
     [Fact]

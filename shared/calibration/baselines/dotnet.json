@@ -3,10 +3,10 @@
   "corpusSha256": "2e439e89ff5833b0567c2f74faabe6b4cafb5bcaf3482778ae004fa34197d1b0",
   "tool": {
     "name": "CodeMetrics.AI",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "ecosystem": "dotnet"
   },
-  "ruleset": "dotnet-2026-09-05",
+  "ruleset": "dotnet-2026-09-08",
   "scope": "Only listed rules have accuracy labels. Fixture distributions do not establish cross-ecosystem comparability.",
   "accuracy": {
     "errorHandling/emptyCatch": {

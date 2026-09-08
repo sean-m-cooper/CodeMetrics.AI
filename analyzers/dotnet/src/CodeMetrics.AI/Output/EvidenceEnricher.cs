@@ -32,6 +32,8 @@ internal static class EvidenceEnricher
             foreach (var finding in result.Findings.OrderBy(finding => finding.File, StringComparer.Ordinal).ThenBy(finding => finding.Line))
             {
                 finding.RuleId = $"dotnet/{dimension}/{finding.Category}";
+                if (dimension == "dependencyManagement" && finding.Package != null && finding.Project is { } packageProject && Path.IsPathFullyQualified(packageProject))
+                    finding.Project = Path.GetRelativePath(repositoryRoot, packageProject).Replace('\\', '/');
                 var anchor = "";
                 if (finding.File is { Length: > 0 } file)
                 {
@@ -66,6 +68,8 @@ internal static class EvidenceEnricher
                 if (finding.Category is "uncoveredProject" or "missingAuthorization" or "missingLoggerForMultipleCatches")
                     finding.Confidence = "low";
                 var identity = string.Join("|", finding.RuleId, finding.File, finding.Project, finding.Type, finding.Member, finding.Package, anchor);
+                if (dimension == "dependencyManagement" && finding.Package != null && finding.Observations.TryGetValue("targetFramework", out var framework))
+                    identity += "|" + framework;
                 occurrences.TryGetValue(identity, out var occurrence);
                 occurrences[identity] = occurrence + 1;
                 finding.Fingerprint = Hash(identity + "|" + occurrence);
