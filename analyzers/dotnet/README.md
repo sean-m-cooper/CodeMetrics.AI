@@ -37,7 +37,7 @@ The tool scores your codebase across 9 quality dimensions (0-10 scale):
 
 | Dimension | Method |
 |-----------|--------|
-| Code Quality | Statistical — decomposition ratio and max member cyclomatic complexity |
+| Complexity & Decomposition | Separate method-complexity and decomposition components, retaining one combined score |
 | Maintainability | Statistical — maintainability index population/tail/extreme analysis |
 | Error Handling | Rule-based — empty catches, throw ex, broad catches, sync blocking |
 | Performance & Async | Rule-based — sync-over-async, sequential I/O, unbounded fan-out, shared-state concurrency |
@@ -46,6 +46,8 @@ The tool scores your codebase across 9 quality dimensions (0-10 scale):
 | Documentation | Deduction-based — README, docs/, XML docs, public API coverage, unresolved `cref` references |
 | Dependency Management | Rule-based — vulnerabilities, outdated, deprecated, version drift; failed commands are unscored |
 | Architecture & SOLID | Rule-based — project cycles, layering violations, metric hotspots |
+
+**Complexity & Decomposition** retains the `codeQuality` evidence key and one combined score. Reports show Method complexity and Decomposition separately, with component-specific explanations and type hotspots. The former measures each type's worst member; the latter measures class complexity per member. Neither is a general verdict on correctness, reliability or readability. See [component presentation and compatibility](../../shared/scorecard-schema/scoring-decisions.md#complexity-and-decomposition-presentation). Thresholds, combination and overall weighting are unchanged.
 
 ## Raw Metrics
 
@@ -258,7 +260,7 @@ and scored.
 
 Passive data carriers are identified structurally rather than by names such as `Request`, `Response`, or `Dto`. Records, classes, and structs that only declare state through primary-constructor parameters, auto-properties, fields, or assignment-only constructors are treated as data carriers.
 
-Their raw metrics remain in `metrics.csv`, but they are excluded from the scored Code Quality,
+Their raw metrics remain in `metrics.csv`, but they are excluded from the scored Complexity & Decomposition,
 Maintainability, and Architecture-hotspot populations. References to them remain visible in raw
 coupling evidence but do not contribute to structural `highCoupling` scoring.
 

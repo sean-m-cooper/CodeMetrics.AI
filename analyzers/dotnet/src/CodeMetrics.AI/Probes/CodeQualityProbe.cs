@@ -31,7 +31,12 @@ public static class CodeQualityProbe
                 ScoringStep.Rule("emptyPopulation", "eligibleTypes == 0", true, 10)),
             Basis = excludedDataCarriers > 0
                 ? $"No behavior-bearing types with members. Passive data carriers excluded: {excludedDataCarriers}."
-                : "No types with members."
+                : "No types with members.",
+            Extra = new Dictionary<string, object?>
+            {
+                ["displayName"] = "Complexity & Decomposition",
+                ["componentDetails"] = CreateComponentDetails([], null, null)
+            }
         };
     }
 
@@ -86,13 +91,16 @@ public static class CodeQualityProbe
             decision);
     }
 
-    private static object CreateOffenders(IEnumerable<TypeMetrics> eligible)
+    private static object CreateOffenders(IEnumerable<TypeMetrics> eligible, bool methodComplexity = false)
     {
-        return eligible
-            .Where(type => type.MemberCount >= 2)
-            .OrderByDescending(type => type.DecompositionRatio)
-            .ThenByDescending(type => type.MaxMemberCyclomaticComplexity)
-            .ThenBy(type => type.Type)
+        var ranked = methodComplexity
+            ? eligible.OrderByDescending(type => type.MaxMemberCyclomaticComplexity).ThenByDescending(type => type.DecompositionRatio)
+            : eligible.Where(type => type.MemberCount >= 2).OrderByDescending(type => type.DecompositionRatio).ThenByDescending(type => type.MaxMemberCyclomaticComplexity);
+        return ranked
+            .ThenBy(type => type.Type, StringComparer.Ordinal)
+            .ThenBy(type => type.Project, StringComparer.Ordinal)
+            .ThenBy(type => type.Namespace, StringComparer.Ordinal)
+            .ThenBy(type => type.FilePath, StringComparer.Ordinal)
             .Take(5)
             .Select(type => new
             {
@@ -109,6 +117,29 @@ public static class CodeQualityProbe
             })
             .ToList();
     }
+
+    private static JsonElement CreateComponentDetails(IReadOnlyList<TypeMetrics> eligible, double? decomposition, double? complexity) =>
+        JsonSerializer.SerializeToElement(new
+        {
+            methodComplexity = new
+            {
+                label = "Method complexity",
+                score = complexity,
+                eligibleTypes = eligible.Count,
+                measure = "Distribution of each eligible type's maximum member cyclomatic complexity; not the percentage of all methods.",
+                limitation = "Branching is a review signal, not proof of incorrectness or avoidable complexity.",
+                topOffenders = CreateOffenders(eligible, methodComplexity: true)
+            },
+            decomposition = new
+            {
+                label = "Decomposition",
+                score = decomposition,
+                eligibleTypes = eligible.Count(type => type.MemberCount >= 2),
+                measure = "Distribution of class cyclomatic complexity divided by member count, for eligible types with at least two members.",
+                limitation = "Does not establish cohesion or readability. Extracting trivial helpers can improve the ratio without improving the code. A zero eligible population is unmeasured, even when policy supplies a default score.",
+                topOffenders = CreateOffenders(eligible)
+            }
+        });
 
     private static DimensionResult CreateResult(
         IReadOnlyList<TypeMetrics> eligible,
@@ -152,12 +183,14 @@ public static class CodeQualityProbe
 
         var extra = new Dictionary<string, object?>
         {
+            ["displayName"] = "Complexity & Decomposition",
+            ["componentDetails"] = CreateComponentDetails(eligible, decomposition.Score, complexity.Score),
             ["metrics"] = JsonSerializer.SerializeToElement(metrics),
             ["topOffenders"] = JsonSerializer.SerializeToElement(CreateOffenders(eligible))
         };
 
         var basis = $"Eligible types: {eligible.Count}. Passive data carriers excluded: {excludedDataCarriers}. " +
-                    $"DecompScore: {decomposition.Score}, CCScore: {complexity.Score}.";
+                    $"Method complexity: {complexity.Score}, Decomposition: {decomposition.Score}. Combined: {finalScore}.";
 
         return new DimensionResult
         {

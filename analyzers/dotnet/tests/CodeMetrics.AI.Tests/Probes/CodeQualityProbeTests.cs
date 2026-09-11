@@ -34,6 +34,54 @@ public class CodeQualityProbeTests
         };
 
     [Fact]
+    public void ComponentHotspots_AreRankedIndependently_AndKeepDistinctPopulations()
+    {
+        var result = CodeQualityProbe.Analyze([
+            MakeType("DecompositionHotspot", memberCount: 2, decompositionRatio: 18, maxMemberCC: 20),
+            MakeType("ComplexityHotspot", memberCount: 1, decompositionRatio: 60, maxMemberCC: 60),
+            MakeType("Passive", memberCount: 2, decompositionRatio: 99, maxMemberCC: 99, isDataCarrier: true)
+        ]);
+        result.Extra["displayName"].Should().Be("Complexity & Decomposition");
+        var details = (JsonElement)result.Extra["componentDetails"]!;
+        var complexity = details.GetProperty("methodComplexity");
+        var decomposition = details.GetProperty("decomposition");
+        complexity.GetProperty("eligibleTypes").GetInt32().Should().Be(2);
+        decomposition.GetProperty("eligibleTypes").GetInt32().Should().Be(1);
+        complexity.GetProperty("topOffenders")[0].GetProperty("type").GetString().Should().Be("ComplexityHotspot");
+        decomposition.GetProperty("topOffenders")[0].GetProperty("type").GetString().Should().Be("DecompositionHotspot");
+        var metrics = (JsonElement)result.Extra["metrics"]!;
+        complexity.GetProperty("score").GetDouble().Should().Be(metrics.GetProperty("maxMemberCyclomaticComplexity").GetProperty("ccScore").GetDouble());
+        decomposition.GetProperty("score").GetDouble().Should().Be(metrics.GetProperty("decomposition").GetProperty("decompScore").GetDouble());
+        result.Score.Should().Be(result.ScoringDecision!.FinalScore);
+        result.ScoringDecision.Steps.Count.Should().Be(2);
+    }
+
+    [Fact]
+    public void EmptyComponents_DoNotInventMeasuredScoresOrHotspots()
+    {
+        var result = CodeQualityProbe.Analyze([]);
+        var details = (JsonElement)result.Extra["componentDetails"]!;
+        foreach (var component in details.EnumerateObject())
+        {
+            component.Value.GetProperty("score").ValueKind.Should().Be(JsonValueKind.Null);
+            component.Value.GetProperty("eligibleTypes").GetInt32().Should().Be(0);
+            component.Value.GetProperty("topOffenders").GetArrayLength().Should().Be(0);
+        }
+        result.Score.Should().Be(10); // Preserve the existing empty-population policy.
+    }
+
+    [Fact]
+    public void SingleMemberPopulation_ExposesDecompositionAsAnEmptyPopulationDefault()
+    {
+        var result = CodeQualityProbe.Analyze([MakeType(memberCount: 1, maxMemberCC: 60)]);
+        var details = (JsonElement)result.Extra["componentDetails"]!;
+        details.GetProperty("decomposition").GetProperty("eligibleTypes").GetInt32().Should().Be(0);
+        details.GetProperty("decomposition").GetProperty("score").GetDouble().Should().Be(10);
+        details.GetProperty("methodComplexity").GetProperty("score").GetDouble().Should().Be(0);
+        result.Score.Should().Be(5);
+    }
+
+    [Fact]
     public void EmptyInput_ReturnsScore10()
     {
         var result = CodeQualityProbe.Analyze([]);

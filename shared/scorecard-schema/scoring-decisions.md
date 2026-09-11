@@ -26,3 +26,16 @@ Root `findingEffects` identifies each emitted finding exactly once by fingerprin
 For example, a dependency run with six deprecated occurrences and two included outdated occurrences selects `deprecatedPackage` at 4. The outdated findings remain visible but cause no additional reduction. Six occurrences may represent one package across projects and TFMs. Consumers should group the presentation without altering the deterministic counts or score.
 
 The analyzer constructs decision records while executing the policy, rather than reconstructing them from the final score. The evidence validator checks the optional structure, final score equality, unique step identifiers, and finding/step references. It does not recalculate policy conditions from source. Source and behavior review remain necessary for recommendations.
+
+## Complexity and decomposition presentation
+
+The .NET `codeQuality` key remains stable for schema, comparison and overall-score compatibility. Its display label is **Complexity & Decomposition**. It is one dimension with two component scores, not two additional dimensions or deductions. Preserve the recorded combined score and existing overall weighting.
+
+| Component | Recorded score | Interpretation |
+|---|---|---|
+| Method complexity | `scoringDecision.steps[id=complexity].score` | Distribution of each eligible type's maximum member cyclomatic complexity. Percentages describe type instances, not all methods. |
+| Decomposition | `scoringDecision.steps[id=decomposition].score` | Distribution of class complexity divided by member count, restricted to types with at least two members. It does not measure cohesion or establish that helper extraction improves readability. |
+
+.NET 2.3.0 also supplies `displayName` and `componentDetails.methodComplexity` / `componentDetails.decomposition`: recorded scores, eligible populations, descriptions, limitations and separately ranked type hotspot lists. Hotspots retain project/TFM identity and are samples, not denominators or automatic refactoring instructions. The existing `topOffenders` field remains the decomposition-ranked list for older consumers. Empty overall populations have null component scores; an empty decomposition population within a nonempty run retains the existing policy default of 10, with zero eligible types. Neither establishes measured excellence.
+
+Older .NET evidence may expose the scores only as `metrics.maxMemberCyclomaticComplexity.ccScore` and `metrics.decomposition.decompScore`. If neither representation exists, report component scores as unavailable rather than deriving them from the combined score. Failed-run diagnostic detail cannot restore component scores. JS/TS currently implements only method complexity; do not invent a decomposition score or apply the .NET combination policy to it.
