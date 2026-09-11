@@ -199,6 +199,8 @@ The Performance & Async dimension also reports `sharedStateMutationInFanOut` whe
 
 ### Evidence population and samples
 
+Starting with 2.2.0, every scored dimension also includes `scoringDecision`, recording policy inputs, selected rules, nested components, binding/nonbinding caps and finding effects. The existing scores and `dotnet-2026-09-08` ruleset are unchanged. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md); these effects are not independent finding deductions.
+
 Starting with 2.1.0 (`dotnet-2026-09-08`), Architecture metric hotspots use a population/severity policy. Coupling, complexity, and size each have a component score:
 
 ```text

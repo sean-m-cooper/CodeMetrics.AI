@@ -50,19 +50,24 @@ public static class SecurityProbe
         var errors = findings.Count(f => f.Severity == "error");
         var warnings = findings.Count(f => f.Severity == "warning");
 
-        double score;
-        if (hardcodedSecrets > 2 || allowAnyOriginWithCreds > 0)
-            score = 0;
-        else if (hardcodedSecrets > 0 || rawSqlCount > 0 || importedVulnerabilities > 0)
-            score = 2;
-        else if (unsafeDeser > 0)
-            score = 4;
-        else if (warnings > 2)
-            score = 6;
-        else if (warnings > 0)
-            score = 8;
-        else
-            score = 10;
+        var decision = ScoringDecision.FirstMatch("dotnet/security/v1", new()
+        {
+            ["hardcodedSecrets"] = hardcodedSecrets,
+            ["allowAnyOriginWithCreds"] = allowAnyOriginWithCreds,
+            ["rawSqlCount"] = rawSqlCount,
+            ["unsafeDeser"] = unsafeDeser,
+            ["importedVulnerabilities"] = importedVulnerabilities,
+            ["warnings"] = warnings
+        },
+        ScoringStep.Rule("manySecrets", "hardcodedSecrets > 2", hardcodedSecrets > 2, 0, ["hardcodedSecret"]),
+        ScoringStep.Rule("unsafeCors", "allowAnyOriginWithCreds > 0", allowAnyOriginWithCreds > 0, 0, ["allowAnyOriginWithCredentials"]),
+        ScoringStep.Rule("secret", "hardcodedSecrets > 0", hardcodedSecrets > 0, 2, ["hardcodedSecret"]),
+        ScoringStep.Rule("rawSql", "rawSqlCount > 0", rawSqlCount > 0, 2, ["rawSqlInterpolation"]),
+        ScoringStep.Rule("importedVulnerabilities", "importedVulnerabilities > 0", importedVulnerabilities > 0, 2, []),
+        ScoringStep.Rule("unsafeDeserialization", "unsafeDeser > 0", unsafeDeser > 0, 4, ["unsafeDeserialization"]),
+        ScoringStep.Rule("manyWarnings", "warnings > 2", warnings > 2, 6, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
+        ScoringStep.Rule("warnings", "warnings > 0", warnings > 0, 8, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
+        ScoringStep.Rule("clean", "otherwise", true, 10, []));
 
         var basis = $"Findings: {findings.Count} (errors: {errors}, warnings: {warnings}). " +
                     $"hardcodedSecrets={hardcodedSecrets}, rawSql={rawSqlCount}, " +
@@ -72,7 +77,8 @@ public static class SecurityProbe
         return new DimensionResult
         {
             Status = "scored",
-            Score = score,
+            Score = decision.FinalScore,
+            ScoringDecision = decision,
             Basis = basis,
             Findings = findings
         };

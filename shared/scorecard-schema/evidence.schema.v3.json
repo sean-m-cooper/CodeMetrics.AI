@@ -347,6 +347,9 @@
               }
             }
           }
+        },
+        "scoringDecision": {
+          "$ref": "#/$defs/scoringDecision"
         }
       },
       "additionalProperties": true,
@@ -367,8 +370,17 @@
       },
       "else": {
         "not": {
-          "required": [
-            "score"
+          "anyOf": [
+            {
+              "required": [
+                "score"
+              ]
+            },
+            {
+              "required": [
+                "scoringDecision"
+              ]
+            }
           ]
         }
       }
@@ -437,6 +449,163 @@
         },
         "observations": {
           "type": "object"
+        }
+      }
+    },
+    "scoringDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "policy",
+        "operation",
+        "finalScore",
+        "inputs",
+        "steps",
+        "findingEffects"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "policy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "enum": [
+            "firstMatch",
+            "minimum",
+            "mean",
+            "deductions"
+          ]
+        },
+        "finalScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "inputs": {
+          "type": "object"
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/scoringStep"
+          }
+        },
+        "findingEffects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/findingScoreEffect"
+          }
+        }
+      }
+    },
+    "scoringStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "score",
+        "disposition",
+        "inputs",
+        "findingCategories"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "rule",
+            "component",
+            "cap"
+          ]
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "condition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "matched": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "disposition": {
+          "enum": [
+            "selected",
+            "shadowed",
+            "notMatched",
+            "contributing",
+            "notLimiting",
+            "applied"
+          ]
+        },
+        "inputs": {
+          "type": "object"
+        },
+        "findingCategories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/scoringDecision"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "findingScoreEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fingerprint",
+        "category",
+        "effect",
+        "stepIds"
+      ],
+      "properties": {
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect": {
+          "enum": [
+            "policyInput",
+            "excluded",
+            "noAdditionalReduction"
+          ]
+        },
+        "stepIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     }

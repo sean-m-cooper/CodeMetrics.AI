@@ -9,6 +9,9 @@ public sealed class DimensionResult
     public required string Basis { get; init; }
     public List<Finding> Findings { get; init; } = [];
 
+    [JsonIgnore]
+    public ScoringDecision? ScoringDecision { get; init; }
+
     [JsonExtensionData]
     public Dictionary<string, object?> Extra { get; init; } = [];
 }

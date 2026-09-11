@@ -5,7 +5,7 @@ Both analyzers emit schema-v3 evidence. The `codemetrics-evidence` command ships
 ```sh
 # Analyze a .NET solution and compare with a committed baseline.
 code-metrics --solution App.slnx --configuration Release --skip-dependency-probe
-npx --package codemetrics-ai@0.2.0 codemetrics-evidence \
+npx --package codemetrics-ai@0.3.0 codemetrics-evidence \
   --input .scorecard/dotnet/evidence.json \
   --baseline quality-baselines/dotnet.json \
   --output .scorecard/dotnet/comparison.json \
@@ -13,7 +13,7 @@ npx --package codemetrics-ai@0.2.0 codemetrics-evidence \
   --sarif .scorecard/dotnet/results.sarif
 
 # JS/TS also accepts comparison options directly.
-npx codemetrics-ai@0.2.0 --project package.json \
+npx codemetrics-ai@0.3.0 --project package.json \
   --baseline quality-baselines/javascript-typescript.json \
   --comparison-output .scorecard/javascript-typescript/comparison.json \
   --fail-on-new error --sarif .scorecard/javascript-typescript/results.sarif
@@ -32,7 +32,7 @@ Do not average ecosystem scores. JS/TS scores are uncalibrated across ecosystems
 The `code-scorecard` skill in `ai_tools` is a version-aware consumer. Keep thresholds and schemas here; downstream consumers pin tested package versions and use the packaged validator. Generate a fresh run by default, validate both process exit and evidence provenance, and expose scope alongside every score. Never promote partial CSV into a replacement score after a failed analysis.
 
 ```sh
-npx --package codemetrics-ai@0.2.0 codemetrics-evidence --input evidence.json \
+npx --package codemetrics-ai@0.3.0 codemetrics-evidence --input evidence.json \
   --inspect-output inspection.json --expected-ecosystem dotnet \
   --expected-version 2.0.0 --expected-entry-point /repo/src/App/App.csproj \
   --expected-root /repo --expected-variant Release

@@ -52,6 +52,13 @@ public class CliIntegrationTests
                 else
                     diagnostics.Should().Contain(d => d.GetProperty("kind").GetString() == "workspace");
                 evidence.RootElement.GetProperty("dimensions").GetProperty("codeQuality").TryGetProperty("score", out _).Should().Be(expectedExit == 0);
+                foreach (var dimension in evidence.RootElement.GetProperty("dimensions").EnumerateObject())
+                {
+                    var scored = dimension.Value.GetProperty("status").GetString() == "scored";
+                    dimension.Value.TryGetProperty("scoringDecision", out var decision).Should().Be(scored);
+                    if (scored)
+                        decision.GetProperty("finalScore").GetDouble().Should().Be(dimension.Value.GetProperty("score").GetDouble());
+                }
             }
         }
         finally { Directory.Delete(root, recursive: true); }

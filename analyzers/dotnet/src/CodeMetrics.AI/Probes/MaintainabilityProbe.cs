@@ -15,6 +15,8 @@ public static class MaintainabilityProbe
             {
                 Status = "scored",
                 Score = 10,
+                ScoringDecision = ScoringDecision.FirstMatch("dotnet/maintainability/v1", new() { ["eligibleTypes"] = 0 },
+                    ScoringStep.Rule("emptyPopulation", "eligibleTypes == 0", true, 10)),
                 Basis = "No types found."
             };
         }
@@ -28,6 +30,8 @@ public static class MaintainabilityProbe
             {
                 Status = "scored",
                 Score = 10,
+                ScoringDecision = ScoringDecision.FirstMatch("dotnet/maintainability/v1", new() { ["eligibleTypes"] = 0 },
+                    ScoringStep.Rule("emptyPopulation", "eligibleTypes == 0", true, 10)),
                 Basis = $"No behavior-bearing types. Passive data carriers excluded: {excludedDataCarriers}."
             };
         }
@@ -47,11 +51,16 @@ public static class MaintainabilityProbe
         double p10MI = CodeQualityProbe.Percentile(miValues, 10);
         double extremeBelow40 = scoredTypes.Count(item => item.ScoredMi < 40) * 100.0 / scoredTypes.Count;
 
-        int popBelow60Score = CodeQualityProbe.ScoreThreshold(popBelow60, [1, 3, 6, 10, 15]);
-        int p10Score = ScoreThresholdReverse(p10MI, [75, 70, 65, 58, 52]);
-        int extremeBelow40Score = CodeQualityProbe.ScoreThreshold(extremeBelow40, [0.2, 0.5, 1.2, 2.5, 4.0]);
-
-        double finalScore = Math.Round((popBelow60Score + p10Score + extremeBelow40Score) / 3.0, 1);
+        var decision = ScoringDecision.Mean("dotnet/maintainability/v1",
+            ScoringDecision.Threshold("populationBelow60", popBelow60, [1, 3, 6, 10, 15]),
+            ScoringDecision.Threshold("tailMi", p10MI, [75, 70, 65, 58, 52], descending: true),
+            ScoringDecision.Threshold("extremeBelow40", extremeBelow40, [.2, .5, 1.2, 2.5, 4]));
+        decision.Inputs["eligibleTypes"] = eligible.Count;
+        decision.Inputs["entryPointMiAdjustment"] = EntryPointMiAdjustment;
+        var popBelow60Score = (int)decision.Steps[0].Score;
+        var p10Score = (int)decision.Steps[1].Score;
+        var extremeBelow40Score = (int)decision.Steps[2].Score;
+        var finalScore = decision.FinalScore;
 
         // Top 5 offenders: sort by MI asc, Type name
         var offenders = eligible
@@ -106,6 +115,7 @@ public static class MaintainabilityProbe
         {
             Status = "scored",
             Score = finalScore,
+            ScoringDecision = decision,
             Basis = basis,
             Extra = extra
         };

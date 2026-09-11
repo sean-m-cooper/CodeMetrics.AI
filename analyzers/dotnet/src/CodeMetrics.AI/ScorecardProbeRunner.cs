@@ -27,6 +27,7 @@ internal static class ScorecardProbeRunner
             {
                 var previous = (DimensionResult)dimensions[key];
                 previous.Extra.Remove("scoring");
+                previous.Extra.Remove("scoringDecision");
                 dimensions[key] = new DimensionResult
                 {
                     Status = "failed",

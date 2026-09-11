@@ -17,6 +17,22 @@ export function validateEvidence(value: unknown): asserts value is Evidence {
   if (evidence.filters.analyzedUnits > evidence.filters.totalUnits) throw new Error("Analyzed units exceed total units.");
   const ids = findings(evidence).map(finding => finding.fingerprint);
   if (new Set(ids).size !== ids.length) throw new Error("Duplicate finding fingerprints.");
+  for (const dimension of Object.values(evidence.dimensions)) {
+    const decision = dimension.scoringDecision;
+    if (!decision) continue; // Older schema-v3 producers remain supported.
+    if (decision.finalScore !== dimension.score) throw new Error("Scoring decision differs from dimension score.");
+    const steps = (items: typeof decision.steps): typeof decision.steps => items.flatMap(step => [step, ...steps(step.decision?.steps ?? [])]);
+    const stepIds = steps(decision.steps).map(step => step.id);
+    if (new Set(stepIds).size !== stepIds.length) throw new Error("Duplicate scoring step identifiers.");
+    const effectIds = decision.findingEffects.map(effect => effect.fingerprint);
+    if (new Set(effectIds).size !== effectIds.length || effectIds.length !== dimension.findings.length)
+      throw new Error("Scoring effects must identify each finding exactly once.");
+    for (const effect of decision.findingEffects) {
+      if (!dimension.findings.some(finding => finding.fingerprint === effect.fingerprint && finding.category === effect.category))
+        throw new Error("Scoring effect references an unknown finding.");
+      if (effect.stepIds.some(id => !stepIds.includes(id))) throw new Error("Scoring effect references an unknown step.");
+    }
+  }
 }
 export function readEvidence(file: string): Evidence {
   const value: unknown = JSON.parse(fs.readFileSync(file, "utf8")); validateEvidence(value); return value;

@@ -76,6 +76,13 @@ internal static class EvidenceEnricher
                 finding.Observations.TryAdd("confidenceBasis", finding.Confidence == "high" ? "Direct syntax, semantic, or metric observation" : "Heuristic; review surrounding context");
             }
             result.Findings.Sort((left, right) => StringComparer.Ordinal.Compare(left.Fingerprint, right.Fingerprint));
+            if (result.Status == "scored" && result.ScoringDecision is { } decision)
+            {
+                if (decision.FinalScore != result.Score)
+                    throw new InvalidOperationException($"Scoring decision differs from the {dimension} score.");
+                decision.AttachFindings(result.Findings);
+                result.Extra["scoringDecision"] = decision;
+            }
             if (result.Status == "scored")
                 result.Extra["scoring"] = new
                 {

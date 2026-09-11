@@ -53,19 +53,21 @@ public static class PerformanceAsyncProbe
         //   6  several   — two or three advisory warnings
         //   8  minor     — a single advisory warning, no errors
         //  10  clean     — no findings
-        double score;
-        if (errors >= 5)
-            score = 0;
-        else if (hasSyncOverAsync || hasSaveChangesInsideLoop || errors > 0)
-            score = 2;
-        else if (warnings > 3)
-            score = 4;
-        else if (warnings > 1)
-            score = 6;
-        else if (warnings > 0)
-            score = 8;
-        else
-            score = 10;
+        var decision = ScoringDecision.FirstMatch("dotnet/performanceAsync/v1", new()
+        {
+            ["errors"] = errors,
+            ["warnings"] = warnings,
+            ["hasSyncOverAsync"] = hasSyncOverAsync,
+            ["hasSaveChangesInsideLoop"] = hasSaveChangesInsideLoop
+        },
+        ScoringStep.Rule("systemicErrors", "errors >= 5", errors >= 5, 0, findings.Where(f => f.Severity == "error").Select(f => f.Category).Distinct().ToArray()),
+        ScoringStep.Rule("syncOverAsync", "hasSyncOverAsync", hasSyncOverAsync, 2, ["syncOverAsync"]),
+        ScoringStep.Rule("saveChangesInsideLoop", "hasSaveChangesInsideLoop", hasSaveChangesInsideLoop, 2, ["saveChangesInsideLoop"]),
+        ScoringStep.Rule("errors", "errors > 0", errors > 0, 2, findings.Where(f => f.Severity == "error").Select(f => f.Category).Distinct().ToArray()),
+        ScoringStep.Rule("manyWarnings", "warnings > 3", warnings > 3, 4, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
+        ScoringStep.Rule("severalWarnings", "warnings > 1", warnings > 1, 6, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
+        ScoringStep.Rule("warnings", "warnings > 0", warnings > 0, 8, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
+        ScoringStep.Rule("clean", "otherwise", true, 10, []));
 
         var basis = $"Findings: {findings.Count} (errors: {errors}, warnings: {warnings}). " +
                     $"syncOverAsync={findings.Count(f => f.Category == "syncOverAsync")}, " +
@@ -80,7 +82,8 @@ public static class PerformanceAsyncProbe
         return new DimensionResult
         {
             Status = "scored",
-            Score = score,
+            Score = decision.FinalScore,
+            ScoringDecision = decision,
             Basis = basis,
             Findings = findings
         };

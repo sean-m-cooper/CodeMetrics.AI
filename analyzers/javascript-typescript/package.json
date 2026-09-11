@@ -1,6 +1,6 @@
 {
   "name": "codemetrics-ai",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Deterministic code metrics and scorecard evidence for JavaScript, TypeScript, and React projects",
   "license": "MIT",
   "type": "module",

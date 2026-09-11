@@ -330,6 +330,7 @@ public static class DependencyProbe
         DependencyMetrics metrics,
         List<Finding> findings)
     {
+        var decision = CalculateDecision(metrics);
         var outdated = metrics.OutdatedCounts.Included;
         var frameworkIncompatible = metrics.OutdatedCounts.FrameworkIncompatible;
         var compatibilityUnknown = metrics.OutdatedCounts.CompatibilityUnknown;
@@ -345,7 +346,8 @@ public static class DependencyProbe
         return new DimensionResult
         {
             Status = "scored",
-            Score = CalculateScore(metrics),
+            Score = decision.FinalScore,
+            ScoringDecision = decision,
             Basis = basis,
             Findings = findings,
             Extra =
@@ -387,26 +389,28 @@ public static class DependencyProbe
             .ToArray();
     }
 
-    private static double CalculateScore(DependencyMetrics metrics)
+    private static ScoringDecision CalculateDecision(DependencyMetrics metrics)
     {
-        if (metrics.VulnerableDirect > 0)
-            return 0;
-        if (metrics.VulnerableTransitive > 0 || metrics.UnsupportedTfms > 1)
-            return 2;
-        if (metrics.Deprecated > 0 ||
-            metrics.VersionDrift > 2 ||
-            metrics.OutdatedCounts.Included > 10)
+        return ScoringDecision.FirstMatch("dotnet/dependencyManagement/v1", new()
         {
-            return 4;
-        }
-
-        if (metrics.OutdatedCounts.Included > 5 || metrics.UnsupportedTfms == 1)
-            return 6;
-        return metrics.CpmEnabled &&
-               metrics.VersionDrift == 0 &&
-               metrics.OutdatedCounts.Included == 0
-            ? 10
-            : 8;
+            ["vulnerableDirect"] = metrics.VulnerableDirect,
+            ["vulnerableTransitive"] = metrics.VulnerableTransitive,
+            ["deprecated"] = metrics.Deprecated,
+            ["versionDrift"] = metrics.VersionDrift,
+            ["outdatedIncluded"] = metrics.OutdatedCounts.Included,
+            ["unsupportedTfms"] = metrics.UnsupportedTfms,
+            ["cpmEnabled"] = metrics.CpmEnabled
+        },
+        ScoringStep.Rule("directVulnerability", "vulnerableDirect > 0", metrics.VulnerableDirect > 0, 0, "vulnerableDirectDependency"),
+        ScoringStep.Rule("transitiveVulnerability", "vulnerableTransitive > 0", metrics.VulnerableTransitive > 0, 2, "vulnerableTransitiveDependency"),
+        ScoringStep.Rule("multipleUnsupportedFrameworks", "unsupportedTfms > 1", metrics.UnsupportedTfms > 1, 2, "unsupportedTargetFramework"),
+        ScoringStep.Rule("deprecatedPackage", "deprecated > 0", metrics.Deprecated > 0, 4, "deprecatedDependency"),
+        ScoringStep.Rule("versionDrift", "versionDrift > 2", metrics.VersionDrift > 2, 4, "versionDrift"),
+        ScoringStep.Rule("manyOutdated", "outdatedIncluded > 10", metrics.OutdatedCounts.Included > 10, 4, "outdatedDependency"),
+        ScoringStep.Rule("severalOutdated", "outdatedIncluded > 5", metrics.OutdatedCounts.Included > 5, 6, "outdatedDependency"),
+        ScoringStep.Rule("unsupportedFramework", "unsupportedTfms == 1", metrics.UnsupportedTfms == 1, 6, "unsupportedTargetFramework"),
+        ScoringStep.Rule("cleanManagedDependencies", "cpmEnabled && versionDrift == 0 && outdatedIncluded == 0", metrics.CpmEnabled && metrics.VersionDrift == 0 && metrics.OutdatedCounts.Included == 0, 10),
+        ScoringStep.Rule("remainingMaintenance", "otherwise", true, 8, "outdatedDependency", "versionDrift", "noCentralPackageManagement"));
     }
 
     private sealed record DependencyMetrics(

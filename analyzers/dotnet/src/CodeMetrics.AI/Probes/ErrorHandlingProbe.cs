@@ -43,19 +43,23 @@ public static class ErrorHandlingProbe
         //   6  noisy          — more than three advisory warnings
         //   8  minor          — one to three advisory warnings, no errors
         //  10  clean          — no findings
-        double score;
-        if (emptyCatches >= 5 || broadDefaults >= 5)
-            score = 0;
-        else if (emptyCatches > 0 || throwExes > 0)
-            score = 2;
-        else if (hasBroadDefault || hasSyncBlock)
-            score = 4;
-        else if (warnings > 3)
-            score = 6;
-        else if (warnings > 0)
-            score = 8;
-        else
-            score = 10;
+        var decision = ScoringDecision.FirstMatch("dotnet/errorHandling/v1", new()
+        {
+            ["emptyCatches"] = emptyCatches,
+            ["throwExes"] = throwExes,
+            ["broadDefaults"] = broadDefaults,
+            ["hasSyncBlock"] = hasSyncBlock,
+            ["warnings"] = warnings
+        },
+        ScoringStep.Rule("systemicEmptyCatches", "emptyCatches >= 5", emptyCatches >= 5, 0, ["emptyCatch"]),
+        ScoringStep.Rule("systemicBroadDefaults", "broadDefaults >= 5", broadDefaults >= 5, 0, ["broadCatchReturnsDefault"]),
+        ScoringStep.Rule("emptyCatch", "emptyCatches > 0", emptyCatches > 0, 2, ["emptyCatch"]),
+        ScoringStep.Rule("throwEx", "throwExes > 0", throwExes > 0, 2, ["throwEx"]),
+        ScoringStep.Rule("broadDefault", "broadDefaults > 0", hasBroadDefault, 4, ["broadCatchReturnsDefault"]),
+        ScoringStep.Rule("syncBlocking", "hasSyncBlock", hasSyncBlock, 4, ["syncBlockingCall"]),
+        ScoringStep.Rule("manyWarnings", "warnings > 3", warnings > 3, 6, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
+        ScoringStep.Rule("warnings", "warnings > 0", warnings > 0, 8, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
+        ScoringStep.Rule("clean", "otherwise", true, 10, []));
 
         var basis = $"Findings: {findings.Count} (errors: {errors}, warnings: {warnings}). " +
                     $"emptyCatch={emptyCatches}, throwEx={throwExes}, broadDefaults={broadDefaults}.";
@@ -63,7 +67,8 @@ public static class ErrorHandlingProbe
         return new DimensionResult
         {
             Status = "scored",
-            Score = score,
+            Score = decision.FinalScore,
+            ScoringDecision = decision,
             Basis = basis,
             Findings = findings
         };
