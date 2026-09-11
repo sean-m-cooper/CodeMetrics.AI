@@ -3,7 +3,7 @@
   "corpusSha256": "2e439e89ff5833b0567c2f74faabe6b4cafb5bcaf3482778ae004fa34197d1b0",
   "tool": {
     "name": "codemetrics-ai",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "ecosystem": "javascript-typescript"
   },
   "ruleset": "javascript-typescript-2026-09-05",

@@ -30,9 +30,9 @@ public static class TestingProbe
         var testProjectNames = testProjects.Select(p => p.Name).ToList();
         var uncoveredProjects = FindUncoveredProductionProjects(analyzedProjectNames, testProjectNames);
         AddUncoveredProjectFindings(findings, uncoveredProjects, coverage != null);
-        var score = CalculateScore(testProjects.Count, testMetrics, uncoveredProjects, coverage);
+        var decision = CalculateDecision(testProjects.Count, testMetrics, uncoveredProjects, coverage);
         var result = CreateResult(
-            score,
+            decision,
             testProjects.Count,
             analyzedProjectNames.Count,
             testMetrics,
@@ -110,33 +110,38 @@ public static class TestingProbe
         }
     }
 
-    private static double CalculateScore(
-        int testProjectCount,
-        TestMetrics metrics,
-        IReadOnlyCollection<string> uncoveredProjects,
-        CoverageRates? coverage)
+    private static ScoringDecision CalculateDecision(
+        int testProjectCount, TestMetrics metrics, IReadOnlyCollection<string> uncoveredProjects, CoverageRates? coverage)
     {
-        double score;
-        if (testProjectCount == 0 || metrics.TestMethods == 0)
-            score = 0;
-        else if (metrics.AssertionDensity == 0.0 || metrics.PlaceholderTests >= metrics.TestMethods)
-            score = 2;
-        else if (metrics.PlaceholderTests > 0 || metrics.SkippedTests > 2)
-            score = 4;
-        else if ((coverage == null && uncoveredProjects.Count > 0) || metrics.AssertionDensity < 1.0)
-            score = 6;
-        else if (metrics.SkippedTests > 0)
-            score = 8;
-        else
-            score = 10;
-
-        return coverage == null
-            ? score
-            : Math.Min(score, CoverageCeiling(coverage.LineRate));
+        var signals = ScoringDecision.FirstMatch("dotnet/testing/signals/v1", new()
+        {
+            ["testProjectCount"] = testProjectCount,
+            ["testMethods"] = metrics.TestMethods,
+            ["assertionDensity"] = metrics.AssertionDensity,
+            ["placeholderTests"] = metrics.PlaceholderTests,
+            ["skippedTests"] = metrics.SkippedTests,
+            ["uncoveredProjectCount"] = uncoveredProjects.Count,
+            ["coverageAvailable"] = coverage != null
+        },
+        ScoringStep.Rule("noTests", "testProjectCount == 0 || testMethods == 0", testProjectCount == 0 || metrics.TestMethods == 0, 0, "uncoveredProject"),
+        ScoringStep.Rule("noMeaningfulAssertions", "assertionDensity == 0 || placeholderTests >= testMethods", metrics.AssertionDensity == 0 || metrics.PlaceholderTests >= metrics.TestMethods, 2, "placeholderTest"),
+        ScoringStep.Rule("placeholdersOrManySkipped", "placeholderTests > 0 || skippedTests > 2", metrics.PlaceholderTests > 0 || metrics.SkippedTests > 2, 4, "placeholderTest"),
+        ScoringStep.Rule("missingProjectsOrLowDensity", "(!coverageAvailable && uncoveredProjectCount > 0) || assertionDensity < 1", (coverage == null && uncoveredProjects.Count > 0) || metrics.AssertionDensity < 1, 6, "uncoveredProject"),
+        ScoringStep.Rule("skippedTests", "skippedTests > 0", metrics.SkippedTests > 0, 8),
+        ScoringStep.Rule("testSignalsSatisfied", "otherwise", true, 10));
+        if (coverage == null) return signals;
+        return ScoringDecision.Minimum("dotnet/testing/v1", 1, MidpointRounding.ToEven,
+            ScoringStep.Component("testSignals", signals.FinalScore, decision: signals),
+            ScoringStep.Component("lineCoverage", CoverageCeiling(coverage.LineRate), inputs: new()
+            {
+                ["lineRate"] = coverage.LineRate,
+                ["thresholdsAtLeast"] = new[] { .8, .6, .4, .2 },
+                ["scores"] = new[] { 10, 8, 6, 4, 2 }
+            }, kind: "cap"));
     }
 
     private static DimensionResult CreateResult(
-        double score,
+        ScoringDecision decision,
         int testProjectCount,
         int productionProjectCount,
         TestMetrics metrics,
@@ -157,7 +162,8 @@ public static class TestingProbe
         return new DimensionResult
         {
             Status = "scored",
-            Score = score,
+            Score = decision.FinalScore,
+            ScoringDecision = decision,
             Basis = basis,
             Findings = findings,
             Extra =

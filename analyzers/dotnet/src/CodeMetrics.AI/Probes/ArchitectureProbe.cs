@@ -142,19 +142,19 @@ public static class ArchitectureProbe
 
         // Preserve graph/layering caps; metric warnings have their own population policy.
         var hasCycles = cycles.Count > 0;
-        double layeringCap;
-        if (hasCycles)
-            layeringCap = 0;
-        else if (hasErrors)
-            layeringCap = 2;
-        else if (warningCount > 2)
-            layeringCap = 4;
-        else if (warningCount > 1)
-            layeringCap = 6;
-        else if (warningCount >= 1)
-            layeringCap = 8;
-        else
-            layeringCap = 10;
+        var layeringDecision = ScoringDecision.FirstMatch("dotnet/architecture/layering/v1", new()
+        {
+            ["cycles"] = cycles.Count,
+            ["errors"] = errorFindings.Count,
+            ["advisoryWarnings"] = warningCount
+        },
+        ScoringStep.Rule("projectCycles", "cycles > 0", hasCycles, 0, "projectCycle"),
+        ScoringStep.Rule("layeringErrors", "errors > 0", hasErrors, 2, "controllerDataDependency"),
+        ScoringStep.Rule("manyLayeringWarnings", "advisoryWarnings > 2", warningCount > 2, 4, "concreteInfrastructureDependency"),
+        ScoringStep.Rule("severalLayeringWarnings", "advisoryWarnings > 1", warningCount > 1, 6, "concreteInfrastructureDependency"),
+        ScoringStep.Rule("layeringWarning", "advisoryWarnings > 0", warningCount > 0, 8, "concreteInfrastructureDependency"),
+        ScoringStep.Rule("noLayeringCap", "otherwise", true, 10));
+        var layeringCap = layeringDecision.FinalScore;
 
         var eligibleTypes = typeMetrics.Where(metric => !metric.IsDataCarrier &&
             !dependencyInjectionExtensionTypes.Contains(GetTypeKey(metric.Project, metric.Namespace, metric.Type))).ToList();
@@ -168,7 +168,21 @@ public static class ArchitectureProbe
             ScoreMetricPopulation("size", eligibleTypes, metric => metric.LinesOfSource / 500d)
         };
         var metricScore = components.Min(component => component.Score);
-        var score = Math.Round(Math.Min(metricScore, layeringCap), 1, MidpointRounding.AwayFromZero);
+        var metricSteps = components.Select(component => ScoringStep.Component(component.Metric, component.Score,
+            [component.Metric switch { "coupling" => "highCoupling", "complexity" => "highCyclomaticComplexity", _ => "largeClass" }],
+            new()
+            {
+                ["eligibleTypeCount"] = component.EligibleTypeCount,
+                ["hotspotCount"] = component.HotspotCount,
+                ["hotspotRate"] = component.HotspotRate,
+                ["worstThresholdRatio"] = component.WorstThresholdRatio,
+                ["populationPenalty"] = component.PopulationPenalty,
+                ["severityPenalty"] = component.SeverityPenalty,
+                ["formula"] = "10 - min(6, 12 * hotspotRate) - min(4, 2 * max(0, worstThresholdRatio - 1))"
+            })).ToList();
+        metricSteps.Add(ScoringStep.Component("graphLayeringCap", layeringCap, decision: layeringDecision, kind: "cap"));
+        var decision = ScoringDecision.Minimum("dotnet/architecture/population-severity-v1", 1, MidpointRounding.AwayFromZero, [.. metricSteps]);
+        var score = decision.FinalScore;
 
         var hotspotBasis = hotspots.Count > displayedHotspots.Count
             ? $"hotspots: {hotspots.Count} (showing {displayedHotspots.Count})"
@@ -257,6 +271,7 @@ public static class ArchitectureProbe
         {
             Status = "scored",
             Score = score,
+            ScoringDecision = decision,
             Basis = basis,
             Findings = findings,
             Extra =

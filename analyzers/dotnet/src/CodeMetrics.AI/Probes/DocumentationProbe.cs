@@ -106,31 +106,44 @@ public static class DocumentationProbe
               $"libraryXmlDocRatio={snapshot.LibraryXmlDocRatio:F2}, " +
               $"publicApiDocCoverage={snapshot.PublicApiDocCoverage:F2}, " +
               $"staleMarkers={snapshot.StaleMarkers}, unresolvedCrefs={snapshot.UnresolvedCrefs}.";
+        var decision = CalculateDecision(snapshot);
         return new DimensionResult
         {
             Status = "scored",
-            Score = CalculateScore(snapshot),
+            Score = decision.FinalScore,
+            ScoringDecision = decision,
             Basis = basis,
             Findings = findings,
             Extra = BuildExtra(snapshot)
         };
     }
 
-    private static double CalculateScore(DocumentationSnapshot snapshot)
+    private static ScoringDecision CalculateDecision(DocumentationSnapshot snapshot)
     {
+        var inputs = new Dictionary<string, object?>
+        {
+            ["hasReadme"] = snapshot.HasReadme,
+            ["hasDocsDirectory"] = snapshot.HasDocsDirectory,
+            ["readmeNonBlankLines"] = snapshot.ReadmeNonBlankLines,
+            ["architectureDocuments"] = snapshot.ArchitectureDocuments,
+            ["hasAiInstructions"] = snapshot.HasAiInstructions,
+            ["allLibraryProjectsHaveXmlDocs"] = snapshot.AllLibraryProjectsHaveXmlDocs,
+            ["publicApiDocCoverage"] = snapshot.PublicApiDocCoverage,
+            ["staleMarkers"] = snapshot.StaleMarkers,
+            ["unresolvedCrefs"] = snapshot.UnresolvedCrefs
+        };
         if (!snapshot.HasReadme && !snapshot.HasDocsDirectory)
-            return 0;
-
-        var score = 10.0;
-        if (snapshot.ReadmeNonBlankLines < 20) score -= 3;
-        if (!snapshot.HasDocsDirectory) score -= 2;
-        if (snapshot.ArchitectureDocuments == 0) score -= 1;
-        if (!snapshot.HasAiInstructions) score -= 1;
-        if (!snapshot.AllLibraryProjectsHaveXmlDocs) score -= 2;
-        if (snapshot.PublicApiDocCoverage < 0.5) score -= 1;
-        if (snapshot.StaleMarkers > 0) score -= 1;
-        if (snapshot.UnresolvedCrefs > 0) score -= 1;
-        return Math.Clamp(score, 0, 10);
+            return ScoringDecision.FirstMatch("dotnet/documentation/v1", inputs,
+                ScoringStep.Rule("noDocumentation", "!hasReadme && !hasDocsDirectory", true, 0));
+        return ScoringDecision.Deductions("dotnet/documentation/v1", inputs,
+            ScoringStep.Rule("shortReadme", "readmeNonBlankLines < 20", snapshot.ReadmeNonBlankLines < 20, 3),
+            ScoringStep.Rule("noDocsDirectory", "!hasDocsDirectory", !snapshot.HasDocsDirectory, 2),
+            ScoringStep.Rule("noArchitectureDocs", "architectureDocuments == 0", snapshot.ArchitectureDocuments == 0, 1),
+            ScoringStep.Rule("noAiInstructions", "!hasAiInstructions", !snapshot.HasAiInstructions, 1),
+            ScoringStep.Rule("missingLibraryXmlDocs", "!allLibraryProjectsHaveXmlDocs", !snapshot.AllLibraryProjectsHaveXmlDocs, 2),
+            ScoringStep.Rule("lowPublicApiCoverage", "publicApiDocCoverage < 0.5", snapshot.PublicApiDocCoverage < .5, 1),
+            ScoringStep.Rule("staleMarkers", "staleMarkers > 0", snapshot.StaleMarkers > 0, 1),
+            ScoringStep.Rule("unresolvedCrefs", "unresolvedCrefs > 0", snapshot.UnresolvedCrefs > 0, 1, "unresolvedCref"));
     }
 
     private sealed record LibraryDocumentation(
@@ -149,8 +162,6 @@ public static class DocumentationProbe
         double PublicApiDocCoverage,
         int StaleMarkers,
         int UnresolvedCrefs);
-
-    // ── Helpers ──────────────────────────────────────────────────────────────────
 
     private static string? FindDocsDirectory(string solutionDir)
     {

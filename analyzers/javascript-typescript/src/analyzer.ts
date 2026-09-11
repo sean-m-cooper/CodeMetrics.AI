@@ -3,6 +3,7 @@ import { discover } from "./discovery.js";
 import { analyzeFile, type Metric } from "./metrics.js";
 import { hash, invocationIds, scored, skippedDimensions, type Evidence } from "./evidence.js";
 import { metricsCsvHeader } from "./scorecard-contract.js";
+import { firstMatch, thresholdDecision } from "./scoring-decision.js";
 
 export function analyze(options: { project?: string; tsconfig?: string; runId?: string; auditId?: string }, version: string): { evidence: Evidence; metrics: Metric[]; csv: string; inputs: string[] } {
   const identity = invocationIds(options.runId, options.auditId);
@@ -34,18 +35,23 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
   if (analyzedFiles === 0) diagnostics.push({ kind: "emptyPopulation", message: "No production source files were analyzed." });
   if (metrics.length) {
     const maximum = Math.max(...metrics.map(metric => metric.complexity));
-    const quality = maximum <= 5 ? 10 : maximum <= 10 ? 8 : maximum <= 20 ? 6 : maximum <= 40 ? 4 : 2;
+    const quality = thresholdDecision("javascript-typescript/codeQuality/v1", maximum, [5, 10, 20, 40], false,
+      [...new Set(collected.filter(item => item.dimension === "codeQuality").map(item => item.finding.category))]);
     dimensions.codeQuality = scored(quality, `Maximum member cyclomatic complexity=${maximum}; uncalibrated JS/TS policy.`,
       collected.filter(item => item.dimension === "codeQuality").map(item => item.finding), { maxMemberComplexity: maximum, thresholds: [5, 10, 20, 40] });
     const values = metrics.map(metric => metric.maintainabilityIndex).sort((a,b) => a-b);
     const median = (values[Math.floor((values.length-1)/2)] + values[Math.ceil((values.length-1)/2)]) / 2;
-    dimensions.maintainability = scored(median >= 85 ? 10 : median >= 65 ? 8 : median >= 40 ? 6 : median >= 20 ? 4 : 2,
+    dimensions.maintainability = scored(thresholdDecision("javascript-typescript/maintainability/v1", median, [85, 65, 40, 20], true),
       `Median member maintainability index=${median}; uncalibrated JS/TS policy.`, [], { median, thresholds: [85,65,40,20] });
     const performance = collected.filter(item => item.dimension === "performanceAsync").map(item => item.finding);
     const actionable = performance.filter(finding => finding.confidence !== "low");
-    if (reactSupported) dimensions.performanceAsync = scored(actionable.length ? 6 : 10,
+    if (reactSupported) dimensions.performanceAsync = scored(firstMatch("javascript-typescript/performanceAsync/react-hooks/v1",
+      { actionableFindings: actionable.length, advisoryFindings: performance.length - actionable.length }, [
+        { id: "actionableHooks", condition: "actionableFindings > 0", matched: actionable.length > 0, score: 6, categories: [...new Set(actionable.map(f => f.category))] },
+        { id: "noActionableHooks", condition: "otherwise", matched: true, score: 10 }
+      ]),
       "Limited scope: React hook placement and effect callbacks. General async and concurrency analysis is not implemented.", performance,
-      { actionableFindings: actionable.length, advisoryFindings: performance.length-actionable.length, scope: "react-hooks" });
+      { actionableFindings: actionable.length, advisoryFindings: performance.length-actionable.length, scope: "react-hooks" }, finding => finding.confidence !== "low");
   }
   if (diagnostics.length) for (const key of ["codeQuality", "maintainability", "performanceAsync"] as const)
     dimensions[key] = { status: "failed", basis: "Incomplete source analysis; partial findings are unscored.", findings: dimensions[key].findings };

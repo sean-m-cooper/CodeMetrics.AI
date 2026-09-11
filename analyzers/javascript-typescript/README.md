@@ -1,6 +1,8 @@
 # codemetrics-ai
 
-Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0.2.0 implements source metrics and React hook/effect checks and emits schema-v3 evidence. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
+Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0.3.0 implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
+
+Each scored dimension includes `scoringDecision`: policy inputs, the selected threshold/condition, other matching conditions, and finding attribution. These are aggregate policy decisions, not independent deductions. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md). Existing 0.2.0 scores and thresholds are unchanged.
 
 ```sh
 npx codemetrics-ai --project package.json

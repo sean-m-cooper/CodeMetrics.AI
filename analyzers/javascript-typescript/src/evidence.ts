@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { dimensionKeys, type DimensionKey } from "./scorecard-contract.js";
+import { attachFindings, type ScoringDecision } from "./scoring-decision.js";
 
 export const hash = (text: string) => createHash("sha256").update(text).digest("hex");
 export function invocationIds(runId = randomUUID() as string, auditId = runId) {
@@ -14,6 +15,7 @@ export interface Finding {
   package?: string; observations: Record<string, unknown>;
 }
 export interface Dimension {
+  scoringDecision?: ScoringDecision;
   scope?: { id: string; coverage: "partial" | "unsupported"; includes: string[]; excludes: string[] };
   status: "scored" | "skipped" | "failed"; score?: number; basis: string; findings: Finding[];
   [key: string]: unknown;
@@ -38,8 +40,10 @@ export function skippedDimensions(): Record<DimensionKey, Dimension> {
     scope: { id: `javascript-typescript/${key}/unsupported`, coverage: "unsupported", includes: [], excludes: [key] }
   }])) as unknown as Record<DimensionKey, Dimension>;
 }
-export function scored(score: number, basis: string, findings: Finding[], observations: Record<string, unknown>): Dimension {
-  return { status: "scored", score, basis, findings: findings.sort((a, b) => a.fingerprint.localeCompare(b.fingerprint, "en")),
+export function scored(decision: ScoringDecision, basis: string, findings: Finding[], observations: Record<string, unknown>, eligible?: (finding: Finding) => boolean): Dimension {
+  const score = decision.finalScore;
+  attachFindings(decision, findings, eligible);
+  return { status: "scored", score, basis, scoringDecision: decision, findings: findings.sort((a, b) => a.fingerprint.localeCompare(b.fingerprint, "en")),
     scoring: { algorithm: "dimension-policy", finalScore: score, aggregateScoreLoss: 10 - score,
       contributionMode: "aggregate; findings are not independent deductions", observations } };
 }

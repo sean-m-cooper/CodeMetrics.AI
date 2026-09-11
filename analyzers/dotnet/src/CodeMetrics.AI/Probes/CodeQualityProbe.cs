@@ -27,6 +27,8 @@ public static class CodeQualityProbe
         {
             Status = "scored",
             Score = 10,
+            ScoringDecision = ScoringDecision.FirstMatch("dotnet/codeQuality/v1", new() { ["eligibleTypes"] = 0 },
+                ScoringStep.Rule("emptyPopulation", "eligibleTypes == 0", true, 10)),
             Basis = excludedDataCarriers > 0
                 ? $"No behavior-bearing types with members. Passive data carriers excluded: {excludedDataCarriers}."
                 : "No types with members."
@@ -44,9 +46,13 @@ public static class CodeQualityProbe
         var extremeOver15 = decompositionEligible.Count > 0
             ? decompositionEligible.Count(t => t.DecompositionRatio > 15) * 100.0 / decompositionEligible.Count
             : 0.0;
-        var populationScore = ScoreThreshold(populationOver4, [1, 3, 6, 10, 15]);
-        var p90Score = ScoreThreshold(p90Ratio, [2.0, 2.5, 3.5, 5.0, 7.0]);
-        var extremeScore = ScoreThreshold(extremeOver15, [0.1, 0.5, 1.0, 2.0, 4.0]);
+        var decision = ScoringDecision.Mean("dotnet/codeQuality/decomposition/v1",
+            ScoringDecision.Threshold("decomposition/population", populationOver4, [1, 3, 6, 10, 15]),
+            ScoringDecision.Threshold("decomposition/tail", p90Ratio, [2.0, 2.5, 3.5, 5.0, 7.0]),
+            ScoringDecision.Threshold("decomposition/extreme", extremeOver15, [0.1, 0.5, 1.0, 2.0, 4.0]));
+        var populationScore = (int)decision.Steps[0].Score;
+        var p90Score = (int)decision.Steps[1].Score;
+        var extremeScore = (int)decision.Steps[2].Score;
         return new DecompositionScores(
             populationOver4,
             populationScore,
@@ -54,7 +60,7 @@ public static class CodeQualityProbe
             p90Score,
             extremeOver15,
             extremeScore,
-            Math.Round((populationScore + p90Score + extremeScore) / 3.0, 1));
+            decision);
     }
 
     private static ComplexityScores AnalyzeComplexity(IReadOnlyList<TypeMetrics> eligible)
@@ -63,9 +69,13 @@ public static class CodeQualityProbe
         var populationOver15 = eligible.Count(t => t.MaxMemberCyclomaticComplexity > 15) * 100.0 / eligible.Count;
         var p90MaxCc = Percentile(maxCCs, 90);
         var extremeOver30 = eligible.Count(t => t.MaxMemberCyclomaticComplexity > 30) * 100.0 / eligible.Count;
-        var populationScore = ScoreThreshold(populationOver15, [0.5, 2, 4, 7, 10]);
-        var p90Score = ScoreThreshold(p90MaxCc, [4, 6, 9, 12, 16]);
-        var extremeScore = ScoreThreshold(extremeOver30, [0.2, 0.6, 1.2, 2.5, 4.0]);
+        var decision = ScoringDecision.Mean("dotnet/codeQuality/complexity/v1",
+            ScoringDecision.Threshold("complexity/population", populationOver15, [0.5, 2, 4, 7, 10]),
+            ScoringDecision.Threshold("complexity/tail", p90MaxCc, [4, 6, 9, 12, 16]),
+            ScoringDecision.Threshold("complexity/extreme", extremeOver30, [0.2, 0.6, 1.2, 2.5, 4.0]));
+        var populationScore = (int)decision.Steps[0].Score;
+        var p90Score = (int)decision.Steps[1].Score;
+        var extremeScore = (int)decision.Steps[2].Score;
         return new ComplexityScores(
             populationOver15,
             populationScore,
@@ -73,7 +83,7 @@ public static class CodeQualityProbe
             p90Score,
             extremeOver30,
             extremeScore,
-            Math.Round((populationScore + p90Score + extremeScore) / 3.0, 1));
+            decision);
     }
 
     private static object CreateOffenders(IEnumerable<TypeMetrics> eligible)
@@ -106,7 +116,12 @@ public static class CodeQualityProbe
         DecompositionScores decomposition,
         ComplexityScores complexity)
     {
-        var finalScore = Math.Round((decomposition.Score + complexity.Score) / 2.0, 1);
+        var decision = ScoringDecision.Mean("dotnet/codeQuality/v1",
+            ScoringStep.Component("decomposition", decomposition.Score, decision: decomposition.Decision),
+            ScoringStep.Component("complexity", complexity.Score, decision: complexity.Decision));
+        decision.Inputs["eligibleTypes"] = eligible.Count;
+        decision.Inputs["decompositionEligibleTypes"] = eligible.Count(type => type.MemberCount >= 2);
+        var finalScore = decision.FinalScore;
         var metrics = new
         {
             filtering = new
@@ -148,6 +163,7 @@ public static class CodeQualityProbe
         {
             Status = "scored",
             Score = finalScore,
+            ScoringDecision = decision,
             Basis = basis,
             Extra = extra
         };
@@ -160,7 +176,10 @@ public static class CodeQualityProbe
         int P90Score,
         double ExtremePercent,
         int ExtremeScore,
-        double Score);
+        ScoringDecision Decision)
+    {
+        public double Score => Decision.FinalScore;
+    }
 
     private sealed record ComplexityScores(
         double PopulationPercent,
@@ -169,7 +188,10 @@ public static class CodeQualityProbe
         int P90Score,
         double ExtremePercent,
         int ExtremeScore,
-        double Score);
+        ScoringDecision Decision)
+    {
+        public double Score => Decision.FinalScore;
+    }
 
     /// <summary>
     /// Scores a value against ascending thresholds [t10, t8, t6, t4, t2].
