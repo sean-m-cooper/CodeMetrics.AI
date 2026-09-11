@@ -99,6 +99,8 @@ static async Task<int> AnalyzeSolutionAsync(CliOptions options, CancellationToke
     solutionPath = Path.GetFullPath(solutionPath);
     var solutionDir = Path.GetDirectoryName(solutionPath)!;
     Console.WriteLine($"Solution: {solutionPath}");
+    var scope = await SolutionScope.ReadAsync(solutionPath, options.Configuration, "Any CPU", cancellationToken);
+    Console.Error.WriteLine($"Loading projects ({scope.DisabledPaths.Count} excluded by build configuration)...");
 
     using var workspace = MSBuildWorkspace.Create(new Dictionary<string, string>
     {
@@ -116,7 +118,7 @@ static async Task<int> AnalyzeSolutionAsync(CliOptions options, CancellationToke
     var solution = project?.Solution ?? await workspace.OpenSolutionAsync(
         solutionPath, logger, cancellationToken: cancellationToken);
     var context = await SolutionCompilationLoader.LoadAsync(
-        solution, solutionDir, cancellationToken, project?.Id);
+        solution, solutionDir, cancellationToken, project?.Id, scope);
     context.Diagnostics.AddRange(workspaceDiagnostics.Read(cancellationToken));
     var comparer = OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
     var inputs = solution.Projects.Select(project => project.FilePath)
@@ -143,7 +145,8 @@ static async Task<int> AnalyzeSolutionAsync(CliOptions options, CancellationToke
         solutionDir,
         options.SkipDependencyProbe,
         cancellationToken,
-        options.Coverage);
+        options.Coverage,
+        scope);
     var evidence = EvidenceFactory.Create(
         context, solutionPath, solutionDir, options.Configuration, dimensions, runId, auditId);
 

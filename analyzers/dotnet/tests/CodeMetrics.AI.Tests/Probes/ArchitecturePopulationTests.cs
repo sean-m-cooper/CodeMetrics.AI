@@ -87,7 +87,7 @@ public sealed class ArchitecturePopulationTests : IDisposable
     [Fact]
     public void Controller_UsesItsOwnThreshold()
     {
-        var controller = new TypeMetrics { Project = "App", Namespace = "App", Type = "HomeController", FilePath = "HomeController.cs", StructuralClassCoupling = 8 };
+        var controller = new TypeMetrics { Project = "App", Namespace = "App", Type = "HomeController", FilePath = "HomeController.cs", StructuralClassCoupling = 8, IsWebController = true };
         Analyze(new[] { controller }.Concat(Enumerable.Range(1, 99).Select(index => Metric(index)))).Score.Should().Be(9.9);
     }
 }

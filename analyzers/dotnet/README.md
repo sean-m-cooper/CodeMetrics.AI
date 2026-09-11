@@ -199,7 +199,18 @@ The Performance & Async dimension also reports `sharedStateMutationInFanOut` whe
 
 ### Evidence population and samples
 
-Starting with 2.2.0, every scored dimension also includes `scoringDecision`, recording policy inputs, selected rules, nested components, binding/nonbinding caps and finding effects. The existing scores and `dotnet-2026-09-08` ruleset are unchanged. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md); these effects are not independent finding deductions.
+Starting with 2.2.0, every scored dimension also includes `scoringDecision`, recording policy inputs, selected rules, nested components, binding/nonbinding caps and finding effects. That release preserved the scores and `dotnet-2026-09-08` ruleset. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md); these effects are not independent finding deductions.
+
+Version 2.3.0 uses ruleset `dotnet-2026-09-11`. Thresholds and score formulas are unchanged, but project populations and rule classification are corrected:
+
+- Solution runs honor build exclusions for the selected configuration and Any CPU. Dependency checks use the same enabled project scope; static dependency checks and architecture cycles do not scan unrelated projects elsewhere in the checkout. Project entry points retain their selected-project scope.
+- Framework suffixes no longer hide test, sample or benchmark roles. Test metadata, semantic test attributes and conventional test/support directories keep non-production code out of production metrics. Testing counts unique project/source sites across frameworks and reports loaded test instances separately.
+- Controller-specific architecture rules require a web-controller base type or attribute. Delegates and generic execution contexts are not data-layer dependencies.
+- `.Result` and equivalent blocking checks recognize direct completion guards and simple semantically verified helpers. Reassigned tasks, unverified helpers and deferred lambda bodies remain conservative review candidates.
+- Documentation presence is checked from the Git repository root, while API documentation remains limited to selected source.
+- Dependency subprocesses resolve their own repository SDK without inherited MSBuild locator paths. Failed commands retain stdout diagnostics and timeout cleanup terminates their process trees.
+
+These corrections can change scores without source changes. Evidence from the earlier ruleset is incompatible for baseline gates. A complete run still provides a partial static assessment, and test signals do not establish measured coverage.
 
 Starting with 2.1.0 (`dotnet-2026-09-08`), Architecture metric hotspots use a population/severity policy. Coupling, complexity, and size each have a component score:
 

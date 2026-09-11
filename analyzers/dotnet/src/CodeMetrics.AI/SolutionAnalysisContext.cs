@@ -15,6 +15,7 @@ internal sealed record SolutionAnalysisContext(
     IReadOnlyList<MemberMetrics> MemberMetrics)
 {
     public List<AnalysisDiagnostic> Diagnostics { get; } = [];
+    public IReadOnlyList<string> ScopedProjectPaths { get; init; } = [];
     public bool HasErrors => Diagnostics.Any(diagnostic => diagnostic.Kind != "workspaceWarning");
 }
 
@@ -24,12 +25,25 @@ internal static class SolutionCompilationLoader
         Solution solution,
         string solutionDir,
         CancellationToken cancellationToken,
-        ProjectId? entryProjectId = null)
+        ProjectId? entryProjectId = null,
+        SolutionScope? scope = null)
     {
         // References remain in the workspace for semantic resolution; project entry points score only that project.
         var projects = solution.Projects.Where(project => entryProjectId == null || project.Id == entryProjectId).ToList();
-        var (skipped, analyzedProjectIds) = ClassifyProjects(projects);
-        var compiledProjects = await CompileAsync(projects, cancellationToken);
+        var (skipped, analyzedProjectIds) = ClassifyProjects(projects, solutionDir, scope);
+        var activeProjects = projects.Where(p => p.FilePath == null || scope == null ||
+            (scope.ProjectPaths.Contains(p.FilePath) && !scope.DisabledPaths.Contains(p.FilePath))).ToList();
+        var compilationProjects = activeProjects.Where(p => analyzedProjectIds.Contains(p.Id) ||
+            skipped.Any(s => s.Name == p.Name && s.Reason == "Test project")).ToList();
+        var compiledProjects = await CompileAsync(compilationProjects, cancellationToken);
+        foreach (var (candidate, compilation) in compiledProjects)
+        {
+            if (compilation != null && analyzedProjectIds.Contains(candidate.Id) && ProjectFilter.HasTestMethods(compilation, solutionDir))
+            {
+                analyzedProjectIds.Remove(candidate.Id);
+                skipped.Add(new SkippedProjectInfo { Name = candidate.Name, Reason = "Test project (semantic attributes)" });
+            }
+        }
         var loaded = CollectMetrics(compiledProjects, analyzedProjectIds, solutionDir);
 
         var context = new SolutionAnalysisContext(
@@ -40,7 +54,10 @@ internal static class SolutionCompilationLoader
             loaded.AnalyzedCompilations,
             loaded.ProjectsWithPaths,
             loaded.Types,
-            loaded.Members);
+            loaded.Members)
+        {
+            ScopedProjectPaths = activeProjects.Select(p => p.FilePath).OfType<string>().Distinct(SolutionScope.PathComparer).ToArray()
+        };
         foreach (var (project, compilation) in compiledProjects)
         {
             if (compilation == null)
@@ -63,13 +80,17 @@ internal static class SolutionCompilationLoader
 
     private static (
         List<SkippedProjectInfo> Skipped,
-        HashSet<ProjectId> AnalyzedProjectIds) ClassifyProjects(IEnumerable<Project> projects)
+        HashSet<ProjectId> AnalyzedProjectIds) ClassifyProjects(IEnumerable<Project> projects, string root, SolutionScope? scope)
     {
         var skipped = new List<SkippedProjectInfo>();
         var analyzedProjectIds = new HashSet<ProjectId>();
         foreach (var project in projects)
         {
-            if (ProjectFilter.ShouldSkip(project.Name, out var reason))
+            if (project.FilePath != null && scope?.DisabledPaths.Contains(project.FilePath) == true)
+                skipped.Add(new SkippedProjectInfo { Name = project.Name, Reason = "Excluded by solution build configuration" });
+            else if (project.FilePath != null && scope != null && !scope.ProjectPaths.Contains(project.FilePath))
+                skipped.Add(new SkippedProjectInfo { Name = project.Name, Reason = "Reference outside selected solution" });
+            else if (ProjectFilter.ShouldSkip(project.Name, project.FilePath, root, out var reason))
                 skipped.Add(new SkippedProjectInfo { Name = project.Name, Reason = reason });
             else
                 analyzedProjectIds.Add(project.Id);

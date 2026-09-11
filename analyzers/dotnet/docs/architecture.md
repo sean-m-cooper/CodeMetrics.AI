@@ -5,12 +5,14 @@ CodeMetrics.AI is a deterministic, read-only analyzer. It loads a .NET solution 
 ## Analysis flow
 
 1. `Program.cs` parses command-line options and passes cancellation to the analysis pipeline.
-2. `Program` loads the solution or project with the selected MSBuild configuration. Project mode scores only the selected project while keeping references in the workspace for semantic resolution. `SolutionCompilationLoader` classifies projects, bounds concurrent compilations to four, and records missing compilations and compiler errors.
+2. `SolutionScope` reads solution build mappings with SolutionPersistence. `Program` loads the solution or project with the selected MSBuild configuration (Any CPU). Project mode scores only the selected project while keeping references in the workspace for semantic resolution. `SolutionCompilationLoader` classifies enabled projects, bounds concurrent compilations to four, and records missing compilations and compiler errors. Disabled projects remain explicit filter entries and are excluded from both source compilation diagnostics and package checks; enabled production compilation errors remain blocking.
 3. `MetricsCollector` calculates type/member metrics from production syntax and symbols.
 4. Each class in `Probes/` evaluates one scorecard dimension. Probes receive immutable metric or compilation inputs and return a `DimensionResult`.
 5. `CsvWriter` and `EvidenceWriter` persist the two public output formats.
 
 The dependency probe is the only probe that invokes external commands or reads package feeds. Those operations are bounded, cancellable, and degrade to explicit failed or unknown evidence rather than silently inventing compatibility.
+
+Dependency subprocesses remove the MSBuild paths installed by the analyzer's locator and resolve their own SDK from the repository working directory. When a solution excludes projects from its build, package commands receive a disposable solution containing only enabled projects. Static dependency checks use the same selected paths. Source architecture cycles use production paths, and testing aggregates a union of unique source sites across target frameworks. Test/support/sample exclusions do not remove enabled package dependencies from the dependency assessment.
 
 ## Important boundaries
 

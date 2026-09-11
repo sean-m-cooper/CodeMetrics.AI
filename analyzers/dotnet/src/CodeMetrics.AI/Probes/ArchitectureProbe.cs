@@ -25,12 +25,6 @@ public static class ArchitectureProbe
         "Gateway", "Client", "Context", "Repository", "Infrastructure"
     ];
 
-    // Data-related keywords for controller dependency check
-    private static readonly string[] DataKeywords =
-    [
-        "DbContext", "Context", "Repository", "DAL"
-    ];
-
     private static readonly HashSet<string> DependencyInjectionExtensionReceivers =
     [
         "Microsoft.Extensions.DependencyInjection.IServiceCollection",
@@ -63,7 +57,8 @@ public static class ArchitectureProbe
     public static DimensionResult Analyze(
         IReadOnlyList<(string Name, Compilation Compilation)> projects,
         IReadOnlyList<TypeMetrics> typeMetrics,
-        string solutionDir)
+        string solutionDir,
+        IReadOnlyList<string>? projectPaths = null)
     {
         var findings = new List<Finding>();
         var dependencyInjectionExtensionTypes = new HashSet<string>(StringComparer.Ordinal);
@@ -75,7 +70,7 @@ public static class ArchitectureProbe
             .ToHashSet(StringComparer.Ordinal);
 
         // 1. Project graph cycle detection
-        var cycles = ProjectCycleDetector.Find(solutionDir);
+        var cycles = ProjectCycleDetector.Find(solutionDir, projectPaths);
         foreach (var cycle in cycles)
         {
             findings.Add(new Finding
@@ -319,16 +314,15 @@ public static class ArchitectureProbe
             // Collect all constructor parameter types
             var constructorParams = GetAllConstructorParameterTypeNames(typeDecl, semanticModel);
 
-            if (typeName.EndsWith("Controller", StringComparison.Ordinal))
+            if (WebTypeClassifier.IsController(semanticModel.GetDeclaredSymbol(typeDecl) as INamedTypeSymbol))
             {
                 // Check for data-layer dependencies in controllers
-                foreach (var (paramTypeName, _, _, line) in constructorParams)
+                foreach (var (paramTypeName, _, paramTypeSymbol, line) in constructorParams)
                 {
                     if (IsCrossCuttingType(paramTypeName))
                         continue;
 
-                    if (DataKeywords.Any(kw =>
-                            paramTypeName.Contains(kw, StringComparison.OrdinalIgnoreCase)))
+                    if (WebTypeClassifier.IsDataDependency(paramTypeSymbol))
                     {
                         findings.Add(new Finding
                         {
@@ -450,10 +444,10 @@ public static class ArchitectureProbe
         string projectName,
         List<ControllerActionObservation> observations)
     {
-        foreach (var declaration in root.DescendantNodes().OfType<ClassDeclarationSyntax>()
-                     .Where(candidate => candidate.Identifier.Text.EndsWith("Controller", StringComparison.Ordinal)))
+        foreach (var declaration in root.DescendantNodes().OfType<ClassDeclarationSyntax>())
         {
-            if (semanticModel.GetDeclaredSymbol(declaration) is not INamedTypeSymbol controllerSymbol)
+            if (semanticModel.GetDeclaredSymbol(declaration) is not INamedTypeSymbol controllerSymbol ||
+                !WebTypeClassifier.IsController(controllerSymbol))
                 continue;
 
             var constructorDependencyTypes = GetAllConstructorParameterTypeNames(declaration, semanticModel)
@@ -717,19 +711,19 @@ public static class ArchitectureProbe
     {
         if (!metric.StructuralClassCoupling.HasValue)
         {
-            return metric.Type.EndsWith("Controller", StringComparison.Ordinal)
+            return metric.IsWebController
                 ? LegacyControllerRawCouplingThreshold
                 : LegacyRawCouplingThresholdValue;
         }
 
-        return metric.Type.EndsWith("Controller", StringComparison.Ordinal)
+        return metric.IsWebController
             ? ControllerStructuralCouplingThreshold
             : StructuralCouplingThreshold;
     }
 
     private static int LegacyRawCouplingThreshold(TypeMetrics metric)
     {
-        return metric.Type.EndsWith("Controller", StringComparison.Ordinal)
+        return metric.IsWebController
             ? LegacyControllerRawCouplingThreshold
             : LegacyRawCouplingThresholdValue;
     }

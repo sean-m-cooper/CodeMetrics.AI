@@ -10,14 +10,17 @@ internal static class ScorecardProbeRunner
         string solutionDir,
         bool skipDependencyProbe,
         CancellationToken cancellationToken,
-        string? coveragePath = null)
+        string? coveragePath = null,
+        SolutionScope? scope = null)
     {
         var dimensions = CreateCoreDimensions(context, solutionDir);
         var dependency = await AnalyzeDependenciesAsync(
             solutionPath,
             solutionDir,
             skipDependencyProbe,
-            cancellationToken);
+            cancellationToken,
+            context.ScopedProjectPaths,
+            scope);
         dimensions["dependencyManagement"] = dependency;
         AddDependentDimensions(dimensions, context, dependency, solutionDir, coveragePath);
         Output.EvidenceEnricher.Enrich(dimensions, context, solutionDir);
@@ -60,7 +63,9 @@ internal static class ScorecardProbeRunner
         string solutionPath,
         string solutionDir,
         bool skipDependencyProbe,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        IReadOnlyList<string> projectPaths,
+        SolutionScope? scope)
     {
         return skipDependencyProbe
             ? new DimensionResult
@@ -69,7 +74,7 @@ internal static class ScorecardProbeRunner
                 Basis = "Dependency probe skipped via --skip-dependency-probe."
             }
             : await DependencyProbe.AnalyzeAsync(
-                solutionPath, solutionDir, cancellationToken);
+                solutionPath, solutionDir, cancellationToken, projectPaths, scope);
     }
 
     private static void AddDependentDimensions(
@@ -88,6 +93,7 @@ internal static class ScorecardProbeRunner
         dimensions["documentation"] = DocumentationProbe.Analyze(
             solutionDir, context.ProjectsWithPaths);
         dimensions["architecture"] = ArchitectureProbe.Analyze(
-            context.AnalyzedProjectCompilations, context.TypeMetrics, solutionDir);
+            context.AnalyzedProjectCompilations, context.TypeMetrics, solutionDir,
+            context.ProjectsWithPaths.Select(p => p.ProjectFilePath).OfType<string>().ToArray());
     }
 }

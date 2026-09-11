@@ -137,6 +137,7 @@ public static class MetricsCollector
         var coupling = ClassCouplingCalculator.Analyze(typeDecl, model);
         return new TypeMetrics
         {
+            IsWebController = WebTypeClassifier.IsController(typeSymbol),
             Project = project,
             Namespace = ns,
             Type = type,

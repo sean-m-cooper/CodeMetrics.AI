@@ -30,17 +30,20 @@ public static class TestingProbe
         var testProjectNames = testProjects.Select(p => p.Name).ToList();
         var uncoveredProjects = FindUncoveredProductionProjects(analyzedProjectNames, testProjectNames);
         AddUncoveredProjectFindings(findings, uncoveredProjects, coverage != null);
-        var decision = CalculateDecision(testProjects.Count, testMetrics, uncoveredProjects, coverage);
+        var uniqueTestProjects = testProjects.Select(p => ProjectFilter.NormalizeName(p.Name)).Distinct(StringComparer.OrdinalIgnoreCase).Count();
+        var decision = CalculateDecision(uniqueTestProjects, testMetrics, uncoveredProjects, coverage);
         var result = CreateResult(
             decision,
-            testProjects.Count,
-            analyzedProjectNames.Count,
+            uniqueTestProjects,
+            analyzedProjectNames.Select(ProjectFilter.NormalizeName).Distinct(StringComparer.OrdinalIgnoreCase).Count(),
             testMetrics,
             uncoveredProjects,
             coverageFileFound,
             coverage,
             findings);
         result.Extra["coverageMode"] = coveragePath == null ? "auto" : "explicit";
+        result.Extra["testProjectInstances"] = testProjects.Count;
+        result.Extra["testPopulationPolicy"] = "unique project and source method sites; union across target frameworks";
         result.Extra["coverage"] = report ?? (object)new { status = "missing", path = selectedCoveragePath };
         if (coveragePath != null && coverage == null)
             return new DimensionResult { Status = "failed", Basis = "The requested coverage report is missing, invalid, or does not match production files.", Findings = findings, Extra = result.Extra };
@@ -61,10 +64,10 @@ public static class TestingProbe
         string solutionDir,
         List<Finding> findings)
     {
-        var testMethodCount = 0;
-        var skippedTests = 0;
-        var placeholderTests = 0;
-        var assertionCount = 0;
+        var testMethods = new HashSet<string>(StringComparer.Ordinal);
+        var skippedTests = new HashSet<string>(StringComparer.Ordinal);
+        var placeholderTests = new HashSet<string>(StringComparer.Ordinal);
+        var assertions = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (var (projectName, compilation) in testProjects)
         {
@@ -75,14 +78,14 @@ public static class TestingProbe
                     tree.FilePath,
                     projectName,
                     findings,
-                    ref testMethodCount,
-                    ref skippedTests,
-                    ref placeholderTests,
-                    ref assertionCount);
+                    testMethods,
+                    skippedTests,
+                    placeholderTests,
+                    assertions);
             }
         }
 
-        return new TestMetrics(testMethodCount, skippedTests, placeholderTests, assertionCount);
+        return new TestMetrics(testMethods.Count, skippedTests.Count, placeholderTests.Count, assertions.Count);
     }
 
     private static void AddUncoveredProjectFindings(
@@ -219,8 +222,8 @@ public static class TestingProbe
 
     private static bool IsTestProject(string projectName, Compilation compilation, string solutionDir)
     {
-        // Name-based detection
-        if (projectName.Contains("Test", StringComparison.OrdinalIgnoreCase))
+        var name = ProjectFilter.NormalizeName(projectName);
+        if (name.EndsWith(".Tests", StringComparison.OrdinalIgnoreCase) || name.EndsWith(".Test", StringComparison.OrdinalIgnoreCase))
             return true;
 
         // Source-based detection: any method with a test attribute
@@ -245,10 +248,10 @@ public static class TestingProbe
         string filePath,
         string projectName,
         List<Finding> findings,
-        ref int testMethodCount,
-        ref int skippedTests,
-        ref int placeholderTests,
-        ref int assertionCount)
+        HashSet<string> testMethods,
+        HashSet<string> skippedTests,
+        HashSet<string> placeholderTests,
+        HashSet<string> assertions)
     {
         var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
@@ -257,30 +260,31 @@ public static class TestingProbe
             if (!HasTestAttribute(method))
                 continue;
 
-            testMethodCount++;
+            var site = $"{ProjectFilter.NormalizeName(projectName)}|{filePath}|{method.Identifier.SpanStart}";
+            testMethods.Add(site);
 
             // Skipped test: Skip or Ignore named argument in any test attribute
             if (HasSkipOrIgnoreArgument(method))
-                skippedTests++;
+                skippedTests.Add(site);
 
             // Placeholder test: empty body, NotImplementedException throw, or name contains todo/placeholder
-            if (IsPlaceholderTest(method))
+            if (IsPlaceholderTest(method) && placeholderTests.Add(site))
             {
-                placeholderTests++;
                 findings.Add(new Finding
                 {
                     Category = "placeholderTest",
                     Severity = "warning",
                     File = filePath,
                     Line = GetLine(method),
-                    Project = projectName,
+                    Project = ProjectFilter.NormalizeName(projectName),
                     Type = GetContainingTypeName(method),
                     Message = $"Test method '{method.Identifier.Text}' appears to be a placeholder."
                 });
             }
 
             // Count assertions within this method
-            assertionCount += CountAssertions(method);
+            foreach (var position in AssertionPositions(method))
+                assertions.Add($"{site}|{position}");
         }
     }
 
@@ -366,10 +370,9 @@ public static class TestingProbe
         return false;
     }
 
-    private static int CountAssertions(MethodDeclarationSyntax method)
+    private static IEnumerable<int> AssertionPositions(MethodDeclarationSyntax method)
     {
         var invocations = method.DescendantNodes().OfType<InvocationExpressionSyntax>();
-        int count = 0;
         foreach (var inv in invocations)
         {
             var text = inv.Expression.ToString();
@@ -378,10 +381,9 @@ public static class TestingProbe
                 text.IndexOf("Verify", StringComparison.OrdinalIgnoreCase) >= 0 ||
                 text.IndexOf("Expect", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                count++;
+                yield return inv.SpanStart;
             }
         }
-        return count;
     }
 
     private static List<string> FindUncoveredProductionProjects(
@@ -390,7 +392,7 @@ public static class TestingProbe
     {
         var uncovered = new List<string>();
 
-        foreach (var productionProject in analyzedProjectNames)
+        foreach (var productionProject in analyzedProjectNames.Select(ProjectFilter.NormalizeName).Distinct(StringComparer.OrdinalIgnoreCase))
         {
             bool covered = testProjectNames.Any(testProject =>
                 DoesTestProjectCover(testProject, productionProject));
@@ -406,18 +408,11 @@ public static class TestingProbe
     {
         // "MyApp.Core.Tests" covers "MyApp.Core"
         // Strategy: strip common test suffixes/prefixes and compare
-        productionProjectName = StripTargetFrameworkSuffix(productionProjectName);
+        productionProjectName = ProjectFilter.NormalizeName(productionProjectName);
+        testProjectName = ProjectFilter.NormalizeName(testProjectName);
         var strippedTest = StripTestSuffix(testProjectName);
         return strippedTest.Equals(productionProjectName, StringComparison.OrdinalIgnoreCase) ||
                testProjectName.StartsWith(productionProjectName, StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static string StripTargetFrameworkSuffix(string name)
-    {
-        var index = name.LastIndexOf(" (", StringComparison.Ordinal);
-        return index > 0 && name.EndsWith(")", StringComparison.Ordinal)
-            ? name[..index]
-            : name;
     }
 
     private static string StripTestSuffix(string name)

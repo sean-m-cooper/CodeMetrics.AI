@@ -15,7 +15,7 @@ public class ArchitectureProbeTests
         IReadOnlyList<TypeMetrics>? metrics = null,
         string? solutionDir = null)
     {
-        var (_, _, compilation) = RoslynTestHelper.CompileCode(code);
+        var (_, _, compilation) = RoslynTestHelper.CompileCode(code + "\nnamespace Microsoft.AspNetCore.Mvc { public class ControllerAttribute : System.Attribute { } }");
         var projects = new List<(string, Compilation)> { ("TestProject", compilation) };
         return ArchitectureProbe.Analyze(
             projects,
@@ -144,7 +144,7 @@ public class ArchitectureProbeTests
     {
         const string code = """
             public class AppDbContext { }
-            public class MyController {
+            [Microsoft.AspNetCore.Mvc.Controller] public class MyController {
                 public MyController(AppDbContext db) { }
             }
             """;
@@ -159,7 +159,7 @@ public class ArchitectureProbeTests
     {
         const string code = """
             public class AppDbContext { }
-            public class MyController {
+            [Microsoft.AspNetCore.Mvc.Controller] public class MyController {
                 public MyController(AppDbContext db) { }
             }
             """;
@@ -175,7 +175,7 @@ public class ArchitectureProbeTests
     {
         const string code = """
             public class UserRepository { }
-            public class UserController {
+            [Microsoft.AspNetCore.Mvc.Controller] public class UserController {
                 public UserController(UserRepository repo) { }
             }
             """;
@@ -190,7 +190,7 @@ public class ArchitectureProbeTests
     {
         const string code = """
             public interface ILogger<T> { }
-            public class MyController {
+            [Microsoft.AspNetCore.Mvc.Controller] public class MyController {
                 public MyController(ILogger<MyController> logger) { }
             }
             """;
@@ -408,6 +408,7 @@ public class ArchitectureProbeTests
                 Project = "TestProject",
                 Namespace = "MyNs",
                 Type = "OrdersController",
+                IsWebController = true,
                 FilePath = "OrdersController.cs",
                 CyclomaticComplexity = 5,
                 ClassCoupling = 35,
@@ -430,6 +431,7 @@ public class ArchitectureProbeTests
                 Project = "TestProject",
                 Namespace = "MyNs",
                 Type = "OrdersController",
+                IsWebController = true,
                 FilePath = "OrdersController.cs",
                 CyclomaticComplexity = 5,
                 ClassCoupling = 67,
@@ -465,6 +467,7 @@ public class ArchitectureProbeTests
                 Project = "TestProject",
                 Namespace = "MyNs",
                 Type = "OrdersController",
+                IsWebController = true,
                 FilePath = "OrdersController.cs",
                 CyclomaticComplexity = 5,
                 ClassCoupling = 20,
@@ -580,7 +583,7 @@ public class ArchitectureProbeTests
             public interface ILogger { }
             public class ActionService { }
             public class Response { }
-            public class OrdersController {
+            [Microsoft.AspNetCore.Mvc.Controller] public class OrdersController {
                 private readonly IControllerDependency dependency;
                 public OrdersController(IControllerDependency dependency, ILogger logger) {
                     this.dependency = dependency;
@@ -837,7 +840,7 @@ public class ArchitectureProbeTests
 
         try
         {
-            var (_, _, compilation) = RoslynTestHelper.CompileCode(code);
+            var (_, _, compilation) = RoslynTestHelper.CompileCode(code + "\nnamespace Microsoft.AspNetCore.Mvc { public class ControllerAttribute : System.Attribute { } }");
             var projects = new List<(string, Compilation)> { ("TestProject", compilation) };
             var result = ArchitectureProbe.Analyze(projects, [], tempDir);
 
@@ -875,7 +878,7 @@ public class ArchitectureProbeTests
     {
         const string code = """
             public class AppDbContext { }
-            public class MyController {
+            [Microsoft.AspNetCore.Mvc.Controller] public class MyController {
                 public MyController(AppDbContext db) { }
             }
             """;
@@ -915,7 +918,7 @@ public class ArchitectureProbeTests
         // broken architecture indistinguishable from an untidy one.
         const string errorRung = """
             public class AppDbContext { }
-            public class MyController { public MyController(AppDbContext db) { } }
+            [Microsoft.AspNetCore.Mvc.Controller] public class MyController { public MyController(AppDbContext db) { } }
             """;
         const string noisy = """
             public class SqlGateway { }

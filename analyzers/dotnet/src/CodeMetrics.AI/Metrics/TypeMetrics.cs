@@ -21,4 +21,5 @@ public sealed class TypeMetrics
     public int MaxMemberCyclomaticComplexity { get; set; }
     public double DecompositionRatio { get; set; }
     public bool IsDataCarrier { get; set; }
+    public bool IsWebController { get; set; }
 }
