@@ -138,3 +138,21 @@ A fresh packaged Polly run at the same source commit records 48 distinct finding
 - Verification: 536 analyzer tests pass, including 12 source-population regression cases; all six .NET calibration fixtures retain scores and findings; formatting and whitespace checks pass.
 
 The new regressions cover one catch across one/five/ten frameworks, five distinct catches on one line, separate conditional branches, findings present in only one variant, identical text in different files, linked shared files, warning-count inflation, different rules at one site, deterministic ordering, and missing file identity. This correction applies to error-handling source findings; type-metric and package populations in other dimensions remain unchanged. It is local and unpublished.
+
+## Follow-up: exception results and error callbacks
+
+Polly's catch blocks expose additional legitimate handling paths: `PolicyResult.Failure(exception, ...)`, `Outcome.FromException(...)`, invoked cache-error delegates, and an outcome local returned after cleanup. The timeout strategy returns that outcome through `WithCallerCancellationToken`; source review confirms that this preserves the failure while adjusting cancellation context. These paths should not be described as swallowing exceptions solely because they lack logging or rethrow.
+
+The probe now recognizes exception-bearing returned factories/constructors, initializers and tuples; direct exception returns; unchanged outcome locals returned directly or through an operation returning the same outcome type; and void/awaited delegate invocations receiving the caught exception. The missing-logger advisory respects these paths. Semantic symbol identity, write checks and exclusion of deferred catch-body lambdas/local functions guard against discarded results, unrelated exceptions and callbacks that are only declared. The existing post-catch deferred-logging behavior is preserved. Recognition is a bounded static handling lead, not proof that every branch reports the exception or that a factory retains it. Unrecognized paths now receive review wording instead of a definitive swallowing claim.
+
+A fresh packaged run on unchanged Polly commit `1a80392b1f093f40e59c515f4aeb989bea5db857` removes **25 distinct warnings**: 23 broad-catch warnings and two missing-logger advisories. Findings fall from **48 to 23**, framework observations from **220 to 107**, and warnings from **46 to 21**. Remaining findings comprise two empty catches, seven broad-catch review leads, 12 synchronous-blocking observations and two missing-logger advisories. There are no newly added findings.
+
+Error Handling remains **2**, limited by the same two empty catches. All eight other dimension scores are unchanged. This is a measurement correction with partial static scope; it does not establish that the remaining findings are defects.
+
+- Development version 2.3.0, schema 3, ruleset `dotnet-2026-09-11`; policy `dotnet/errorHandling/source-findings-v1`, with `inputs.handlingRecognition: exception-propagation-v1`. Thresholds and source-counting rules are unchanged.
+- Run ID: `d543f072-f3f8-4ca5-93e6-7442aac06f83`; audit ID: `9326e28e-7c2f-4813-bd29-6d6bfdf109e3`.
+- Comparison run: `ba207238-b19b-4344-b8c1-cb9880688528`.
+- Package SHA-256: `0304b104f7b5d48f585804ab987e205ab191fa921e7fbdca87c55de935c8567f`.
+- Analyzer and validator exit 0; inspection usable; invocation/evidence run and audit IDs match. Target source remains unchanged; no target test suite or coverage was run.
+- Local artifacts, package, logs and comparison script: `E:/repos/CodeMetrics.AI/TestResults/exception-propagation/`. Polly retains its run-specific evidence, inspection and CSV.
+- Verification: **584 analyzer tests pass**, including **48 new regression cases**. All six .NET calibration fixtures retain their scores and findings. Formatting and whitespace checks pass. The correction remains local and unpublished.
