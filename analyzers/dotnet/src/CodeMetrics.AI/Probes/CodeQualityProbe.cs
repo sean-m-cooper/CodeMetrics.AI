@@ -107,6 +107,8 @@ public static class CodeQualityProbe
                 project = type.Project,
                 @namespace = type.Namespace,
                 type = type.Type,
+                typeId = type.TypeId,
+                sourceFiles = type.SourceFiles,
                 decompositionRatio = type.DecompositionRatio,
                 maxMemberCc = type.MaxMemberCyclomaticComplexity,
                 classCc = type.CyclomaticComplexity,

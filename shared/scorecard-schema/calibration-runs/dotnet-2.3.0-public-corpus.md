@@ -94,3 +94,31 @@ Tested local NuGet package SHA-256: `1e630035ab4c2d3d91437a6db71dceebebb2ddcccfd
 ## Remaining limits
 
 Polly still has synchronous-boundary and exception-handling findings. Newtonsoft.Json still has catch/default-result findings. These require call-site and behavioral review; this release does not assert that each finding is a defect or suppress them by repository name. Test-project name matching remains a coverage heuristic. Production metrics still count target-framework instances, while test-method signals use the documented union of source sites. Dependency observations include enabled test/sample projects and live feed results; package rows are not unique package counts. Four repositories do not establish broad calibration or cross-ecosystem comparability.
+
+## Follow-up: logical partial-type aggregation
+
+A source review of Newtonsoft.Json exposed a population defect: `JContainer.Async.cs` was scored as a two-member type independently of the other declaration. The collector now combines included declarations by Roslyn symbol within each project/framework compilation, calculates member aggregates once, and unions coupling references. Partial method/property signatures and implementations count once. Generated declarations remain excluded. CSV membership uses the logical identity so partials and same-named nested/generic types do not multiply member rows. Component hotspot samples include the logical identity and source files. Raw physical line counts still include declaration/formatting overhead.
+
+These fresh runs compare with the subsequent component-reporting snapshot, at the same four source commits listed above. Both snapshots use development version 2.3.0 and ruleset `dotnet-2026-09-11`; package hashes distinguish the implementations. Thresholds, score formulas and overall weights are unchanged. Every run completed and passed validation with matching run/audit IDs. Target source remained unchanged; target test suites were not executed and no coverage was supplied.
+
+| Repository | Method complexity before / after | Decomposition before / after | Combined before / after |
+|---|---:|---:|---:|
+| Polly | 9.3 / 9.3 | 9.3 / 10 | 9.3 / 9.6 |
+| Newtonsoft.Json | 0 / 0 | 4.7 / 5.3 | 2.4 / 2.6 |
+| SimplCommerce | 8.7 / 8.7 | 9.3 / 9.3 | 9 / 9 |
+| OrchardCore | 6.7 / 6.7 | 6.7 / 6.7 | 6.7 / 6.7 |
+
+All scores remain partial static assessments. Newtonsoft.Json's net8.0 `JContainer` now has one type row, 101 members, aggregate CC 263 and decomposition ratio 2.604 (the async fragment previously scored 17). `JValue` has 64 members and ratio 4.4375; `Operation` retains CC 69 and appears once in CSV for that framework.
+
+Other changed dimensions: Newtonsoft.Json maintainability rises 7.3 to 8.7 after combining member populations. Polly architecture falls 9.3 to 5.6: its combined non-generic `Policy` has 43 structural dependencies, which limits the coupling component. Inspected partial files expose public factory APIs for policy construction; this measurement requires that context before making a responsibility judgment. No factory-specific scoring adjustment was made. All other dimension scores are unchanged. These are measurement corrections, not source improvements.
+
+| Repository | Run ID | Audit ID |
+|---|---|---|
+| Polly | `ed8a28ed-e7dd-4b0b-bcd5-c6b41c2fd267` | `8cc05791-3662-4153-9503-c00d74c59ae9` |
+| Newtonsoft.Json | `402c8b82-1f1f-40a3-ba2e-6639e082b255` | `1176e4d4-c957-4d52-9583-3ea5b4268862` |
+| SimplCommerce | `117c4170-8cf2-4fac-9e3c-012faf802d2a` | `b012ccfe-5092-4bd8-a808-9fc9a69b7886` |
+| OrchardCore | `9b559530-3aec-4a3c-8269-7d10d0c76af9` | `b8642cdb-508f-4a8b-8b71-355d021fd0ce` |
+
+Package SHA-256: `5cbb328235a59266f1b1221a61c1a94e8f2265c0837e87c76388a5376d9533c0`. Local comparison, invocation results, logs, package, prior run IDs and full dimension deltas are under `E:/repos/CodeMetrics.AI/TestResults/partial-types/`; each repository retains its run-specific evidence/inspection/CSV.
+
+Verification: 520 analyzer tests pass, including seven new partial-type regression cases. All six .NET calibration fixtures retain their scores and findings. Formatting and whitespace checks pass. This correction remains local on the development branch; it has not been published.

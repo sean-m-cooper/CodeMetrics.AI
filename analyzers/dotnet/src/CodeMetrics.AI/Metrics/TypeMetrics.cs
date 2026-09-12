@@ -5,7 +5,9 @@ public sealed class TypeMetrics
     public required string Project { get; init; }
     public required string Namespace { get; init; }
     public required string Type { get; init; }
+    public string? TypeId { get; init; }
     public required string FilePath { get; init; }
+    public IReadOnlyList<string> SourceFiles { get; init; } = [];
     public int CyclomaticComplexity { get; set; }
     public int MaintainabilityIndex { get; set; }
     public int DepthOfInheritance { get; set; }

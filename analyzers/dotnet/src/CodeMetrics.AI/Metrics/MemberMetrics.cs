@@ -5,6 +5,7 @@ public sealed class MemberMetrics
     public required string Project { get; init; }
     public required string Namespace { get; init; }
     public required string Type { get; init; }
+    public string? TypeId { get; init; }
     public required string Member { get; init; }
     public int CyclomaticComplexity { get; set; }
     public int LinesOfSource { get; set; }

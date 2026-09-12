@@ -11,71 +11,90 @@ public static class MetricsCollector
         var types = new List<TypeMetrics>();
         var members = new List<MemberMetrics>();
 
+        var declarations = new Dictionary<INamedTypeSymbol, List<TypePart>>(SymbolEqualityComparer.Default);
         foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
-            CollectTree(projectName, compilation, tree, types, members);
+        {
+            var model = compilation.GetSemanticModel(tree);
+            foreach (var declaration in tree.GetRoot().DescendantNodes().OfType<TypeDeclarationSyntax>())
+            {
+                if (model.GetDeclaredSymbol(declaration) is not INamedTypeSymbol symbol)
+                    continue;
+                if (!declarations.TryGetValue(symbol, out var parts))
+                    declarations[symbol] = parts = [];
+                parts.Add(new TypePart(declaration, model));
+            }
+        }
+
+        foreach (var (symbol, parts) in declarations.OrderBy(pair => pair.Key.ToDisplayString(), StringComparer.Ordinal))
+            CollectType(projectName, symbol, parts, types, members);
 
         return (types, members);
     }
 
-    private static void CollectTree(
-        string projectName,
-        Compilation compilation,
-        SyntaxTree tree,
-        List<TypeMetrics> types,
-        List<MemberMetrics> members)
-    {
-        var semanticModel = compilation.GetSemanticModel(tree);
-        var root = tree.GetRoot();
-        foreach (var typeDeclaration in root.DescendantNodes().OfType<TypeDeclarationSyntax>())
-            CollectType(projectName, tree.FilePath, typeDeclaration, semanticModel, types, members);
-    }
-
     private static void CollectType(
         string projectName,
-        string filePath,
-        TypeDeclarationSyntax typeDeclaration,
-        SemanticModel semanticModel,
+        INamedTypeSymbol typeSymbol,
+        List<TypePart> parts,
         List<TypeMetrics> types,
         List<MemberMetrics> members)
     {
-        if (semanticModel.GetDeclaredSymbol(typeDeclaration) is not INamedTypeSymbol typeSymbol)
-            return;
-
+        parts = parts.OrderBy(part => part.Declaration.SyntaxTree.FilePath, StringComparer.Ordinal)
+            .ThenBy(part => part.Declaration.SpanStart).ToList();
         var namespaceName = typeSymbol.ContainingNamespace?.ToDisplayString() ?? "";
         var typeName = typeSymbol.Name;
+        var typeId = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         var memberMetrics = CollectMemberMetrics(
-            typeDeclaration,
-            semanticModel,
-            projectName,
-            namespaceName,
-            typeName);
-        members.AddRange(memberMetrics);
-        types.Add(BuildTypeMetrics(
-            typeDeclaration,
-            typeSymbol,
-            semanticModel,
+            parts,
             projectName,
             namespaceName,
             typeName,
-            filePath,
+            typeId);
+        members.AddRange(memberMetrics);
+        types.Add(BuildTypeMetrics(
+            parts,
+            typeSymbol,
+            projectName,
+            namespaceName,
+            typeName,
+            typeId,
             memberMetrics));
     }
 
     private static List<MemberMetrics> CollectMemberMetrics(
-        TypeDeclarationSyntax typeDecl,
-        SemanticModel semanticModel,
+        IReadOnlyList<TypePart> parts,
         string project,
         string ns,
-        string type)
+        string type,
+        string typeId)
     {
         var result = new List<MemberMetrics>();
+        var partialMembers = new Dictionary<ISymbol, int>(SymbolEqualityComparer.Default);
 
-        foreach (var member in typeDecl.Members)
-        {
-            var metrics = BuildMemberMetrics(member, semanticModel, project, ns, type);
-            if (metrics != null)
+        foreach (var part in parts)
+            foreach (var member in part.Declaration.Members)
+            {
+                var metrics = BuildMemberMetrics(member, part.Model, project, ns, type, typeId);
+                if (metrics == null)
+                    continue;
+
+                // A partial member's signature and implementation describe one member.
+                // Only consider declarations in authored, included trees: never pull in generated bodies.
+                var definition = part.Model.GetDeclaredSymbol(member) switch
+                {
+                    IMethodSymbol method => method.PartialDefinitionPart ?? method,
+                    IPropertySymbol property => (ISymbol?)property.PartialDefinitionPart ?? property,
+                    _ => null
+                };
+                if (definition != null && partialMembers.TryGetValue(definition, out var index))
+                {
+                    if (metrics.HasBody)
+                        result[index] = metrics;
+                    continue;
+                }
+                if (definition != null)
+                    partialMembers[definition] = result.Count;
                 result.Add(metrics);
-        }
+            }
 
         return result;
     }
@@ -85,7 +104,8 @@ public static class MetricsCollector
         SemanticModel semanticModel,
         string project,
         string ns,
-        string type)
+        string type,
+        string typeId)
     {
         if (member is TypeDeclarationSyntax)
             return null;
@@ -103,6 +123,7 @@ public static class MetricsCollector
             Project = project,
             Namespace = ns,
             Type = type,
+            TypeId = typeId,
             Member = memberName,
             CyclomaticComplexity = complexity,
             LinesOfSource = sourceLines,
@@ -129,35 +150,52 @@ public static class MetricsCollector
     }
 
     private static TypeMetrics BuildTypeMetrics(
-        TypeDeclarationSyntax typeDecl, INamedTypeSymbol typeSymbol,
-        SemanticModel model, string project, string ns, string type,
-        string filePath, List<MemberMetrics> memberMetrics)
+        IReadOnlyList<TypePart> parts, INamedTypeSymbol typeSymbol,
+        string project, string ns, string type,
+        string typeId, List<MemberMetrics> memberMetrics)
     {
         var aggregate = CalculateAggregates(memberMetrics);
-        var coupling = ClassCouplingCalculator.Analyze(typeDecl, model);
+        var couplings = parts.Select(part => ClassCouplingCalculator.Analyze(part.Declaration, part.Model)).ToList();
+        var raw = Union(couplings.SelectMany(coupling => coupling.RawTypes));
+        var structural = Union(couplings.SelectMany(coupling => coupling.StructuralTypes));
+        var exclusions = couplings.SelectMany(coupling => coupling.ExcludedTypes)
+            .GroupBy(pair => pair.Key, StringComparer.Ordinal)
+            .OrderBy(group => group.Key, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key,
+                group => Union(group.SelectMany(pair => pair.Value).Except(structural, StringComparer.Ordinal)),
+                StringComparer.Ordinal);
+        var files = Union(parts.Select(part => part.Declaration.SyntaxTree.FilePath));
         return new TypeMetrics
         {
             IsWebController = WebTypeClassifier.IsController(typeSymbol),
             Project = project,
             Namespace = ns,
             Type = type,
-            FilePath = filePath,
+            TypeId = typeId,
+            FilePath = files[0],
+            SourceFiles = files,
             CyclomaticComplexity = aggregate.CyclomaticComplexity,
             MaintainabilityIndex = aggregate.MaintainabilityIndex,
             DepthOfInheritance = DepthOfInheritanceCalculator.Calculate(typeSymbol),
-            ClassCoupling = coupling.RawTypes.Count,
-            CoupledTypes = coupling.RawTypes,
-            StructuralClassCoupling = coupling.StructuralTypes.Count,
-            StructuralCoupledTypes = coupling.StructuralTypes,
-            CouplingExclusions = coupling.ExcludedTypes,
-            LinesOfSource = LinesOfCodeCounter.CountSourceLines(typeDecl),
-            LinesOfExecutable = LinesOfCodeCounter.CountExecutableLines(typeDecl),
+            ClassCoupling = raw.Count,
+            CoupledTypes = raw,
+            StructuralClassCoupling = structural.Count,
+            StructuralCoupledTypes = structural,
+            CouplingExclusions = exclusions.Where(pair => pair.Value.Count > 0)
+                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal),
+            LinesOfSource = parts.Sum(part => LinesOfCodeCounter.CountSourceLines(part.Declaration)),
+            LinesOfExecutable = parts.Sum(part => LinesOfCodeCounter.CountExecutableLines(part.Declaration)),
             MemberCount = aggregate.MemberCount,
             MaxMemberCyclomaticComplexity = aggregate.MaxMemberCyclomaticComplexity,
             DecompositionRatio = aggregate.DecompositionRatio,
             IsDataCarrier = DataCarrierClassifier.IsPassiveDataCarrier(typeSymbol),
         };
     }
+
+    private static IReadOnlyList<string> Union(IEnumerable<string> values) =>
+        values.Distinct(StringComparer.Ordinal).OrderBy(value => value, StringComparer.Ordinal).ToList();
+
+    private sealed record TypePart(TypeDeclarationSyntax Declaration, SemanticModel Model);
 
     private static TypeMetricAggregates CalculateAggregates(
         IReadOnlyList<MemberMetrics> memberMetrics)

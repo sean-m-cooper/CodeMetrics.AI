@@ -6,7 +6,7 @@ CodeMetrics.AI is a deterministic, read-only analyzer. It loads a .NET solution 
 
 1. `Program.cs` parses command-line options and passes cancellation to the analysis pipeline.
 2. `SolutionScope` reads solution build mappings with SolutionPersistence. `Program` loads the solution or project with the selected MSBuild configuration (Any CPU). Project mode scores only the selected project while keeping references in the workspace for semantic resolution. `SolutionCompilationLoader` classifies enabled projects, bounds concurrent compilations to four, and records missing compilations and compiler errors. Disabled projects remain explicit filter entries and are excluded from both source compilation diagnostics and package checks; enabled production compilation errors remain blocking.
-3. `MetricsCollector` calculates type/member metrics from production syntax and symbols.
+3. `MetricsCollector` groups included production declarations by Roslyn type symbol within each project/framework compilation. Partial declarations contribute to one logical type: member aggregates are calculated once, partial member definitions/implementations count once, and raw/structural coupling uses the union of dependencies. Generated/excluded declarations are not imported through symbol references. Source-line counts retain physical declaration overhead. A deterministic representative file and the full included source-file list retain provenance; component hotspot samples expose the logical identity and files.
 4. Each class in `Probes/` evaluates one scorecard dimension. Probes receive immutable metric or compilation inputs and return a `DimensionResult`.
 5. `CsvWriter` and `EvidenceWriter` persist the two public output formats.
 
@@ -24,6 +24,7 @@ Dependency subprocesses remove the MSBuild paths installed by the analyzer's loc
 ## Design invariants
 
 - Scores must be deterministic for the same source, configuration, analyzer version, and package-source responses.
+- Splitting a type into partial files must preserve its member complexity, decomposition, maintainability and coupling measurements. Physical source-line counts can still change with declaration headers and formatting. Same-named nested/generic types and different project/framework instances remain separate; CSV membership uses logical identity, not a short-name join.
 - Generated code, build output, and test projects never enter production type metrics.
 - A missing or failed signal is reported as skipped, failed, or unknown; it is never treated as a clean result.
 - Suppressions are category-specific and require a nearby reason.
