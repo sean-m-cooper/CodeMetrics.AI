@@ -122,3 +122,19 @@ Other changed dimensions: Newtonsoft.Json maintainability rises 7.3 to 8.7 after
 Package SHA-256: `5cbb328235a59266f1b1221a61c1a94e8f2265c0837e87c76388a5376d9533c0`. Local comparison, invocation results, logs, package, prior run IDs and full dimension deltas are under `E:/repos/CodeMetrics.AI/TestResults/partial-types/`; each repository retains its run-specific evidence/inspection/CSV.
 
 Verification: 520 analyzer tests pass, including seven new partial-type regression cases. All six .NET calibration fixtures retain their scores and findings. Formatting and whitespace checks pass. This correction remains local on the development branch; it has not been published.
+
+## Follow-up: error-handling source findings across frameworks
+
+Polly's nine empty-catch observations were two authored catches repeated across project/framework instances. The error-handling probe now groups by physical source file, exact syntax span, rule category and severity before applying the existing ladder. It retains affected project/framework labels, observation counts and original messages. Different source sites, files and rules remain distinct; missing file identity is conservatively left unmerged. Catch classification itself was not changed or exempted by repository name.
+
+A fresh packaged Polly run at the same source commit records 48 distinct findings across 220 observations: two errors and 46 warnings. `DisposeHelper.cs:35` has five affected framework instances; `BulkheadEngine.cs:45` has four. They count as two empty catches, so Error Handling changes **0 to 2** under the unchanged thresholds. All eight other dimension scores are unchanged. This is still a partial static assessment; the two catch behaviors have not been newly judged safe or defective by this counting correction.
+
+- Policy: `dotnet/errorHandling/source-findings-v1`; development version 2.3.0, schema 3, ruleset `dotnet-2026-09-11`.
+- Run ID: `ba207238-b19b-4344-b8c1-cb9880688528`; audit ID: `f967f142-b332-4770-b009-dc1f1b3c82ce`.
+- Previous run: `ed8a28ed-e7dd-4b0b-bcd5-c6b41c2fd267`.
+- Package SHA-256: `6462ff5c4ffcb94d7a01d309264915d2b69a1e56e5ce1375acf5ce1f30b6305a`.
+- Analyzer and validator exit 0; inspection usable; invocation/evidence run and audit IDs match. Polly source remains unchanged. No target test suite or coverage was run.
+- Local artifacts and verification script: `E:/repos/CodeMetrics.AI/TestResults/source-findings/`; the run-specific repository directory retains evidence, inspection and CSV.
+- Verification: 536 analyzer tests pass, including 12 source-population regression cases; all six .NET calibration fixtures retain scores and findings; formatting and whitespace checks pass.
+
+The new regressions cover one catch across one/five/ten frameworks, five distinct catches on one line, separate conditional branches, findings present in only one variant, identical text in different files, linked shared files, warning-count inflation, different rules at one site, deterministic ordering, and missing file identity. This correction applies to error-handling source findings; type-metric and package populations in other dimensions remain unchanged. It is local and unpublished.

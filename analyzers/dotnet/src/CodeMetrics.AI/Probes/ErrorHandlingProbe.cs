@@ -27,6 +27,8 @@ public static class ErrorHandlingProbe
             }
         }
 
+        var observationCount = findings.Count;
+        findings = CollapseSourceFindings(findings, solutionDir);
         var emptyCatches = findings.Count(f => f.Category == "emptyCatch");
         var throwExes = findings.Count(f => f.Category == "throwEx");
         var broadDefaults = findings.Count(f => f.Category == "broadCatchReturnsDefault");
@@ -43,8 +45,11 @@ public static class ErrorHandlingProbe
         //   6  noisy          — more than three advisory warnings
         //   8  minor          — one to three advisory warnings, no errors
         //  10  clean          — no findings
-        var decision = ScoringDecision.FirstMatch("dotnet/errorHandling/v1", new()
+        var decision = ScoringDecision.FirstMatch("dotnet/errorHandling/source-findings-v1", new()
         {
+            ["countingUnit"] = "distinctSourceFinding",
+            ["sourceFindings"] = findings.Count,
+            ["projectFrameworkObservations"] = observationCount,
             ["emptyCatches"] = emptyCatches,
             ["throwExes"] = throwExes,
             ["broadDefaults"] = broadDefaults,
@@ -61,7 +66,8 @@ public static class ErrorHandlingProbe
         ScoringStep.Rule("warnings", "warnings > 0", warnings > 0, 8, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
         ScoringStep.Rule("clean", "otherwise", true, 10, []));
 
-        var basis = $"Findings: {findings.Count} (errors: {errors}, warnings: {warnings}). " +
+        var basis = $"Distinct source findings: {findings.Count} across {observationCount} project/framework observations " +
+                    $"(errors: {errors}, warnings: {warnings}). " +
                     $"emptyCatch={emptyCatches}, throwEx={throwExes}, broadDefaults={broadDefaults}.";
 
         return new DimensionResult
@@ -72,6 +78,51 @@ public static class ErrorHandlingProbe
             Basis = basis,
             Findings = findings
         };
+    }
+
+    private static Dictionary<string, object?> SourceLocation(SyntaxNode node) => new()
+    {
+        ["sourceSpanStart"] = node.SpanStart,
+        ["sourceSpanLength"] = node.Span.Length
+    };
+
+    private static List<Finding> CollapseSourceFindings(List<Finding> observations, string? solutionDir)
+    {
+        var root = Path.GetFullPath(string.IsNullOrWhiteSpace(solutionDir) ? "." : solutionDir);
+        return observations.Select((finding, index) => (Finding: finding, Index: index))
+            .GroupBy(item =>
+            {
+                var finding = item.Finding;
+                var hasLocation = !string.IsNullOrWhiteSpace(finding.File);
+                var file = hasLocation ? Path.GetFullPath(finding.File!, root) : "";
+                if (OperatingSystem.IsWindows())
+                    file = file.ToUpperInvariant();
+                return (File: file, Start: (int)finding.Observations["sourceSpanStart"]!,
+                    Length: (int)finding.Observations["sourceSpanLength"]!, finding.Category, finding.Severity,
+                    UnknownLocation: hasLocation ? -1 : item.Index);
+            })
+            .OrderBy(group => group.Key.File, StringComparer.Ordinal)
+            .ThenBy(group => group.Key.Start).ThenBy(group => group.Key.Length)
+            .ThenBy(group => group.Key.Category, StringComparer.Ordinal)
+            .ThenBy(group => group.Key.Severity, StringComparer.Ordinal)
+            .Select(group =>
+            {
+                var ordered = group.Select(item => item.Finding)
+                    .OrderBy(finding => finding.Project, StringComparer.Ordinal)
+                    .ThenBy(finding => finding.Message, StringComparer.Ordinal)
+                    .ThenBy(finding => finding.File, StringComparer.Ordinal).ToList();
+                var finding = ordered[0];
+                finding.Observations["countingUnit"] = "distinctSourceFinding";
+                finding.Observations["observationCount"] = ordered.Count;
+                finding.Observations["affectedProjects"] = ordered.Select(item => item.Project)
+                    .Distinct(StringComparer.Ordinal).ToArray();
+                finding.Observations["projectFrameworkObservations"] = ordered.Select(item => new
+                {
+                    project = item.Project,
+                    message = item.Message
+                }).ToArray();
+                return finding;
+            }).ToList();
     }
 
     private static void AnalyzeCatchBlocks(
@@ -98,6 +149,7 @@ public static class ErrorHandlingProbe
                         Severity = "error",
                         File = filePath,
                         Line = GetLine(catchClause),
+                        Observations = SourceLocation(catchClause),
                         Project = projectName,
                         Type = containingType,
                         Message = "Empty catch block suppresses exceptions silently."
@@ -123,6 +175,7 @@ public static class ErrorHandlingProbe
                             Severity = "error",
                             File = filePath,
                             Line = GetLine(throwStmt),
+                            Observations = SourceLocation(throwStmt),
                             Project = projectName,
                             Type = containingType,
                             Message = $"'throw {caughtVarName};' loses the original stack trace. Use bare 'throw;' instead."
@@ -149,6 +202,7 @@ public static class ErrorHandlingProbe
                         Severity = "warning",
                         File = filePath,
                         Line = GetLine(catchClause),
+                        Observations = SourceLocation(catchClause),
                         Project = projectName,
                         Type = containingType,
                         Message = "Broad catch block without logging or rethrow swallows exceptions."
@@ -164,6 +218,7 @@ public static class ErrorHandlingProbe
                         Severity = "error",
                         File = filePath,
                         Line = GetLine(catchClause),
+                        Observations = SourceLocation(catchClause),
                         Project = projectName,
                         Type = containingType,
                         Message = "Broad catch block returns a default value without logging or " +
@@ -239,6 +294,7 @@ public static class ErrorHandlingProbe
                 Severity = "warning",
                 File = filePath,
                 Line = GetLine(access.Node),
+                Observations = SourceLocation(access.Node),
                 Project = projectName,
                 Type = GetContainingTypeName(access.Node),
                 Message = $"'{operation}' blocks the calling thread and can cause deadlocks. Use 'await' instead."
@@ -263,6 +319,7 @@ public static class ErrorHandlingProbe
                     Severity = "info",
                     File = filePath,
                     Line = GetLine(inv),
+                    Observations = SourceLocation(inv),
                     Project = projectName,
                     Type = GetContainingTypeName(inv),
                     Message = "Console.WriteLine found. Prefer structured logging."
@@ -293,6 +350,7 @@ public static class ErrorHandlingProbe
                     Severity = "warning",
                     File = filePath,
                     Line = GetLine(typeDecl),
+                    Observations = SourceLocation(typeDecl),
                     Project = projectName,
                     Type = typeDecl.Identifier.Text,
                     Message = $"Type '{typeDecl.Identifier.Text}' has {catchCount} catch blocks but no ILogger field/property/parameter."

@@ -24,6 +24,7 @@ Dependency subprocesses remove the MSBuild paths installed by the analyzer's loc
 ## Design invariants
 
 - Scores must be deterministic for the same source, configuration, analyzer version, and package-source responses.
+- Error-handling penalties count distinct rule/severity/source-span findings, not repeated project/framework observations. Shared authored files count once; different files, source spans and rules remain distinct. Each finding retains affected project/framework labels and original messages. Missing file identity is conservatively left unmerged. This counting policy currently applies to error handling; it does not change type-metric populations or package observations in other dimensions.
 - Splitting a type into partial files must preserve its member complexity, decomposition, maintainability and coupling measurements. Physical source-line counts can still change with declaration headers and formatting. Same-named nested/generic types and different project/framework instances remain separate; CSV membership uses logical identity, not a short-name join.
 - Generated code, build output, and test projects never enter production type metrics.
 - A missing or failed signal is reported as skipped, failed, or unknown; it is never treated as a clean result.

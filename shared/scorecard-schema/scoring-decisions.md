@@ -27,6 +27,12 @@ For example, a dependency run with six deprecated occurrences and two included o
 
 The analyzer constructs decision records while executing the policy, rather than reconstructing them from the final score. The evidence validator checks the optional structure, final score equality, unique step identifiers, and finding/step references. It does not recalculate policy conditions from source. Source and behavior review remain necessary for recommendations.
 
+## Error-handling source populations
+
+Development .NET 2.3.0 uses `dotnet/errorHandling/source-findings-v1`. Its ladder thresholds are unchanged, but inputs count distinct source findings instead of project/framework repetitions. Identity uses the physical file, exact syntax span, rule category and severity. Two catches on the same line remain distinct; the same catch included in multiple frameworks or linked into multiple projects counts once. Separate conditional branches retain their source identities. A finding emitted in only one variant lists only that variant. Sources without a file identity remain unmerged.
+
+Each finding's `observations` includes `sourceSpanStart`, `sourceSpanLength` (Roslyn zero-based character offsets), `countingUnit`, `observationCount`, `affectedProjects`, and `projectFrameworkObservations` containing project labels and original messages. The legacy `project` field is a deterministic representative; consumers should use `affectedProjects` for full applicability. Decision inputs record `sourceFindings` and `projectFrameworkObservations` totals. Report the unique count as the scoring population and the repeated count as provenance, without restoring the old penalty. This policy does not change how other dimensions count type or package instances.
+
 ## Complexity and decomposition presentation
 
 The .NET `codeQuality` key remains stable for schema, comparison and overall-score compatibility. Its display label is **Complexity & Decomposition**. It is one dimension with two component scores, not two additional dimensions or deductions. Preserve the recorded combined score and existing overall weighting.
