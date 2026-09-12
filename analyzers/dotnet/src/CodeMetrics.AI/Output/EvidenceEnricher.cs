@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using CodeMetrics.AI.Probes;
+using CodeMetrics.AI.Rules;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -28,10 +29,20 @@ internal static class EvidenceEnricher
         foreach (var (dimension, value) in dimensions)
         {
             var result = (DimensionResult)value;
+            result.Extra["ruleCatalog"] = new
+            {
+                version = RuleCatalog.Document.CatalogVersion,
+                toolVersion = new ToolInfo().Version,
+                command = "code-metrics rules --format json",
+                rules = RuleCatalog.Document.Rules.Where(rule => rule.Dimension == dimension)
+                    .Select(rule => new { rule.Code, rule.RuleId, rule.Kind }).ToArray()
+            };
             var occurrences = new Dictionary<string, int>();
             foreach (var finding in result.Findings.OrderBy(finding => finding.File, StringComparer.Ordinal).ThenBy(finding => finding.Line))
             {
                 finding.RuleId = $"dotnet/{dimension}/{finding.Category}";
+                if (RuleCatalog.Find(finding.RuleId) is { } rule)
+                    finding.Observations["diagnosticCode"] = rule.Code;
                 if (dimension == "dependencyManagement" && finding.Package != null && finding.Project is { } packageProject && Path.IsPathFullyQualified(packageProject))
                     finding.Project = Path.GetRelativePath(repositoryRoot, packageProject).Replace('\\', '/');
                 var anchor = "";

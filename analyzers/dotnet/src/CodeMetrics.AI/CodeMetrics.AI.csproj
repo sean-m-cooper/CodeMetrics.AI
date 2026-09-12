@@ -19,6 +19,9 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <EmbeddedResource Include="Rules\rules.json" LogicalName="CodeMetrics.AI.Rules.rules.json" />
+    <None Update="Rules\rules.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="Rules\rules.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Locator" />

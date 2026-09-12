@@ -27,6 +27,18 @@ For example, a dependency run with six deprecated occurrences and two included o
 
 The analyzer constructs decision records while executing the policy, rather than reconstructing them from the final score. The evidence validator checks the optional structure, final score equality, unique step identifiers, and finding/step references. It does not recalculate policy conditions from source. Source and behavior review remain necessary for recommendations.
 
+## Packaged CMAI rule catalog
+
+Development .NET 2.3.0 ships catalog version 1 with 44 permanent CMAI codes: 38 finding identities and six aggregate metric components across nine dimensions. `code-metrics rules --format json` returns the installed package version and definitions. The package also contains `Rules/rules.json` and generated `Rules/rules.md`. New meanings receive unused codes; existing codes and long rule IDs must not be reassigned.
+
+Findings retain existing `ruleId` values and fingerprints and add `observations.diagnosticCode`. Dimensions include `ruleCatalog` with version and code/identity/kind references. Metric entries describe components without inventing per-site findings or independent deductions. These fields fit existing schema-v3 extension points; scores, thresholds and finding populations are unchanged for unannotated source.
+
+The first catalog enables comments for CMAI5001 (empty catch), CMAI5005 (error-handling sync block), CMAI8001 (performance sync-over-async), and CMAI8006 (awaited I/O in a loop). CMAI directives require a nonempty rationale and exclude only the matched rule occurrence before scoring. The rationale is accepted without a business-judgment review. Existing category directives retain legacy behavior. Other codes explicitly advertise that comment exclusion is not implemented. A suppression declaration alone does not prove applicability or a score change.
+
+The scorecard helper obtains definitions from the same isolated analyzer executable used for a fresh run and validates the catalog against evidence. It exposes `artifacts.ruleCatalog` only after validation. Historical imports and older packages do not borrow a current catalog. Missing catalog guidance cannot alter otherwise validated scores.
+
+Verification: 605 analyzer tests (21 new catalog cases), 27 skill/runtime/integration tests, six unchanged .NET calibration fixtures, formatting and whitespace checks passed. Package contents and CLI lookup/error paths were checked without a solution. Tested NuGet SHA-256: `fa19507a8cebdba9e09a19f83d8235be8aa2ace83f1175ac9536b9d8890c8f38`. Local logs are under `E:/repos/CodeMetrics.AI/TestResults/rule-catalog/`. This checkpoint is unpublished.
+
 ## Error-handling source populations
 
 Development .NET 2.3.0 uses `dotnet/errorHandling/source-findings-v1`. Its ladder thresholds are unchanged, but inputs count distinct source findings instead of project/framework repetitions. Identity uses the physical file, exact syntax span, rule category and severity. Two catches on the same line remain distinct; the same catch included in multiple frameworks or linked into multiple projects counts once. Separate conditional branches retain their source identities. A finding emitted in only one variant lists only that variant. Sources without a file identity remain unmerged.

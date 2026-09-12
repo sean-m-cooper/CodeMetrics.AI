@@ -1,6 +1,7 @@
 using System.CommandLine;
 using CodeMetrics.AI;
 using CodeMetrics.AI.Output;
+using CodeMetrics.AI.Rules;
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis.MSBuild;
 
@@ -48,6 +49,32 @@ var runIdOption = new Option<string?>("--run-id") { Description = "UUID identify
 var auditIdOption = new Option<string?>("--audit-id") { Description = "UUID shared by ecosystem runs in one audit (defaults to run ID)" };
 rootCommand.Options.Add(runIdOption);
 rootCommand.Options.Add(auditIdOption);
+
+var rulesCommand = new Command("rules", "List the rule catalog shipped with this analyzer; no solution is loaded");
+var rulesFormat = new Option<string>("--format") { Description = "text, json, or markdown", DefaultValueFactory = _ => "text" };
+var rulesCode = new Option<string?>("--code") { Description = "CMAI code or existing rule ID to look up" };
+var rulesOutput = new Option<string?>("--output") { Description = "Write catalog to a file instead of stdout" };
+rulesCommand.Options.Add(rulesFormat);
+rulesCommand.Options.Add(rulesCode);
+rulesCommand.Options.Add(rulesOutput);
+rulesCommand.SetAction(parseResult =>
+{
+    try
+    {
+        var content = RuleCatalog.Render(parseResult.GetValue(rulesFormat)!, parseResult.GetValue(rulesCode));
+        if (parseResult.GetValue(rulesOutput) is { } file)
+            File.WriteAllText(file, content);
+        else
+            Console.Write(content);
+        return 0;
+    }
+    catch (Exception exception) when (exception is ArgumentException or IOException or UnauthorizedAccessException)
+    {
+        Console.Error.WriteLine(exception.Message);
+        return 2;
+    }
+});
+rootCommand.Subcommands.Add(rulesCommand);
 
 rootCommand.SetAction(async (parseResult, cancellationToken) =>
 {

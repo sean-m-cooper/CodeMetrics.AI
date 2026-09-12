@@ -1,0 +1,767 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": 1,
+  "ecosystem": "dotnet",
+  "rules": [
+    {
+      "code": "CMAI1001",
+      "ruleId": "dotnet/architecture/highCoupling",
+      "dimension": "architecture",
+      "category": "highCoupling",
+      "kind": "finding",
+      "title": "High structural coupling",
+      "description": "Structural dependencies exceed the configured threshold. A coordination or factory role can explain the measurement; it does not establish a responsibility defect.",
+      "documentation": "Rules/rules.md#cmai1001",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI1002",
+      "ruleId": "dotnet/architecture/highCyclomaticComplexity",
+      "dimension": "architecture",
+      "category": "highCyclomaticComplexity",
+      "kind": "finding",
+      "title": "High class complexity",
+      "description": "Aggregate type complexity exceeds the configured architecture threshold. Review the responsibilities and necessary branching.",
+      "documentation": "Rules/rules.md#cmai1002",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI1003",
+      "ruleId": "dotnet/architecture/largeClass",
+      "dimension": "architecture",
+      "category": "largeClass",
+      "kind": "finding",
+      "title": "Large class",
+      "description": "Included type source lines exceed the configured size threshold. Review the source context before recommending decomposition.",
+      "documentation": "Rules/rules.md#cmai1003",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI1004",
+      "ruleId": "dotnet/architecture/projectCycle",
+      "dimension": "architecture",
+      "category": "projectCycle",
+      "kind": "finding",
+      "title": "Project dependency cycle",
+      "description": "Production project references form a cycle. The graph observation does not establish whether the dependency is accidental.",
+      "documentation": "Rules/rules.md#cmai1004",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI1005",
+      "ruleId": "dotnet/architecture/controllerDataDependency",
+      "dimension": "architecture",
+      "category": "controllerDataDependency",
+      "kind": "finding",
+      "title": "Controller data dependency",
+      "description": "A controller directly depends on a recognized data-access type. Review the intended orchestration and boundary responsibilities.",
+      "documentation": "Rules/rules.md#cmai1005",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI1006",
+      "ruleId": "dotnet/architecture/concreteInfrastructureDependency",
+      "dimension": "architecture",
+      "category": "concreteInfrastructureDependency",
+      "kind": "finding",
+      "title": "Concrete infrastructure dependency",
+      "description": "A source type depends on recognized concrete infrastructure. Review whether the chosen boundary is deliberate.",
+      "documentation": "Rules/rules.md#cmai1006",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI2001",
+      "ruleId": "dotnet/codeQuality/decomposition",
+      "dimension": "codeQuality",
+      "category": "decomposition",
+      "kind": "metric",
+      "title": "Decomposition distribution",
+      "description": "Scores the distribution of class complexity divided by member count. This ratio does not establish cohesion or whether extraction would improve readability.",
+      "documentation": "Rules/rules.md#cmai2001",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI2002",
+      "ruleId": "dotnet/codeQuality/methodComplexity",
+      "dimension": "codeQuality",
+      "category": "methodComplexity",
+      "kind": "metric",
+      "title": "Method complexity distribution",
+      "description": "Scores the distribution of each eligible type's maximum member cyclomatic complexity. The population is type instances, not individual methods.",
+      "documentation": "Rules/rules.md#cmai2002",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI3001",
+      "ruleId": "dotnet/testing/placeholderTest",
+      "dimension": "testing",
+      "category": "placeholderTest",
+      "kind": "finding",
+      "title": "Placeholder test",
+      "description": "A recognized test has placeholder structure. Review its assertions and intended behavior.",
+      "documentation": "Rules/rules.md#cmai3001",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI3002",
+      "ruleId": "dotnet/testing/uncoveredProject",
+      "dimension": "testing",
+      "category": "uncoveredProject",
+      "kind": "finding",
+      "title": "Uncovered production project",
+      "description": "The probe did not associate a production project with recognized test coverage signals. This is a heuristic, not proof that tests are absent.",
+      "documentation": "Rules/rules.md#cmai3002",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI3003",
+      "ruleId": "dotnet/testing/testSignals",
+      "dimension": "testing",
+      "category": "testSignals",
+      "kind": "metric",
+      "title": "Test and coverage signals",
+      "description": "Aggregates recognized test methods, assertions, project associations and optional supplied coverage. Static test signals do not establish test effectiveness.",
+      "documentation": "Rules/rules.md#cmai3003",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI4001",
+      "ruleId": "dotnet/security/hardcodedSecret",
+      "dimension": "security",
+      "category": "hardcodedSecret",
+      "kind": "finding",
+      "title": "Potential hardcoded secret",
+      "description": "Source matches a credential or secret pattern. Review whether the value is a real credential; avoid reproducing secret values in reports.",
+      "documentation": "Rules/rules.md#cmai4001",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI4002",
+      "ruleId": "dotnet/security/rawSqlInterpolation",
+      "dimension": "security",
+      "category": "rawSqlInterpolation",
+      "kind": "finding",
+      "title": "Interpolated raw SQL",
+      "description": "A recognized raw SQL API receives interpolated or concatenated input. Review parameterization and the origin of values.",
+      "documentation": "Rules/rules.md#cmai4002",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI4003",
+      "ruleId": "dotnet/security/unsafeDeserialization",
+      "dimension": "security",
+      "category": "unsafeDeserialization",
+      "kind": "finding",
+      "title": "Deserialization configuration",
+      "description": "A recognized deserialization pattern can accept unsafe type information. Review trust boundaries and serializer settings.",
+      "documentation": "Rules/rules.md#cmai4003",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI4004",
+      "ruleId": "dotnet/security/allowAnyOriginWithCredentials",
+      "dimension": "security",
+      "category": "allowAnyOriginWithCredentials",
+      "kind": "finding",
+      "title": "Permissive credentialed CORS",
+      "description": "Recognized CORS configuration combines permissive origins with credentials. Review the actual request boundary and configuration.",
+      "documentation": "Rules/rules.md#cmai4004",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI4005",
+      "ruleId": "dotnet/security/allowAnonymous",
+      "dimension": "security",
+      "category": "allowAnonymous",
+      "kind": "finding",
+      "title": "Anonymous access declaration",
+      "description": "An AllowAnonymous declaration permits anonymous access. Review the endpoint's intended exposure; the declaration alone is not a vulnerability.",
+      "documentation": "Rules/rules.md#cmai4005",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI4006",
+      "ruleId": "dotnet/security/missingAuthorization",
+      "dimension": "security",
+      "category": "missingAuthorization",
+      "kind": "finding",
+      "title": "Unrecognized authorization boundary",
+      "description": "The probe did not recognize an authorization boundary for a source endpoint. Global or external controls may provide that boundary.",
+      "documentation": "Rules/rules.md#cmai4006",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI4007",
+      "ruleId": "dotnet/security/vulnerabilityExposure",
+      "dimension": "security",
+      "category": "vulnerabilityExposure",
+      "kind": "metric",
+      "title": "Dependency vulnerability observations",
+      "description": "Security scoring includes vulnerable-package observations supplied by the dependency probe. Findings and advisory details reside in the dependency dimension.",
+      "documentation": "Rules/rules.md#cmai4007",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI5001",
+      "ruleId": "dotnet/errorHandling/emptyCatch",
+      "dimension": "errorHandling",
+      "category": "emptyCatch",
+      "kind": "finding",
+      "title": "Empty catch",
+      "description": "An empty catch has no recognized handling or accepted suppression. It may reflect a deliberate fallback; use a scoped declaration to record that decision.",
+      "documentation": "Rules/rules.md#cmai5001",
+      "annotation": {
+        "supported": true,
+        "scopes": [
+          "catch",
+          "member"
+        ],
+        "rationaleRequired": true,
+        "example": "// codemetrics-ignore: CMAI5001 -- Cleanup failure must not replace the original exception.",
+        "scoringEffect": "Excludes this rule occurrence before scoring; raw metrics are unchanged."
+      }
+    },
+    {
+      "code": "CMAI5002",
+      "ruleId": "dotnet/errorHandling/throwEx",
+      "dimension": "errorHandling",
+      "category": "throwEx",
+      "kind": "finding",
+      "title": "Caught exception rethrow",
+      "description": "Rethrowing the caught exception variable resets its stack origin. A bare throw preserves the existing stack trace.",
+      "documentation": "Rules/rules.md#cmai5002",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI5003",
+      "ruleId": "dotnet/errorHandling/broadCatchWithoutLoggingOrRethrow",
+      "dimension": "errorHandling",
+      "category": "broadCatchWithoutLoggingOrRethrow",
+      "kind": "finding",
+      "title": "Unrecognized broad-catch handling",
+      "description": "A broad catch has no recognized logging, propagation, exception-bearing return or invoked error callback. Review the surrounding handling path.",
+      "documentation": "Rules/rules.md#cmai5003",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI5004",
+      "ruleId": "dotnet/errorHandling/broadCatchReturnsDefault",
+      "dimension": "errorHandling",
+      "category": "broadCatchReturnsDefault",
+      "kind": "finding",
+      "title": "Default return after broad catch",
+      "description": "A broad catch returns a default value without a recognized handling path. Review whether the result communicates or deliberately absorbs failure.",
+      "documentation": "Rules/rules.md#cmai5004",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI5005",
+      "ruleId": "dotnet/errorHandling/syncBlockingCall",
+      "dimension": "errorHandling",
+      "category": "syncBlockingCall",
+      "kind": "finding",
+      "title": "Synchronous task boundary",
+      "description": "A recognized task wait blocks the calling thread. The finding is shared source context with performance rules but has its own scoring identity.",
+      "documentation": "Rules/rules.md#cmai5005",
+      "annotation": {
+        "supported": true,
+        "scopes": [
+          "statement",
+          "member"
+        ],
+        "rationaleRequired": true,
+        "example": "// codemetrics-ignore: CMAI5005 -- The host requires a synchronous boundary.",
+        "scoringEffect": "Excludes this rule occurrence before scoring; raw metrics are unchanged."
+      }
+    },
+    {
+      "code": "CMAI5006",
+      "ruleId": "dotnet/errorHandling/consoleWriteLine",
+      "dimension": "errorHandling",
+      "category": "consoleWriteLine",
+      "kind": "finding",
+      "title": "Console output",
+      "description": "Source uses Console.WriteLine. This informational observation may be appropriate for command-line or diagnostic output.",
+      "documentation": "Rules/rules.md#cmai5006",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI5007",
+      "ruleId": "dotnet/errorHandling/missingLoggerForMultipleCatches",
+      "dimension": "errorHandling",
+      "category": "missingLoggerForMultipleCatches",
+      "kind": "finding",
+      "title": "Unrecognized reporting for multiple catches",
+      "description": "A type contains multiple catches without recognized handling paths or an ILogger member/parameter. Custom reporting and recovery may be intentional.",
+      "documentation": "Rules/rules.md#cmai5007",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI6001",
+      "ruleId": "dotnet/documentation/unresolvedCref",
+      "dimension": "documentation",
+      "category": "unresolvedCref",
+      "kind": "finding",
+      "title": "Unresolved documentation reference",
+      "description": "An XML documentation cref could not be resolved. Review the referenced symbol and compilation context.",
+      "documentation": "Rules/rules.md#cmai6001",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI6002",
+      "ruleId": "dotnet/documentation/documentationSignals",
+      "dimension": "documentation",
+      "category": "documentationSignals",
+      "kind": "metric",
+      "title": "Documentation presence and content signals",
+      "description": "Aggregates README, documentation directory, architecture documents, AI instructions, XML documentation, public API comments and stale-marker signals. This is a partial documentation assessment.",
+      "documentation": "Rules/rules.md#cmai6002",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI7001",
+      "ruleId": "dotnet/dependencyManagement/vulnerableDirectDependency",
+      "dimension": "dependencyManagement",
+      "category": "vulnerableDirectDependency",
+      "kind": "finding",
+      "title": "Vulnerable direct dependency",
+      "description": "The configured package feed reports a vulnerability for a direct dependency. Review advisory applicability and available remediation.",
+      "documentation": "Rules/rules.md#cmai7001",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI7002",
+      "ruleId": "dotnet/dependencyManagement/vulnerableTransitiveDependency",
+      "dimension": "dependencyManagement",
+      "category": "vulnerableTransitiveDependency",
+      "kind": "finding",
+      "title": "Vulnerable transitive dependency",
+      "description": "The configured package feed reports a vulnerability for a transitive dependency. Review the dependency path and advisory applicability.",
+      "documentation": "Rules/rules.md#cmai7002",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI7003",
+      "ruleId": "dotnet/dependencyManagement/deprecatedDependency",
+      "dimension": "dependencyManagement",
+      "category": "deprecatedDependency",
+      "kind": "finding",
+      "title": "Deprecated dependency",
+      "description": "The package feed reports deprecation. Review its stated reason and any replacement; deprecation alone does not establish upgrade compatibility.",
+      "documentation": "Rules/rules.md#cmai7003",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI7004",
+      "ruleId": "dotnet/dependencyManagement/outdatedDependency",
+      "dimension": "dependencyManagement",
+      "category": "outdatedDependency",
+      "kind": "finding",
+      "title": "Outdated dependency",
+      "description": "The package feed reports a newer version. Evidence records target-framework compatibility and scoring exclusions; compatible assets do not establish a safe upgrade.",
+      "documentation": "Rules/rules.md#cmai7004",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI7005",
+      "ruleId": "dotnet/dependencyManagement/unsupportedTargetFramework",
+      "dimension": "dependencyManagement",
+      "category": "unsupportedTargetFramework",
+      "kind": "finding",
+      "title": "Unsupported target framework signal",
+      "description": "The probe's framework policy flags a target framework. Review the recorded policy version and the project's compatibility constraints.",
+      "documentation": "Rules/rules.md#cmai7005",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI7006",
+      "ruleId": "dotnet/dependencyManagement/versionDrift",
+      "dimension": "dependencyManagement",
+      "category": "versionDrift",
+      "kind": "finding",
+      "title": "Package version drift",
+      "description": "Enabled projects specify differing versions of a package. Review whether the divergence reflects intentional compatibility boundaries.",
+      "documentation": "Rules/rules.md#cmai7006",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI7007",
+      "ruleId": "dotnet/dependencyManagement/noCentralPackageManagement",
+      "dimension": "dependencyManagement",
+      "category": "noCentralPackageManagement",
+      "kind": "finding",
+      "title": "Central package management signal",
+      "description": "The probe did not find the expected central package management configuration. Review whether centralization fits the repository.",
+      "documentation": "Rules/rules.md#cmai7007",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI7008",
+      "ruleId": "dotnet/dependencyManagement/dependencyProbeFailure",
+      "dimension": "dependencyManagement",
+      "category": "dependencyProbeFailure",
+      "kind": "finding",
+      "title": "Dependency observation failure",
+      "description": "A package query failed or produced unusable evidence. Dependency results are unavailable; this is an execution diagnostic, not a source-code defect.",
+      "documentation": "Rules/rules.md#cmai7008",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI8001",
+      "ruleId": "dotnet/performanceAsync/syncOverAsync",
+      "dimension": "performanceAsync",
+      "category": "syncOverAsync",
+      "kind": "finding",
+      "title": "Synchronous wait on asynchronous work",
+      "description": "A recognized task wait blocks the calling thread. Review whether the synchronous boundary is required.",
+      "documentation": "Rules/rules.md#cmai8001",
+      "annotation": {
+        "supported": true,
+        "scopes": [
+          "statement",
+          "member"
+        ],
+        "rationaleRequired": true,
+        "example": "// codemetrics-ignore: CMAI8001 -- The host requires a synchronous boundary.",
+        "scoringEffect": "Excludes this rule occurrence before scoring; raw metrics are unchanged."
+      }
+    },
+    {
+      "code": "CMAI8002",
+      "ruleId": "dotnet/performanceAsync/threadSleep",
+      "dimension": "performanceAsync",
+      "category": "threadSleep",
+      "kind": "finding",
+      "title": "Thread sleep",
+      "description": "Thread.Sleep blocks the calling thread. Review the runtime context and whether blocking is deliberate.",
+      "documentation": "Rules/rules.md#cmai8002",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI8003",
+      "ruleId": "dotnet/performanceAsync/saveChangesInsideLoop",
+      "dimension": "performanceAsync",
+      "category": "saveChangesInsideLoop",
+      "kind": "finding",
+      "title": "Persistence inside a loop",
+      "description": "A recognized SaveChanges call occurs inside a loop. Review transaction, ordering and failure boundaries before batching.",
+      "documentation": "Rules/rules.md#cmai8003",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI8004",
+      "ruleId": "dotnet/performanceAsync/missingCancellationToken",
+      "dimension": "performanceAsync",
+      "category": "missingCancellationToken",
+      "kind": "finding",
+      "title": "Cancellation propagation signal",
+      "description": "An asynchronous API lacks the cancellation-token pattern recognized by the probe. Review the operation's lifetime and cancellation contract.",
+      "documentation": "Rules/rules.md#cmai8004",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI8005",
+      "ruleId": "dotnet/performanceAsync/materializationBeforeQueryShape",
+      "dimension": "performanceAsync",
+      "category": "materializationBeforeQueryShape",
+      "kind": "finding",
+      "title": "Query materialization order",
+      "description": "A query is materialized before recognized shaping operations. Review query-provider behavior and the intended execution boundary.",
+      "documentation": "Rules/rules.md#cmai8005",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI8006",
+      "ruleId": "dotnet/performanceAsync/awaitedIoInsideLoop",
+      "dimension": "performanceAsync",
+      "category": "awaitedIoInsideLoop",
+      "kind": "finding",
+      "title": "Sequential awaited I/O",
+      "description": "Recognized I/O is awaited within a loop. Ordering, shared state, early exit or back-pressure can make sequential execution appropriate.",
+      "documentation": "Rules/rules.md#cmai8006",
+      "annotation": {
+        "supported": true,
+        "scopes": [
+          "loop",
+          "member"
+        ],
+        "rationaleRequired": true,
+        "example": "// codemetrics-ignore: CMAI8006 -- Shared DbContext and transaction ordering require sequential execution.",
+        "scoringEffect": "Excludes this rule occurrence before scoring; raw metrics are unchanged."
+      }
+    },
+    {
+      "code": "CMAI8007",
+      "ruleId": "dotnet/performanceAsync/unboundedWhenAll",
+      "dimension": "performanceAsync",
+      "category": "unboundedWhenAll",
+      "kind": "finding",
+      "title": "Unbounded asynchronous fan-out",
+      "description": "A recognized Task.WhenAll construction has no detected concurrency bound. Review input size and resource limits.",
+      "documentation": "Rules/rules.md#cmai8007",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI8008",
+      "ruleId": "dotnet/performanceAsync/sharedStateMutationInFanOut",
+      "dimension": "performanceAsync",
+      "category": "sharedStateMutationInFanOut",
+      "kind": "finding",
+      "title": "Shared-state mutation during fan-out",
+      "description": "Concurrent work appears to mutate shared state. Review synchronization, ownership and task execution behavior.",
+      "documentation": "Rules/rules.md#cmai8008",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    },
+    {
+      "code": "CMAI9001",
+      "ruleId": "dotnet/maintainability/maintainabilityIndex",
+      "dimension": "maintainability",
+      "category": "maintainabilityIndex",
+      "kind": "metric",
+      "title": "Maintainability index distribution",
+      "description": "Scores the eligible type maintainability-index distribution, including recorded exclusions and entry-point adjustments. It is a static signal of change cost, not a complete maintainability judgment.",
+      "documentation": "Rules/rules.md#cmai9001",
+      "annotation": {
+        "supported": false,
+        "scopes": [],
+        "rationaleRequired": false,
+        "example": null,
+        "scoringEffect": "Comment exclusion is not implemented for this rule in this analyzer version."
+      }
+    }
+  ]
+}

@@ -92,6 +92,28 @@ CodeMetrics.AI recognizes category-scoped suppression comments and selected fram
 
 ### Category-scoped suppression
 
+The package includes a [CMAI rule catalog](src/CodeMetrics.AI/Rules/rules.md), with JSON and Markdown copies under `Rules/` in the tool installation. Read the catalog from the analyzer version used for the run:
+
+```powershell
+code-metrics rules
+code-metrics rules --code CMAI5001
+code-metrics rules --format json
+code-metrics rules --format markdown --output rules.md
+```
+
+This command needs no solution, restore, package-feed access or MSBuild workspace. Codes are permanent aliases for existing `dotnet/<dimension>/<category>` identities. Findings expose the alias in `observations.diagnosticCode`; each dimension's `ruleCatalog` references also identify aggregate metric components. These additions do not change finding fingerprints, scores or schema-v3 compatibility.
+
+The first catalog covers 44 findings/components across all nine dimensions. Four codes currently support annotations: `CMAI5001` (empty catch), `CMAI5005` (error-handling sync block), `CMAI8001` (performance sync-over-async), and `CMAI8006` (sequential awaited I/O). Each **CMAI** directive requires a nonempty rationale after ` -- ` or `—`. The analyzer accepts the explanation without judging the business decision. Unsupported rules, including architecture/decomposition metrics, are explicitly marked in the catalog; their annotations do not yet exclude penalties. One source operation can participate in multiple rules, each with its own code.
+
+```csharp
+// codemetrics-ignore: CMAI5001 -- Cleanup failure must not replace the original exception.
+catch (Exception)
+{
+}
+```
+
+The code-scorecard skill reads this catalog from the exact package used by a fresh run, shows codes with relevant findings, and offers only supported annotation examples. A catalog failure leaves validated scores intact and makes code guidance unavailable. Suppression declarations retain their location and rationale in evidence; `status: declared` alone does not prove that a finding was matched.
+
 Place a directive immediately before the affected statement, loop, catch, or method:
 
 ```csharp

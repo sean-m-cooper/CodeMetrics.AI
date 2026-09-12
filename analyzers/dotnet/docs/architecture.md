@@ -19,6 +19,7 @@ Dependency subprocesses remove the MSBuild paths installed by the analyzer's loc
 - `Metrics/` owns Roslyn metric calculation. Raw Roslyn-compatible class coupling remains available even when architecture scoring uses structural coupling.
 - `Probes/` owns findings and score ladders. A probe should report observable evidence; it should not mutate the analyzed solution.
 - `Output/` owns serialization only. Evidence shape changes must remain compatible with `shared/scorecard-schema/evidence.schema.v3.json`.
+- `Rules/rules.json` owns permanent CMAI aliases, descriptions and annotation capabilities. The package embeds the catalog and ships JSON/Markdown copies. `code-metrics rules` serves the installed version without loading a solution. Findings retain their existing rule IDs and fingerprints while exposing codes in observations; dimensions reference metric-only entries separately. New rules must be cataloged and assigned unused codes; do not renumber or reuse existing codes. Regenerate `Rules/rules.md` with the CLI after editing the catalog. Consumers must check package version and catalog version before presenting annotation guidance.
 - Tests exercise probes with in-memory Roslyn compilations where possible. End-to-end tests are reserved for solution loading, command execution, and output contracts.
 
 ## Design invariants
