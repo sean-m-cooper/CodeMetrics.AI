@@ -43,8 +43,8 @@ public static class MetricsCollector
         var namespaceName = typeSymbol.ContainingNamespace?.ToDisplayString() ?? "";
         var typeName = typeSymbol.Name;
         var typeId = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        var memberMetrics = CollectMemberMetrics(
-            parts,
+        var memberMetrics = MemberMetricsCollector.Collect(
+            parts.Select(part => (part.Declaration, part.Model)),
             projectName,
             namespaceName,
             typeName,
@@ -58,95 +58,6 @@ public static class MetricsCollector
             typeName,
             typeId,
             memberMetrics));
-    }
-
-    private static List<MemberMetrics> CollectMemberMetrics(
-        IReadOnlyList<TypePart> parts,
-        string project,
-        string ns,
-        string type,
-        string typeId)
-    {
-        var result = new List<MemberMetrics>();
-        var partialMembers = new Dictionary<ISymbol, int>(SymbolEqualityComparer.Default);
-
-        foreach (var part in parts)
-            foreach (var member in part.Declaration.Members)
-            {
-                var metrics = BuildMemberMetrics(member, part.Model, project, ns, type, typeId);
-                if (metrics == null)
-                    continue;
-
-                // A partial member's signature and implementation describe one member.
-                // Only consider declarations in authored, included trees: never pull in generated bodies.
-                var definition = part.Model.GetDeclaredSymbol(member) switch
-                {
-                    IMethodSymbol method => method.PartialDefinitionPart ?? method,
-                    IPropertySymbol property => (ISymbol?)property.PartialDefinitionPart ?? property,
-                    _ => null
-                };
-                if (definition != null && partialMembers.TryGetValue(definition, out var index))
-                {
-                    if (metrics.HasBody)
-                        result[index] = metrics;
-                    continue;
-                }
-                if (definition != null)
-                    partialMembers[definition] = result.Count;
-                result.Add(metrics);
-            }
-
-        return result;
-    }
-
-    private static MemberMetrics? BuildMemberMetrics(
-        MemberDeclarationSyntax member,
-        SemanticModel semanticModel,
-        string project,
-        string ns,
-        string type,
-        string typeId)
-    {
-        if (member is TypeDeclarationSyntax)
-            return null;
-
-        var memberName = GetMemberName(member, semanticModel);
-        if (memberName == null)
-            return null;
-
-        var hasBody = HasMethodBody(member);
-        var (complexity, sourceLines, executableLines, maintainabilityIndex) = hasBody
-            ? CalculateBodyMetrics(member)
-            : (1, 0, 0, 100);
-        return new MemberMetrics
-        {
-            Project = project,
-            Namespace = ns,
-            Type = type,
-            TypeId = typeId,
-            Member = memberName,
-            CyclomaticComplexity = complexity,
-            LinesOfSource = sourceLines,
-            LinesOfExecutable = executableLines,
-            MaintainabilityIndex = maintainabilityIndex,
-            HasBody = hasBody,
-        };
-    }
-
-    private static (int Complexity, int SourceLines, int ExecutableLines, int MaintainabilityIndex)
-        CalculateBodyMetrics(MemberDeclarationSyntax member)
-    {
-        var complexityWalker = new CyclomaticComplexityWalker();
-        complexityWalker.Visit(member);
-        var sourceLines = LinesOfCodeCounter.CountSourceLines(member);
-        return (
-            complexityWalker.Complexity,
-            sourceLines,
-            LinesOfCodeCounter.CountExecutableLines(member),
-            MaintainabilityIndexCalculator.Calculate(
-                complexityWalker.Complexity,
-                sourceLines,
-                HalsteadCalculator.ComputeVolume(member)));
     }
 
     private static TypeMetrics BuildTypeMetrics(
@@ -227,37 +138,4 @@ public static class MetricsCollector
         int MaxMemberCyclomaticComplexity,
         double DecompositionRatio);
 
-    private static string? GetMemberName(
-        MemberDeclarationSyntax member,
-        SemanticModel semanticModel)
-    {
-        var variable = member switch
-        {
-            FieldDeclarationSyntax field => field.Declaration.Variables.FirstOrDefault(),
-            EventFieldDeclarationSyntax field => field.Declaration.Variables.FirstOrDefault(),
-            _ => null
-        };
-        if (variable != null)
-            return semanticModel.GetDeclaredSymbol(variable)?.Name;
-
-        return semanticModel.GetDeclaredSymbol(member) switch
-        {
-            IMethodSymbol { MethodKind: MethodKind.Constructor, ContainingType: { } owner } => owner.Name,
-            IMethodSymbol { MethodKind: MethodKind.Destructor, ContainingType: { } owner } => $"~{owner.Name}",
-            IMethodSymbol { MethodKind: MethodKind.UserDefinedOperator } method => method.ToDisplayString(),
-            IMethodSymbol { MethodKind: MethodKind.Conversion } method => method.ToDisplayString(),
-            IPropertySymbol { IsIndexer: true } => "this[]",
-            { } symbol => symbol.Name,
-            _ => null
-        };
-    }
-
-    private static bool HasMethodBody(MemberDeclarationSyntax member)
-    {
-        if (member is FieldDeclarationSyntax or EventFieldDeclarationSyntax)
-            return false;
-
-        return member.DescendantNodes(node => node is not TypeDeclarationSyntax)
-            .Any(node => node is BlockSyntax or ArrowExpressionClauseSyntax);
-    }
 }
