@@ -50,6 +50,8 @@ ExecutableFunctionCollector traverses each included type declaration once, measu
 
 ClassCouplingCalculator separates raw node binding from explicit base/attribute collection. The raw syntax loop reuses a node's SymbolInfo and TypeInfo instead of resolving each twice. Raw and structural recursion share array normalization and self/nested/primitive exclusions, but retain separate generic expansion rules: structural traversal stops at passive carriers and presentation/compiler-generated boundaries, while raw traversal preserves their argument provenance. An already-counted generic definition does not stop traversal of another constructed instance's arguments. These boundaries must preserve raw coupling, structural coupling and exclusion provenance.
 
+ArchitectureProbe coordinates three stages. ArchitectureObservationCollector gathers project cycles, layering findings, source classifications and controller-action observations. ArchitectureScoring evaluates the complete metric census and graph/layering caps, returning an assessment without constructing display summaries. ArchitectureEvidence builds the explanation, sampled hotspots and supplemental provenance from that assessment. ArchitectureTypeScope owns shared eligibility queries so finding, scoring and exclusion populations use the same rules. Observation order, finding order, score decisions, anonymous evidence field names and the ten-hotspot display limit remain contract boundaries; the display sample and controller-action summaries never feed back into scoring.
+
 ## Verification
 
 From the repository root:
