@@ -611,7 +611,7 @@
       "category": "syncOverAsync",
       "kind": "finding",
       "title": "Synchronous wait on asynchronous work",
-      "description": "A recognized task wait blocks the calling thread. Review whether the synchronous boundary is required.",
+      "description": "A recognized task wait blocks the calling thread. Review whether the synchronous boundary is required. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.",
       "documentation": "Rules/rules.md#cmai8001",
       "annotation": {
         "supported": true,
@@ -631,7 +631,7 @@
       "category": "threadSleep",
       "kind": "finding",
       "title": "Thread sleep",
-      "description": "Thread.Sleep blocks the calling thread. Review the runtime context and whether blocking is deliberate.",
+      "description": "Thread.Sleep blocks the calling thread. Review the runtime context and whether blocking is deliberate. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.",
       "documentation": "Rules/rules.md#cmai8002",
       "annotation": {
         "supported": false,
@@ -648,7 +648,7 @@
       "category": "saveChangesInsideLoop",
       "kind": "finding",
       "title": "Persistence inside a loop",
-      "description": "A recognized SaveChanges call occurs inside a loop. Review transaction, ordering and failure boundaries before batching.",
+      "description": "A recognized SaveChanges call occurs inside a loop. Review transaction, ordering and failure boundaries before batching. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.",
       "documentation": "Rules/rules.md#cmai8003",
       "annotation": {
         "supported": false,
@@ -665,7 +665,7 @@
       "category": "missingCancellationToken",
       "kind": "finding",
       "title": "Cancellation propagation signal",
-      "description": "An asynchronous API lacks the cancellation-token pattern recognized by the probe. Review the operation's lifetime and cancellation contract.",
+      "description": "An asynchronous API lacks the cancellation-token pattern recognized by the probe. Review the operation's lifetime and cancellation contract. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.",
       "documentation": "Rules/rules.md#cmai8004",
       "annotation": {
         "supported": false,
@@ -682,7 +682,7 @@
       "category": "materializationBeforeQueryShape",
       "kind": "finding",
       "title": "Query materialization order",
-      "description": "A query is materialized before recognized shaping operations. Review query-provider behavior and the intended execution boundary.",
+      "description": "A query is materialized before recognized shaping operations. Review query-provider behavior and the intended execution boundary. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.",
       "documentation": "Rules/rules.md#cmai8005",
       "annotation": {
         "supported": false,
@@ -699,7 +699,7 @@
       "category": "awaitedIoInsideLoop",
       "kind": "finding",
       "title": "Sequential awaited I/O",
-      "description": "Recognized I/O is awaited within a loop. Ordering, shared state, early exit or back-pressure can make sequential execution appropriate.",
+      "description": "Recognized I/O is awaited within a loop. Ordering, shared state, early exit or back-pressure can make sequential execution appropriate. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.",
       "documentation": "Rules/rules.md#cmai8006",
       "annotation": {
         "supported": true,
@@ -719,7 +719,7 @@
       "category": "unboundedWhenAll",
       "kind": "finding",
       "title": "Unbounded asynchronous fan-out",
-      "description": "A recognized Task.WhenAll construction has no detected concurrency bound. Review input size and resource limits.",
+      "description": "A recognized Task.WhenAll construction has no detected concurrency bound. Review input size and resource limits. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.",
       "documentation": "Rules/rules.md#cmai8007",
       "annotation": {
         "supported": false,
@@ -736,7 +736,7 @@
       "category": "sharedStateMutationInFanOut",
       "kind": "finding",
       "title": "Shared-state mutation during fan-out",
-      "description": "Concurrent work appears to mutate shared state. Review synchronization, ownership and task execution behavior.",
+      "description": "Concurrent work appears to mutate shared state. Review synchronization, ownership and task execution behavior. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.",
       "documentation": "Rules/rules.md#cmai8008",
       "annotation": {
         "supported": false,

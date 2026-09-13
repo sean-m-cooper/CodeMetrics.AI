@@ -1,5 +1,11 @@
 # CodeMetrics.AI architecture
 
+PerformanceAsyncProbe and ConcurrentFanOutProbe attach exact syntax spans when they emit
+observations. PerformanceSourceFindings groups normalized physical file/span/category
+identities before Performance & Async scoring, selects maximum severity per site, and
+retains framework-specific evidence. Missing identities remain separate. This ownership
+keeps source counting independent of pattern recognition and of the score ladder.
+
 CodeMetrics.AI is a deterministic, read-only analyzer. It loads a .NET solution or explicit project with Roslyn, collects production metrics, runs nine independent scorecard probes, and writes CSV metrics plus schema-v3 JSON evidence.
 
 ## Analysis flow

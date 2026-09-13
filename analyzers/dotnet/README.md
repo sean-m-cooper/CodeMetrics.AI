@@ -88,6 +88,21 @@ The tool automatically skips non-production projects:
 - Aspire hosts (AppHost, ServiceDefaults, Hosting)
 - Benchmarks, Samples, Demo, Playground projects
 
+## Performance & Async source counting
+
+Policy `dotnet/performanceAsync/source-findings-v1` counts each normalized physical file,
+exact syntax span and rule category once across project/target-framework compilations.
+The highest observed severity at that site participates in the unchanged score ladder.
+Evidence retains the observation count, affected projects, and every framework's severity
+and message. Distinct operations on one line, different files, different rules
+at the same operation, and different conditional-compilation spans remain distinct.
+Missing file/span identity is conservatively left unmerged.
+
+Ruleset `dotnet-2026-09-13-async-source-findings` records this counting correction.
+Older framework-row scores are historical, not compatible baseline gates. Recognition,
+annotation behavior, raw metrics and CSV are unchanged; this counting policy does not
+establish that a reported pattern is a defect.
+
 ## Code annotations and recognized attributes
 
 CodeMetrics.AI recognizes category-scoped suppression comments and selected framework attributes whose meaning affects a scorecard dimension. It does not require a CodeMetrics.AI package reference in the analyzed solution.

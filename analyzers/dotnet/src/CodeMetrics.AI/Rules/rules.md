@@ -446,7 +446,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-A recognized task wait blocks the calling thread. Review whether the synchronous boundary is required.
+A recognized task wait blocks the calling thread. Review whether the synchronous boundary is required. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
 
 Excludes this rule occurrence before scoring; raw metrics are unchanged.
 
@@ -464,7 +464,7 @@ Supported scopes: statement, member. Rationale required.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-Thread.Sleep blocks the calling thread. Review the runtime context and whether blocking is deliberate.
+Thread.Sleep blocks the calling thread. Review the runtime context and whether blocking is deliberate. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -476,7 +476,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-A recognized SaveChanges call occurs inside a loop. Review transaction, ordering and failure boundaries before batching.
+A recognized SaveChanges call occurs inside a loop. Review transaction, ordering and failure boundaries before batching. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -488,7 +488,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-An asynchronous API lacks the cancellation-token pattern recognized by the probe. Review the operation's lifetime and cancellation contract.
+An asynchronous API lacks the cancellation-token pattern recognized by the probe. Review the operation's lifetime and cancellation contract. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -500,7 +500,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-A query is materialized before recognized shaping operations. Review query-provider behavior and the intended execution boundary.
+A query is materialized before recognized shaping operations. Review query-provider behavior and the intended execution boundary. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -512,7 +512,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-Recognized I/O is awaited within a loop. Ordering, shared state, early exit or back-pressure can make sequential execution appropriate.
+Recognized I/O is awaited within a loop. Ordering, shared state, early exit or back-pressure can make sequential execution appropriate. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
 
 Excludes this rule occurrence before scoring; raw metrics are unchanged.
 
@@ -530,7 +530,7 @@ Supported scopes: loop, member. Rationale required.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-A recognized Task.WhenAll construction has no detected concurrency bound. Review input size and resource limits.
+A recognized Task.WhenAll construction has no detected concurrency bound. Review input size and resource limits. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -542,7 +542,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-Concurrent work appears to mutate shared state. Review synchronization, ownership and task execution behavior.
+Concurrent work appears to mutate shared state. Review synchronization, ownership and task execution behavior. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 

@@ -75,6 +75,23 @@ The [accepted maintainability design](maintainability-policy.md) uses 40% of the
 
 The unpublished .NET 2.3.0 implementation uses `source-function-own-mi-v1` and scoring policy `dotnet/maintainability/source-functions-quintile-40-60-v1`, ruleset `dotnet-2026-09-12-function-maintainability`. Own MI 40/52/58/65/70/75 maps linearly to individual scores 0/2/4/6/8/10. The initial ladder preserves former MI reference points and remains a product choice pending broader labeled calibration. Raw metrics and CSV stay compatible. Earlier `dotnet/maintainability/v1` scores are not comparable baselines.
 
+## Performance & Async source identity
+
+The .NET correction accepted on 2026-09-13 counts authored finding sites rather than
+project/framework rows. Policy `dotnet/performanceAsync/source-findings-v1` groups by
+normalized physical path, exact syntax span and rule category, using the highest observed
+severity per site. All framework observations remain available. Conditional source spans,
+different operations on one line and different rules at the same span remain distinct;
+missing identity is never merged. Pattern recognition, exclusions and ladder thresholds
+are unchanged. This follows the product decision that compiling authored code for more
+frameworks must not multiply its penalty.
+
+Ruleset `dotnet-2026-09-13-async-source-findings` prevents an old row-counting run from
+being used as a compatible baseline gate. The six pinned fixture expectations retain
+their scores, findings, labels and source hashes; only baseline ruleset metadata changes.
+Public-corpus before/after results must be labeled as a counting correction on fixed
+source, not source-code improvement or evidence that every finding is a defect.
+
 ## Prerequisites: metric parity
 
 Before distribution tuning, the new analyzer must demonstrate formula parity with the baseline on the shared raw metrics:
