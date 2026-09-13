@@ -26,7 +26,7 @@ internal static class TargetFrameworkParser
         foreach (var pattern in patterns)
         {
             var match = Regex.Match(value, pattern, RegexOptions.IgnoreCase);
-            if (match.Success && Version.TryParse(match.Groups["version"].Value, out var version))
+            if (MatchedVersion(match) is { } version)
                 return new ParsedFramework(ParseFamily(match.Groups["family"].Value, version), version);
         }
 
@@ -39,7 +39,7 @@ internal static class TargetFrameworkParser
             value,
             "^(?<family>netstandard|netcoreapp)(?<version>\\d+(?:\\.\\d+){1,3})$",
             RegexOptions.IgnoreCase);
-        if (!match.Success || !Version.TryParse(match.Groups["version"].Value, out var version))
+        if (MatchedVersion(match) is not { } version)
             return null;
 
         var family = match.Groups["family"].Value.Equals(
@@ -56,26 +56,29 @@ internal static class TargetFrameworkParser
             value,
             "^net(?<version>\\d+\\.\\d+)(?:-(?<platform>[a-z]+)(?<platformVersion>\\d+(?:\\.\\d+){0,3})?)?$",
             RegexOptions.IgnoreCase);
-        if (!match.Success ||
-            !Version.TryParse(match.Groups["version"].Value, out var version) ||
+        if (MatchedVersion(match) is not { } version ||
             version.Major < 5)
         {
             return null;
         }
 
-        var platformVersion = match.Groups["platformVersion"].Success &&
-                              Version.TryParse(
-                                  match.Groups["platformVersion"].Value,
-                                  out var parsedPlatformVersion)
-            ? parsedPlatformVersion
-            : null;
         return new ParsedFramework(
             FrameworkFamily.ModernDotNet,
             version,
             match.Groups["platform"].Success
                 ? match.Groups["platform"].Value.ToLowerInvariant()
                 : null,
-            platformVersion);
+            OptionalVersion(match.Groups["platformVersion"].Value));
+    }
+
+    private static Version? MatchedVersion(Match match)
+    {
+        return match.Success ? OptionalVersion(match.Groups["version"].Value) : null;
+    }
+
+    private static Version? OptionalVersion(string value)
+    {
+        return Version.TryParse(value, out var version) ? version : null;
     }
 
     private static ParsedFramework? ParseNetFramework(string value)

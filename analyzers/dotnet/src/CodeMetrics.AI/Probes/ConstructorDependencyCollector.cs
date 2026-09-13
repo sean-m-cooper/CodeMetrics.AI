@@ -11,35 +11,24 @@ internal static class ConstructorDependencyCollector
     {
         var result = new List<(string, string?, ITypeSymbol?, int)>();
 
-        // Regular constructor parameters
-        var constructors = typeDecl.Members.OfType<ConstructorDeclarationSyntax>();
-        foreach (var ctor in constructors)
-        {
-            foreach (var param in ctor.ParameterList.Parameters)
-            {
-                AddParameterType(param, semanticModel, result);
-            }
-        }
-
-        // Primary constructor parameters (on the type declaration itself)
-        if (typeDecl is RecordDeclarationSyntax record && record.ParameterList != null)
-        {
-            foreach (var param in record.ParameterList.Parameters)
-            {
-                AddParameterType(param, semanticModel, result);
-            }
-        }
-
-        // Class with primary constructor (C# 12+)
-        if (typeDecl is ClassDeclarationSyntax classDecl && classDecl.ParameterList != null)
-        {
-            foreach (var param in classDecl.ParameterList.Parameters)
-            {
-                AddParameterType(param, semanticModel, result);
-            }
-        }
+        var regular = typeDecl.Members.OfType<ConstructorDeclarationSyntax>()
+            .SelectMany(constructor => constructor.ParameterList.Parameters);
+        // Preserve regular-before-primary order and the existing class/record scope.
+        foreach (var parameter in regular.Concat(PrimaryParameters(typeDecl)))
+            AddParameterType(parameter, semanticModel, result);
 
         return result;
+    }
+
+    private static IEnumerable<ParameterSyntax> PrimaryParameters(TypeDeclarationSyntax declaration)
+    {
+        var list = declaration switch
+        {
+            RecordDeclarationSyntax record => record.ParameterList,
+            ClassDeclarationSyntax type => type.ParameterList,
+            _ => null
+        };
+        return list?.Parameters ?? [];
     }
 
     private static void AddParameterType(

@@ -10,24 +10,25 @@ internal sealed class FindingSourceResolver(
 {
     public string Resolve(Finding finding)
     {
-        var anchor = "";
-        if (finding.File is { Length: > 0 } file)
-        {
-            var fullPath = Path.GetFullPath(file, root);
-            if (trees.TryGetValue(fullPath, out var tree))
-            {
-                var node = FindNode(finding, tree);
-                if (node != null)
-                {
-                    finding.Member = MemberName(node);
-                    finding.Line ??= tree.GetLineSpan(node.Span).StartLinePosition.Line + 1;
-                    var statement = node.AncestorsAndSelf().FirstOrDefault(candidate => candidate is StatementSyntax or CatchClauseSyntax);
-                    anchor = statement == null ? "" : string.Join(" ", statement.DescendantTokens().Select(token => token.Text));
-                }
-            }
-            finding.File = Path.GetRelativePath(repositoryRoot, fullPath).Replace('\\', '/');
-        }
+        if (finding.File is not { Length: > 0 } file)
+            return "";
+
+        var fullPath = Path.GetFullPath(file, root);
+        var anchor = trees.TryGetValue(fullPath, out var tree) ? ResolveNode(finding, tree) : "";
+        finding.File = Path.GetRelativePath(repositoryRoot, fullPath).Replace('\\', '/');
         return anchor;
+    }
+
+    private static string ResolveNode(Finding finding, SyntaxTree tree)
+    {
+        var node = FindNode(finding, tree);
+        if (node == null)
+            return "";
+
+        finding.Member = MemberName(node);
+        finding.Line ??= tree.GetLineSpan(node.Span).StartLinePosition.Line + 1;
+        var statement = node.AncestorsAndSelf().FirstOrDefault(candidate => candidate is StatementSyntax or CatchClauseSyntax);
+        return statement == null ? "" : string.Join(" ", statement.DescendantTokens().Select(token => token.Text));
     }
 
     private static SyntaxNode? FindNode(Finding finding, SyntaxTree tree)

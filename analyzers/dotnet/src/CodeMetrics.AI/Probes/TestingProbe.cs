@@ -292,46 +292,27 @@ public static class TestingProbe
 
     private static bool HasTestAttribute(MethodDeclarationSyntax method)
     {
-        foreach (var attrList in method.AttributeLists)
-        {
-            foreach (var attr in attrList.Attributes)
-            {
-                var name = GetAttributeSimpleName(attr);
-                if (TestAttributeNames.Contains(name))
-                    return true;
-            }
-        }
-        return false;
+        return TestAttributes(method).Any();
+    }
+
+    private static IEnumerable<AttributeSyntax> TestAttributes(MethodDeclarationSyntax method)
+    {
+        return method.AttributeLists.SelectMany(list => list.Attributes)
+            .Where(attribute => TestAttributeNames.Contains(GetAttributeSimpleName(attribute)));
     }
 
     private static bool HasSkipOrIgnoreArgument(MethodDeclarationSyntax method)
     {
-        foreach (var attrList in method.AttributeLists)
-        {
-            foreach (var attr in attrList.Attributes)
-            {
-                var name = GetAttributeSimpleName(attr);
-                if (!TestAttributeNames.Contains(name))
-                    continue;
+        return TestAttributes(method)
+            .SelectMany(attribute => attribute.ArgumentList?.Arguments ?? [])
+            .Any(IsSkipOrIgnoreArgument);
+    }
 
-                if (attr.ArgumentList == null)
-                    continue;
-
-                foreach (var arg in attr.ArgumentList.Arguments)
-                {
-                    var argName = arg.NameEquals?.Name.Identifier.Text
-                                  ?? arg.NameColon?.Name.Identifier.Text;
-
-                    if (argName != null &&
-                        (argName.Equals("Skip", StringComparison.OrdinalIgnoreCase) ||
-                         argName.Equals("Ignore", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+    private static bool IsSkipOrIgnoreArgument(AttributeArgumentSyntax argument)
+    {
+        var name = argument.NameEquals?.Name.Identifier.Text ?? argument.NameColon?.Name.Identifier.Text;
+        return string.Equals(name, "Skip", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(name, "Ignore", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool IsPlaceholderTest(MethodDeclarationSyntax method)

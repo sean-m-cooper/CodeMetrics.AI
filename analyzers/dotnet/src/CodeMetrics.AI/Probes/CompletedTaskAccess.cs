@@ -52,31 +52,41 @@ internal static class CompletedTaskAccess
 
     private static bool ProvesCompletion(ExpressionSyntax expression, ISymbol receiver, SemanticModel model)
     {
-        if (expression is ParenthesizedExpressionSyntax parentheses)
-            return ProvesCompletion(parentheses.Expression, receiver, model);
-        if (expression is BinaryExpressionSyntax binary && binary.IsKind(SyntaxKind.LogicalAndExpression))
-            return ProvesCompletion(binary.Left, receiver, model) || ProvesCompletion(binary.Right, receiver, model);
-        if (expression is BinaryExpressionSyntax either && either.IsKind(SyntaxKind.LogicalOrExpression))
-            return ProvesCompletion(either.Left, receiver, model) && ProvesCompletion(either.Right, receiver, model);
-        if (expression is BinaryExpressionSyntax equality && equality.IsKind(SyntaxKind.EqualsExpression))
-        {
-            return IsCompletedStatus(equality.Left, equality.Right, receiver, model) ||
-                   IsCompletedStatus(equality.Right, equality.Left, receiver, model);
-        }
         return expression switch
         {
+            ParenthesizedExpressionSyntax parentheses => ProvesCompletion(parentheses.Expression, receiver, model),
+            BinaryExpressionSyntax binary => BinaryProvesCompletion(binary, receiver, model),
             MemberAccessExpressionSyntax member => IsCompletionProperty(member, receiver, model),
             InvocationExpressionSyntax call => HelperProvesCompletion(call, receiver, model),
             _ => false
         };
     }
 
+    private static bool BinaryProvesCompletion(BinaryExpressionSyntax binary, ISymbol receiver, SemanticModel model)
+    {
+        // Either conjunct can prove completion, but both alternatives of an OR must.
+        return binary.Kind() switch
+        {
+            SyntaxKind.LogicalAndExpression => ProvesCompletion(binary.Left, receiver, model) || ProvesCompletion(binary.Right, receiver, model),
+            SyntaxKind.LogicalOrExpression => ProvesCompletion(binary.Left, receiver, model) && ProvesCompletion(binary.Right, receiver, model),
+            SyntaxKind.EqualsExpression => IsCompletedStatus(binary.Left, binary.Right, receiver, model) ||
+                                           IsCompletedStatus(binary.Right, binary.Left, receiver, model),
+            _ => false
+        };
+    }
+
     private static bool IsCompletionProperty(MemberAccessExpressionSyntax member, ISymbol receiver, SemanticModel model)
     {
-        return SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(member.Expression).Symbol, receiver) &&
-               model.GetSymbolInfo(member).Symbol is IPropertySymbol property &&
-               property.ContainingType.ToDisplayString() == "System.Threading.Tasks.Task" &&
-               property.Name is "IsCompletedSuccessfully" or "IsCompleted";
+        return TaskPropertyName(member, receiver, model) is "IsCompletedSuccessfully" or "IsCompleted";
+    }
+
+    private static string? TaskPropertyName(MemberAccessExpressionSyntax member, ISymbol receiver, SemanticModel model)
+    {
+        if (!SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(member.Expression).Symbol, receiver) ||
+            model.GetSymbolInfo(member).Symbol is not IPropertySymbol property ||
+            property.ContainingType.ToDisplayString() != "System.Threading.Tasks.Task")
+            return null;
+        return property.Name;
     }
 
     private static bool HelperProvesCompletion(InvocationExpressionSyntax call, ISymbol receiver, SemanticModel model)
@@ -126,9 +136,7 @@ internal static class CompletedTaskAccess
     private static bool IsCompletedStatus(ExpressionSyntax left, ExpressionSyntax right, ISymbol receiver, SemanticModel model)
     {
         return left is MemberAccessExpressionSyntax status &&
-               SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(status.Expression).Symbol, receiver) &&
-               model.GetSymbolInfo(status).Symbol is IPropertySymbol property &&
-               property.Name == "Status" && property.ContainingType.ToDisplayString() == "System.Threading.Tasks.Task" &&
+               TaskPropertyName(status, receiver, model) == "Status" &&
                model.GetSymbolInfo(right).Symbol is IFieldSymbol field &&
                field.ContainingType.ToDisplayString() == "System.Threading.Tasks.TaskStatus" &&
                field.Name is "RanToCompletion" or "Faulted" or "Canceled";

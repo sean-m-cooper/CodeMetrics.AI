@@ -7,6 +7,33 @@ namespace CodeMetrics.AI.Tests.Probes;
 
 public class ErrorHandlingProbeTests
 {
+    [Theory]
+    [InlineData("null", true)]
+    [InlineData("false", true)]
+    [InlineData("0", true)]
+    [InlineData("default", true)]
+    [InlineData("default(object)", true)]
+    [InlineData("string.Empty", true)]
+    [InlineData("System.String.Empty", false)]
+    [InlineData("1", false)]
+    [InlineData("true", false)]
+    [InlineData("(0)", false)]
+    public void BroadCatch_ReturnExpression_PreservesDefaultRecognition(string expression, bool expected)
+    {
+        var code = $$"""
+            class Sample
+            {
+                object Read()
+                {
+                    try { return new object(); }
+                    catch (System.Exception) { return {{expression}}; }
+                }
+            }
+            """;
+        var result = Analyze(code);
+        result.Findings.Any(f => f.Category == "broadCatchReturnsDefault").Should().Be(expected);
+    }
+
     private static DimensionResult Analyze(string code)
     {
         var (_, _, compilation) = RoslynTestHelper.CompileCode(code);
