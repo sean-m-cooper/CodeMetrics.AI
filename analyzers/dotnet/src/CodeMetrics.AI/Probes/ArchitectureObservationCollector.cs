@@ -6,19 +6,6 @@ namespace CodeMetrics.AI.Probes;
 
 internal static class ArchitectureObservationCollector
 {
-    // Cross-cutting types that are acceptable in controllers
-    private static readonly string[] CrossCuttingPrefixes =
-    [
-        "ILogger", "IMapper", "IMediator", "IConfiguration", "IOptions",
-        "IHttpClientFactory", "IMemoryCache", "IDistributedCache"
-    ];
-
-    // Infrastructure keywords for service concrete dependency check
-    private static readonly string[] InfrastructureKeywords =
-    [
-        "Gateway", "Client", "Context", "Repository", "Infrastructure"
-    ];
-
     private static readonly HashSet<string> DependencyInjectionExtensionReceivers =
     [
         "Microsoft.Extensions.DependencyInjection.IServiceCollection",
@@ -71,7 +58,7 @@ internal static class ArchitectureObservationCollector
                 var filePath = tree.FilePath;
                 var semanticModel = compilation.GetSemanticModel(tree);
 
-                AnalyzeLayeringViolations(root, semanticModel, filePath, projectName, findings);
+                ArchitectureLayeringAnalysis.Analyze(root, semanticModel, filePath, projectName, findings);
                 CollectDependencyInjectionExtensionTypes(
                     root, semanticModel, projectName, dependencyInjectionExtensionTypes);
                 CollectFrameworkCouplingArchetypeTypes(
@@ -86,142 +73,6 @@ internal static class ArchitectureObservationCollector
             controllerActionObservations);
     }
 
-    private static void AnalyzeLayeringViolations(
-        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName, List<Finding> findings)
-    {
-        var typeDeclarations = root.DescendantNodes().OfType<TypeDeclarationSyntax>();
-
-        foreach (var typeDecl in typeDeclarations)
-        {
-            var typeName = typeDecl.Identifier.Text;
-
-            // Collect all constructor parameter types
-            var constructorParams = GetAllConstructorParameterTypeNames(typeDecl, semanticModel);
-
-            if (WebTypeClassifier.IsController(semanticModel.GetDeclaredSymbol(typeDecl) as INamedTypeSymbol))
-            {
-                // Check for data-layer dependencies in controllers
-                foreach (var (paramTypeName, _, paramTypeSymbol, line) in constructorParams)
-                {
-                    if (IsCrossCuttingType(paramTypeName))
-                        continue;
-
-                    if (WebTypeClassifier.IsDataDependency(paramTypeSymbol))
-                    {
-                        findings.Add(new Finding
-                        {
-                            Category = "controllerDataDependency",
-                            Severity = "error",
-                            File = filePath,
-                            Line = line,
-                            Project = projectName,
-                            Type = typeName,
-                            Message = $"Controller '{typeName}' directly depends on data-layer type '{paramTypeName}'. " +
-                                      "Controllers should not depend on DbContext, Repository, or DAL types."
-                        });
-                    }
-                }
-            }
-            else if (typeName.EndsWith("Service", StringComparison.Ordinal))
-            {
-                // Check for concrete infrastructure dependencies in services
-                foreach (var (paramTypeName, paramNamespace, paramTypeSymbol, line) in constructorParams)
-                {
-                    // Only concrete classes are actionable. Naming conventions such as an
-                    // I-prefix and namespace fragments such as ".Interfaces" are not type
-                    // facts and can produce both false positives and false negatives.
-                    if (paramTypeSymbol is not INamedTypeSymbol namedType ||
-                        namedType.TypeKind != TypeKind.Class ||
-                        namedType.IsAbstract)
-                        continue;
-
-                    if (IsFrameworkNamespace(paramNamespace))
-                        continue;
-
-                    if (InfrastructureKeywords.Any(kw =>
-                            paramTypeName.Contains(kw, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        findings.Add(new Finding
-                        {
-                            Category = "concreteInfrastructureDependency",
-                            Severity = "warning",
-                            File = filePath,
-                            Line = line,
-                            Project = projectName,
-                            Type = typeName,
-                            Message = $"Service '{typeName}' depends on concrete infrastructure type '{paramTypeName}'. " +
-                                      "Prefer depending on abstractions (interfaces)."
-                        });
-                    }
-                }
-            }
-        }
-    }
-
-    private static bool IsCrossCuttingType(string typeName)
-    {
-        return CrossCuttingPrefixes.Any(prefix =>
-            typeName.StartsWith(prefix, StringComparison.Ordinal));
-    }
-
-    private static bool IsFrameworkNamespace(string? namespaceName)
-    {
-        return namespaceName?.StartsWith("Microsoft.Extensions.", StringComparison.Ordinal) == true ||
-               namespaceName?.StartsWith("Microsoft.AspNetCore.", StringComparison.Ordinal) == true;
-    }
-
-    private static List<(string TypeName, string? Namespace, ITypeSymbol? TypeSymbol, int Line)>
-        GetAllConstructorParameterTypeNames(
-        TypeDeclarationSyntax typeDecl, SemanticModel semanticModel)
-    {
-        var result = new List<(string, string?, ITypeSymbol?, int)>();
-
-        // Regular constructor parameters
-        var constructors = typeDecl.Members.OfType<ConstructorDeclarationSyntax>();
-        foreach (var ctor in constructors)
-        {
-            foreach (var param in ctor.ParameterList.Parameters)
-            {
-                AddParameterType(param, semanticModel, result);
-            }
-        }
-
-        // Primary constructor parameters (on the type declaration itself)
-        if (typeDecl is RecordDeclarationSyntax record && record.ParameterList != null)
-        {
-            foreach (var param in record.ParameterList.Parameters)
-            {
-                AddParameterType(param, semanticModel, result);
-            }
-        }
-
-        // Class with primary constructor (C# 12+)
-        if (typeDecl is ClassDeclarationSyntax classDecl && classDecl.ParameterList != null)
-        {
-            foreach (var param in classDecl.ParameterList.Parameters)
-            {
-                AddParameterType(param, semanticModel, result);
-            }
-        }
-
-        return result;
-    }
-
-    private static void AddParameterType(
-        ParameterSyntax parameter,
-        SemanticModel semanticModel,
-        List<(string TypeName, string? Namespace, ITypeSymbol? TypeSymbol, int Line)> result)
-    {
-        var typeName = parameter.Type?.ToString();
-        if (string.IsNullOrEmpty(typeName))
-            return;
-
-        var typeSymbol = semanticModel.GetTypeInfo(parameter.Type!).Type;
-        var namespaceName = typeSymbol?.ContainingNamespace?.ToDisplayString();
-        var line = parameter.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
-        result.Add((typeName!, namespaceName, typeSymbol, line));
-    }
-
     private static void CollectControllerActionCoupling(
         SyntaxNode root,
         SemanticModel semanticModel,
@@ -234,7 +85,7 @@ internal static class ArchitectureObservationCollector
                 !WebTypeClassifier.IsController(controllerSymbol))
                 continue;
 
-            var constructorDependencyTypes = GetAllConstructorParameterTypeNames(declaration, semanticModel)
+            var constructorDependencyTypes = ConstructorDependencyCollector.Collect(declaration, semanticModel)
                 .Select(parameter => parameter.TypeSymbol)
                 .OfType<INamedTypeSymbol>()
                 .Select(type => type.OriginalDefinition.ToDisplayString())
