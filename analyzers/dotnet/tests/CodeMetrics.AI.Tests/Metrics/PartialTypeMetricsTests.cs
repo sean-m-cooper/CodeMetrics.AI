@@ -43,12 +43,14 @@ public class PartialTypeMetricsTests
         var actual = split.Types.Should().ContainSingle().Subject;
         actual.Should().BeEquivalentTo(whole.Types.Single(), options => options
             .Excluding(type => type.FilePath).Excluding(type => type.SourceFiles)
+            .Excluding(member => member.Path.EndsWith(".File") || member.Path.EndsWith(".Line") || member.Path.EndsWith(".SourceSpanStart"))
             .Excluding(type => type.LinesOfSource)); // Physical declaration headers still occupy source lines.
         split.Members.Should().BeEquivalentTo(whole.Members);
         actual.StructuralCoupledTypes.Should().Equal("System.IDisposable");
         actual.CouplingExclusions.Values.SelectMany(types => types).Should().NotContain("System.IDisposable");
         actual.SourceFiles.Select(Path.GetFileName).Should().Equal("Widget.A.cs", "Widget.B.cs");
         CodeQualityProbe.Analyze(split.Types).Score.Should().Be(CodeQualityProbe.Analyze(whole.Types).Score);
+        MaintainabilityProbe.Analyze(split.Types).Score.Should().Be(MaintainabilityProbe.Analyze(whole.Types).Score);
     }
 
     [Fact]

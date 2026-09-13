@@ -5,14 +5,16 @@ namespace CodeMetrics.AI.Metrics;
 
 public static class HalsteadCalculator
 {
-    public static double ComputeVolume(SyntaxNode node)
+    public static double ComputeVolume(SyntaxNode node) => ComputeVolume(node.DescendantTokens());
+
+    internal static double ComputeVolume(IEnumerable<SyntaxToken> tokens)
     {
         var operators = new HashSet<string>();
         var operands = new HashSet<string>();
         int totalOperators = 0;
         int totalOperands = 0;
 
-        foreach (var token in node.DescendantTokens())
+        foreach (var token in tokens)
         {
             var kind = token.Kind();
             if (kind == SyntaxKind.EndOfFileToken || kind == SyntaxKind.None)

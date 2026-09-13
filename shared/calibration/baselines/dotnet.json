@@ -6,7 +6,7 @@
     "version": "2.3.0",
     "ecosystem": "dotnet"
   },
-  "ruleset": "dotnet-2026-09-11",
+  "ruleset": "dotnet-2026-09-12-function-maintainability",
   "scope": "Only listed rules have accuracy labels. Fixture distributions do not establish cross-ecosystem comparability.",
   "accuracy": {
     "errorHandling/emptyCatch": {
@@ -27,10 +27,10 @@
       "count": 6,
       "median": 10.0,
       "p25": 10.0,
-      "p10": 9.3
+      "p10": 8.85
     },
     "maintainability": {
-      "count": 6,
+      "count": 5,
       "median": 10.0,
       "p25": 10.0,
       "p10": 10.0
@@ -168,7 +168,7 @@
         "members": 1
       },
       "scores": {
-        "codeQuality": 8.6,
+        "codeQuality": 7.7,
         "maintainability": 10,
         "errorHandling": 10,
         "performanceAsync": 10,
@@ -190,7 +190,7 @@
       },
       "scores": {
         "codeQuality": 10,
-        "maintainability": 10,
+        "maintainability": null,
         "errorHandling": 10,
         "performanceAsync": 10,
         "dependencyManagement": null,

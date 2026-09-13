@@ -1,5 +1,13 @@
 # Accuracy and score regression corpus
 
+The [maintainability policy](../scorecard-schema/maintainability-policy.md), implemented in the unpublished .NET 2.3.0 candidate, specifies exclusive executable-function ownership and 40/60 weighting of the weakest fifth and remaining functions. Its initial MI ladder preserves former reference points and requires broader labeled calibration. The [verification record](../scorecard-schema/calibration-runs/dotnet-function-maintainability.md) distinguishes this policy change from code improvement and documents baseline review.
+
+The [executable-function scoring verification](../scorecard-schema/calibration-runs/dotnet-executable-functions.md) records the corrected C&D measurements across the four pinned public repositories, exact raw-CSV preservation and the decision to retain thresholds pending labeled calibration.
+
+The accepted [complexity scoring product decision](../scorecard-schema/calibration.md#complexity-scoring-product-decision) classifies own method CC as 1–5 low, 6–10 moderate, 11–20 high and 21+ severe. Individual-method assessment anchors do not directly cap the aggregate: 10 represents exceptional simplicity, while 8 is a strong target that allows limited moderate complexity. A severe method keeps the reported aggregate below 8; additional hotspots worsen it, and trivial-code padding preserves the severe hotspot's ceiling. The accepted formula is 40% of one worst individual-function score plus 60% of the remaining mean, with a single-function exception; the decision describes the product's expectations rather than asserting that high CC proves defects.
+
+The [method-population verification](../scorecard-schema/calibration-runs/dotnet-method-population.md) records fresh validated runs of the four pinned repositories, the 40/60 policy results, exact raw-CSV and decomposition preservation, regression checks and package provenance. Scores reflect an explicit policy change on unchanged source; this corpus does not establish a held-out or cross-ecosystem calibration result.
+
 `corpus.json` pins 12 local fixtures by SHA-256 (LF-normalized): six .NET and six JavaScript/TypeScript/React cases. The cases exercise clean code, decisions, async misuse, nested functions, passive payloads, and intentional exceptions. Each entry labels positive counts and negative cases for specific rules. Unlabeled rules are recorded but excluded from precision/recall accounting.
 
 Build both analyzers, then run:

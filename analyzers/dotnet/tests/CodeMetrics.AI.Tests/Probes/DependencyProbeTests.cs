@@ -639,6 +639,13 @@ public class DependencyProbeTests
     [InlineData("net9.0-windows10.0", "net9.0-windows11.0", false)]
     [InlineData("net48", "netstandard2.0", true)]
     [InlineData("net48", "netstandard2.1", false)]
+    [InlineData(".NETCoreApp,Version=v9.0", "net8.0", true)]
+    [InlineData("NETFramework4.6.1", "netstandard2.0", true)]
+    [InlineData("netcoreapp3.1", ".NETStandard,Version=v2.1", true)]
+    [InlineData(" NET9.0-WINDOWS10.0 ", "net9.0-windows10.0", true)]
+    [InlineData("net9.0-linux", "net9.0-windows", false)]
+    [InlineData("net9.0-windows", "net9.0-windows10.0", false)]
+    [InlineData("net9.0", "any", true)]
     public void FrameworkCompatibility_UsesTargetFrameworkSemantics(
         string projectFramework,
         string packageFramework,
@@ -653,6 +660,13 @@ public class DependencyProbeTests
     {
         PackageFrameworkCompatibility.IsCompatible("xamarinios10", ["net10.0"])
             .Should().BeNull();
+    }
+
+    [Fact]
+    public void FrameworkCompatibility_CompatibleAssetWinsOverUnknownAlternative()
+    {
+        PackageFrameworkCompatibility.IsCompatible("net9.0", ["uap10.0", "net8.0"])
+            .Should().BeTrue();
     }
 
     [Fact]

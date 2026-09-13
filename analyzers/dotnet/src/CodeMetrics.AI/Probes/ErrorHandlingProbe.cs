@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace CodeMetrics.AI.Probes;
 
@@ -49,6 +50,7 @@ public static class ErrorHandlingProbe
         {
             ["countingUnit"] = "distinctSourceFinding",
             ["handlingRecognition"] = "exception-propagation-v1",
+            ["stderrReportingRecognition"] = "system-console-error-v1",
             ["sourceFindings"] = findings.Count,
             ["projectFrameworkObservations"] = observationCount,
             ["emptyCatches"] = emptyCatches,
@@ -400,7 +402,7 @@ public static class ErrorHandlingProbe
         CatchClauseSyntax catchClause, SemanticModel semanticModel)
     {
         var block = catchClause.Block;
-        return HasLoggingCall(block)
+        return HasLoggingCall(block, semanticModel)
                || HasRethrow(block)
                || HasPrecedingCancellationRethrow(catchClause)
                || HasDeferredLogging(catchClause, semanticModel)
@@ -540,11 +542,31 @@ public static class ErrorHandlingProbe
         };
     }
 
-    private static bool HasLoggingCall(BlockSyntax block)
+    private static bool HasLoggingCall(BlockSyntax block, SemanticModel semanticModel)
     {
         return block.DescendantNodes(ShouldDescendIntoCatchNode)
             .OfType<InvocationExpressionSyntax>()
-            .Any(IsLoggingCall);
+            .Any(invocation => IsLoggingCall(invocation) || IsStandardErrorWrite(invocation, semanticModel));
+    }
+
+    private static bool IsStandardErrorWrite(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
+    {
+        // Resolve both the receiver and method: a lookalike Console.Error or an
+        // arbitrary TextWriter is not evidence of reporting to standard error.
+        if (semanticModel.GetOperation(invocation) is not IInvocationOperation operation ||
+            operation.TargetMethod.Name is not ("Write" or "WriteLine") ||
+            operation.Arguments.Length == 0)
+            return false;
+
+        var receiver = operation.Instance;
+        while (receiver is IConversionOperation conversion)
+            receiver = conversion.Operand;
+
+        return receiver is IPropertyReferenceOperation { Property.Name: "Error" } property &&
+            SymbolEqualityComparer.Default.Equals(property.Property.ContainingType,
+                semanticModel.Compilation.GetTypeByMetadataName("System.Console")) &&
+            SymbolEqualityComparer.Default.Equals(operation.TargetMethod.ContainingType,
+                semanticModel.Compilation.GetTypeByMetadataName("System.IO.TextWriter"));
     }
 
     private static bool HasDeferredLogging(

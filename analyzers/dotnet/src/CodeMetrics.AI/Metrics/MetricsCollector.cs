@@ -189,6 +189,12 @@ public static class MetricsCollector
             MaxMemberCyclomaticComplexity = aggregate.MaxMemberCyclomaticComplexity,
             DecompositionRatio = aggregate.DecompositionRatio,
             IsDataCarrier = DataCarrierClassifier.IsPassiveDataCarrier(typeSymbol),
+            ExecutableMetrics = new ExecutableTypeMetrics(parts
+                .SelectMany(part => ExecutableFunctionCollector.Collect(part.Declaration, part.Model)).ToArray())
+            {
+                MaintainabilityFunctions = parts.SelectMany(part =>
+                    ExecutableFunctionCollector.Collect(part.Declaration, part.Model, forMaintainability: true)).ToArray()
+            },
         };
     }
 

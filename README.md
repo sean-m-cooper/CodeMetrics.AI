@@ -2,6 +2,8 @@
 
 CodeMetrics.AI is a suite of deterministic code analyzers that produce shared scorecard evidence for AI-assisted codebase review.
 
+Its goal is to guide human and AI developers toward better, more maintainable and performant code. Scores express documented product expectations and identify opportunities for improvement; they do not prove defects or replace engineering judgment. The [complexity scoring policy](shared/scorecard-schema/calibration.md#complexity-scoring-product-decision) records the accepted method-CC bands and the distinction between product decisions and their scoring implementation. Real-world usage and developer feedback should inform explicit, versioned policy revisions.
+
 Each analyzer runs in the package ecosystem natural to its target language, then writes the same default outputs:
 
 | File | Description |

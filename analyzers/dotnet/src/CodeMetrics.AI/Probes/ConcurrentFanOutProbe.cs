@@ -34,62 +34,77 @@ internal static class ConcurrentFanOutProbe
         foreach (var (projectName, compilation) in projects)
         {
             foreach (var tree in SourceFileFilter.AnalyzableTrees(compilation, solutionDir))
-            {
-                var root = tree.GetRoot();
-                var model = compilation.GetSemanticModel(tree);
-                foreach (var whenAll in root.DescendantNodes().OfType<InvocationExpressionSyntax>())
-                {
-                    if (!IsTaskWhenAll(whenAll) ||
-                        whenAll.ArgumentList.Arguments.Count != 1 ||
-                        !TryGetProjectionLambda(whenAll.ArgumentList.Arguments[0].Expression, out var lambda))
-                    {
-                        continue;
-                    }
-
-                    var lambdaParameterNames = LambdaParameterNames(lambda);
-                    foreach (var call in lambda.DescendantNodes().OfType<InvocationExpressionSyntax>())
-                    {
-                        if (model.GetSymbolInfo(call).Symbol is not IMethodSymbol calledMethod ||
-                            !mutatedParameters.TryGetValue(
-                                BackpressureMethodClassifier.MethodKey(calledMethod), out var indexes))
-                        {
-                            continue;
-                        }
-
-                        foreach (var index in indexes.Where(index => index < call.ArgumentList.Arguments.Count))
-                        {
-                            var argument = call.ArgumentList.Arguments[index].Expression;
-                            var rootIdentifier = RootIdentifier(argument);
-                            if (rootIdentifier == null || lambdaParameterNames.Contains(rootIdentifier.Identifier.Text))
-                                continue;
-
-                            var captured = model.GetSymbolInfo(rootIdentifier).Symbol;
-                            if (captured is not (ILocalSymbol or IParameterSymbol or IFieldSymbol or IPropertySymbol))
-                                continue;
-
-                            findings.Add(new Finding
-                            {
-                                Category = "sharedStateMutationInFanOut",
-                                Severity = "error",
-                                Confidence = "high",
-                                File = tree.FilePath,
-                                Line = whenAll.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
-                                Project = projectName,
-                                Type = whenAll.Ancestors().OfType<TypeDeclarationSyntax>()
-                                    .FirstOrDefault()?.Identifier.Text,
-                                Message = $"Concurrent fan-out passes captured state '{rootIdentifier.Identifier.Text}' " +
-                                          $"to '{calledMethod.Name}', whose implementation mutates that state."
-                            });
-                            goto NextWhenAll;
-                        }
-                    }
-
-                NextWhenAll:;
-                }
-            }
+                findings.AddRange(AnalyzeTree(projectName, compilation.GetSemanticModel(tree), mutatedParameters));
         }
 
         return findings;
+    }
+
+    private static IEnumerable<Finding> AnalyzeTree(
+        string projectName, SemanticModel model, IReadOnlyDictionary<string, HashSet<int>> mutatedParameters)
+    {
+        foreach (var whenAll in model.SyntaxTree.GetRoot().DescendantNodes().OfType<InvocationExpressionSyntax>())
+        {
+            if (!IsTaskWhenAll(whenAll) || whenAll.ArgumentList.Arguments.Count != 1 ||
+                !TryGetProjectionLambda(whenAll.ArgumentList.Arguments[0].Expression, out var lambda))
+                continue;
+
+            var mutation = FindCapturedMutation(lambda, model, mutatedParameters);
+            if (mutation != null)
+                yield return CreateFinding(projectName, whenAll, mutation);
+        }
+    }
+
+    private sealed record CapturedMutation(string CapturedName, string MethodName);
+
+    private static CapturedMutation? FindCapturedMutation(
+        LambdaExpressionSyntax lambda, SemanticModel model,
+        IReadOnlyDictionary<string, HashSet<int>> mutatedParameters)
+    {
+        var lambdaParameterNames = LambdaParameterNames(lambda);
+        foreach (var call in lambda.DescendantNodes().OfType<InvocationExpressionSyntax>())
+        {
+            if (model.GetSymbolInfo(call).Symbol is not IMethodSymbol calledMethod ||
+                !mutatedParameters.TryGetValue(BackpressureMethodClassifier.MethodKey(calledMethod), out var indexes))
+                continue;
+
+            var captured = FindCapturedArgument(call, indexes, lambdaParameterNames, model);
+            if (captured != null)
+                return new CapturedMutation(captured.Identifier.Text, calledMethod.Name);
+        }
+        return null;
+    }
+
+    private static IdentifierNameSyntax? FindCapturedArgument(
+        InvocationExpressionSyntax call, IEnumerable<int> indexes,
+        IReadOnlySet<string> lambdaParameterNames, SemanticModel model)
+    {
+        foreach (var index in indexes.Where(index => index < call.ArgumentList.Arguments.Count))
+        {
+            var rootIdentifier = RootIdentifier(call.ArgumentList.Arguments[index].Expression);
+            if (rootIdentifier == null || lambdaParameterNames.Contains(rootIdentifier.Identifier.Text))
+                continue;
+
+            if (model.GetSymbolInfo(rootIdentifier).Symbol is ILocalSymbol or IParameterSymbol or IFieldSymbol or IPropertySymbol)
+                return rootIdentifier;
+        }
+        return null;
+    }
+
+    private static Finding CreateFinding(string projectName, InvocationExpressionSyntax whenAll, CapturedMutation mutation)
+    {
+        return new Finding
+        {
+            Category = "sharedStateMutationInFanOut",
+            Severity = "error",
+            Confidence = "high",
+            File = whenAll.SyntaxTree.FilePath,
+            Line = whenAll.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
+            Project = projectName,
+            Type = whenAll.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault()?.Identifier.Text,
+            Message = $"Concurrent fan-out passes captured state '{mutation.CapturedName}' " +
+                      $"to '{mutation.MethodName}', whose implementation mutates that state."
+        };
     }
 
     private static DeclarationIndex CollectDeclarations(
@@ -129,19 +144,23 @@ internal static class ConcurrentFanOutProbe
         IReadOnlyList<MethodEntry> methods,
         IReadOnlyList<INamedTypeSymbol> declaredTypes)
     {
+        // Aliases depend only on authored syntax, not on the evolving mutation summaries.
+        // Reuse them through fixed-point propagation instead of rescanning each method.
+        var analyzedMethods = methods.Select(entry =>
+            (Entry: entry, Aliases: (IReadOnlyDictionary<string, int>)BuildParameterAliases(entry))).ToArray();
         var summaries = new Dictionary<string, HashSet<int>>(StringComparer.Ordinal);
-        foreach (var entry in methods)
+        foreach (var (entry, aliases) in analyzedMethods)
         {
             var key = BackpressureMethodClassifier.MethodKey(entry.Symbol);
             if (!summaries.TryGetValue(key, out var mutations))
                 summaries[key] = mutations = [];
-            mutations.UnionWith(FindDirectMutations(entry));
+            mutations.UnionWith(FindDirectMutations(entry, aliases));
         }
 
         bool changed;
         do
         {
-            changed = PropagateMethodMutations(methods, summaries);
+            changed = PropagateMethodMutations(analyzedMethods, summaries);
             changed |= PropagateInterfaceMutations(declaredTypes, summaries);
         } while (changed);
 
@@ -149,13 +168,12 @@ internal static class ConcurrentFanOutProbe
     }
 
     private static bool PropagateMethodMutations(
-        IEnumerable<MethodEntry> methods,
+        IEnumerable<(MethodEntry Entry, IReadOnlyDictionary<string, int> Aliases)> methods,
         IReadOnlyDictionary<string, HashSet<int>> summaries)
     {
         var changed = false;
-        foreach (var entry in methods)
+        foreach (var (entry, aliases) in methods)
         {
-            var aliases = BuildParameterAliases(entry);
             var target = summaries[BackpressureMethodClassifier.MethodKey(entry.Symbol)];
             foreach (var invocation in entry.Syntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
             {
@@ -224,9 +242,8 @@ internal static class ConcurrentFanOutProbe
         return changed;
     }
 
-    private static HashSet<int> FindDirectMutations(MethodEntry entry)
+    private static HashSet<int> FindDirectMutations(MethodEntry entry, IReadOnlyDictionary<string, int> aliases)
     {
-        var aliases = BuildParameterAliases(entry);
         var mutated = new HashSet<int>();
 
         foreach (var assignment in entry.Syntax.DescendantNodes().OfType<AssignmentExpressionSyntax>())

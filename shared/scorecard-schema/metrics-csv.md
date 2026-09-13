@@ -1,5 +1,7 @@
 # Metrics CSV Contract
 
+The .NET `executable-function-ownership-v1` C&D scoring inputs are additional JSON measurements. This CSV retains its member-level aggregate complexity, member counts and derived raw ratios, including nested-body aggregation. Do not reconstruct the new C&D score from CSV; use the recorded JSON decisions and executable-function denominators. See [scoring decisions](scoring-decisions.md#complexity-and-decomposition-presentation).
+
 Default path (see `ecosystems.md` for the ecosystem id rule):
 
 ```text
@@ -29,6 +31,8 @@ Scope,Project,Namespace,Type,Member,Maintainability Index,Cyclomatic Complexity,
 | Lines of Executable code | Executable statement count or closest language-specific equivalent |
 
 ## .NET partial types
+
+The `source-function-own-mi-v1` Maintainability policy uses separately collected owned-body MI in JSON evidence. CSV retains the historical raw type/member MI definition, including its aggregation and rounding. It does not contain the distinct function population, variant selection or weakest-fifth contributions and cannot reconstruct the new score. See [maintainability-policy.md](maintainability-policy.md).
 
 The development 2.3.0 collector emits one type row per logical type in each analyzed project/framework compilation. Included partial declarations are combined before computing member aggregates. Partial member signatures and implementations contribute once, and each member is emitted once under its owning type. Generated and excluded files remain excluded. Type/member display names and CSV columns are unchanged; short names are not unique identifiers for nested types, generic arities, or overloads.
 

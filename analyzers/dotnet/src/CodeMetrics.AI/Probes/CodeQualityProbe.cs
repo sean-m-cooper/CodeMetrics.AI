@@ -5,10 +5,17 @@ namespace CodeMetrics.AI.Probes;
 
 public static class CodeQualityProbe
 {
+    // Null executable metrics identify explicitly supplied legacy TypeMetrics.
+    // The production collector always supplies executable metrics, including empty populations.
+    private static int FunctionCount(TypeMetrics type) => type.ExecutableMetrics?.FunctionCount ?? type.MemberCount;
+    private static int DecompositionCount(TypeMetrics type) => type.ExecutableMetrics?.DecompositionFunctionCount ?? type.MemberCount;
+    private static int MaxComplexity(TypeMetrics type) => type.ExecutableMetrics?.MaxComplexity ?? type.MaxMemberCyclomaticComplexity;
+    private static double Ratio(TypeMetrics type) => type.ExecutableMetrics?.DecompositionRatio ?? type.DecompositionRatio;
+
     public static DimensionResult Analyze(IReadOnlyList<TypeMetrics> types)
     {
         var excludedDataCarriers = types.Count(t => t.IsDataCarrier);
-        var eligible = types.Where(t => t.MemberCount > 0 && !t.IsDataCarrier).ToList();
+        var eligible = types.Where(t => FunctionCount(t) > 0 && !t.IsDataCarrier).ToList();
         if (eligible.Count == 0)
             return CreateEmptyResult(excludedDataCarriers);
 
@@ -27,7 +34,7 @@ public static class CodeQualityProbe
         {
             Status = "scored",
             Score = 10,
-            ScoringDecision = ScoringDecision.FirstMatch("dotnet/codeQuality/v1", new() { ["eligibleTypes"] = 0 },
+            ScoringDecision = ScoringDecision.FirstMatch("dotnet/codeQuality/method-population-v3", new() { ["eligibleTypes"] = 0 },
                 ScoringStep.Rule("emptyPopulation", "eligibleTypes == 0", true, 10)),
             Basis = excludedDataCarriers > 0
                 ? $"No behavior-bearing types with members. Passive data carriers excluded: {excludedDataCarriers}."
@@ -35,6 +42,7 @@ public static class CodeQualityProbe
             Extra = new Dictionary<string, object?>
             {
                 ["displayName"] = "Complexity & Decomposition",
+                ["measurementPolicy"] = "executable-function-ownership-v1",
                 ["componentDetails"] = CreateComponentDetails([], null, null)
             }
         };
@@ -42,16 +50,16 @@ public static class CodeQualityProbe
 
     private static DecompositionScores AnalyzeDecomposition(IReadOnlyList<TypeMetrics> eligible)
     {
-        var decompositionEligible = eligible.Where(t => t.MemberCount >= 2).ToList();
-        var ratios = decompositionEligible.Select(t => t.DecompositionRatio).ToList();
+        var decompositionEligible = eligible.Where(t => DecompositionCount(t) >= 2).ToList();
+        var ratios = decompositionEligible.Select(t => Ratio(t)).ToList();
         var populationOver4 = decompositionEligible.Count > 0
-            ? decompositionEligible.Count(t => t.DecompositionRatio > 4) * 100.0 / decompositionEligible.Count
+            ? decompositionEligible.Count(t => Ratio(t) > 4) * 100.0 / decompositionEligible.Count
             : 0.0;
         var p90Ratio = Percentile(ratios, 90);
         var extremeOver15 = decompositionEligible.Count > 0
-            ? decompositionEligible.Count(t => t.DecompositionRatio > 15) * 100.0 / decompositionEligible.Count
+            ? decompositionEligible.Count(t => Ratio(t) > 15) * 100.0 / decompositionEligible.Count
             : 0.0;
-        var decision = ScoringDecision.Mean("dotnet/codeQuality/decomposition/v1",
+        var decision = ScoringDecision.Mean("dotnet/codeQuality/decomposition/executable-functions-v2",
             ScoringDecision.Threshold("decomposition/population", populationOver4, [1, 3, 6, 10, 15]),
             ScoringDecision.Threshold("decomposition/tail", p90Ratio, [2.0, 2.5, 3.5, 5.0, 7.0]),
             ScoringDecision.Threshold("decomposition/extreme", extremeOver15, [0.1, 0.5, 1.0, 2.0, 4.0]));
@@ -70,32 +78,43 @@ public static class CodeQualityProbe
 
     private static ComplexityScores AnalyzeComplexity(IReadOnlyList<TypeMetrics> eligible)
     {
-        var maxCCs = eligible.Select(t => (double)t.MaxMemberCyclomaticComplexity).ToList();
-        var populationOver15 = eligible.Count(t => t.MaxMemberCyclomaticComplexity > 15) * 100.0 / eligible.Count;
+        if (eligible.All(type => type.ExecutableMetrics != null))
+        {
+            var population = MethodComplexityProbe.Analyze(eligible);
+            return new ComplexityScores(population.Decision, population.Metrics, population.Details);
+        }
+
+        // Explicit legacy/mixed caller input cannot supply a complete function population.
+        // Keep its former type-maximum policy and disclose the fallback; never invent functions.
+        var maxCCs = eligible.Select(t => (double)MaxComplexity(t)).ToList();
+        var populationOver15 = eligible.Count(t => MaxComplexity(t) > 15) * 100.0 / eligible.Count;
         var p90MaxCc = Percentile(maxCCs, 90);
-        var extremeOver30 = eligible.Count(t => t.MaxMemberCyclomaticComplexity > 30) * 100.0 / eligible.Count;
-        var decision = ScoringDecision.Mean("dotnet/codeQuality/complexity/v1",
+        var extremeOver30 = eligible.Count(t => MaxComplexity(t) > 30) * 100.0 / eligible.Count;
+        var decision = ScoringDecision.Mean("dotnet/codeQuality/complexity/executable-functions-v2",
             ScoringDecision.Threshold("complexity/population", populationOver15, [0.5, 2, 4, 7, 10]),
             ScoringDecision.Threshold("complexity/tail", p90MaxCc, [4, 6, 9, 12, 16]),
             ScoringDecision.Threshold("complexity/extreme", extremeOver30, [0.2, 0.6, 1.2, 2.5, 4.0]));
         var populationScore = (int)decision.Steps[0].Score;
         var p90Score = (int)decision.Steps[1].Score;
         var extremeScore = (int)decision.Steps[2].Score;
-        return new ComplexityScores(
-            populationOver15,
-            populationScore,
-            p90MaxCc,
-            p90Score,
-            extremeOver30,
-            extremeScore,
-            decision);
+        decision.Inputs["measurementPolicy"] = "legacy-type-maxima-v1";
+        return new ComplexityScores(decision, new
+        {
+            populationPercentOver15 = Math.Round(populationOver15, 2),
+            populationPercentOver15Score = populationScore,
+            p90MaxCC = Math.Round(p90MaxCc, 2),
+            p90MaxCCScore = p90Score,
+            extremePercentOver30 = Math.Round(extremeOver30, 2),
+            extremePercentOver30Score = extremeScore,
+            ccScore = decision.FinalScore
+        });
     }
 
     private static object CreateOffenders(IEnumerable<TypeMetrics> eligible, bool methodComplexity = false)
     {
         var ranked = methodComplexity
-            ? eligible.OrderByDescending(type => type.MaxMemberCyclomaticComplexity).ThenByDescending(type => type.DecompositionRatio)
-            : eligible.Where(type => type.MemberCount >= 2).OrderByDescending(type => type.DecompositionRatio).ThenByDescending(type => type.MaxMemberCyclomaticComplexity);
+            ? eligible.OrderByDescending(type => MaxComplexity(type)).ThenByDescending(type => Ratio(type))
+            : eligible.Where(type => DecompositionCount(type) >= 2).OrderByDescending(type => Ratio(type)).ThenByDescending(type => MaxComplexity(type));
         return ranked
             .ThenBy(type => type.Type, StringComparer.Ordinal)
             .ThenBy(type => type.Project, StringComparer.Ordinal)
@@ -109,10 +128,18 @@ public static class CodeQualityProbe
                 type = type.Type,
                 typeId = type.TypeId,
                 sourceFiles = type.SourceFiles,
-                decompositionRatio = type.DecompositionRatio,
-                maxMemberCc = type.MaxMemberCyclomaticComplexity,
+                decompositionRatio = Ratio(type),
+                maxMemberCc = MaxComplexity(type),
                 classCc = type.CyclomaticComplexity,
                 memberCount = type.MemberCount,
+                rawDecompositionRatio = type.DecompositionRatio,
+                rawMaxMemberCc = type.MaxMemberCyclomaticComplexity,
+                executableFunctionCount = FunctionCount(type),
+                decompositionFunctionCount = DecompositionCount(type),
+                decompositionComplexity = type.ExecutableMetrics?.DecompositionComplexity ?? type.CyclomaticComplexity,
+                functions = type.ExecutableMetrics?.Functions.OrderByDescending(function => function.OwnCyclomaticComplexity)
+                    .ThenBy(function => function.File, StringComparer.Ordinal).ThenBy(function => function.Line)
+                    .Take(5).ToArray(),
                 mi = type.MaintainabilityIndex,
                 coupling = type.ClassCoupling,
                 loc = type.LinesOfSource
@@ -120,15 +147,15 @@ public static class CodeQualityProbe
             .ToList();
     }
 
-    private static JsonElement CreateComponentDetails(IReadOnlyList<TypeMetrics> eligible, double? decomposition, double? complexity) =>
+    private static JsonElement CreateComponentDetails(IReadOnlyList<TypeMetrics> eligible, double? decomposition, double? complexity, object? complexityDetails = null) =>
         JsonSerializer.SerializeToElement(new
         {
-            methodComplexity = new
+            methodComplexity = complexityDetails ?? new
             {
                 label = "Method complexity",
                 score = complexity,
                 eligibleTypes = eligible.Count,
-                measure = "Distribution of each eligible type's maximum member cyclomatic complexity; not the percentage of all methods.",
+                measure = "Distribution of each eligible type's maximum own executable-function CC, including local functions and callbacks separately; not the percentage of all functions. Legacy input types retain member maxima.",
                 limitation = "Branching is a review signal, not proof of incorrectness or avoidable complexity.",
                 topOffenders = CreateOffenders(eligible, methodComplexity: true)
             },
@@ -136,8 +163,8 @@ public static class CodeQualityProbe
             {
                 label = "Decomposition",
                 score = decomposition,
-                eligibleTypes = eligible.Count(type => type.MemberCount >= 2),
-                measure = "Distribution of class cyclomatic complexity divided by member count, for eligible types with at least two members.",
+                eligibleTypes = eligible.Count(type => DecompositionCount(type) >= 2),
+                measure = "Distribution of executable complexity divided by decomposition-function count (at least two). Fields, bodyless members and branch-free callbacks/initializers do not increase the denominator. Legacy input types retain member ratios.",
                 limitation = "Does not establish cohesion or readability. Extracting trivial helpers can improve the ratio without improving the code. A zero eligible population is unmeasured, even when policy supplies a default score.",
                 topOffenders = CreateOffenders(eligible)
             }
@@ -149,19 +176,25 @@ public static class CodeQualityProbe
         DecompositionScores decomposition,
         ComplexityScores complexity)
     {
-        var decision = ScoringDecision.Mean("dotnet/codeQuality/v1",
+        var decision = ScoringDecision.Mean(complexity.Details == null ? "dotnet/codeQuality/executable-functions-v2" : "dotnet/codeQuality/method-population-v3",
             ScoringStep.Component("decomposition", decomposition.Score, decision: decomposition.Decision),
             ScoringStep.Component("complexity", complexity.Score, decision: complexity.Decision));
         decision.Inputs["eligibleTypes"] = eligible.Count;
-        decision.Inputs["decompositionEligibleTypes"] = eligible.Count(type => type.MemberCount >= 2);
+        decision.Inputs["measurementPolicy"] = "executable-function-ownership-v1";
+        decision.Inputs["complexityMeasurementPolicy"] = complexity.Details == null ? "legacy-type-maxima-v1" : MethodComplexityProbe.MeasurementPolicy;
+        decision.Inputs["percentileInterpolation"] = "linear-decimal-v1";
+        decision.Inputs["legacyInputTypes"] = eligible.Count(type => type.ExecutableMetrics == null);
+        decision.Inputs["executableFunctions"] = eligible.Sum(FunctionCount);
+        decision.Inputs["decompositionFunctions"] = eligible.Sum(DecompositionCount);
+        decision.Inputs["decompositionEligibleTypes"] = eligible.Count(type => DecompositionCount(type) >= 2);
         var finalScore = decision.FinalScore;
-        var metrics = new
+        var metrics = new Dictionary<string, object?>
         {
-            filtering = new
+            ["filtering"] = new
             {
                 passiveDataCarriersExcluded = excludedDataCarriers
             },
-            decomposition = new
+            ["decomposition"] = new
             {
                 populationPercentOver4 = Math.Round(decomposition.PopulationPercent, 2),
                 populationPercentOver4Score = decomposition.PopulationScore,
@@ -171,22 +204,15 @@ public static class CodeQualityProbe
                 extremePercentOver15Score = decomposition.ExtremeScore,
                 decompScore = decomposition.Score
             },
-            maxMemberCyclomaticComplexity = new
-            {
-                populationPercentOver15 = Math.Round(complexity.PopulationPercent, 2),
-                populationPercentOver15Score = complexity.PopulationScore,
-                p90MaxCC = Math.Round(complexity.P90, 2),
-                p90MaxCCScore = complexity.P90Score,
-                extremePercentOver30 = Math.Round(complexity.ExtremePercent, 2),
-                extremePercentOver30Score = complexity.ExtremeScore,
-                ccScore = complexity.Score
-            }
+            [complexity.Details == null ? "maxMemberCyclomaticComplexity" : "methodComplexity"] = complexity.Metrics
         };
 
         var extra = new Dictionary<string, object?>
         {
             ["displayName"] = "Complexity & Decomposition",
-            ["componentDetails"] = CreateComponentDetails(eligible, decomposition.Score, complexity.Score),
+            ["measurementPolicy"] = "executable-function-ownership-v1",
+            ["complexityMeasurementPolicy"] = decision.Inputs["complexityMeasurementPolicy"],
+            ["componentDetails"] = CreateComponentDetails(eligible, decomposition.Score, complexity.Score, complexity.Details),
             ["metrics"] = JsonSerializer.SerializeToElement(metrics),
             ["topOffenders"] = JsonSerializer.SerializeToElement(CreateOffenders(eligible))
         };
@@ -216,14 +242,7 @@ public static class CodeQualityProbe
         public double Score => Decision.FinalScore;
     }
 
-    private sealed record ComplexityScores(
-        double PopulationPercent,
-        int PopulationScore,
-        double P90,
-        int P90Score,
-        double ExtremePercent,
-        int ExtremeScore,
-        ScoringDecision Decision)
+    private sealed record ComplexityScores(ScoringDecision Decision, object Metrics, object? Details = null)
     {
         public double Score => Decision.FinalScore;
     }
@@ -253,11 +272,13 @@ public static class CodeQualityProbe
         if (values.Count == 1) return values[0];
 
         var sorted = values.OrderBy(v => v).ToList();
-        double rank = (p / 100.0) * (sorted.Count - 1);
+        // Inputs are integer CC/MI or finite decimal decomposition ratios. Decimal
+        // interpolation preserves exact threshold boundaries without rounding to display precision.
+        decimal rank = (decimal)p / 100m * (sorted.Count - 1);
         int lower = (int)Math.Floor(rank);
         int upper = (int)Math.Ceiling(rank);
         if (lower == upper) return sorted[lower];
-        double fraction = rank - lower;
-        return sorted[lower] + fraction * (sorted[upper] - sorted[lower]);
+        decimal fraction = rank - lower;
+        return (double)((decimal)sorted[lower] + fraction * ((decimal)sorted[upper] - (decimal)sorted[lower]));
     }
 }

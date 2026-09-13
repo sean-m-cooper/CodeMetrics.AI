@@ -1,16 +1,13 @@
 import path from "node:path";
 import ts from "typescript";
 import { hash, type Finding } from "./evidence.js";
+import { isFunction, type FunctionNode } from "./function-nodes.js";
+import { inspectReactCall } from "./react-probe.js";
 
 export interface Metric {
   project: string; file: string; type: string; member: string; kind: "function" | "component" | "hook" | "method";
   line: number; complexity: number; sourceLines: number; executableLines: number;
   halsteadVolume: number; maintainabilityIndex: number; coupling: number; inheritance: number;
-}
-type FunctionNode = ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction | ts.MethodDeclaration | ts.ConstructorDeclaration | ts.GetAccessorDeclaration | ts.SetAccessorDeclaration;
-function isFunction(node: ts.Node): node is FunctionNode {
-  return ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node) || ts.isArrowFunction(node) ||
-    ts.isMethodDeclaration(node) || ts.isConstructorDeclaration(node) || ts.isGetAccessorDeclaration(node) || ts.isSetAccessorDeclaration(node);
 }
 function nameOf(node: FunctionNode, source: ts.SourceFile): string {
   if (node.name) return node.name.getText(source);
@@ -55,38 +52,8 @@ export function analyzeFile(source: ts.SourceFile, checker: ts.TypeChecker, proj
         if (ts.isStatement(child) && !ts.isBlock(child) && !ts.isEmptyStatement(child)) executableLines++;
         if (ts.isJsxElement(child) || ts.isJsxSelfClosingElement(child) || ts.isJsxFragment(child)) hasJsx = true;
         if (ts.isCallExpression(child)) {
-          const symbol = checker.getSymbolAtLocation(ts.isPropertyAccessExpression(child.expression) ? child.expression.name : child.expression);
-          const declarations = symbol?.declarations ?? [];
-          const reactHook = declarations.some(declaration => {
-            let cursor: ts.Node | undefined = declaration;
-            while (cursor && !ts.isImportDeclaration(cursor)) cursor = cursor.parent;
-            return cursor && ts.isStringLiteral(cursor.moduleSpecifier) && cursor.moduleSpecifier.text === "react";
-          });
-          const hookName = declarations.find(ts.isImportSpecifier);
-          const calledName = hookName ? (hookName.propertyName ?? hookName.name).text : ts.isPropertyAccessExpression(child.expression) ? child.expression.name.text : "";
-          const namespaceSymbol = ts.isPropertyAccessExpression(child.expression) ? checker.getSymbolAtLocation(child.expression.expression) : undefined;
-          const reactNamespace = namespaceSymbol?.declarations?.some(declaration => {
-            let cursor: ts.Node | undefined = declaration;
-            while (cursor && !ts.isImportDeclaration(cursor)) cursor = cursor.parent;
-            return cursor && ts.isStringLiteral(cursor.moduleSpecifier) && cursor.moduleSpecifier.text === "react";
-          });
-          if ((reactHook || reactNamespace) && /^use[A-Z]/.test(calledName)) {
-            let ancestor = child.parent;
-            while (ancestor && ancestor !== node.body) {
-              if (ts.isIfStatement(ancestor) || ts.isConditionalExpression(ancestor) || ts.isForStatement(ancestor) || ts.isForOfStatement(ancestor) || ts.isForInStatement(ancestor) || ts.isWhileStatement(ancestor) || ts.isDoStatement(ancestor) ||
-                  ts.isBinaryExpression(ancestor) && [ts.SyntaxKind.AmpersandAmpersandToken, ts.SyntaxKind.BarBarToken, ts.SyntaxKind.QuestionQuestionToken].includes(ancestor.operatorToken.kind)) {
-                emit("conditionalHook", "performanceAsync", child, member, `${calledName} is called within a conditional or loop.`, { hook: calledName }); break;
-              }
-              ancestor = ancestor.parent;
-            }
-            if (["useEffect", "useLayoutEffect"].includes(calledName)) {
-              const callback = child.arguments[0];
-              if (callback && isFunction(callback) && callback.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.AsyncKeyword))
-                emit("asyncEffectCallback", "performanceAsync", child, member, "An effect callback is async and returns a Promise instead of cleanup or undefined.", { hook: calledName });
-              if (child.arguments.length < 2)
-                emit("effectWithoutDependencies", "performanceAsync", child, member, "Effect runs after every render; verify that this is intentional.", { hook: calledName }, "low");
-            }
-          }
+          for (const finding of inspectReactCall(child, node.body!, checker))
+            emit(finding.category, "performanceAsync", child, member, finding.message, finding.observations, finding.confidence);
         }
       });
       if (!ts.isBlock(node.body)) executableLines++;

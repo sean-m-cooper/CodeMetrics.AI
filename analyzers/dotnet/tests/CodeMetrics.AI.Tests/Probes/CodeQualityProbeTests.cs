@@ -282,6 +282,44 @@ public class CodeQualityProbeTests
     }
 
     [Fact]
+    public void Percentile_ExactBoundaryDoesNotAddALegacyComplexityPenalty()
+    {
+        var types = Enumerable.Range(0, 59).Select(i => new TypeMetrics
+        {
+            Project = "Controlled",
+            Namespace = "Calibration",
+            Type = $"T{i}",
+            FilePath = "controlled.cs",
+            MemberCount = 2,
+            MaxMemberCyclomaticComplexity = i < 6 ? 16 : 1,
+            DecompositionRatio = i < 6 ? 9 : 1.5
+        }).ToArray();
+
+        var result = CodeQualityProbe.Analyze(types);
+        var complexity = result.ScoringDecision!.Steps.Single(step => step.Id == "complexity").Decision!;
+        var tail = complexity.Steps.Single(step => step.Id == "complexity/tail");
+        tail.Decision!.Inputs["measured"].Should().Be(4.0);
+        tail.Score.Should().Be(10);
+        complexity.FinalScore.Should().Be(6.7);
+        result.Score.Should().Be(6.4);
+        result.ScoringDecision.Inputs["percentileInterpolation"].Should().Be("linear-decimal-v1");
+    }
+
+    [Theory]
+    [InlineData(1, 16, 90, 4)]
+    [InlineData(1, 16.00000001, 90, 4.000000002)]
+    [InlineData(60, 85, 10, 80)]
+    public void Percentile_PreservesDecimalBoundariesAndRealExceedances(double low, double high, double percentile, double expected)
+    {
+        var lowCount = percentile == 90 ? 53 : 6;
+        var values = Enumerable.Repeat(low, lowCount).Concat(Enumerable.Repeat(high, 59 - lowCount)).ToList();
+        var measured = CodeQualityProbe.Percentile(values, percentile);
+        measured.Should().Be(expected);
+        if (percentile == 90)
+            ScoringDecision.Threshold("tail", measured, [4, 6, 9, 12, 16]).Score.Should().Be(expected > 4 ? 8 : 10);
+    }
+
+    [Fact]
     public void Percentile_EmptyList_ReturnsZero()
     {
         var values = new List<double>();

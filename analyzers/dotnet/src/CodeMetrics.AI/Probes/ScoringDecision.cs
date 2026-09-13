@@ -30,19 +30,24 @@ public sealed class ScoringDecision
             Policy = policy,
             Operation = "minimum",
             Steps = [.. components],
-            Inputs = { ["roundingDecimals"] = decimals, ["roundingMode"] = rounding.ToString(), ["unroundedScore"] = minimum },
-            FinalScore = Math.Round(minimum, decimals, rounding)
+            Inputs = { ["roundingDecimals"] = decimals, ["roundingMode"] = rounding.ToString(), ["roundingArithmetic"] = "decimal", ["unroundedScore"] = minimum },
+            FinalScore = (double)Math.Round((decimal)minimum, decimals, rounding)
         };
     }
 
-    public static ScoringDecision Mean(string policy, params ScoringStep[] components) => new()
+    public static ScoringDecision Mean(string policy, params ScoringStep[] components)
     {
-        Policy = policy,
-        Operation = "mean",
-        Steps = [.. components],
-        Inputs = { ["roundingDecimals"] = 1, ["roundingMode"] = "ToEven", ["unroundedScore"] = components.Average(component => component.Score) },
-        FinalScore = Math.Round(components.Average(component => component.Score), 1)
-    };
+        // Average decimal score inputs before rounding so binary addition cannot move a tie.
+        var mean = components.Average(component => (decimal)component.Score);
+        return new ScoringDecision
+        {
+            Policy = policy,
+            Operation = "mean",
+            Steps = [.. components],
+            Inputs = { ["roundingDecimals"] = 1, ["roundingMode"] = "AwayFromZero", ["roundingArithmetic"] = "decimal", ["unroundedScore"] = (double)mean },
+            FinalScore = (double)Math.Round(mean, 1, MidpointRounding.AwayFromZero)
+        };
+    }
 
     public static ScoringDecision Deductions(string policy, Dictionary<string, object?> inputs, params ScoringStep[] deductions)
     {

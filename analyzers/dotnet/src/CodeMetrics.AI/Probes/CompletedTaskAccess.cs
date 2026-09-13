@@ -58,34 +58,60 @@ internal static class CompletedTaskAccess
             return ProvesCompletion(binary.Left, receiver, model) || ProvesCompletion(binary.Right, receiver, model);
         if (expression is BinaryExpressionSyntax either && either.IsKind(SyntaxKind.LogicalOrExpression))
             return ProvesCompletion(either.Left, receiver, model) && ProvesCompletion(either.Right, receiver, model);
-        if (expression is MemberAccessExpressionSyntax member &&
-            SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(member.Expression).Symbol, receiver) &&
-            model.GetSymbolInfo(member).Symbol is IPropertySymbol property &&
-            property.ContainingType.ToDisplayString() == "System.Threading.Tasks.Task" &&
-            property.Name is "IsCompletedSuccessfully" or "IsCompleted")
-            return true;
         if (expression is BinaryExpressionSyntax equality && equality.IsKind(SyntaxKind.EqualsExpression))
         {
             return IsCompletedStatus(equality.Left, equality.Right, receiver, model) ||
                    IsCompletedStatus(equality.Right, equality.Left, receiver, model);
         }
-        if (expression is not InvocationExpressionSyntax call ||
-            model.GetSymbolInfo(call).Symbol is not IMethodSymbol method)
+        return expression switch
+        {
+            MemberAccessExpressionSyntax member => IsCompletionProperty(member, receiver, model),
+            InvocationExpressionSyntax call => HelperProvesCompletion(call, receiver, model),
+            _ => false
+        };
+    }
+
+    private static bool IsCompletionProperty(MemberAccessExpressionSyntax member, ISymbol receiver, SemanticModel model)
+    {
+        return SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(member.Expression).Symbol, receiver) &&
+               model.GetSymbolInfo(member).Symbol is IPropertySymbol property &&
+               property.ContainingType.ToDisplayString() == "System.Threading.Tasks.Task" &&
+               property.Name is "IsCompletedSuccessfully" or "IsCompleted";
+    }
+
+    private static bool HelperProvesCompletion(InvocationExpressionSyntax call, ISymbol receiver, SemanticModel model)
+    {
+        if (model.GetSymbolInfo(call).Symbol is not IMethodSymbol method)
             return false;
         var definition = method.ReducedFrom ?? method;
         if (!definition.IsStatic || definition.Parameters.Length != 1 ||
             definition.ReturnType.SpecialType != SpecialType.System_Boolean)
             return false;
-        var argument = method.ReducedFrom != null && call.Expression is MemberAccessExpressionSyntax extension
-            ? extension.Expression : call.ArgumentList.Arguments.FirstOrDefault()?.Expression;
+        var argument = HelperArgument(call, method);
         if (argument == null || !SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(argument).Symbol, receiver))
             return false;
         if (definition.DeclaringSyntaxReferences.Length != 1 ||
             definition.DeclaringSyntaxReferences[0].GetSyntax() is not MethodDeclarationSyntax declaration)
             return false;
-        var returned = declaration.ExpressionBody?.Expression ??
-            (declaration.Body?.Statements.Count == 1 && declaration.Body.Statements[0] is ReturnStatementSyntax result
-                ? result.Expression : null);
+        return HelperBodyProvesCompletion(declaration, model);
+    }
+
+    private static ExpressionSyntax? HelperArgument(InvocationExpressionSyntax call, IMethodSymbol method)
+    {
+        return method.ReducedFrom != null && call.Expression is MemberAccessExpressionSyntax extension
+            ? extension.Expression : call.ArgumentList.Arguments.FirstOrDefault()?.Expression;
+    }
+
+    private static ExpressionSyntax? SingleReturnedExpression(MethodDeclarationSyntax declaration)
+    {
+        return declaration.ExpressionBody?.Expression ??
+               (declaration.Body?.Statements.Count == 1 && declaration.Body.Statements[0] is ReturnStatementSyntax result
+                   ? result.Expression : null);
+    }
+
+    private static bool HelperBodyProvesCompletion(MethodDeclarationSyntax declaration, SemanticModel model)
+    {
+        var returned = SingleReturnedExpression(declaration);
         // Do not recursively trust wrappers or names: the helper must directly prove the
         // completed state of its parameter without preceding side effects.
         if (returned == null || returned.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>().Any())

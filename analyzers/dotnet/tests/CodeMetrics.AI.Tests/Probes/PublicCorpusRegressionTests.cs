@@ -17,6 +17,10 @@ public class PublicCorpusRegressionTests
     [InlineData("task.IsCompleted")]
     [InlineData("task.Status == TaskStatus.RanToCompletion")]
     [InlineData("task.IsCompletedSuccessfullyHelper()")]
+    [InlineData("(task.IsCompletedSuccessfully)")]
+    [InlineData("task.IsCompleted && task.Status == TaskStatus.RanToCompletion")]
+    [InlineData("task.IsCompleted || task.Status == TaskStatus.Faulted")]
+    [InlineData("TaskStatus.Canceled == task.Status")]
     public void CompletedTaskGuards_DoNotReportBlocking(string guard)
     {
         var compilation = Compile($$"""
@@ -48,6 +52,38 @@ public class PublicCorpusRegressionTests
             }
             """);
         PerformanceAsyncProbe.Analyze(new[] { ("Reader", compilation) }, Root).Findings.Should().Contain(f => f.Category == "syncOverAsync");
+    }
+
+    [Fact]
+    public void CompletionHelper_WithSingleReturn_ProvesCompletion()
+    {
+        AssertHelperBlocking("return task.IsCompleted;", false);
+    }
+
+    [Theory]
+    [InlineData("return Wrapper(task);")]
+    [InlineData("System.Console.WriteLine(task); return task.IsCompleted;")]
+    [InlineData("return (task = Task.CompletedTask).IsCompleted;")]
+    public void CompletionHelper_WithCallsOrSideEffects_RemainsUnproven(string body)
+    {
+        AssertHelperBlocking(body, true);
+    }
+
+    private static void AssertHelperBlocking(string body, bool expected)
+    {
+        var compilation = Compile($$"""
+            using System.Threading.Tasks;
+            static class Helpers {
+                public static bool Completed(Task task) { {{body}} }
+                private static bool Wrapper(Task task) => task.IsCompleted;
+            }
+            class Reader {
+                public int Read(Task<int> task) { if (Helpers.Completed(task)) return task.Result; return 0; }
+            }
+            """);
+        var projects = new[] { ("Reader", compilation) };
+        PerformanceAsyncProbe.Analyze(projects, Root).Findings.Any(f => f.Category == "syncOverAsync").Should().Be(expected);
+        ErrorHandlingProbe.Analyze(projects, Root).Findings.Any(f => f.Category == "syncBlockingCall").Should().Be(expected);
     }
 
     [Fact]

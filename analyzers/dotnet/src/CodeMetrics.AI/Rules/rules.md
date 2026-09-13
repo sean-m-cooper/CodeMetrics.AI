@@ -86,7 +86,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `codeQuality`
 - Kind: `metric`
 
-Scores the distribution of class complexity divided by member count. This ratio does not establish cohesion or whether extraction would improve readability.
+Scores executable complexity divided by decomposition-function count. Fields and bodyless members are excluded; named local helpers count like methods, and branch-free callbacks do not inflate the denominator. This ratio does not establish cohesion or readability.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -98,7 +98,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `codeQuality`
 - Kind: `metric`
 
-Scores the distribution of each eligible type's maximum member cyclomatic complexity. The population is type instances, not individual methods.
+Scores distinct authored executable functions: 40% worst individual score plus 60% mean of the remaining functions. Own CC anchors 3/5/10/20/40 map to 10/8/6/4/0 with linear interpolation. A single-function scope uses its individual score. Repeated source observations count once at maximum variant CC. Decomposition retains its separate type-instance population.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -554,6 +554,6 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `maintainability`
 - Kind: `metric`
 
-Scores the eligible type maintainability-index distribution, including recorded exclusions and entry-point adjustments. It is a static signal of change cost, not a complete maintainability judgment.
+Scores distinct authored executable functions: 40% of the weakest fifth mean plus 60% of the remaining mean. Each function contributes once; enum and non-executable declarations give no credit. Own MI uses exclusively owned body CC, tokens and source lines. Repeated source observations count once at minimum MI. MI 40/52/58/65/70/75 maps linearly to 0/2/4/6/8/10. Empty populations are unmeasured; distribution statistics are diagnostic only. Explicit legacy inputs retain the labeled type policy.
 
 Comment exclusion is not implemented for this rule in this analyzer version.

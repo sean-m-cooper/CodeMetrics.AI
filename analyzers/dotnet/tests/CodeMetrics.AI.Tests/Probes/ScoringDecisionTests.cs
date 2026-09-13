@@ -68,4 +68,37 @@ public sealed class ScoringDecisionTests
         inner.FinalScore.Should().Be(7.3);
         outer.FinalScore.Should().Be(8.3);
     }
+
+    [Theory]
+    [InlineData(4, 1.3, 2.7)]
+    [InlineData(9.3, 4, 6.7)]
+    [InlineData(9.3, 8, 8.7)]
+    [InlineData(3.3, 4, 3.7)]
+    [InlineData(2.64999999, 2.64999999, 2.6)]
+    [InlineData(2.65000001, 2.65000001, 2.7)]
+    public void MeansRoundDecimalMidpointsUp(double first, double second, double expected)
+    {
+        var decision = ScoringDecision.Mean("test", ScoringStep.Component("first", first), ScoringStep.Component("second", second));
+        decision.FinalScore.Should().Be(expected);
+        decision.Inputs["roundingMode"].Should().Be("AwayFromZero");
+        decision.Inputs["roundingArithmetic"].Should().Be("decimal");
+        decision.Inputs["roundingDecimals"].Should().Be(1);
+        decision.Inputs["unroundedScore"].Should().Be((double)(((decimal)first + (decimal)second) / 2));
+    }
+
+    [Theory]
+    [InlineData(2.5, 0, 3)]
+    [InlineData(2.65, 1, 2.7)]
+    [InlineData(8.65, 1, 8.7)]
+    [InlineData(2.64999999, 1, 2.6)]
+    [InlineData(2.65000001, 1, 2.7)]
+    public void MinimumRoundsMidpointsUpAfterSelectingTheCap(double cap, int decimals, double expected)
+    {
+        var decision = ScoringDecision.Minimum("test", decimals, MidpointRounding.AwayFromZero,
+            ScoringStep.Component("signals", 10), ScoringStep.Component("cap", cap));
+        decision.FinalScore.Should().Be(expected);
+        decision.Steps[1].Disposition.Should().Be("selected");
+        decision.Inputs["roundingMode"].Should().Be("AwayFromZero");
+        decision.Inputs["roundingArithmetic"].Should().Be("decimal");
+    }
 }

@@ -38,7 +38,7 @@ The tool scores your codebase across 9 quality dimensions (0-10 scale):
 | Dimension | Method |
 |-----------|--------|
 | Complexity & Decomposition | Separate method-complexity and decomposition components, retaining one combined score |
-| Maintainability | Statistical — maintainability index population/tail/extreme analysis |
+| Maintainability | Statistical — distinct executable-function MI, weakest fifth / remaining population |
 | Error Handling | Rule-based — empty catches, throw ex, broad catches, sync blocking |
 | Performance & Async | Rule-based — sync-over-async, sequential I/O, unbounded fan-out, shared-state concurrency |
 | Security | Rule-based — hardcoded secrets, SQL interpolation, unsafe deserialization |
@@ -47,7 +47,9 @@ The tool scores your codebase across 9 quality dimensions (0-10 scale):
 | Dependency Management | Rule-based — vulnerabilities, outdated, deprecated, version drift; failed commands are unscored |
 | Architecture & SOLID | Rule-based — project cycles, layering violations, metric hotspots |
 
-**Complexity & Decomposition** retains the `codeQuality` evidence key and one combined score. Reports show Method complexity and Decomposition separately, with component-specific explanations and type hotspots. The former measures each type's worst member; the latter measures class complexity per member. Neither is a general verdict on correctness, reliability or readability. See [component presentation and compatibility](../../shared/scorecard-schema/scoring-decisions.md#complexity-and-decomposition-presentation). Thresholds, combination and overall weighting are unchanged.
+**Complexity & Decomposition** retains the `codeQuality` evidence key and one combined score. Development ruleset `dotnet-2026-09-12-method-population` scores Method complexity as 40% of one worst individual-function score plus 60% of the mean of the remaining functions. Own CC 3/5/10/20/40 maps to individual scores 10/8/6/4/0 with linear interpolation and clamping. A single-function scope uses its individual score. Repeated observations across projects/frameworks count once at maximum variant CC; function hotspots retain names, locations and variant details. The aggregate uses decimal arithmetic and half-up rounding to one decimal.
+
+Decomposition retains its executable complexity per qualifying function within each type instance, with separate type hotspots. Fields, bodyless members and branch-free callbacks/initializers do not inflate that denominator. The combined C&D score remains the mean of its two rounded components, and overall weighting is unchanged. Interpret 10 as exceptional and 8 as a strong engineering target; high CC describes branching burden, not proof of defects or poor runtime performance. Raw CSV metrics remain unchanged. Read the recorded policy when interpreting older evidence or legacy-input fallbacks. See [component presentation and compatibility](../../shared/scorecard-schema/scoring-decisions.md#complexity-and-decomposition-presentation).
 
 ## Raw Metrics
 
@@ -282,16 +284,19 @@ and scored.
 
 Passive data carriers are identified structurally rather than by names such as `Request`, `Response`, or `Dto`. Records, classes, and structs that only declare state through primary-constructor parameters, auto-properties, fields, or assignment-only constructors are treated as data carriers.
 
-Their raw metrics remain in `metrics.csv`, but they are excluded from the scored Complexity & Decomposition,
-Maintainability, and Architecture-hotspot populations. References to them remain visible in raw
+Their raw metrics remain in `metrics.csv`, but they are excluded from the scored Complexity & Decomposition
+and Architecture-hotspot populations. Function-based Maintainability ignores state declarations while still measuring explicit executable bodies, including assignment constructors. References to them remain visible in raw
 coupling evidence but do not contribute to structural `highCoupling` scoring.
 
 Types are scored normally as soon as they define behavior, including methods, computed properties, custom accessors, operators, validation logic, or nontrivial constructor logic.
 
-`Program` and `Startup` composition-root types remain in `metrics.csv` and in the scored
-Maintainability population, but receive a 10-point MI adjustment when thresholds are
-evaluated and stay out of the general offender sample. This gives their expected
-registration density more room without hiding a severely degraded composition root.
+The legacy type-based Maintainability policy gives `Program` and `Startup` a 10-point MI adjustment and omits them from its general offender sample. The new function-based policy measures their owned bodies without a name-based bonus.
+
+### Function-based maintainability
+
+Development policy `dotnet/maintainability/source-functions-quintile-40-60-v1` uses 40% of the mean score of the weakest fifth of distinct executable functions and 60% of the remaining mean. Every function contributes once. Enums and non-executable declarations provide no credit or penalty; nested bodies own their own MI inputs. Runtime initializers are included, constant declarations are neutral, and repeated project/TFM observations count once at the lowest observed own MI. Low-MI prevalence and percentiles are diagnostics only.
+
+Own MI 40/52/58/65/70/75 maps linearly to scores 0/2/4/6/8/10. The final weighted aggregate rounds once to one decimal, midpoint ties up. One function uses its own score; no functions is unmeasured. Raw type/member MI and CSV retain their previous definitions and cannot reconstruct this score. See the [measurement, evidence and calibration policy](../../shared/scorecard-schema/maintainability-policy.md). Earlier type-policy scores remain historical, not compatible baselines.
 
 Documented empty catches are exempt only for a narrow exception type in a conservative
 try/fallback shape: the catch contains an explanatory comment, the try has a success

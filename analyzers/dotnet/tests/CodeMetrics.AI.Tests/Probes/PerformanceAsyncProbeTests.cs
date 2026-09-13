@@ -1394,6 +1394,52 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
+    public void FanOutTransitiveMutation_ReportsOncePerSiteAndRetainsFirstCall()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Threading.Tasks;
+            sealed class Request { public List<int> Values { get; } = new(); }
+            static class Mutator {
+                public static void First(Request request) { var alias = request; Second(alias); }
+                public static void Second(Request request) { Third(request); }
+                public static void Third(Request request) { request.Values.Add(1); }
+            }
+            class Orchestrator {
+                public Task RunAsync(IEnumerable<int> items, Request request) =>
+                    Task.WhenAll(items.Select(item => { Mutator.First(request); Mutator.Third(request); return Task.CompletedTask; }));
+                public Task AgainAsync(IEnumerable<int> items, Request request) =>
+                    Task.WhenAll(items.Select(item => { Mutator.First(request); return Task.CompletedTask; }));
+            }
+            """;
+        var findings = Analyze(code, addTasksRef: true).Findings
+            .Where(f => f.Category == "sharedStateMutationInFanOut").ToList();
+        findings.Should().HaveCount(2);
+        findings.Should().OnlyContain(f => f.Message.Contains("'First'") && f.Message.Contains("'request'"));
+        findings.Select(f => f.Line).Distinct().Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void FanOutMutatesOnlyItsOwnItem_DoesNotReportCapturedState()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Threading.Tasks;
+            sealed class Request { public List<int> Values { get; } = new(); }
+            static class Mutator {
+                public static Task Apply(Request request) { request.Values.Add(1); return Task.CompletedTask; }
+            }
+            class Orchestrator {
+                public Task RunAsync(IEnumerable<Request> requests) =>
+                    Task.WhenAll(requests.Select(request => Mutator.Apply(request)));
+            }
+            """;
+        Analyze(code, addTasksRef: true).Findings.Should().NotContain(f => f.Category == "sharedStateMutationInFanOut");
+    }
+
+    [Fact]
     public void FanOutReturnsResultsWithoutMutatingRequest_DoesNotFindSharedStateMutation()
     {
         const string code = """

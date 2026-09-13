@@ -61,6 +61,8 @@ Exit codes: 0 success, 1 requested quality gate failed, 2 invalid input or incom
 
 ## Development
 
+`metrics.ts` owns source traversal, member metrics and finding identities. `react-probe.ts` checks calls supplied by that traversal for React hook/effect observations; it does not walk into nested functions or calculate metrics. Both use `function-nodes.ts` for the same function boundary definition. Regression fixtures preserve raw metrics, source locations, finding order and fingerprints across this separation.
+
 ```sh
 npm ci
 npm test

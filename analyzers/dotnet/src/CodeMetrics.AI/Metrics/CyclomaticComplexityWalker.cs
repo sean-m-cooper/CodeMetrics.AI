@@ -7,6 +7,42 @@ namespace CodeMetrics.AI.Metrics;
 
 public sealed class CyclomaticComplexityWalker : CSharpSyntaxWalker
 {
+    private readonly bool includeNestedFunctions = true;
+    private SyntaxNode? root;
+
+    public CyclomaticComplexityWalker() { }
+
+    internal CyclomaticComplexityWalker(bool includeNestedFunctions)
+    {
+        this.includeNestedFunctions = includeNestedFunctions;
+    }
+
+    public override void Visit(SyntaxNode? node)
+    {
+        root ??= node;
+        base.Visit(node);
+    }
+
+    public override void VisitLocalFunctionStatement(LocalFunctionStatementSyntax node)
+    {
+        if (includeNestedFunctions || node == root) base.VisitLocalFunctionStatement(node);
+    }
+
+    public override void VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax node)
+    {
+        if (includeNestedFunctions || node == root) base.VisitSimpleLambdaExpression(node);
+    }
+
+    public override void VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax node)
+    {
+        if (includeNestedFunctions || node == root) base.VisitParenthesizedLambdaExpression(node);
+    }
+
+    public override void VisitAnonymousMethodExpression(AnonymousMethodExpressionSyntax node)
+    {
+        if (includeNestedFunctions || node == root) base.VisitAnonymousMethodExpression(node);
+    }
+
     public int Complexity { get; private set; } = 1;
 
     public override void VisitIfStatement(IfStatementSyntax node) { Complexity++; base.VisitIfStatement(node); }

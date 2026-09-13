@@ -133,7 +133,7 @@ public static class TestingProbe
         ScoringStep.Rule("skippedTests", "skippedTests > 0", metrics.SkippedTests > 0, 8),
         ScoringStep.Rule("testSignalsSatisfied", "otherwise", true, 10));
         if (coverage == null) return signals;
-        return ScoringDecision.Minimum("dotnet/testing/v1", 1, MidpointRounding.ToEven,
+        return ScoringDecision.Minimum("dotnet/testing/v1", 1, MidpointRounding.AwayFromZero,
             ScoringStep.Component("testSignals", signals.FinalScore, decision: signals),
             ScoringStep.Component("lineCoverage", CoverageCeiling(coverage.LineRate), inputs: new()
             {

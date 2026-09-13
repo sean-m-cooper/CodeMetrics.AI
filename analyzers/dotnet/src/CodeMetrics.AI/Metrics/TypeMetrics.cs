@@ -24,4 +24,5 @@ public sealed class TypeMetrics
     public double DecompositionRatio { get; set; }
     public bool IsDataCarrier { get; set; }
     public bool IsWebController { get; set; }
+    public ExecutableTypeMetrics? ExecutableMetrics { get; init; }
 }

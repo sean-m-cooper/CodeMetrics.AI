@@ -44,6 +44,54 @@ public class CoverageReportTests
     }
 
     [Fact]
+    public void DuplicateLines_MergeHits_AndIgnoreInvalidObservations()
+    {
+        var path = Path.GetTempFileName();
+        var root = Path.GetTempPath();
+        try
+        {
+            File.WriteAllText(path, """
+                <coverage branch-rate="0.75"><sources><source>src</source></sources>
+                <class filename="Production.cs"><lines>
+                  <line number="1" hits="0"/><line number="2" hits="0"/>
+                  <line number="0" hits="1"/><line number="3" hits="-1"/>
+                  <line number="bad" hits="1"/><line number="4" hits="bad"/>
+                </lines></class>
+                <class filename="Production.cs"><lines><line number="1" hits="2"/></lines></class>
+                <class filename=" "/>
+                </coverage>
+                """);
+            var report = CoverageReport.Read(path, [Path.Combine(root, "src", "Production.cs")], root);
+            report.Status.Should().Be("matched");
+            report.LineRate.Should().Be(0.5);
+            report.BranchRate.Should().Be(0.75);
+            report.MatchedFiles.Should().Equal("src/Production.cs");
+            report.UnmatchedFiles.Should().BeEmpty();
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Theory]
+    [InlineData("<notCoverage />")]
+    [InlineData("<coverage>")]
+    [InlineData("<!DOCTYPE coverage [<!ENTITY external SYSTEM 'file:///unread'>]><coverage>&external;</coverage>")]
+    public void InvalidOrUnsafeXml_IsRejectedWithItsContentHash(string xml)
+    {
+        var path = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(path, xml);
+            var report = CoverageReport.Read(path, [], Path.GetTempPath());
+            report.Status.Should().Be("invalid");
+            report.Sha256.Should().HaveLength(64);
+            report.LineRate.Should().BeNull();
+            report.BranchRate.Should().BeNull();
+            report.Error.Should().NotBeNullOrWhiteSpace();
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Fact]
     public void ExplicitMissingCoverage_FailsInsteadOfInventingAScore()
     {
         var result = TestingProbe.Analyze([], [], Path.GetTempPath(), Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".xml"));
