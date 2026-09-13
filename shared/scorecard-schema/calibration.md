@@ -120,3 +120,7 @@ Until an ecosystem completes this procedure:
 ## Executable regression checks
 
 See `../calibration/README.md` and `../calibration/baselines/` for the pinned labeled fixture corpus, measured .NET reference distribution, JS/TS distributions, and release checks. These fixtures supplement the public-repository procedure above; they do not establish cross-ecosystem comparability. Always evaluate labeled false positives and false negatives alongside distribution similarity.
+
+## Security and error-handling context correction
+
+The unpublished .NET 2.3.0 candidate uses ruleset `dotnet-2026-09-13-security-catch-context`. It distinguishes descriptive identifiers from credential candidates, recognizes bounded CORS rejecting guards, accepts local catch rationale and diagnostic output parameters, and scores the severity-weighted source catch population. See the [policy and limitations](error-handling-policy.md). Earlier absolute-count scores are incompatible baseline gates.

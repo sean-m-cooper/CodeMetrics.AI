@@ -11,6 +11,7 @@ public static class ErrorHandlingProbe
         string? solutionDir = null)
     {
         var findings = new List<Finding>();
+        var population = new CatchPopulation(solutionDir);
 
         foreach (var (projectName, compilation) in projects)
         {
@@ -22,7 +23,7 @@ public static class ErrorHandlingProbe
 
                 var catches = root.DescendantNodes().OfType<CatchClauseSyntax>()
                     .ToDictionary(clause => clause, clause => new CatchObservation(clause, semanticModel));
-                AnalyzeCatchBlocks(catches.Values, filePath, projectName, findings);
+                AnalyzeCatchBlocks(catches.Values, filePath, projectName, findings, population);
                 AnalyzeSyncBlockingCalls(root, semanticModel, filePath, projectName, findings);
                 AnalyzeConsoleWriteLine(root, filePath, projectName, findings);
                 AnalyzeMissingLoggerForMultipleCatches(root, catches, filePath, projectName, findings);
@@ -34,45 +35,15 @@ public static class ErrorHandlingProbe
         var emptyCatches = findings.Count(f => f.Category == "emptyCatch");
         var throwExes = findings.Count(f => f.Category == "throwEx");
         var broadDefaults = findings.Count(f => f.Category == "broadCatchReturnsDefault");
-        var hasBroadDefault = broadDefaults > 0;
-        var hasSyncBlock = findings.Any(f => f.Category == "syncBlockingCall");
-        var warnings = findings.Count(f => f.Severity == "warning");
+        var decision = population.Score(findings, observationCount);
         var errors = findings.Count(f => f.Severity == "error");
-
-        // Ladder rungs, matching SecurityProbe's convention of reserving 0/2/4 for
-        // error-severity and structural findings and 6/8 for the warning tail:
-        //   0  systemic       — five or more empty catches or default-returning broad catches
-        //   2  errors         — any empty catch or 'throw ex;'
-        //   4  structural     — a default-returning broad catch or a sync-blocking call
-        //   6  noisy          — more than three advisory warnings
-        //   8  minor          — one to three advisory warnings, no errors
-        //  10  clean          — no findings
-        var decision = ScoringDecision.FirstMatch("dotnet/errorHandling/source-findings-v1", new()
-        {
-            ["countingUnit"] = "distinctSourceFinding",
-            ["handlingRecognition"] = "exception-propagation-v1",
-            ["stderrReportingRecognition"] = "system-console-error-v1",
-            ["sourceFindings"] = findings.Count,
-            ["projectFrameworkObservations"] = observationCount,
-            ["emptyCatches"] = emptyCatches,
-            ["throwExes"] = throwExes,
-            ["broadDefaults"] = broadDefaults,
-            ["hasSyncBlock"] = hasSyncBlock,
-            ["warnings"] = warnings
-        },
-        ScoringStep.Rule("systemicEmptyCatches", "emptyCatches >= 5", emptyCatches >= 5, 0, ["emptyCatch"]),
-        ScoringStep.Rule("systemicBroadDefaults", "broadDefaults >= 5", broadDefaults >= 5, 0, ["broadCatchReturnsDefault"]),
-        ScoringStep.Rule("emptyCatch", "emptyCatches > 0", emptyCatches > 0, 2, ["emptyCatch"]),
-        ScoringStep.Rule("throwEx", "throwExes > 0", throwExes > 0, 2, ["throwEx"]),
-        ScoringStep.Rule("broadDefault", "broadDefaults > 0", hasBroadDefault, 4, ["broadCatchReturnsDefault"]),
-        ScoringStep.Rule("syncBlocking", "hasSyncBlock", hasSyncBlock, 4, ["syncBlockingCall"]),
-        ScoringStep.Rule("manyWarnings", "warnings > 3", warnings > 3, 6, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
-        ScoringStep.Rule("warnings", "warnings > 0", warnings > 0, 8, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
-        ScoringStep.Rule("clean", "otherwise", true, 10, []));
+        var warnings = findings.Count(f => f.Severity == "warning");
 
         var basis = $"Distinct source findings: {findings.Count} across {observationCount} project/framework observations " +
                     $"(errors: {errors}, warnings: {warnings}). " +
-                    $"emptyCatch={emptyCatches}, throwEx={throwExes}, broadDefaults={broadDefaults}.";
+                    $"emptyCatch={emptyCatches}, throwEx={throwExes}, broadDefaults={broadDefaults}. " +
+                    $"Affected catches: {decision.Inputs["affectedCatches"]}/{decision.Inputs["catchPopulation"]}; " +
+                    $"documented catches: {decision.Inputs["documentedCatches"]}.";
 
         return new DimensionResult
         {
@@ -130,11 +101,15 @@ public static class ErrorHandlingProbe
     }
 
     private static void AnalyzeCatchBlocks(IEnumerable<CatchObservation> catches,
-        string filePath, string projectName, List<Finding> findings)
+        string filePath, string projectName, List<Finding> findings, CatchPopulation population)
     {
         foreach (var observation in catches)
-            foreach (var issue in CatchClassifier.Classify(observation))
+        {
+            var issues = CatchClassifier.Classify(observation);
+            population.Add(observation, issues);
+            foreach (var issue in issues)
                 findings.Add(CreateCatchFinding(issue, observation.Clause, filePath, projectName));
+        }
     }
 
     private static Finding CreateCatchFinding(CatchIssue issue, CatchClauseSyntax clause, string filePath, string projectName)
@@ -159,7 +134,12 @@ public static class ErrorHandlingProbe
             Message = message,
             File = filePath,
             Line = GetLine(issue.Node),
-            Observations = SourceLocation(issue.Node),
+            Observations = new(SourceLocation(issue.Node))
+            {
+                ["catchSpanStart"] = clause.SpanStart,
+                ["catchSpanLength"] = clause.Span.Length,
+                ["scoringAggregation"] = "maximumWeightPerSourceCatchAcrossFrameworks"
+            },
             Project = projectName,
             Type = GetContainingTypeName(clause)
         };

@@ -34,7 +34,7 @@ public sealed class ErrorHandlingSourcePopulationTests
         var projects = Enumerable.Range(0, frameworks).Select(index => ($"Library(net{index}.0)", compilation)).ToList();
         var result = ErrorHandlingProbe.Analyze(projects, Root);
 
-        result.Score.Should().Be(2);
+        result.Score.Should().Be(0);
         var finding = result.Findings.Should().ContainSingle().Subject;
         finding.Observations["observationCount"].Should().Be(frameworks);
         JsonSerializer.SerializeToElement(finding.Observations["affectedProjects"]).GetArrayLength().Should().Be(frameworks);
@@ -92,6 +92,10 @@ public sealed class ErrorHandlingSourcePopulationTests
         var finding = result.Findings.Should().ContainSingle().Subject;
         JsonSerializer.SerializeToElement(finding.Observations["affectedProjects"])
             .EnumerateArray().Select(item => item.GetString()).Should().Equal("Library(net10.0)");
+        result.ScoringDecision!.Inputs["catchPopulation"].Should().Be(1);
+        result.ScoringDecision.Inputs["affectedCatches"].Should().Be(1);
+        result.ScoringDecision.Inputs["weightedAffectedCatches"].Should().Be(1m);
+        result.Score.Should().Be(0);
     }
 
     [Fact]
@@ -117,7 +121,7 @@ public sealed class ErrorHandlingSourcePopulationTests
     {
         var compilation = Compile("class C { void Run() { try {} catch { var ignored = 1; } } }");
         var result = ErrorHandlingProbe.Analyze(Enumerable.Range(0, 5).Select(index => ($"App(net{index}.0)", compilation)).ToList(), Root);
-        result.Score.Should().Be(8);
+        result.Score.Should().Be(5);
         result.Findings.Should().ContainSingle().Subject.Category.Should().Be("broadCatchWithoutLoggingOrRethrow");
     }
 
@@ -126,7 +130,7 @@ public sealed class ErrorHandlingSourcePopulationTests
     {
         var compilation = Compile("class C { int Run() { try { return 1; } catch { return 0; } } }");
         var result = ErrorHandlingProbe.Analyze([("App(net8.0)", compilation), ("App(net10.0)", compilation)], Root);
-        result.Score.Should().Be(4);
+        result.Score.Should().Be(2.5);
         result.Findings.Select(finding => finding.Category).Should().BeEquivalentTo(
             "broadCatchWithoutLoggingOrRethrow", "broadCatchReturnsDefault");
     }

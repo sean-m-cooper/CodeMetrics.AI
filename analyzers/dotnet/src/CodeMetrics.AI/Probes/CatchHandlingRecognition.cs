@@ -9,6 +9,8 @@ internal static class CatchHandlingRecognition
 {
     // These are recognized handling paths, not proof of handling on every path.
     public static bool IsHandled(CatchObservation observation) =>
+        CatchIntentRecognition.HasExplanation(observation.Clause) ||
+        CatchIntentRecognition.HasErrorOutput(observation) ||
         HasLoggingCall(observation) || observation.ActiveNodes.OfType<ThrowStatementSyntax>().Any() ||
         HasPrecedingCancellationRethrow(observation.Clause) || HasDeferredLogging(observation) ||
         ExceptionPropagationAnalysis.Recognizes(observation);

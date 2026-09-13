@@ -197,7 +197,7 @@
       "category": "hardcodedSecret",
       "kind": "finding",
       "title": "Potential hardcoded secret",
-      "description": "Source matches a credential or secret pattern. Review whether the value is a real credential; avoid reproducing secret values in reports.",
+      "description": "Source matches a potential credential literal. Descriptive literals spelling the declaration name (including route, key and purpose identifiers) are excluded by a bounded lexical rule. Naming suffixes alone do not exempt credentials. Review actual use; never reproduce secret values in reports.",
       "documentation": "Rules/rules.md#cmai4001",
       "annotation": {
         "supported": false,
@@ -248,7 +248,7 @@
       "category": "allowAnyOriginWithCredentials",
       "kind": "finding",
       "title": "Permissive credentialed CORS",
-      "description": "Recognized CORS configuration combines permissive origins with credentials. Review the actual request boundary and configuration.",
+      "description": "The same CORS builder enables permissive origins and credentials without a recognized rejecting guard. Separate policies and opposite branches are distinguished. Recognition is bounded static analysis; review the actual request boundary and configuration.",
       "documentation": "Rules/rules.md#cmai4004",
       "annotation": {
         "supported": false,
@@ -316,7 +316,7 @@
       "category": "emptyCatch",
       "kind": "finding",
       "title": "Empty catch",
-      "description": "An empty catch has no recognized handling or accepted suppression. It may reflect a deliberate fallback; use a scoped declaration to record that decision.",
+      "description": "An empty catch has no recognized handling, local explanatory comment or accepted scoped suppression. Prose rationale is accepted as declared intent without judging the business decision. Empty/task-marker comments and commented-out statements do not qualify. Scoring uses the maximum issue weight per source catch within the catch population.",
       "documentation": "Rules/rules.md#cmai5001",
       "annotation": {
         "supported": true,
@@ -353,7 +353,7 @@
       "category": "broadCatchWithoutLoggingOrRethrow",
       "kind": "finding",
       "title": "Unrecognized broad-catch handling",
-      "description": "A broad catch has no recognized logging, propagation, exception-bearing return or invoked error callback. Review the surrounding handling path.",
+      "description": "A broad catch has no recognized logging, propagation, exception-bearing return, invoked error callback, diagnostic output parameter or local explanatory comment. Review the surrounding handling path. Overlapping catch findings contribute only their maximum weight per source catch.",
       "documentation": "Rules/rules.md#cmai5003",
       "annotation": {
         "supported": false,
@@ -370,7 +370,7 @@
       "category": "broadCatchReturnsDefault",
       "kind": "finding",
       "title": "Default return after broad catch",
-      "description": "A broad catch returns a default value without a recognized handling path. Review whether the result communicates or deliberately absorbs failure.",
+      "description": "A broad catch returns a default value without a recognized handling path or local explanatory comment. Explicit diagnostic outputs can establish reporting. Method names alone do not establish a valid fallback contract. Scoring counts the source catch once at its highest issue weight.",
       "documentation": "Rules/rules.md#cmai5004",
       "annotation": {
         "supported": false,
@@ -424,7 +424,7 @@
       "category": "missingLoggerForMultipleCatches",
       "kind": "finding",
       "title": "Unrecognized reporting for multiple catches",
-      "description": "A type contains multiple catches without recognized handling paths or an ILogger member/parameter. Custom reporting and recovery may be intentional.",
+      "description": "A type contains multiple catches without recognized handling paths or an ILogger member/parameter. Custom reporting and recovery may be intentional. This advisory adds no independent score reduction to the catch-population policy.",
       "documentation": "Rules/rules.md#cmai5007",
       "annotation": {
         "supported": false,

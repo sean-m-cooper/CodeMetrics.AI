@@ -52,7 +52,7 @@ public sealed class ErrorHandlingPropagationTests
         var result = Analyze(body);
         result.Findings.Should().BeEmpty();
         result.Score.Should().Be(10);
-        result.ScoringDecision!.Inputs["handlingRecognition"].Should().Be("exception-propagation-v1");
+        result.ScoringDecision!.Inputs["handlingRecognition"].Should().Be("documented-intent-error-output-v2");
     }
 
     [Fact]

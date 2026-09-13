@@ -6,7 +6,7 @@
     "version": "2.3.0",
     "ecosystem": "dotnet"
   },
-  "ruleset": "dotnet-2026-09-13-async-source-findings",
+  "ruleset": "dotnet-2026-09-13-security-catch-context",
   "scope": "Only listed rules have accuracy labels. Fixture distributions do not establish cross-ecosystem comparability.",
   "accuracy": {
     "errorHandling/emptyCatch": {
@@ -39,7 +39,7 @@
       "count": 6,
       "median": 10.0,
       "p25": 5.5,
-      "p10": 3.0
+      "p10": 2.0
     },
     "performanceAsync": {
       "count": 6,
@@ -104,7 +104,7 @@
       "scores": {
         "codeQuality": 10,
         "maintainability": 10,
-        "errorHandling": 2,
+        "errorHandling": 0,
         "performanceAsync": 10,
         "dependencyManagement": null,
         "security": 10,

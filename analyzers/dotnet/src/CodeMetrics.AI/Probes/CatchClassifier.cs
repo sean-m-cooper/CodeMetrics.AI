@@ -10,7 +10,8 @@ internal static class CatchClassifier
     {
         var clause = observation.Clause;
         if (clause.Block.Statements.Count == 0)
-            return ClassifyEmpty(clause, observation.SemanticModel);
+            return !FindingSuppression.IsSuppressed(clause, "emptyCatch") && !CatchIntentRecognition.HasExplanation(clause)
+                ? [new(CatchIssueKind.Empty, clause)] : [];
 
         var issues = new List<CatchIssue>();
         var caughtName = clause.Declaration?.Identifier.Text;
@@ -26,65 +27,6 @@ internal static class CatchClassifier
                 issues.Add(new(CatchIssueKind.BroadDefault, clause));
         }
         return issues;
-    }
-
-    private static IReadOnlyList<CatchIssue> ClassifyEmpty(CatchClauseSyntax clause, SemanticModel model)
-    {
-        return !FindingSuppression.IsSuppressed(clause, "emptyCatch") &&
-               !IsDocumentedNarrowFallbackCatch(clause, model)
-            ? [new(CatchIssueKind.Empty, clause)] : [];
-    }
-
-    private static bool IsDocumentedNarrowFallbackCatch(
-        CatchClauseSyntax catchClause,
-        SemanticModel semanticModel)
-    {
-        if (catchClause.Declaration?.Type is not { } catchType ||
-            catchClause.Parent is not TryStatementSyntax tryStatement)
-        {
-            return false;
-        }
-
-        if (!IsNarrowException(catchType, semanticModel))
-            return false;
-
-        var hasExplanation = catchClause.Block.DescendantTrivia(descendIntoTrivia: true)
-            .Any(trivia => trivia.Kind() is SyntaxKind.SingleLineCommentTrivia or SyntaxKind.MultiLineCommentTrivia);
-        if (!hasExplanation ||
-            !tryStatement.Block.DescendantNodes().OfType<ReturnStatementSyntax>().Any())
-        {
-            return false;
-        }
-
-        return HasFollowingReturn(tryStatement);
-    }
-
-    private static bool HasFollowingReturn(TryStatementSyntax tryStatement)
-    {
-        if (tryStatement.Parent is not BlockSyntax containingBlock)
-            return false;
-        var tryIndex = containingBlock.Statements.IndexOf(tryStatement);
-        return tryIndex >= 0 &&
-               tryIndex + 1 < containingBlock.Statements.Count &&
-               containingBlock.Statements[tryIndex + 1] is ReturnStatementSyntax;
-    }
-
-    private static bool IsNarrowException(TypeSyntax syntax, SemanticModel model)
-    {
-        return model.GetTypeInfo(syntax).Type is INamedTypeSymbol caughtType &&
-               caughtType.ToDisplayString() is not ("System.Exception" or "System.SystemException") &&
-               DerivesFromException(caughtType);
-    }
-
-    private static bool DerivesFromException(INamedTypeSymbol type)
-    {
-        for (var current = type; current != null; current = current.BaseType)
-        {
-            if (current.ToDisplayString() == "System.Exception")
-                return true;
-        }
-
-        return false;
     }
 
     private static bool IsBroadCatch(CatchClauseSyntax catchClause)

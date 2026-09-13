@@ -35,7 +35,7 @@ public static class SecurityProbe
                 AnalyzeHardcodedSecrets(root, filePath, projectName, findings);
                 AnalyzeRawSqlInterpolation(root, filePath, projectName, findings);
                 AnalyzeUnsafeDeserialization(root, filePath, projectName, findings);
-                AnalyzeAllowAnyOriginWithCredentials(root, filePath, projectName, findings);
+                AnalyzeAllowAnyOriginWithCredentials(root, compilation.GetSemanticModel(tree), filePath, projectName, findings);
                 AnalyzeAllowAnonymous(root, filePath, projectName, findings);
             }
 
@@ -50,7 +50,7 @@ public static class SecurityProbe
         var errors = findings.Count(f => f.Severity == "error");
         var warnings = findings.Count(f => f.Severity == "warning");
 
-        var decision = ScoringDecision.FirstMatch("dotnet/security/v1", new()
+        var decision = ScoringDecision.FirstMatch("dotnet/security/identifier-cors-flow-v2", new()
         {
             ["hardcodedSecrets"] = hardcodedSecrets,
             ["allowAnyOriginWithCreds"] = allowAnyOriginWithCreds,
@@ -116,7 +116,8 @@ public static class SecurityProbe
     private static bool IsSecretLiteral(string name, ExpressionSyntax? expression) =>
         ContainsSecretKeyword(name) && expression is LiteralExpressionSyntax literal &&
         literal.IsKind(SyntaxKind.StringLiteralExpression) && literal.Token.ValueText.Length >= 16 &&
-        !ContainsSafePlaceholder(literal.Token.ValueText);
+        !ContainsSafePlaceholder(literal.Token.ValueText) &&
+        !SecretIdentifierRecognition.IsIdentifier(name, literal.Token.ValueText);
 
     private static Finding CreateSecretFinding(SyntaxNode node, string filePath, string projectName, string message) => new()
     {
@@ -229,35 +230,22 @@ public static class SecurityProbe
     // ── Finding 4: AllowAnyOrigin + AllowCredentials ──────────────────────────
 
     private static void AnalyzeAllowAnyOriginWithCredentials(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel model, string filePath, string projectName, List<Finding> findings)
     {
-        var statements = root.DescendantNodes().OfType<ExpressionStatementSyntax>();
-
-        foreach (var stmt in statements)
+        foreach (var node in CorsPolicyAnalysis.FindUnsafePairs(root, model))
         {
-            var invocationNames = stmt.DescendantNodes()
-                .OfType<InvocationExpressionSyntax>()
-                .Select(inv => GetMethodName(inv))
-                .Where(n => n != null)
-                .ToHashSet(StringComparer.Ordinal)!;
-
-            if (invocationNames.Contains("AllowAnyOrigin") &&
-                invocationNames.Contains("AllowCredentials"))
+            findings.Add(new Finding
             {
-                findings.Add(new Finding
-                {
-                    Category = "allowAnyOriginWithCredentials",
-                    Severity = "error",
-                    File = filePath,
-                    Line = GetLine(stmt),
-                    Project = projectName,
-                    Type = GetContainingTypeName(stmt),
-                    Message = "Combining AllowAnyOrigin() and AllowCredentials() is a CORS misconfiguration that violates the spec."
-                });
-            }
+                Category = "allowAnyOriginWithCredentials",
+                Severity = "error",
+                File = filePath,
+                Line = GetLine(node),
+                Project = projectName,
+                Type = GetContainingTypeName(node),
+                Message = "The same CORS builder enables AllowAnyOrigin() and AllowCredentials() without a recognized rejecting guard."
+            });
         }
     }
-
     // ── Finding 5: AllowAnonymous ─────────────────────────────────────────────
 
     private static void AnalyzeAllowAnonymous(

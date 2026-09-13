@@ -146,7 +146,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `security`
 - Kind: `finding`
 
-Source matches a credential or secret pattern. Review whether the value is a real credential; avoid reproducing secret values in reports.
+Source matches a potential credential literal. Descriptive literals spelling the declaration name (including route, key and purpose identifiers) are excluded by a bounded lexical rule. Naming suffixes alone do not exempt credentials. Review actual use; never reproduce secret values in reports.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -182,7 +182,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `security`
 - Kind: `finding`
 
-Recognized CORS configuration combines permissive origins with credentials. Review the actual request boundary and configuration.
+The same CORS builder enables permissive origins and credentials without a recognized rejecting guard. Separate policies and opposite branches are distinguished. Recognition is bounded static analysis; review the actual request boundary and configuration.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -230,7 +230,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `errorHandling`
 - Kind: `finding`
 
-An empty catch has no recognized handling or accepted suppression. It may reflect a deliberate fallback; use a scoped declaration to record that decision.
+An empty catch has no recognized handling, local explanatory comment or accepted scoped suppression. Prose rationale is accepted as declared intent without judging the business decision. Empty/task-marker comments and commented-out statements do not qualify. Scoring uses the maximum issue weight per source catch within the catch population.
 
 Excludes this rule occurrence before scoring; raw metrics are unchanged.
 
@@ -260,7 +260,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `errorHandling`
 - Kind: `finding`
 
-A broad catch has no recognized logging, propagation, exception-bearing return or invoked error callback. Review the surrounding handling path.
+A broad catch has no recognized logging, propagation, exception-bearing return, invoked error callback, diagnostic output parameter or local explanatory comment. Review the surrounding handling path. Overlapping catch findings contribute only their maximum weight per source catch.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -272,7 +272,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `errorHandling`
 - Kind: `finding`
 
-A broad catch returns a default value without a recognized handling path. Review whether the result communicates or deliberately absorbs failure.
+A broad catch returns a default value without a recognized handling path or local explanatory comment. Explicit diagnostic outputs can establish reporting. Method names alone do not establish a valid fallback contract. Scoring counts the source catch once at its highest issue weight.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -314,7 +314,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `errorHandling`
 - Kind: `finding`
 
-A type contains multiple catches without recognized handling paths or an ILogger member/parameter. Custom reporting and recovery may be intentional.
+A type contains multiple catches without recognized handling paths or an ILogger member/parameter. Custom reporting and recovery may be intentional. This advisory adds no independent score reduction to the catch-population policy.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
