@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Operations;
 
 namespace CodeMetrics.AI.Probes;
 
@@ -21,10 +20,12 @@ public static class ErrorHandlingProbe
                 var filePath = tree.FilePath;
                 var semanticModel = compilation.GetSemanticModel(tree);
 
-                AnalyzeCatchBlocks(root, semanticModel, filePath, projectName, findings);
+                var catches = root.DescendantNodes().OfType<CatchClauseSyntax>()
+                    .ToDictionary(clause => clause, clause => new CatchObservation(clause, semanticModel));
+                AnalyzeCatchBlocks(catches.Values, filePath, projectName, findings);
                 AnalyzeSyncBlockingCalls(root, semanticModel, filePath, projectName, findings);
                 AnalyzeConsoleWriteLine(root, filePath, projectName, findings);
-                AnalyzeMissingLoggerForMultipleCatches(root, semanticModel, filePath, projectName, findings);
+                AnalyzeMissingLoggerForMultipleCatches(root, catches, filePath, projectName, findings);
             }
         }
 
@@ -128,152 +129,40 @@ public static class ErrorHandlingProbe
             }).ToList();
     }
 
-    private static void AnalyzeCatchBlocks(
-        SyntaxNode root, SemanticModel semanticModel,
+    private static void AnalyzeCatchBlocks(IEnumerable<CatchObservation> catches,
         string filePath, string projectName, List<Finding> findings)
     {
-        var catchClauses = root.DescendantNodes().OfType<CatchClauseSyntax>();
-
-        foreach (var catchClause in catchClauses)
-        {
-            var block = catchClause.Block;
-            var stmts = block.Statements;
-            var containingType = GetContainingTypeName(catchClause);
-
-            // 1. emptyCatch
-            if (stmts.Count == 0)
-            {
-                if (!FindingSuppression.IsSuppressed(catchClause, "emptyCatch") &&
-                    !IsDocumentedNarrowFallbackCatch(catchClause, semanticModel))
-                {
-                    findings.Add(new Finding
-                    {
-                        Category = "emptyCatch",
-                        Severity = "error",
-                        File = filePath,
-                        Line = GetLine(catchClause),
-                        Observations = SourceLocation(catchClause),
-                        Project = projectName,
-                        Type = containingType,
-                        Message = "Empty catch block suppresses exceptions silently."
-                    });
-                }
-                continue; // no further analysis on an empty block
-            }
-
-            var caughtVarName = catchClause.Declaration?.Identifier.Text;
-
-            // 2. throwEx — throw ex; where ex matches caught variable
-            if (!string.IsNullOrEmpty(caughtVarName))
-            {
-                var throwStatements = block.DescendantNodes().OfType<ThrowStatementSyntax>();
-                foreach (var throwStmt in throwStatements)
-                {
-                    if (throwStmt.Expression is IdentifierNameSyntax id &&
-                        id.Identifier.Text == caughtVarName)
-                    {
-                        findings.Add(new Finding
-                        {
-                            Category = "throwEx",
-                            Severity = "error",
-                            File = filePath,
-                            Line = GetLine(throwStmt),
-                            Observations = SourceLocation(throwStmt),
-                            Project = projectName,
-                            Type = containingType,
-                            Message = $"'throw {caughtVarName};' loses the original stack trace. Use bare 'throw;' instead."
-                        });
-                    }
-                }
-            }
-
-            // 3 & 4. Broad catch checks (catch (Exception) or bare catch, no when filter)
-            bool isBroad = IsBroadCatch(catchClause);
-            if (isBroad)
-            {
-                // A broad catch only swallows when nothing observes or propagates the
-                // exception. Both broad-catch rules share that test so a catch cannot
-                // be silent for one rule and handled for the other.
-                bool isHandled = IsHandledBroadCatch(catchClause, semanticModel);
-
-                // 3. broadCatchWithoutLoggingOrRethrow
-                if (!isHandled)
-                {
-                    findings.Add(new Finding
-                    {
-                        Category = "broadCatchWithoutLoggingOrRethrow",
-                        Severity = "warning",
-                        File = filePath,
-                        Line = GetLine(catchClause),
-                        Observations = SourceLocation(catchClause),
-                        Project = projectName,
-                        Type = containingType,
-                        Message = "Broad catch has no recognized logging, rethrow, exception-bearing return, " +
-                                  "or error callback. Review whether the exception is observed or propagated."
-                    });
-                }
-
-                // 4. broadCatchReturnsDefault
-                if (!isHandled && ReturnsDefault(block))
-                {
-                    findings.Add(new Finding
-                    {
-                        Category = "broadCatchReturnsDefault",
-                        Severity = "error",
-                        File = filePath,
-                        Line = GetLine(catchClause),
-                        Observations = SourceLocation(catchClause),
-                        Project = projectName,
-                        Type = containingType,
-                        Message = "Broad catch returns a default value with no recognized exception-handling path. " +
-                                  "Review whether the result hides a failure."
-                    });
-                }
-            }
-        }
+        foreach (var observation in catches)
+            foreach (var issue in CatchClassifier.Classify(observation))
+                findings.Add(CreateCatchFinding(issue, observation.Clause, filePath, projectName));
     }
 
-    private static bool IsDocumentedNarrowFallbackCatch(
-        CatchClauseSyntax catchClause,
-        SemanticModel semanticModel)
+    private static Finding CreateCatchFinding(CatchIssue issue, CatchClauseSyntax clause, string filePath, string projectName)
     {
-        if (catchClause.Declaration?.Type is not { } catchType ||
-            catchClause.Parent is not TryStatementSyntax tryStatement ||
-            tryStatement.Parent is not BlockSyntax containingBlock)
+        var (category, severity, message) = issue.Kind switch
         {
-            return false;
-        }
-
-        if (semanticModel.GetTypeInfo(catchType).Type is not INamedTypeSymbol caughtType ||
-            caughtType.ToDisplayString() is "System.Exception" or "System.SystemException" ||
-            !DerivesFromException(caughtType))
-            return false;
-
-        var hasExplanation = catchClause.Block.DescendantTrivia(descendIntoTrivia: true)
-            .Any(trivia =>
-                trivia.IsKind(SyntaxKind.SingleLineCommentTrivia) ||
-                trivia.IsKind(SyntaxKind.MultiLineCommentTrivia));
-        if (!hasExplanation ||
-            !tryStatement.Block.DescendantNodes().OfType<ReturnStatementSyntax>().Any())
+            CatchIssueKind.Empty => ("emptyCatch", "error", "Empty catch block suppresses exceptions silently."),
+            CatchIssueKind.ThrowCaught => ("throwEx", "error",
+                $"'throw {clause.Declaration!.Identifier.Text};' loses the original stack trace. Use bare 'throw;' instead."),
+            CatchIssueKind.UnhandledBroad => ("broadCatchWithoutLoggingOrRethrow", "warning",
+                "Broad catch has no recognized logging, rethrow, exception-bearing return, " +
+                "or error callback. Review whether the exception is observed or propagated."),
+            CatchIssueKind.BroadDefault => ("broadCatchReturnsDefault", "error",
+                "Broad catch returns a default value with no recognized exception-handling path. " +
+                "Review whether the result hides a failure."),
+            _ => throw new ArgumentOutOfRangeException(nameof(issue))
+        };
+        return new Finding
         {
-            return false;
-        }
-
-        var tryIndex = containingBlock.Statements.IndexOf(tryStatement);
-        return tryIndex >= 0 &&
-               tryIndex + 1 < containingBlock.Statements.Count &&
-               containingBlock.Statements[tryIndex + 1] is ReturnStatementSyntax;
-    }
-
-    private static bool DerivesFromException(INamedTypeSymbol type)
-    {
-        for (var current = type; current != null; current = current.BaseType)
-        {
-            if (current.ToDisplayString() == "System.Exception")
-                return true;
-        }
-
-        return false;
+            Category = category,
+            Severity = severity,
+            Message = message,
+            File = filePath,
+            Line = GetLine(issue.Node),
+            Observations = SourceLocation(issue.Node),
+            Project = projectName,
+            Type = GetContainingTypeName(clause)
+        };
     }
 
     private static void AnalyzeSyncBlockingCalls(
@@ -333,7 +222,7 @@ public static class ErrorHandlingProbe
     }
 
     private static void AnalyzeMissingLoggerForMultipleCatches(
-        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, IReadOnlyDictionary<CatchClauseSyntax, CatchObservation> catches, string filePath, string projectName, List<Finding> findings)
     {
         var typeDeclarations = root.DescendantNodes().OfType<TypeDeclarationSyntax>();
 
@@ -341,7 +230,7 @@ public static class ErrorHandlingProbe
         {
             var catchCount = typeDecl.DescendantNodes()
                 .OfType<CatchClauseSyntax>()
-                .Count(catchClause => RequiresLoggingSupport(catchClause, semanticModel));
+                .Count(catchClause => catches[catchClause].RequiresLoggingSupport);
             if (catchCount < 2)
                 continue;
 
@@ -364,337 +253,7 @@ public static class ErrorHandlingProbe
         }
     }
 
-    private static bool RequiresLoggingSupport(CatchClauseSyntax catchClause, SemanticModel semanticModel)
-    {
-        return !catchClause.Block.DescendantNodes(ShouldDescendIntoCatchNode).Any(node =>
-            node is ReturnStatementSyntax or ContinueStatementSyntax or ThrowStatementSyntax)
-            && !IsHandledBroadCatch(catchClause, semanticModel);
-    }
-
-    private static bool ShouldDescendIntoCatchNode(SyntaxNode node)
-    {
-        return node is not LocalFunctionStatementSyntax and
-               not AnonymousFunctionExpressionSyntax;
-    }
-
     // --- Helpers ---
-
-    private static bool IsBroadCatch(CatchClauseSyntax catchClause)
-    {
-        // Has a when filter → not broad
-        if (catchClause.Filter != null)
-            return false;
-
-        // Bare catch (no declaration)
-        if (catchClause.Declaration == null)
-            return true;
-
-        // catch (Exception) or catch (Exception ex)
-        var typeName = catchClause.Declaration.Type.ToString();
-        return typeName == "Exception" || typeName == "System.Exception";
-    }
-
-    /// <summary>
-    /// Recognizes handling paths, not a proof of handling on every execution path.
-    /// Bodies of deferred lambdas and local functions do not establish handling.
-    /// </summary>
-    private static bool IsHandledBroadCatch(
-        CatchClauseSyntax catchClause, SemanticModel semanticModel)
-    {
-        var block = catchClause.Block;
-        return HasLoggingCall(block, semanticModel)
-               || HasRethrow(block)
-               || HasPrecedingCancellationRethrow(catchClause)
-               || HasDeferredLogging(catchClause, semanticModel)
-               || HasExceptionPropagation(catchClause, semanticModel);
-    }
-
-    private static bool HasExceptionPropagation(CatchClauseSyntax catchClause, SemanticModel semanticModel)
-    {
-        if (catchClause.Declaration is not { } declaration ||
-            semanticModel.GetDeclaredSymbol(declaration) is not { } caughtSymbol)
-            return false;
-
-        // Symbol identity prevents unrelated exceptions from qualifying. If the catch
-        // variable is overwritten, we cannot establish its value without flow tracking.
-        var flow = semanticModel.AnalyzeDataFlow(catchClause.Block);
-        if (flow is not { Succeeded: true } ||
-            flow.WrittenInside.Contains(caughtSymbol, SymbolEqualityComparer.Default))
-            return false;
-
-        var nodes = catchClause.Block.DescendantNodes(ShouldDescendIntoCatchNode).ToList();
-        if (nodes.OfType<ReturnStatementSyntax>().Any(statement =>
-                statement.Expression is { } expression && CarriesException(expression)))
-            return true;
-
-        // Result APIs also store an outcome, perform cleanup, and then return it.
-        // Keep this bounded to direct catch statements and an unchanged local value.
-        var scope = catchClause.Ancestors().FirstOrDefault(node => node is
-            BaseMethodDeclarationSyntax or AccessorDeclarationSyntax or
-            LocalFunctionStatementSyntax or AnonymousFunctionExpressionSyntax);
-        foreach (var statement in catchClause.Block.Statements)
-        {
-            if (statement is ExpressionStatementSyntax
-                {
-                    Expression: AssignmentExpressionSyntax assignment
-                } && assignment.IsKind(SyntaxKind.SimpleAssignmentExpression) &&
-                CarriesException(assignment.Right) &&
-                semanticModel.GetSymbolInfo(assignment.Left).Symbol is ILocalSymbol assigned &&
-                IsReturnedLocal(assigned, assignment.Span.End))
-                return true;
-
-            if (statement is LocalDeclarationStatementSyntax declarationStatement &&
-                declarationStatement.Declaration.Variables.Any(variable =>
-                    variable.Initializer is { } initializer && CarriesException(initializer.Value) &&
-                    semanticModel.GetDeclaredSymbol(variable) is ILocalSymbol local &&
-                    IsReturnedLocal(local, variable.Span.End)))
-                return true;
-        }
-
-        return nodes.OfType<InvocationExpressionSyntax>().Any(invocation =>
-            semanticModel.GetSymbolInfo(invocation).Symbol is IMethodSymbol { MethodKind: MethodKind.DelegateInvoke } method &&
-            invocation.ArgumentList.Arguments.Any(argument => IsCaughtException(argument.Expression)) &&
-            (method.ReturnsVoid || invocation.Ancestors().TakeWhile(node => node != catchClause)
-                .Any(node => node is AwaitExpressionSyntax)));
-
-        bool IsCaughtException(ExpressionSyntax expression)
-        {
-            expression = Unwrap(expression);
-            return expression is IdentifierNameSyntax && SymbolEqualityComparer.Default.Equals(
-                semanticModel.GetSymbolInfo(expression).Symbol, caughtSymbol);
-        }
-
-        bool CarriesException(ExpressionSyntax expression)
-        {
-            expression = Unwrap(expression);
-            if (IsCaughtException(expression))
-                return true;
-
-            // Follow only returned values and exception-bearing arguments, not arbitrary
-            // descendant references (e.g. ex.Message.Length or a deferred lambda).
-            return expression switch
-            {
-                AwaitExpressionSyntax awaited => CarriesException(awaited.Expression),
-                InvocationExpressionSyntax invocation =>
-                    semanticModel.GetSymbolInfo(invocation).Symbol is IMethodSymbol { ReturnsVoid: false } &&
-                    invocation.ArgumentList.Arguments.Any(argument => CarriesException(argument.Expression)),
-                BaseObjectCreationExpressionSyntax creation =>
-                    semanticModel.GetSymbolInfo(creation).Symbol is IMethodSymbol &&
-                    (creation.ArgumentList?.Arguments.Any(argument => IsCaughtException(argument.Expression)) == true ||
-                     creation.Initializer?.Expressions.OfType<AssignmentExpressionSyntax>()
-                         .Any(assignment => IsCaughtException(assignment.Right)) == true),
-                TupleExpressionSyntax tuple => tuple.Arguments.Any(argument => IsCaughtException(argument.Expression)),
-                _ => false
-            };
-        }
-
-        bool IsReturnedLocal(ILocalSymbol local, int start)
-        {
-            if (scope == null)
-                return false;
-
-            var returns = scope.DescendantNodes(ShouldDescendIntoCatchNode).OfType<ReturnStatementSyntax>()
-                .Where(statement => statement.SpanStart > start && statement.Expression is { } value &&
-                    ReturnsLocal(value));
-            return returns.Any(statement => !scope.DescendantNodes().OfType<IdentifierNameSyntax>()
-                .Where(identifier => identifier.SpanStart >= start && identifier.SpanStart < statement.SpanStart &&
-                    SymbolEqualityComparer.Default.Equals(semanticModel.GetSymbolInfo(identifier).Symbol, local))
-                .Any(identifier => identifier.Ancestors().TakeWhile(node => node is not StatementSyntax)
-                    .Any(node => node is AssignmentExpressionSyntax write && write.Left.Span.Contains(identifier.Span) ||
-                        node is PrefixUnaryExpressionSyntax prefix &&
-                            prefix.Kind() is SyntaxKind.PreIncrementExpression or SyntaxKind.PreDecrementExpression ||
-                        node is PostfixUnaryExpressionSyntax postfix &&
-                            postfix.Kind() is SyntaxKind.PostIncrementExpression or SyntaxKind.PostDecrementExpression ||
-                        node is ArgumentSyntax argument && argument.RefKindKeyword.Kind() is
-                            SyntaxKind.RefKeyword or SyntaxKind.OutKeyword)));
-
-            bool ReturnsLocal(ExpressionSyntax expression)
-            {
-                expression = Unwrap(expression);
-                if (IsLocal(expression))
-                    return true;
-
-                // A returned operation on the outcome (e.g. adding context) remains a
-                // handling lead when it returns the same outcome type. Do not count
-                // unrelated projections such as outcome.ToString().
-                return expression is InvocationExpressionSyntax invocation &&
-                    semanticModel.GetSymbolInfo(invocation).Symbol is IMethodSymbol method &&
-                    SymbolEqualityComparer.Default.Equals(method.ReturnType, local.Type) &&
-                    (invocation.Expression is MemberAccessExpressionSyntax access && IsLocal(access.Expression) ||
-                     invocation.ArgumentList.Arguments.Any(argument =>
-                         argument.RefKindKeyword.IsKind(SyntaxKind.None) && IsLocal(argument.Expression)));
-            }
-
-            bool IsLocal(ExpressionSyntax expression) => Unwrap(expression) is IdentifierNameSyntax identifier &&
-                SymbolEqualityComparer.Default.Equals(semanticModel.GetSymbolInfo(identifier).Symbol, local);
-        }
-    }
-
-    private static ExpressionSyntax Unwrap(ExpressionSyntax expression)
-    {
-        return expression switch
-        {
-            ParenthesizedExpressionSyntax parenthesized => Unwrap(parenthesized.Expression),
-            CastExpressionSyntax cast => Unwrap(cast.Expression),
-            PostfixUnaryExpressionSyntax postfix when postfix.IsKind(SyntaxKind.SuppressNullableWarningExpression)
-                => Unwrap(postfix.Operand),
-            _ => expression
-        };
-    }
-
-    private static bool HasLoggingCall(BlockSyntax block, SemanticModel semanticModel)
-    {
-        return block.DescendantNodes(ShouldDescendIntoCatchNode)
-            .OfType<InvocationExpressionSyntax>()
-            .Any(invocation => IsLoggingCall(invocation) || IsStandardErrorWrite(invocation, semanticModel));
-    }
-
-    private static bool IsStandardErrorWrite(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
-    {
-        // Resolve both the receiver and method: a lookalike Console.Error or an
-        // arbitrary TextWriter is not evidence of reporting to standard error.
-        if (semanticModel.GetOperation(invocation) is not IInvocationOperation operation ||
-            operation.TargetMethod.Name is not ("Write" or "WriteLine") ||
-            operation.Arguments.Length == 0)
-            return false;
-
-        var receiver = operation.Instance;
-        while (receiver is IConversionOperation conversion)
-            receiver = conversion.Operand;
-
-        return receiver is IPropertyReferenceOperation { Property.Name: "Error" } property &&
-            SymbolEqualityComparer.Default.Equals(property.Property.ContainingType,
-                semanticModel.Compilation.GetTypeByMetadataName("System.Console")) &&
-            SymbolEqualityComparer.Default.Equals(operation.TargetMethod.ContainingType,
-                semanticModel.Compilation.GetTypeByMetadataName("System.IO.TextWriter"));
-    }
-
-    private static bool HasDeferredLogging(
-        CatchClauseSyntax catchClause, SemanticModel semanticModel)
-    {
-        var caughtSymbol = catchClause.Declaration == null
-            ? null
-            : semanticModel.GetDeclaredSymbol(catchClause.Declaration);
-
-        if (caughtSymbol == null)
-            return false;
-
-        var capturedSymbols = catchClause.Block.DescendantNodes(ShouldDescendIntoCatchNode)
-            .OfType<AssignmentExpressionSyntax>()
-            .Where(assignment =>
-                assignment.IsKind(SyntaxKind.SimpleAssignmentExpression) &&
-                SymbolEqualityComparer.Default.Equals(
-                    semanticModel.GetSymbolInfo(assignment.Right).Symbol,
-                    caughtSymbol))
-            .Select(assignment => semanticModel.GetSymbolInfo(assignment.Left).Symbol)
-            .Where(symbol => symbol != null)
-            .Cast<ISymbol>()
-            .ToList();
-
-        if (capturedSymbols.Count == 0)
-            return false;
-
-        var containingScope = catchClause.Ancestors().FirstOrDefault(node =>
-            node is BaseMethodDeclarationSyntax or
-                AccessorDeclarationSyntax or
-                LocalFunctionStatementSyntax or
-                AnonymousFunctionExpressionSyntax);
-
-        if (containingScope == null)
-            return false;
-
-        // Preserve the existing deferred-logging recognition, including callbacks
-        // registered after the catch with the captured exception.
-        return containingScope.DescendantNodes()
-            .OfType<InvocationExpressionSyntax>()
-            .Where(invocation =>
-                invocation.SpanStart > catchClause.Span.End &&
-                IsLoggingCall(invocation))
-            .SelectMany(invocation => invocation.ArgumentList.Arguments)
-            .SelectMany(argument => argument.Expression.DescendantNodesAndSelf())
-            .OfType<ExpressionSyntax>()
-            .Select(expression => semanticModel.GetSymbolInfo(expression).Symbol)
-            .Any(symbol => capturedSymbols.Any(captured =>
-                SymbolEqualityComparer.Default.Equals(symbol, captured)));
-    }
-
-    private static bool IsLoggingCall(InvocationExpressionSyntax invocation)
-    {
-        var text = invocation.Expression.ToString();
-        return text.IndexOf("Log", StringComparison.OrdinalIgnoreCase) >= 0;
-    }
-
-    /// <summary>
-    /// Any throw statement propagates. A bare 'throw;' preserves the stack trace and a
-    /// 'throw new Wrapped(ex);' surfaces the failure to the caller; neither swallows.
-    /// 'throw ex;' is reported separately by the throwEx rule, so counting it here
-    /// stops one catch from being penalised twice for a shape that does propagate.
-    /// </summary>
-    private static bool HasRethrow(BlockSyntax block)
-    {
-        return block.DescendantNodes(ShouldDescendIntoCatchNode).OfType<ThrowStatementSyntax>().Any();
-    }
-
-    /// <summary>
-    /// True when an earlier catch clause on the same try rethrows cancellation, as in
-    /// 'catch (OperationCanceledException) { throw; }' ahead of a broad catch. The
-    /// broad catch is then a deliberate degrade-gracefully handler for real faults
-    /// rather than a blanket suppressor, because cancellation never reaches it.
-    /// </summary>
-    private static bool HasPrecedingCancellationRethrow(CatchClauseSyntax catchClause)
-    {
-        if (catchClause.Parent is not TryStatementSyntax tryStatement)
-            return false;
-
-        foreach (var preceding in tryStatement.Catches)
-        {
-            if (preceding == catchClause)
-                break;
-
-            if (IsCancellationCatch(preceding) && HasRethrow(preceding.Block))
-                return true;
-        }
-
-        return false;
-    }
-
-    private static bool IsCancellationCatch(CatchClauseSyntax catchClause)
-    {
-        // A 'when' filter means the clause may decline the exception, so it cannot be
-        // relied on to propagate cancellation.
-        if (catchClause.Filter != null)
-            return false;
-
-        var typeName = catchClause.Declaration?.Type.ToString();
-        if (typeName == null)
-            return false;
-
-        // Strip any namespace qualifier: System.OperationCanceledException → OperationCanceledException.
-        var simpleName = typeName[(typeName.LastIndexOf('.') + 1)..];
-        return simpleName is "OperationCanceledException" or "TaskCanceledException";
-    }
-
-    private static bool ReturnsDefault(BlockSyntax block)
-    {
-        return block.DescendantNodes()
-            .OfType<ReturnStatementSyntax>()
-            .Any(ret =>
-            {
-                if (ret.Expression == null) return false;
-                var expr = ret.Expression;
-                return expr is LiteralExpressionSyntax lit &&
-                           (lit.IsKind(SyntaxKind.NullLiteralExpression) ||
-                            lit.IsKind(SyntaxKind.FalseLiteralExpression) ||
-                            (lit.IsKind(SyntaxKind.NumericLiteralExpression) &&
-                             lit.Token.ValueText == "0"))
-                       || expr is DefaultExpressionSyntax
-                       || expr is LiteralExpressionSyntax lit2 &&
-                          lit2.IsKind(SyntaxKind.DefaultLiteralExpression)
-                       || (expr is MemberAccessExpressionSyntax ma &&
-                           ma.Expression.ToString() == "string" &&
-                           ma.Name.Identifier.Text == "Empty");
-            });
-    }
 
     private static bool HasLoggerMember(TypeDeclarationSyntax typeDecl)
     {

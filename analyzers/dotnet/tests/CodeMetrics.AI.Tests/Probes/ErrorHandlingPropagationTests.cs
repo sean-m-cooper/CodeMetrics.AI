@@ -42,6 +42,8 @@ public sealed class ErrorHandlingPropagationTests
     [InlineData("return (false, ex);")]
     [InlineData("return Outcome.Failure((Exception)(ex!));")]
     [InlineData("var result = Outcome.Failure(ex); return result;")]
+    [InlineData("var first = Outcome.Failure(ex); var second = Outcome.Failure(ex); first = new Outcome(); return second;")]
+    [InlineData("var result = Outcome.Failure(ex); if (other != null) return result; result = new Outcome(); return result;")]
     [InlineData("onError(ex); return null;")]
     [InlineData("onError.Invoke(ex); return null;")]
     [InlineData("onError?.Invoke(ex); return null;")]
@@ -102,6 +104,7 @@ public sealed class ErrorHandlingPropagationTests
     [InlineData("return nameof(ex);")]
     [InlineData("ex = other; return Outcome.Failure(ex);")]
     [InlineData("var result = Outcome.Failure(ex); result = new Outcome(); return result;")]
+    [InlineData("var first = Outcome.Failure(ex); var second = Outcome.Failure(ex); first = new Outcome(); second = new Outcome(); return second;")]
     public void MerelyReferencingOrReplacingAnException_IsNotPropagation(string body)
     {
         Analyze(body).Findings.Should().Contain(finding => finding.Category == "broadCatchWithoutLoggingOrRethrow");
@@ -113,6 +116,9 @@ public sealed class ErrorHandlingPropagationTests
     [InlineData("", "outcome.ToString()", true)]
     [InlineData("outcome = new Outcome(null);", "outcome", true)]
     [InlineData("Replace(ref outcome);", "outcome", true)]
+    [InlineData("Reset(out outcome);", "outcome", true)]
+    [InlineData("Action replace = () => outcome = new Outcome(null);", "outcome", true)]
+    [InlineData("var unrelated = new Outcome(null); Replace(ref unrelated);", "outcome", false)]
     [InlineData("(outcome, _) = (new Outcome(null), 1);", "outcome", true)]
     public void StoredOutcomeReturnedAfterCleanup_RequiresAnUnchangedLocal(
         string cleanup, string returned, bool expectedFinding)
@@ -125,6 +131,7 @@ public sealed class ErrorHandlingPropagationTests
             }
             class C {
                 void Replace(ref Outcome value) { value = new Outcome(null); }
+                void Reset(out Outcome value) { value = new Outcome(null); }
                 object Run() {
                     Outcome outcome;
                     try { outcome = new Outcome(null); }
