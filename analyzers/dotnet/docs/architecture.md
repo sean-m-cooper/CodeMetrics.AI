@@ -44,9 +44,13 @@ Dependency subprocesses remove the MSBuild paths installed by the analyzer's loc
 - Concurrency recommendations must account for ordering, back-pressure, shared contexts, and framework thread-safety.
 - Package upgrade scoring uses the candidate package's target-framework assets, not version-major guesses.
 
-## Verification
+## Collection responsibilities
 
 ExecutableFunctionCollector traverses each included type declaration once, measuring function identity and own CC once for both scoring populations. Complexity and Maintainability retain separate initializer eligibility: a branching compile-time constant can remain a C&D observation while a branch-free runtime initializer belongs only to Maintainability. C&D evidence omits the MI payload; shared collection must preserve source anchors, ordering and both population definitions.
+
+ClassCouplingCalculator separates raw node binding from explicit base/attribute collection. The raw syntax loop reuses a node's SymbolInfo and TypeInfo instead of resolving each twice. Raw and structural recursion share array normalization and self/nested/primitive exclusions, but retain separate generic expansion rules: structural traversal stops at passive carriers and presentation/compiler-generated boundaries, while raw traversal preserves their argument provenance. An already-counted generic definition does not stop traversal of another constructed instance's arguments. These boundaries must preserve raw coupling, structural coupling and exclusion provenance.
+
+## Verification
 
 From the repository root:
 
