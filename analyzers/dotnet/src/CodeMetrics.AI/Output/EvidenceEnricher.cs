@@ -109,20 +109,17 @@ internal static class EvidenceEnricher
     public static List<object> FindSuppressionDeclarations(SolutionAnalysisContext context, string root)
     {
         var results = new List<object>();
+        var repositoryRoot = RepositoryRoot(root);
         foreach (var tree in context.AnalyzedProjectCompilations.SelectMany(project => SourceFileFilter.AnalyzableTrees(project.Compilation, root))
             .DistinctBy(tree => tree.FilePath).OrderBy(tree => tree.FilePath, StringComparer.Ordinal))
         {
             foreach (var trivia in tree.GetRoot().DescendantTrivia())
             {
-                if (!trivia.IsKind(SyntaxKind.SingleLineCommentTrivia) && !trivia.IsKind(SyntaxKind.MultiLineCommentTrivia)) continue;
-                var text = trivia.ToString();
-                var marker = text.IndexOf("codemetrics-ignore:", StringComparison.OrdinalIgnoreCase);
-                if (marker < 0 && !text.Contains("amp-metrics: sync-required", StringComparison.OrdinalIgnoreCase)) continue;
-                var declaration = marker < 0 ? "sync-required" : text[(marker + "codemetrics-ignore:".Length)..].Trim().TrimEnd('*', '/');
-                var parts = declaration.Split(["—", " -- "], 2, StringSplitOptions.TrimEntries);
+                var parts = ParseSuppressionComment(trivia);
+                if (parts == null) continue;
                 results.Add(new
                 {
-                    file = Path.GetRelativePath(RepositoryRoot(root), tree.FilePath).Replace('\\', '/'),
+                    file = Path.GetRelativePath(repositoryRoot, tree.FilePath).Replace('\\', '/'),
                     line = tree.GetLineSpan(trivia.Span).StartLinePosition.Line + 1,
                     categories = parts[0].Split([',', ' ', '\t'], StringSplitOptions.RemoveEmptyEntries),
                     reason = parts.Length > 1 ? parts[1] : null,
@@ -131,5 +128,17 @@ internal static class EvidenceEnricher
             }
         }
         return results;
+    }
+
+    private static string[]? ParseSuppressionComment(SyntaxTrivia trivia)
+    {
+        if (!trivia.IsKind(SyntaxKind.SingleLineCommentTrivia) && !trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
+            return null;
+        var text = trivia.ToString();
+        var marker = text.IndexOf("codemetrics-ignore:", StringComparison.OrdinalIgnoreCase);
+        if (marker < 0 && !text.Contains("amp-metrics: sync-required", StringComparison.OrdinalIgnoreCase))
+            return null;
+        var declaration = marker < 0 ? "sync-required" : text[(marker + "codemetrics-ignore:".Length)..].Trim().TrimEnd('*', '/');
+        return declaration.Split(["—", " -- "], 2, StringSplitOptions.TrimEntries);
     }
 }

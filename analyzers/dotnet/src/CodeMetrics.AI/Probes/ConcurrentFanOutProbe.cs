@@ -147,9 +147,14 @@ internal static class ConcurrentFanOutProbe
         // Aliases depend only on authored syntax, not on the evolving mutation summaries.
         // Reuse them through fixed-point propagation instead of rescanning each method.
         var analyzedMethods = methods.Select(entry =>
-            (Entry: entry, Aliases: (IReadOnlyDictionary<string, int>)BuildParameterAliases(entry))).ToArray();
+        {
+            var aliases = BuildParameterAliases(entry);
+            return (Entry: entry, Aliases: (IReadOnlyDictionary<string, int>)aliases,
+                Calls: ResolveCalls(entry, aliases).ToArray());
+        }).ToArray();
+        var interfaceMethods = InterfaceMethods(declaredTypes).ToArray();
         var summaries = new Dictionary<string, HashSet<int>>(StringComparer.Ordinal);
-        foreach (var (entry, aliases) in analyzedMethods)
+        foreach (var (entry, aliases, _) in analyzedMethods)
         {
             var key = BackpressureMethodClassifier.MethodKey(entry.Symbol);
             if (!summaries.TryGetValue(key, out var mutations))
@@ -161,58 +166,63 @@ internal static class ConcurrentFanOutProbe
         do
         {
             changed = PropagateMethodMutations(analyzedMethods, summaries);
-            changed |= PropagateInterfaceMutations(declaredTypes, summaries);
+            changed |= PropagateInterfaceMutations(interfaceMethods, summaries);
         } while (changed);
 
         return summaries;
     }
 
+    private sealed record MutationCall(string MethodKey, int?[] ParameterIndexes);
+
+    private static IEnumerable<MutationCall> ResolveCalls(MethodEntry entry, IReadOnlyDictionary<string, int> aliases)
+    {
+        // Symbol binding and argument roots do not depend on the growing mutation sets.
+        foreach (var invocation in entry.Syntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
+        {
+            if (entry.Model.GetSymbolInfo(invocation).Symbol is IMethodSymbol called)
+                yield return new MutationCall(BackpressureMethodClassifier.MethodKey(called),
+                    invocation.ArgumentList.Arguments.Select(argument => ParameterIndex(argument.Expression, aliases)).ToArray());
+        }
+    }
+
     private static bool PropagateMethodMutations(
-        IEnumerable<(MethodEntry Entry, IReadOnlyDictionary<string, int> Aliases)> methods,
+        IEnumerable<(MethodEntry Entry, IReadOnlyDictionary<string, int> Aliases, MutationCall[] Calls)> methods,
         IReadOnlyDictionary<string, HashSet<int>> summaries)
     {
         var changed = false;
-        foreach (var (entry, aliases) in methods)
+        foreach (var (entry, _, calls) in methods)
         {
             var target = summaries[BackpressureMethodClassifier.MethodKey(entry.Symbol)];
-            foreach (var invocation in entry.Syntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
+            foreach (var call in calls)
             {
-                if (entry.Model.GetSymbolInfo(invocation).Symbol is not IMethodSymbol called ||
-                    !summaries.TryGetValue(
-                        BackpressureMethodClassifier.MethodKey(called), out var calledMutations))
-                {
+                if (!summaries.TryGetValue(call.MethodKey, out var calledMutations))
                     continue;
-                }
-
-                foreach (var index in calledMutations.Where(index =>
-                             index < invocation.ArgumentList.Arguments.Count))
-                {
-                    var root = RootIdentifier(invocation.ArgumentList.Arguments[index].Expression);
-                    if (root != null && aliases.TryGetValue(root.Identifier.Text, out var parameterIndex))
+                // Iterate the mutation set in its original order to preserve the first
+                // captured argument reported when several parameters are mutated.
+                foreach (var index in calledMutations.Where(index => index < call.ParameterIndexes.Length))
+                    if (call.ParameterIndexes[index] is { } parameterIndex)
                         changed |= target.Add(parameterIndex);
-                }
             }
         }
-
         return changed;
     }
 
+    private static IEnumerable<(INamedTypeSymbol Type, IMethodSymbol Method)> InterfaceMethods(
+        IEnumerable<INamedTypeSymbol> declaredTypes)
+    {
+        foreach (var type in declaredTypes)
+            foreach (var interfaceType in type.AllInterfaces)
+                foreach (var method in interfaceType.GetMembers().OfType<IMethodSymbol>())
+                    yield return (type, method);
+    }
+
     private static bool PropagateInterfaceMutations(
-        IEnumerable<INamedTypeSymbol> declaredTypes,
+        IEnumerable<(INamedTypeSymbol Type, IMethodSymbol Method)> methods,
         IDictionary<string, HashSet<int>> summaries)
     {
         var changed = false;
-        foreach (var type in declaredTypes)
-        {
-            foreach (var interfaceType in type.AllInterfaces)
-            {
-                foreach (var interfaceMethod in interfaceType.GetMembers().OfType<IMethodSymbol>())
-                {
-                    changed |= PropagateInterfaceMutation(type, interfaceMethod, summaries);
-                }
-            }
-        }
-
+        foreach (var (type, method) in methods)
+            changed |= PropagateInterfaceMutation(type, method, summaries);
         return changed;
     }
 
@@ -244,32 +254,22 @@ internal static class ConcurrentFanOutProbe
 
     private static HashSet<int> FindDirectMutations(MethodEntry entry, IReadOnlyDictionary<string, int> aliases)
     {
-        var mutated = new HashSet<int>();
+        var assignments = entry.Syntax.DescendantNodes().OfType<AssignmentExpressionSyntax>()
+            .Where(assignment => assignment.Left is not IdentifierNameSyntax)
+            .Select(assignment => assignment.Left);
+        var receivers = entry.Syntax.DescendantNodes().OfType<InvocationExpressionSyntax>()
+            .Select(invocation => invocation.Expression).OfType<MemberAccessExpressionSyntax>()
+            .Where(member => MutationMethods.Contains(member.Name.Identifier.Text))
+            .Select(member => member.Expression);
+        // Assignment observations precede mutating calls, preserving insertion order.
+        return assignments.Concat(receivers).Select(expression => ParameterIndex(expression, aliases))
+            .OfType<int>().ToHashSet();
+    }
 
-        foreach (var assignment in entry.Syntax.DescendantNodes().OfType<AssignmentExpressionSyntax>())
-        {
-            var root = RootIdentifier(assignment.Left);
-            if (root != null && aliases.TryGetValue(root.Identifier.Text, out var index) &&
-                assignment.Left is not IdentifierNameSyntax)
-            {
-                mutated.Add(index);
-            }
-        }
-
-        foreach (var invocation in entry.Syntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
-        {
-            if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess ||
-                !MutationMethods.Contains(memberAccess.Name.Identifier.Text))
-            {
-                continue;
-            }
-
-            var root = RootIdentifier(memberAccess.Expression);
-            if (root != null && aliases.TryGetValue(root.Identifier.Text, out var index))
-                mutated.Add(index);
-        }
-
-        return mutated;
+    private static int? ParameterIndex(ExpressionSyntax expression, IReadOnlyDictionary<string, int> aliases)
+    {
+        var root = RootIdentifier(expression);
+        return root != null && aliases.TryGetValue(root.Identifier.Text, out var index) ? index : null;
     }
 
     private static Dictionary<string, int> BuildParameterAliases(MethodEntry entry)
@@ -287,8 +287,7 @@ internal static class ConcurrentFanOutProbe
                 if (declarator.Initializer == null || aliases.ContainsKey(declarator.Identifier.Text))
                     continue;
 
-                var root = RootIdentifier(declarator.Initializer.Value);
-                if (root != null && aliases.TryGetValue(root.Identifier.Text, out var index))
+                if (ParameterIndex(declarator.Initializer.Value, aliases) is { } index)
                 {
                     aliases[declarator.Identifier.Text] = index;
                     changed = true;

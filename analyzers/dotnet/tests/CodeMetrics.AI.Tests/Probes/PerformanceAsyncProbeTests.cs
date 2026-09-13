@@ -7,6 +7,47 @@ namespace CodeMetrics.AI.Tests.Probes;
 
 public class PerformanceAsyncProbeTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void FanOut_InterfacePropagationRetainsFirstMutatedArgumentAcrossDeclarationOrders(bool implementationFirst)
+    {
+        const string implementation = """
+            public class Request { public int Value; }
+            public interface IWriter { Task Write(Request first, Request second); }
+            public class Writer : IWriter
+            {
+                public Task Write(Request first, Request second)
+                {
+                    second.Value = 1;
+                    first.Value = 2;
+                    return Task.CompletedTask;
+                }
+            }
+            """;
+        const string caller = """
+            public class Driver
+            {
+                private readonly IWriter writer = new Writer();
+                private Task Relay(Request first, Request second)
+                {
+                    var alias = second;
+                    return writer.Write(first, alias);
+                }
+                private Task Bridge(Request first, Request second) => Relay(first, second);
+                public async Task Run(int[] items, Request left, Request right)
+                {
+                    await Task.WhenAll(items.Select(item => Bridge(left, right)));
+                }
+            }
+            """;
+        var code = "using System.Linq; using System.Threading.Tasks;\n" +
+                   (implementationFirst ? implementation + caller : caller + implementation);
+        var result = Analyze(code, addTasksRef: true);
+        result.Findings.Should().ContainSingle(f => f.Category == "sharedStateMutationInFanOut")
+            .Which.Message.Should().Be("Concurrent fan-out passes captured state 'right' to 'Bridge', whose implementation mutates that state.");
+    }
+
     private static readonly string TasksRef =
         Path.Combine(
             Path.GetDirectoryName(typeof(object).Assembly.Location)!,

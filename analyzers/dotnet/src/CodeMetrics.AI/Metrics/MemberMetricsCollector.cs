@@ -14,8 +14,7 @@ internal static class MemberMetricsCollector
         string type,
         string typeId)
     {
-        var result = new List<MemberMetrics>();
-        var partialMembers = new Dictionary<ISymbol, int>(SymbolEqualityComparer.Default);
+        var members = new MemberMetricAccumulator();
 
         foreach (var part in parts)
             foreach (var member in part.Declaration.Members)
@@ -27,26 +26,10 @@ internal static class MemberMetricsCollector
                 if (metrics == null)
                     continue;
 
-                // A partial member's signature and implementation describe one member.
-                // Only consider declarations in authored, included trees: never pull in generated bodies.
-                var definition = symbol switch
-                {
-                    IMethodSymbol method => method.PartialDefinitionPart ?? method,
-                    IPropertySymbol property => (ISymbol?)property.PartialDefinitionPart ?? property,
-                    _ => null
-                };
-                if (definition != null && partialMembers.TryGetValue(definition, out var index))
-                {
-                    if (metrics.HasBody)
-                        result[index] = metrics;
-                    continue;
-                }
-                if (definition != null)
-                    partialMembers[definition] = result.Count;
-                result.Add(metrics);
+                members.Add(symbol, metrics);
             }
 
-        return result;
+        return members.Members;
     }
 
     private static MemberMetrics? BuildMemberMetrics(

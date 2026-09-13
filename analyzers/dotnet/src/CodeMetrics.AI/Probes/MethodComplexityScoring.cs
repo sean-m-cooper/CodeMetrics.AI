@@ -16,13 +16,9 @@ internal static class MethodComplexityScoring
         decimal worstWeight = remaining.Count == 0 ? 1m : .4m;
         decimal remainingWeight = 1m - worstWeight;
         decimal? remainingMean = remaining.Count == 0 ? null : remaining.Average(function => IndividualScore(function.Complexity));
-        decimal worstPenalty = worstWeight * (10m - worstScore);
-        decimal remainingPenalty = remainingWeight * (10m - (remainingMean ?? 10m));
-        decimal unrounded = 10m - worstPenalty - remainingPenalty;
-        decimal ceiling = 10m - worstPenalty;
+        var score = WeightedScore.Calculate(worstScore, remainingMean, worstWeight, remainingWeight);
         return new(worst, worstScore, remaining.Count, worstWeight, remainingWeight,
-            remainingMean, worstPenalty, remainingPenalty, unrounded, ceiling,
-            (double)Math.Round(unrounded, 1, MidpointRounding.AwayFromZero));
+            remainingMean, score.FirstPenalty, score.RemainingPenalty, score.Unrounded, score.Ceiling, score.Rounded);
     }
 
     internal static decimal IndividualScore(int cc) => cc switch

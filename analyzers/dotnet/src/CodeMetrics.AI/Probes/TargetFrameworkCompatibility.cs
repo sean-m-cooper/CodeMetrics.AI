@@ -11,73 +11,64 @@ internal static class TargetFrameworkCompatibility
         if (projectFramework == null)
             return null;
 
-        var parsedPackageFrameworks = packageFrameworkValues
-            .Select(value => (Value: value, Framework: TargetFrameworkParser.Parse(value)))
-            .ToList();
-        var packageFrameworks = parsedPackageFrameworks
-            .Where(item => item.Framework != null)
-            .Select(item => item.Framework!)
-            .Distinct()
-            .ToList();
+        var packageFrameworks = packageFrameworkValues.Select(TargetFrameworkParser.Parse).ToList();
+        return EvaluateAssets(projectFramework, packageFrameworks);
+    }
 
-        if (packageFrameworks.Count == 0)
-            return packageFrameworkValues.Count == 0 ? true : null;
-
-        if (packageFrameworks.Any(packageFramework =>
-                IsCompatible(projectFramework, packageFramework)))
-        {
+    private static bool? EvaluateAssets(ParsedFramework project, IReadOnlyList<ParsedFramework?> packages)
+    {
+        if (packages.Count == 0)
             return true;
-        }
-
-        return parsedPackageFrameworks.Any(item => item.Framework == null) ? null : false;
+        if (packages.Any(package => package != null && IsCompatible(project, package)))
+            return true;
+        return packages.Any(package => package == null) ? null : false;
     }
 
     private static bool IsCompatible(ParsedFramework project, ParsedFramework package)
     {
         if (package.Family == FrameworkFamily.Any)
             return true;
-
-        if (!IsPlatformCompatible(project, package))
-            return false;
-
-        if (project.Family == package.Family)
-            return project.Version >= package.Version;
-
-        if (package.Family == FrameworkFamily.NetStandard)
-            return IsNetStandardCompatible(project, package.Version);
-
-        return project.Family == FrameworkFamily.ModernDotNet &&
-               package.Family == FrameworkFamily.NetCoreApp &&
-               package.Version <= new Version(3, 1);
+        return IsPlatformCompatible(project, package) &&
+               SupportedVersion(project, package.Family) is { } maximum && package.Version <= maximum;
     }
 
-    private static bool IsNetStandardCompatible(ParsedFramework project, Version packageVersion)
-    {
-        return project.Family switch
+    private static readonly Version NetCoreAppMaximum = new(3, 1);
+    // Descending minimum versions retain the previous first-matching support bands.
+    private static readonly IReadOnlyDictionary<FrameworkFamily, (Version Minimum, Version Standard)[]> NetStandardSupport =
+        new Dictionary<FrameworkFamily, (Version, Version)[]>
         {
-            FrameworkFamily.ModernDotNet => packageVersion <= new Version(2, 1),
-            FrameworkFamily.NetCoreApp when project.Version >= new Version(3, 0) =>
-                packageVersion <= new Version(2, 1),
-            FrameworkFamily.NetCoreApp when project.Version >= new Version(2, 0) =>
-                packageVersion <= new Version(2, 0),
-            FrameworkFamily.NetFramework when project.Version >= new Version(4, 6, 1) =>
-                packageVersion <= new Version(2, 0),
-            FrameworkFamily.NetFramework when project.Version >= new Version(4, 6) =>
-                packageVersion <= new Version(1, 3),
-            FrameworkFamily.NetFramework when project.Version >= new Version(4, 5, 1) =>
-                packageVersion <= new Version(1, 2),
-            FrameworkFamily.NetFramework when project.Version >= new Version(4, 5) =>
-                packageVersion <= new Version(1, 1),
-            _ => false
+            [FrameworkFamily.ModernDotNet] = [(new(0, 0), new(2, 1))],
+            [FrameworkFamily.NetCoreApp] = [(new(3, 0), new(2, 1)), (new(2, 0), new(2, 0))],
+            [FrameworkFamily.NetFramework] =
+            [
+                (new(4, 6, 1), new(2, 0)), (new(4, 6), new(1, 3)),
+                (new(4, 5, 1), new(1, 2)), (new(4, 5), new(1, 1))
+            ]
         };
+
+    private static Version? SupportedVersion(ParsedFramework project, FrameworkFamily packageFamily)
+    {
+        if (project.Family == packageFamily)
+            return project.Version;
+        if (packageFamily == FrameworkFamily.NetStandard)
+            return NetStandardVersion(project);
+        if (project.Family == FrameworkFamily.ModernDotNet && packageFamily == FrameworkFamily.NetCoreApp)
+            return NetCoreAppMaximum;
+        return null;
+    }
+
+    private static Version? NetStandardVersion(ParsedFramework project)
+    {
+        if (!NetStandardSupport.TryGetValue(project.Family, out var bands))
+            return null;
+        return bands.FirstOrDefault(band => project.Version >= band.Minimum).Standard;
     }
 
     private static bool IsPlatformCompatible(ParsedFramework project, ParsedFramework package)
     {
         if (package.Platform == null)
             return true;
-        if (project.Platform == null ||
-            !project.Platform.Equals(package.Platform, StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(project.Platform, package.Platform, StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }

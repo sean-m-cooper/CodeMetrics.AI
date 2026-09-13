@@ -51,8 +51,7 @@ internal static class ControllerAuthorizationAnalysis
     // for controllers with no eligible actions when the project uses authorization.
     private static int? CountUnannotatedActions(INamedTypeSymbol controller)
     {
-        if (HasAttributeInTypeHierarchy(controller, "Authorize") ||
-            HasAttributeInTypeHierarchy(controller, "AllowAnonymous"))
+        if (HasAuthorizationIntentInHierarchy(controller))
             return null;
 
         var actionCount = 0;
@@ -60,7 +59,7 @@ internal static class ControllerAuthorizationAnalysis
         foreach (var action in controller.GetMembers().OfType<IMethodSymbol>().Where(IsControllerAction))
         {
             actionCount++;
-            if (!HasAttribute(action, "Authorize") && !HasAttribute(action, "AllowAnonymous"))
+            if (!HasAuthorizationIntent(action))
                 unannotatedCount++;
         }
 
@@ -76,11 +75,17 @@ internal static class ControllerAuthorizationAnalysis
         });
     }
 
-    private static bool HasAttributeInTypeHierarchy(INamedTypeSymbol type, string attributeName)
+    private static bool HasAuthorizationIntent(ISymbol symbol)
+    {
+        return symbol.GetAttributes().Any(attribute => attribute.AttributeClass?.Name is
+            "Authorize" or "AuthorizeAttribute" or "AllowAnonymous" or "AllowAnonymousAttribute");
+    }
+
+    private static bool HasAuthorizationIntentInHierarchy(INamedTypeSymbol type)
     {
         for (var current = type; current != null; current = current.BaseType)
         {
-            if (HasAttribute(current, attributeName))
+            if (HasAuthorizationIntent(current))
                 return true;
         }
 

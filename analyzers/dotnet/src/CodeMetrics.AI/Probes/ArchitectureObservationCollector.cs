@@ -63,7 +63,7 @@ internal static class ArchitectureObservationCollector
                     root, semanticModel, projectName, dependencyInjectionExtensionTypes);
                 CollectFrameworkCouplingArchetypeTypes(
                     root, semanticModel, projectName, frameworkCouplingArchetypeTypes);
-                CollectControllerActionCoupling(
+                ControllerActionCollector.Collect(
                     root, semanticModel, projectName, controllerActionObservations);
             }
         }
@@ -71,58 +71,6 @@ internal static class ArchitectureObservationCollector
         return new(cycles, findings,
             new(dependencyInjectionExtensionTypes, frameworkCouplingArchetypeTypes, applicationProjects),
             controllerActionObservations);
-    }
-
-    private static void CollectControllerActionCoupling(
-        SyntaxNode root,
-        SemanticModel semanticModel,
-        string projectName,
-        List<ControllerActionObservation> observations)
-    {
-        foreach (var declaration in root.DescendantNodes().OfType<ClassDeclarationSyntax>())
-        {
-            if (semanticModel.GetDeclaredSymbol(declaration) is not INamedTypeSymbol controllerSymbol ||
-                !WebTypeClassifier.IsController(controllerSymbol))
-                continue;
-
-            var constructorDependencyTypes = ConstructorDependencyCollector.Collect(declaration, semanticModel)
-                .Select(parameter => parameter.TypeSymbol)
-                .OfType<INamedTypeSymbol>()
-                .Select(type => type.OriginalDefinition.ToDisplayString())
-                .Distinct(StringComparer.Ordinal)
-                .ToList();
-
-            foreach (var action in declaration.Members.OfType<MethodDeclarationSyntax>())
-            {
-                if (semanticModel.GetDeclaredSymbol(action) is not IMethodSymbol actionSymbol ||
-                    actionSymbol.MethodKind != MethodKind.Ordinary ||
-                    actionSymbol.DeclaredAccessibility != Accessibility.Public ||
-                    actionSymbol.IsStatic ||
-                    HasAttribute(actionSymbol, "NonActionAttribute"))
-                {
-                    continue;
-                }
-
-                var fromServicesCount = actionSymbol.Parameters.Count(parameter =>
-                    HasAttribute(parameter, "FromServicesAttribute"));
-                observations.Add(new ControllerActionObservation(
-                    projectName,
-                    controllerSymbol.ContainingNamespace?.ToDisplayString() ?? "",
-                    controllerSymbol.Name,
-                    actionSymbol.Name,
-                    action.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
-                    ClassCouplingCalculator.CalculateAction(action, semanticModel),
-                    ClassCouplingCalculator.CalculateStructuralAction(action, semanticModel),
-                    fromServicesCount,
-                    constructorDependencyTypes));
-            }
-        }
-    }
-
-    private static bool HasAttribute(ISymbol symbol, string attributeClassName)
-    {
-        return symbol.GetAttributes().Any(attribute =>
-            attribute.AttributeClass?.Name == attributeClassName);
     }
 
     // ── Static metric hotspots ────────────────────────────────────────────────

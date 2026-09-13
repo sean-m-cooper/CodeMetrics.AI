@@ -76,14 +76,15 @@ internal static class FunctionMaintainabilityProbe
     private static ScoringDecision CreateDecision(decimal weakestMean, decimal? remainingMean,
         decimal weakestWeight, decimal remainingWeight)
     {
-        var weakestPenalty = weakestWeight * (10m - weakestMean);
-        var remainingPenalty = remainingWeight * (10m - (remainingMean ?? 10m));
-        var unrounded = 10m - weakestPenalty - remainingPenalty;
+        var score = WeightedScore.Calculate(weakestMean, remainingMean, weakestWeight, remainingWeight);
+        var weakestPenalty = score.FirstPenalty;
+        var remainingPenalty = score.RemainingPenalty;
+        var unrounded = score.Unrounded;
         return new()
         {
             Policy = Policy,
             Operation = "deductions",
-            FinalScore = (double)Math.Round(unrounded, 1, MidpointRounding.AwayFromZero),
+            FinalScore = score.Rounded,
             Inputs = new()
             {
                 ["measurementPolicy"] = MeasurementPolicy,
