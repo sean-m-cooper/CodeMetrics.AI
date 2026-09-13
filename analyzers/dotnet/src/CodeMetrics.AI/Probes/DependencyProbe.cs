@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -472,49 +471,9 @@ public static class DependencyProbe
     {
         try
         {
-            var psi = new ProcessStartInfo("dotnet", $"list \"{solutionPath}\" package {args} --format json --output-version 1")
-            {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                WorkingDirectory = workingDirectory
-            };
-            // MSBuildLocator mutates the parent environment. Child SDK selection must
-            // resolve from its own global.json, not inherit targets from the analyzer SDK.
-            foreach (var key in new[] { "MSBUILD_EXE_PATH", "MSBuildSDKsPath", "MSBuildExtensionsPath" })
-                psi.Environment.Remove(key);
-            Console.Error.WriteLine($"Dependency check: {args}");
-
-            using var process = Process.Start(psi);
-            if (process == null)
-            {
-                return new DependencyCommandResult(
-                    args, string.Empty, string.Empty, null,
-                    nameof(InvalidOperationException), "dotnet process could not be started.");
-            }
-
-            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            timeout.CancelAfter(TimeSpan.FromMinutes(5));
-            var stdout = process.StandardOutput.ReadToEndAsync(timeout.Token);
-            var stderr = process.StandardError.ReadToEndAsync(timeout.Token);
-            try
-            {
-                await Task.WhenAll(stdout, stderr, process.WaitForExitAsync(timeout.Token));
-            }
-            catch (OperationCanceledException)
-            {
-                if (!process.HasExited) process.Kill(entireProcessTree: true);
-                await process.WaitForExitAsync(CancellationToken.None);
-                if (cancellationToken.IsCancellationRequested) throw;
-                return new DependencyCommandResult(args, "", "", null, nameof(TimeoutException), "Package command exceeded five minutes.");
-            }
-
-            var output = await stdout;
-            if (process.ExitCode == 0)
-                PackageReport.Parse(output); // Never turn missing or malformed output into a clean score.
-            return new DependencyCommandResult(
-                args, output, await stderr, process.ExitCode);
+            var command = await DependencyCommandRunner.RunAsync(
+                solutionPath, args, cancellationToken, workingDirectory);
+            return ValidateCommandResult(command);
         }
         catch (OperationCanceledException)
         {
@@ -526,6 +485,13 @@ public static class DependencyProbe
                 args, string.Empty, string.Empty, null,
                 ex.GetType().Name, ex.Message);
         }
+    }
+
+    internal static DependencyCommandResult ValidateCommandResult(DependencyCommandResult command)
+    {
+        if (command.ExitCode == 0)
+            PackageReport.Parse(command.StandardOutput); // Missing or malformed output cannot restore a clean score.
+        return command;
     }
 
     private static string FormatFailure(DependencyCommandResult command)

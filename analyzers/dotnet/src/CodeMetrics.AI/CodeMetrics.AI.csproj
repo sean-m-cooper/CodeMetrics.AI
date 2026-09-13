@@ -18,6 +18,9 @@
     <PackageTags>code-metrics;roslyn;static-analysis;scorecard;dotnet-tool</PackageTags>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="CodeMetrics.AI.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     <EmbeddedResource Include="Rules\rules.json" LogicalName="CodeMetrics.AI.Rules.rules.json" />
     <None Update="Rules\rules.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
