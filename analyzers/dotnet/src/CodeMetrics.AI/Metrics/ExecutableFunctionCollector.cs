@@ -5,34 +5,58 @@ namespace CodeMetrics.AI.Metrics;
 
 internal static class ExecutableFunctionCollector
 {
-    public static IEnumerable<ExecutableFunctionMetrics> Collect(TypeDeclarationSyntax declaration, SemanticModel model,
-        bool forMaintainability = false)
+    public static ExecutableTypeMetrics Collect(
+        IEnumerable<(TypeDeclarationSyntax Declaration, SemanticModel Model)> declarations)
+    {
+        var complexityFunctions = new List<ExecutableFunctionMetrics>();
+        var maintainabilityFunctions = new List<ExecutableFunctionMetrics>();
+        foreach (var (declaration, model) in declarations)
+            foreach (var function in CollectFunctions(declaration, model))
+            {
+                // Each population retains its own eligibility and evidence contract.
+                if (function.Kind != "initializer" || function.OwnCyclomaticComplexity > 1)
+                    complexityFunctions.Add(function with { Maintainability = null });
+                if (function.Maintainability != null)
+                    maintainabilityFunctions.Add(function);
+            }
+        return new(complexityFunctions.ToArray()) { MaintainabilityFunctions = maintainabilityFunctions.ToArray() };
+    }
+
+    private static IEnumerable<ExecutableFunctionMetrics> CollectFunctions(TypeDeclarationSyntax declaration, SemanticModel model)
     {
         foreach (var node in declaration.DescendantNodes(node => node == declaration || node is not TypeDeclarationSyntax))
         {
             var kind = FunctionKind(node);
             if (kind == null) continue;
 
-            var walker = new CyclomaticComplexityWalker(includeNestedFunctions: false);
-            walker.Visit(node);
-            // Storage initialization with no decisions is not executable decomposition.
-            if (!forMaintainability && kind == "initializer" && walker.Complexity == 1) continue;
-            if (forMaintainability && node is EqualsValueClauseSyntax initializer &&
-                model.GetConstantValue(initializer.Value).HasValue) continue;
-            var maintainability = forMaintainability ? FunctionMaintainabilityCalculator.Measure(node, walker.Complexity) : null;
-            // An initializer consisting solely of a nested lambda has no separately owned body.
-            if (forMaintainability && kind == "initializer" && maintainability!.SourceLines == 0) continue;
-            var name = node is AnonymousFunctionExpressionSyntax ? "callback"
-                : model.GetDeclaredSymbol(node)?.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) ?? kind;
-            var start = FunctionStart(node);
-            yield return new ExecutableFunctionMetrics(name, kind, node.SyntaxTree.FilePath,
-                node.SyntaxTree.GetLineSpan(new(start, 0)).StartLinePosition.Line + 1, walker.Complexity)
-            {
-                SourceSpanStart = start,
-                SourceSpanLength = node.Span.End - start,
-                Maintainability = maintainability
-            };
+            yield return MeasureFunction(node, model, kind);
         }
+    }
+
+    private static ExecutableFunctionMetrics MeasureFunction(SyntaxNode node, SemanticModel model, string kind)
+    {
+        var walker = new CyclomaticComplexityWalker(includeNestedFunctions: false);
+        walker.Visit(node);
+        var name = node is AnonymousFunctionExpressionSyntax ? "callback"
+            : model.GetDeclaredSymbol(node)?.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) ?? kind;
+        var start = FunctionStart(node);
+        return new(name, kind, node.SyntaxTree.FilePath,
+            node.SyntaxTree.GetLineSpan(new(start, 0)).StartLinePosition.Line + 1, walker.Complexity)
+        {
+            SourceSpanStart = start,
+            SourceSpanLength = node.Span.End - start,
+            Maintainability = MeasureMaintainability(node, model, kind, walker.Complexity)
+        };
+    }
+
+    private static FunctionMaintainabilityMetrics? MeasureMaintainability(
+        SyntaxNode node, SemanticModel model, string kind, int complexity)
+    {
+        if (node is EqualsValueClauseSyntax initializer && model.GetConstantValue(initializer.Value).HasValue)
+            return null;
+        var measurement = FunctionMaintainabilityCalculator.Measure(node, complexity);
+        // A lambda-only initializer has no separately owned body; its callback counts.
+        return kind == "initializer" && measurement.SourceLines == 0 ? null : measurement;
     }
 
     // Anchor identity at the authored name/defining token, not attributes or a

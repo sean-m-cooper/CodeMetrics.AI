@@ -19,6 +19,30 @@ public sealed class ExecutableFunctionMetricsTests
     }
 
     [Fact]
+    public void SharedCollectionPreservesDifferentInitializerPopulationsAndEvidence()
+    {
+        var metrics = Collect("""
+            class C {
+                int constant = true ? 1 : 2;
+                object runtime = new object();
+                System.Func<int> callback = () => 3;
+                int F() => 4;
+            }
+            """).Types.Single().ExecutableMetrics!;
+        var complexityInitializer = metrics.Functions.Single(f => f.Kind == "initializer");
+        complexityInitializer.OwnCyclomaticComplexity.Should().Be(2);
+        var miInitializer = metrics.MaintainabilityFunctions.Single(f => f.Kind == "initializer");
+        miInitializer.OwnCyclomaticComplexity.Should().Be(1);
+        miInitializer.SourceSpanStart.Should().NotBe(complexityInitializer.SourceSpanStart);
+        metrics.Functions.Should().HaveCount(3).And.OnlyContain(f => f.Maintainability == null);
+        metrics.MaintainabilityFunctions.Should().HaveCount(3).And.OnlyContain(f => f.Maintainability != null);
+        metrics.Functions.Where(f => f.Kind != "initializer")
+            .Should().BeEquivalentTo(metrics.MaintainabilityFunctions.Where(f => f.Kind != "initializer")
+                .Select(f => f with { Maintainability = null }));
+        JsonSerializer.Serialize(metrics.Functions).Should().NotContain("Maintainability");
+    }
+
+    [Fact]
     public void NamedLocalHelperAndPrivateMethod_HaveIdenticalScoringMeasurements()
     {
         var local = Collect("""

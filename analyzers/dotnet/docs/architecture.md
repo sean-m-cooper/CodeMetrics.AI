@@ -46,6 +46,8 @@ Dependency subprocesses remove the MSBuild paths installed by the analyzer's loc
 
 ## Verification
 
+ExecutableFunctionCollector traverses each included type declaration once, measuring function identity and own CC once for both scoring populations. Complexity and Maintainability retain separate initializer eligibility: a branching compile-time constant can remain a C&D observation while a branch-free runtime initializer belongs only to Maintainability. C&D evidence omits the MI payload; shared collection must preserve source anchors, ordering and both population definitions.
+
 From the repository root:
 
 ```powershell
