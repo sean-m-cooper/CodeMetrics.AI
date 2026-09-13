@@ -89,67 +89,45 @@ public static class SecurityProbe
     private static void AnalyzeHardcodedSecrets(
         SyntaxNode root, string filePath, string projectName, List<Finding> findings)
     {
-        // Variable declarations: string ApiKey = "abcdef...";
-        var varDecls = root.DescendantNodes().OfType<VariableDeclaratorSyntax>();
-        foreach (var varDecl in varDecls)
+        // Preserve declaration-before-assignment finding order, even when source
+        // locations interleave. Both forms use the same literal/placeholder policy.
+        foreach (var variable in root.DescendantNodes().OfType<VariableDeclaratorSyntax>())
         {
-            var name = varDecl.Identifier.Text;
-            if (!ContainsSecretKeyword(name))
-                continue;
-
-            if (varDecl.Initializer?.Value is LiteralExpressionSyntax lit &&
-                lit.IsKind(SyntaxKind.StringLiteralExpression))
-            {
-                var value = lit.Token.ValueText;
-                if (value.Length >= 16 && !ContainsSafePlaceholder(value))
-                {
-                    findings.Add(new Finding
-                    {
-                        Category = "hardcodedSecret",
-                        Severity = "error",
-                        File = filePath,
-                        Line = GetLine(varDecl),
-                        Project = projectName,
-                        Type = GetContainingTypeName(varDecl),
-                        Message = $"Variable '{name}' appears to contain a hardcoded secret."
-                    });
-                }
-            }
+            var name = variable.Identifier.Text;
+            if (IsSecretLiteral(name, variable.Initializer?.Value))
+                findings.Add(CreateSecretFinding(variable, filePath, projectName,
+                    $"Variable '{name}' appears to contain a hardcoded secret."));
         }
-
-        // Assignment expressions: ApiKey = "abcdef...";
-        var assignments = root.DescendantNodes().OfType<AssignmentExpressionSyntax>();
-        foreach (var assignment in assignments)
+        foreach (var assignment in root.DescendantNodes().OfType<AssignmentExpressionSyntax>())
         {
-            var leftText = assignment.Left.ToString();
-            // Extract just the identifier name (last segment if member access)
-            var namePart = leftText.Contains('.')
-                ? leftText.Substring(leftText.LastIndexOf('.') + 1)
-                : leftText;
-
-            if (!ContainsSecretKeyword(namePart))
-                continue;
-
-            if (assignment.Right is LiteralExpressionSyntax lit &&
-                lit.IsKind(SyntaxKind.StringLiteralExpression))
-            {
-                var value = lit.Token.ValueText;
-                if (value.Length >= 16 && !ContainsSafePlaceholder(value))
-                {
-                    findings.Add(new Finding
-                    {
-                        Category = "hardcodedSecret",
-                        Severity = "error",
-                        File = filePath,
-                        Line = GetLine(assignment),
-                        Project = projectName,
-                        Type = GetContainingTypeName(assignment),
-                        Message = $"Assignment to '{namePart}' appears to contain a hardcoded secret."
-                    });
-                }
-            }
+            var name = AssignmentName(assignment);
+            if (IsSecretLiteral(name, assignment.Right))
+                findings.Add(CreateSecretFinding(assignment, filePath, projectName,
+                    $"Assignment to '{name}' appears to contain a hardcoded secret."));
         }
     }
+
+    private static string AssignmentName(AssignmentExpressionSyntax assignment)
+    {
+        var text = assignment.Left.ToString();
+        return text[(text.LastIndexOf('.') + 1)..];
+    }
+
+    private static bool IsSecretLiteral(string name, ExpressionSyntax? expression) =>
+        ContainsSecretKeyword(name) && expression is LiteralExpressionSyntax literal &&
+        literal.IsKind(SyntaxKind.StringLiteralExpression) && literal.Token.ValueText.Length >= 16 &&
+        !ContainsSafePlaceholder(literal.Token.ValueText);
+
+    private static Finding CreateSecretFinding(SyntaxNode node, string filePath, string projectName, string message) => new()
+    {
+        Category = "hardcodedSecret",
+        Severity = "error",
+        File = filePath,
+        Line = GetLine(node),
+        Project = projectName,
+        Type = GetContainingTypeName(node),
+        Message = message
+    };
 
     private static bool ContainsSecretKeyword(string name)
     {

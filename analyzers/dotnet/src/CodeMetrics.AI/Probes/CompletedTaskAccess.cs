@@ -7,46 +7,46 @@ namespace CodeMetrics.AI.Probes;
 internal static class CompletedTaskAccess
 {
     public static bool IsKnownCompleted(
-        SyntaxNode access,
-        ExpressionSyntax receiver,
-        SemanticModel semanticModel)
+        SyntaxNode access, ExpressionSyntax receiver, SemanticModel semanticModel)
     {
-        var receiverSymbol = semanticModel.GetSymbolInfo(receiver).Symbol;
-        if (receiverSymbol is not (ILocalSymbol or IParameterSymbol))
-            return false;
+        var symbol = semanticModel.GetSymbolInfo(receiver).Symbol;
+        return symbol is ILocalSymbol or IParameterSymbol &&
+            (HasCompletionGuard(access, symbol, semanticModel) || HasPrecedingCompletion(access, symbol, semanticModel));
+    }
 
-        foreach (var guard in access.Ancestors().OfType<IfStatementSyntax>())
-        {
-            if (!access.Ancestors().TakeWhile(node => node != guard).Any(node => node is AnonymousFunctionExpressionSyntax or LocalFunctionStatementSyntax) &&
-                guard.Statement.Span.Contains(access.Span) &&
-                !guard.Condition.DescendantNodesAndSelf().Any(node => WritesReceiver(node, receiverSymbol, semanticModel)) &&
-                ProvesCompletion(guard.Condition, receiverSymbol, semanticModel) &&
-                !guard.Statement.DescendantNodesAndSelf().Where(node => node.SpanStart < access.SpanStart)
-                    .Any(node => WritesReceiver(node, receiverSymbol, semanticModel)))
-                return true;
-        }
+    private static bool HasCompletionGuard(SyntaxNode access, ISymbol receiver, SemanticModel model)
+    {
+        return access.Ancestors().OfType<IfStatementSyntax>().Any(guard =>
+            GuardAppliesToAccess(guard, access) &&
+            !guard.Condition.DescendantNodesAndSelf().Any(node => WritesReceiver(node, receiver, model)) &&
+            ProvesCompletion(guard.Condition, receiver, model) &&
+            !guard.Statement.DescendantNodesAndSelf().Where(node => node.SpanStart < access.SpanStart)
+                .Any(node => WritesReceiver(node, receiver, model)));
+    }
 
+    private static bool GuardAppliesToAccess(IfStatementSyntax guard, SyntaxNode access) =>
+        !access.Ancestors().TakeWhile(node => node != guard)
+            .Any(node => node is AnonymousFunctionExpressionSyntax or LocalFunctionStatementSyntax) &&
+        guard.Statement.Span.Contains(access.Span);
+
+    private static bool HasPrecedingCompletion(SyntaxNode access, ISymbol receiver, SemanticModel model)
+    {
         var statement = access.AncestorsAndSelf().OfType<StatementSyntax>().FirstOrDefault();
         if (statement?.Parent is not BlockSyntax block)
             return false;
 
-        var statementIndex = block.Statements.IndexOf(statement);
-        if (statementIndex < 0)
-            return false;
-
-        for (var index = statementIndex - 1; index >= 0; index--)
+        // Search backwards: a write invalidates earlier completion evidence, while
+        // assignment of an awaited WhenAny result establishes a new completed value.
+        for (var index = block.Statements.IndexOf(statement) - 1; index >= 0; index--)
         {
             var preceding = block.Statements[index];
-            if (AssignsAwaitedWhenAny(preceding, receiverSymbol, semanticModel))
+            if (AssignsAwaitedWhenAny(preceding, receiver, model))
                 return true;
-
-            if (WritesSymbol(preceding, receiverSymbol, semanticModel))
+            if (WritesSymbol(preceding, receiver, model))
                 return false;
-
-            if (AwaitsWhenAll(preceding, receiverSymbol, semanticModel))
+            if (AwaitsWhenAll(preceding, receiver, model))
                 return true;
         }
-
         return false;
     }
 

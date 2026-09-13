@@ -286,26 +286,49 @@ public static class DependencyProbe
         if (!PackageReport.IsJson(output)) return;
         foreach (var package in PackageReport.Parse(output))
         {
-            var aspire = IsAspireProjectSection(package.Project, aspireProjects);
-            var assessed = compatibility != null && compatibility.TryGetValue(package.Upgrade, out _);
-            var incompatible = assessed && !compatibility![package.Upgrade];
-            var disposition = aspire ? "excludedAspire" : incompatible ? "excludedFrameworkIncompatible" : "included";
-            var observations = package.Observations();
-            observations["scoreDisposition"] = disposition;
-            observations["frameworkCompatibility"] = aspire || !assessed ? "unknown" : incompatible ? "incompatible" : "compatible";
-            findings.Add(new Finding
-            {
-                Category = "outdatedDependency",
-                Severity = disposition == "included" ? "warning" : "info",
-                Confidence = "high",
-                Project = package.Project,
-                Package = package.Package,
-                Message = $"Package '{package.Package}' {package.ResolvedVersion} ({package.TargetFramework}) has latest version {package.LatestVersion}. " +
-                    (aspire ? "Excluded from outdated scoring by Aspire policy." : incompatible ? "Latest version is incompatible with this target framework; excluded from scoring." :
-                        assessed ? "Latest version has compatible framework assets; review breaking changes before upgrading." : "Framework compatibility is unknown; review before upgrading."),
-                Observations = observations
-            });
+            var assessment = AssessOutdatedPackage(package.Upgrade, aspireProjects, compatibility);
+            findings.Add(CreateOutdatedFinding(package, assessment));
         }
+    }
+
+    private enum OutdatedAssessment { Aspire, NotAssessed, Unknown, Compatible, Incompatible }
+
+    private static OutdatedAssessment AssessOutdatedPackage(OutdatedPackageUpgrade upgrade,
+        IReadOnlySet<string> aspireProjects, IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? compatibility)
+    {
+        if (upgrade.Project != null && IsAspireProjectSection(upgrade.Project, aspireProjects))
+            return OutdatedAssessment.Aspire;
+        if (compatibility == null)
+            return OutdatedAssessment.NotAssessed;
+        if (!compatibility.TryGetValue(upgrade, out var compatible))
+            return OutdatedAssessment.Unknown;
+        return compatible ? OutdatedAssessment.Compatible : OutdatedAssessment.Incompatible;
+    }
+
+    private static Finding CreateOutdatedFinding(PackageReport.PackageRow package, OutdatedAssessment assessment)
+    {
+        var (disposition, compatibility, explanation) = assessment switch
+        {
+            OutdatedAssessment.Aspire => ("excludedAspire", "unknown", "Excluded from outdated scoring by Aspire policy."),
+            OutdatedAssessment.Incompatible => ("excludedFrameworkIncompatible", "incompatible",
+                "Latest version is incompatible with this target framework; excluded from scoring."),
+            OutdatedAssessment.Compatible => ("included", "compatible",
+                "Latest version has compatible framework assets; review breaking changes before upgrading."),
+            _ => ("included", "unknown", "Framework compatibility is unknown; review before upgrading.")
+        };
+        var observations = package.Observations();
+        observations["scoreDisposition"] = disposition;
+        observations["frameworkCompatibility"] = compatibility;
+        return new Finding
+        {
+            Category = "outdatedDependency",
+            Severity = disposition == "included" ? "warning" : "info",
+            Confidence = "high",
+            Project = package.Project,
+            Package = package.Package,
+            Message = $"Package '{package.Package}' {package.ResolvedVersion} ({package.TargetFramework}) has latest version {package.LatestVersion}. " + explanation,
+            Observations = observations
+        };
     }
 
     private static void AddStaticFindings(
@@ -580,30 +603,24 @@ public static class DependencyProbe
 
         foreach (var upgrade in PackageFrameworkCompatibility.ParseOutdatedOutput(output))
         {
-            if (upgrade.Project != null &&
-                IsAspireProjectSection(upgrade.Project, aspireProjects))
+            switch (AssessOutdatedPackage(upgrade, aspireProjects, frameworkCompatibility))
             {
-                aspireExcluded++;
-                continue;
+                case OutdatedAssessment.Aspire:
+                    aspireExcluded++;
+                    break;
+                case OutdatedAssessment.Incompatible:
+                    frameworkIncompatible.Add(upgrade);
+                    break;
+                case OutdatedAssessment.Unknown:
+                    compatibilityUnknown.Add(upgrade);
+                    included++;
+                    break;
+                default:
+                    // No assessment retains the legacy count without adding an
+                    // unknown-upgrade diagnostic; an explicitly missing entry does.
+                    included++;
+                    break;
             }
-
-            if (frameworkCompatibility == null)
-            {
-                included++;
-                continue;
-            }
-
-            if (!frameworkCompatibility.TryGetValue(upgrade, out var compatible))
-            {
-                included++;
-                compatibilityUnknown.Add(upgrade);
-                continue;
-            }
-
-            if (compatible)
-                included++;
-            else
-                frameworkIncompatible.Add(upgrade);
         }
 
         return new OutdatedPackageCounts(

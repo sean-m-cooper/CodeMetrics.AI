@@ -6,6 +6,42 @@ namespace CodeMetrics.AI.Tests.Probes;
 
 public class DependencyProbeTests
 {
+    [Theory]
+    [InlineData("notAssessed", false, 1, 0, "included", "unknown")]
+    [InlineData("missing", false, 1, 1, "included", "unknown")]
+    [InlineData("compatible", false, 1, 0, "included", "compatible")]
+    [InlineData("incompatible", false, 0, 0, "excludedFrameworkIncompatible", "incompatible")]
+    [InlineData("incompatible", true, 0, 0, "excludedAspire", "unknown")]
+    public void OutdatedCountsAndFindingDisposition_PreserveAssessmentStates(
+        string assessment, bool aspire, int included, int unknown, string disposition, string compatibilityLabel)
+    {
+        var dir = TempDir();
+        try
+        {
+            WriteCsproj(dir, "App.csproj", aspire
+                ? "<Project Sdk=\"Aspire.AppHost.Sdk/13.0.0\"><PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup></Project>"
+                : SimpleCsproj());
+            const string output = """
+                { "version": 1, "projects": [{ "path": "App.csproj", "frameworks": [{
+                  "framework": "net10.0", "topLevelPackages": [{ "id": "Library", "resolvedVersion": "1.0.0", "latestVersion": "2.0.0" }]
+                }] }] }
+                """;
+            var upgrade = PackageFrameworkCompatibility.ParseOutdatedOutput(output).Single();
+            Dictionary<OutdatedPackageUpgrade, bool>? compatibility = assessment == "notAssessed" ? null : new();
+            if (assessment is "compatible" or "incompatible")
+                compatibility![upgrade] = assessment == "compatible";
+            var result = DependencyProbe.AnalyzeOutput(EmptyVulnerableOutput, output, EmptyDeprecatedOutput,
+                dir, false, frameworkCompatibility: compatibility);
+            result.Basis.Should().Contain($"outdated={included},")
+                .And.Contain($"outdatedFrameworkCompatibilityUnknown={unknown},");
+            var finding = result.Findings.Single(item => item.Category == "outdatedDependency");
+            finding.Observations["scoreDisposition"].Should().Be(disposition);
+            finding.Observations["frameworkCompatibility"].Should().Be(compatibilityLabel);
+            finding.Severity.Should().Be(included == 1 ? "warning" : "info");
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
     // ── Helper: build empty temp directory ────────────────────────────────────
 
     private static string TempDir()

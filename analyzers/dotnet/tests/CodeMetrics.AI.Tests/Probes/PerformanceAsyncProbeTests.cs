@@ -247,6 +247,24 @@ public class PerformanceAsyncProbeTests
         result.Findings.Should().Contain(f => f.Category == "syncOverAsync");
     }
 
+    [Theory]
+    [InlineData("task = other; await Task.WhenAll(task);", false)]
+    [InlineData("await Task.WhenAll(task); task = other;", true)]
+    [InlineData("task = await Task.WhenAny(task, other);", false)]
+    public void CompletionHistory_UsesTheMostRecentReceiverValue(string history, bool blocking)
+    {
+        var result = Analyze($$"""
+            using System.Threading.Tasks;
+            class C {
+                async Task<int> Read(Task<int> task, Task<int> other) {
+                    {{history}}
+                    return task.Result;
+                }
+            }
+            """, addTasksRef: true);
+        result.Findings.Any(f => f.Category == "syncOverAsync").Should().Be(blocking);
+    }
+
     [Fact]
     public void ResultAfterAwaitedWhenAll_DoesNotFindSyncOverAsync()
     {

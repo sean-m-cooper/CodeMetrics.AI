@@ -7,6 +7,28 @@ namespace CodeMetrics.AI.Tests.Probes;
 
 public class SecurityProbeTests
 {
+    [Theory]
+    [InlineData("abcdefghijklmno", 0)]
+    [InlineData("abcdefghijklmnop", 2)]
+    [InlineData("example_abcdefghijklmnop", 0)]
+    public void SecretDeclarationsAndAssignments_ShareThresholdAndPlaceholderRules(string value, int expected)
+    {
+        var result = Analyze($$"""
+            class C {
+                string ApiKey;
+                void Assign() { this.ApiKey = "{{value}}"; }
+                string clientSecret = "{{value}}";
+            }
+            """);
+        var findings = result.Findings.Where(f => f.Category == "hardcodedSecret").ToArray();
+        findings.Should().HaveCount(expected);
+        if (expected == 0) return;
+        findings.Select(f => f.Message).Should().Equal(
+            "Variable 'clientSecret' appears to contain a hardcoded secret.",
+            "Assignment to 'ApiKey' appears to contain a hardcoded secret.");
+        findings[0].Line.Should().BeGreaterThan(findings[1].Line!.Value);
+    }
+
     private static DimensionResult Analyze(string code, int importedVulnerabilities = 0)
     {
         var (_, _, compilation) = RoslynTestHelper.CompileCode(code);
