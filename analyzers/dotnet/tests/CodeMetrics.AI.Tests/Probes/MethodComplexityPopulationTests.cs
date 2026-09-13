@@ -83,6 +83,31 @@ public sealed class MethodComplexityPopulationTests
     }
 
     [Fact]
+    public void VariantDeduplicationAndDisplayLimit_PreserveTheCompletePopulationAndTiedWorst()
+    {
+        var original = Type("App(net9.0)", [21, 21, 3, 3, 3, 3, 3]);
+        var variant = Type("App(net10.0)", [10, 21, 3, 3, 3, 3, 3]);
+        var result = CodeQualityProbe.Analyze([variant, original]);
+        var decision = result.ScoringDecision!.Steps.Single(step => step.Id == "complexity").Decision!;
+        decision.Inputs["eligibleFunctions"].Should().Be(7);
+        decision.Inputs["functionObservations"].Should().Be(14);
+        decision.Inputs["repeatedObservations"].Should().Be(7);
+        decision.Inputs["variantComplexityDifferences"].Should().Be(1);
+        decision.Inputs["remainingFunctions"].Should().Be(6);
+        decision.Inputs["remainingMeanScore"].Should().Be(53.8m / 6m);
+        decision.FinalScore.Should().Be(6.9);
+
+        var details = ((JsonElement)result.Extra["componentDetails"]!).GetProperty("methodComplexity");
+        var sample = details.GetProperty("topOffenders").EnumerateArray().ToArray();
+        sample.Select(item => item.GetProperty("name").GetString()).Should().Equal("F0", "F1", "F2", "F3", "F4");
+        details.GetProperty("worstFunction").GetProperty("project").GetString().Should().Be("App(net9.0)");
+        sample.Should().OnlyContain(item => item.GetProperty("observationCount").GetInt32() == 2);
+        var reversed = CodeQualityProbe.Analyze([original, variant]);
+        ((JsonElement)reversed.Extra["componentDetails"]!).GetProperty("methodComplexity").GetRawText()
+            .Should().Be(details.GetRawText());
+    }
+
+    [Fact]
     public void ExactlyOneWorstFunctionIsRemovedEvenWhenSeveralTie()
     {
         var decision = Decision(Type("App", [21, 21, 3]));
