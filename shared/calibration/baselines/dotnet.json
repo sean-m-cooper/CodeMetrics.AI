@@ -6,7 +6,7 @@
     "version": "2.3.0",
     "ecosystem": "dotnet"
   },
-  "ruleset": "dotnet-2026-09-13-wait-boundaries",
+  "ruleset": "dotnet-2026-09-14-dependency-availability",
   "scope": "Only listed rules have accuracy labels. Fixture distributions do not establish cross-ecosystem comparability.",
   "accuracy": {
     "errorHandling/emptyCatch": {
