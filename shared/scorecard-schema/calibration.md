@@ -1,6 +1,6 @@
 # Cross-Ecosystem Calibration
 
-The unpublished .NET 2.3.0 candidate now uses `dotnet-2026-09-13-wait-boundaries`.
+The .NET 2.3.0 release uses `dotnet-2026-09-14-dependency-availability`. Missing dependency compatibility evidence now withholds the dependency score; a failed vulnerability query also withholds Security. See [release notes](../../docs/releases/2.3.0.md).
 Performance and shared blocking observations separate actionable signals from unscored
 review leads under the [classification policy](performance-async-policy.md). Numeric
 ladders and catch-population weights are unchanged. Population/severity recalibration
@@ -84,7 +84,7 @@ The .NET development implementation uses complexity policy `dotnet/codeQuality/c
 
 The [accepted maintainability design](maintainability-policy.md) uses 40% of the mean individual score of the weakest fifth of distinct executable functions and 60% of the remaining mean. Every function belongs to one group; enums and non-executable declarations provide no credit or penalty, and low-MI distribution statistics remain diagnostics rather than additional deductions. The decision documents examples, small populations, ownership rules and dilution limits.
 
-The unpublished .NET 2.3.0 implementation uses `source-function-own-mi-v1` and scoring policy `dotnet/maintainability/source-functions-quintile-40-60-v1`, ruleset `dotnet-2026-09-12-function-maintainability`. Own MI 40/52/58/65/70/75 maps linearly to individual scores 0/2/4/6/8/10. The initial ladder preserves former MI reference points and remains a product choice pending broader labeled calibration. Raw metrics and CSV stay compatible. Earlier `dotnet/maintainability/v1` scores are not comparable baselines.
+The .NET 2.3.0 implementation uses `source-function-own-mi-v1` and scoring policy `dotnet/maintainability/source-functions-quintile-40-60-v1`, ruleset `dotnet-2026-09-14-dependency-availability`. Own MI 40/52/58/65/70/75 maps linearly to individual scores 0/2/4/6/8/10. The initial ladder preserves former MI reference points and remains a product choice pending broader labeled calibration. Raw metrics and CSV stay compatible. Earlier `dotnet/maintainability/v1` scores are not comparable baselines.
 
 ## Performance & Async source identity
 
@@ -134,4 +134,4 @@ See `../calibration/README.md` and `../calibration/baselines/` for the pinned la
 
 ## Security and error-handling context correction
 
-The unpublished .NET 2.3.0 candidate uses ruleset `dotnet-2026-09-13-security-catch-context`. It distinguishes descriptive identifiers from credential candidates, recognizes bounded CORS rejecting guards, accepts local catch rationale and diagnostic output parameters, and scores the severity-weighted source catch population. See the [policy and limitations](error-handling-policy.md). Earlier absolute-count scores are incompatible baseline gates.
+The .NET 2.3.0 release uses ruleset `dotnet-2026-09-14-dependency-availability`. It distinguishes descriptive identifiers from credential candidates, recognizes bounded CORS rejecting guards, accepts local catch rationale and diagnostic output parameters, and scores the severity-weighted source catch population. See the [policy and limitations](error-handling-policy.md). Earlier absolute-count scores are incompatible baseline gates.

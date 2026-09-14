@@ -44,6 +44,8 @@ The .NET `--solution` option also accepts an explicit `.csproj`. Project mode sc
 
 Dimension `scope` has a stable `id`, `coverage` (`partial` or `unsupported`), `includes` and `excludes`. Status separately says whether a probe ran successfully. All current static probes cover only part of the broader quality dimension. JS/TS performance scope explicitly covers React hooks/effects and excludes general async, concurrency and runtime performance. Missing scope in historical v3 means unknown, not comprehensive. Changed scope rejects baseline comparisons.
 
+For .NET 2.3.0+, `dependencyCompatibility` records lookup coverage and grouped reasons. Missing compatibility makes Dependency Management failed with no score. Unknown candidate observations are informational and `scoreDisposition: unavailable`. Successful vulnerability/deprecation checks retain verified findings; unavailable vulnerability evidence also withholds Security. These assessment failures preserve the existing exit-2/unusable contract and cannot support an overall score.
+
 For coordinated changes, test the skill against local `.nupkg` and `.tgz` artifacts from an exact CodeMetrics.AI revision before publication. Release the packages before merging a consumer update that installs those versions by default; do not substitute `latest` when a release is unavailable.
 
 ## Invocation identity and stale findings

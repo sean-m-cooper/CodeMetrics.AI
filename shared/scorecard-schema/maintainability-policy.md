@@ -2,7 +2,7 @@
 
 Accepted weighting and population principles: 2026-09-12.
 
-**Status: implemented in the unpublished .NET 2.3.0 candidate.** Scoring policy `dotnet/maintainability/source-functions-quintile-40-60-v1`, measurement policy `source-function-own-mi-v1`, ruleset `dotnet-2026-09-12-function-maintainability`. The initial ladder retains existing MI reference points; it is a product calibration, not an empirical readability or defect model. Earlier `dotnet/maintainability/v1` results retain their historical interpretation.
+**Status: implemented in .NET 2.3.0.** Scoring policy `dotnet/maintainability/source-functions-quintile-40-60-v1`, measurement policy `source-function-own-mi-v1`, ruleset `dotnet-2026-09-14-dependency-availability`. The initial ladder retains existing MI reference points; it is a product calibration, not an empirical readability or defect model. Earlier `dotnet/maintainability/v1` results retain their historical interpretation.
 
 ## Purpose and rationale
 

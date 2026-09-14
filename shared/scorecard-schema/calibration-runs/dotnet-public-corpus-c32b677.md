@@ -39,8 +39,8 @@ All eight dimensions outside Dependency Management match the prior evidence exac
 ### OrchardCore dependency uncertainty
 
 Unknown upgrade framework compatibility increased from **6 to 536 project/TFM
-observations** across 53 distinct packages. Microsoft.SourceLink.GitHub and
-Microsoft.CodeAnalysis.CSharp.CodeStyle account for 236 observations each. The
+observations** across 52 distinct packages. Microsoft.SourceLink.GitHub and
+Microsoft.CodeAnalysis.CSharp.CodeStyle account for 235 observations each. The
 reported latest versions did not change between matched package/project/TFM rows.
 Dependency commands completed successfully (`anyCommandFailed=false`), but the
 evidence does not expose why compatibility became unknown. A specific network,
@@ -50,7 +50,9 @@ Scored outdated observations increased from 541 to 542, and framework-incompatib
 exclusions fell from 1 to 0; Dependency Management remained 2. Preserve these unknowns
 when reviewing upgrade candidates. The next useful investigation is compatibility
 lookup reliability and failure-reason reporting. This run was retained rather than
-replaced with a cleaner-looking result. [Package-level uncertainty and run identities](<E:/repos/CodeMetrics.AI/TestResults/public-corpus-c32b677/dependency-uncertainty.json>).
+replaced with a cleaner-looking result. The original package summary also counted
+three Aspire-excluded findings; the counts above use the scored unknown population.
+[Follow-up investigation and controlled reproductions](dotnet-orchard-dependency-compatibility-investigation.md).
 
 ## Declared scopes
 

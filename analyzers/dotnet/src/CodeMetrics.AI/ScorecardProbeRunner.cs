@@ -87,7 +87,9 @@ internal static class ScorecardProbeRunner
         var vulnerabilityCount = dependency.Findings.Count(finding =>
             finding.Category.Contains("vulnerable", StringComparison.OrdinalIgnoreCase));
         dimensions["security"] = SecurityProbe.Analyze(
-            context.AnalyzedProjectCompilations, vulnerabilityCount, solutionDir);
+            context.AnalyzedProjectCompilations, vulnerabilityCount, solutionDir,
+            dependency.Status != "failed" ||
+            dependency.Extra.TryGetValue("vulnerabilityAssessmentAvailable", out var available) && available is true);
         dimensions["testing"] = TestingProbe.Analyze(
             context.AllProjectCompilations, context.AnalyzedProjectNames, solutionDir, coveragePath);
         dimensions["documentation"] = DocumentationProbe.Analyze(

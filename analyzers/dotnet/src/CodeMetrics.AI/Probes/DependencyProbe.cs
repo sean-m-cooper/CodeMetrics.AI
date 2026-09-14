@@ -43,7 +43,7 @@ public static class DependencyProbe
             DependencyCommandResult[] commands = [vulnerable, outdated, deprecated];
 
             bool anyCommandFailed = commands.Any(command => command.Failed);
-            IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? frameworkCompatibility = null;
+            PackageCompatibilityAssessment? compatibilityAssessment = null;
             if (!outdated.Failed)
             {
                 var aspireProjects = FindAspireProjectNames(solutionDir, projectPaths);
@@ -53,7 +53,7 @@ public static class DependencyProbe
                         upgrade.Project == null ||
                         !IsAspireProjectSection(upgrade.Project, aspireProjects))
                     .ToList();
-                frameworkCompatibility = await PackageFrameworkCompatibility.AssessAsync(
+                compatibilityAssessment = await PackageFrameworkCompatibility.AssessAsync(
                     assessableUpgrades,
                     outdated.StandardOutput,
                     cancellationToken);
@@ -66,8 +66,9 @@ public static class DependencyProbe
                 solutionDir,
                 anyCommandFailed,
                 commands,
-                frameworkCompatibility,
-                projectPaths);
+                compatibilityAssessment?.Results,
+                projectPaths,
+                compatibilityAssessment);
         }
         finally
         {
@@ -85,7 +86,8 @@ public static class DependencyProbe
         bool anyCommandFailed,
         IReadOnlyList<DependencyCommandResult>? commandResults = null,
         IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? frameworkCompatibility = null,
-        IReadOnlyList<string>? projectPaths = null)
+        IReadOnlyList<string>? projectPaths = null,
+        PackageCompatibilityAssessment? compatibilityAssessment = null)
     {
         if (anyCommandFailed)
             return CreateFailureResult(commandResults);
@@ -127,7 +129,26 @@ public static class DependencyProbe
             unsupportedTFMs,
             versionDrift,
             cpmEnabled);
-        return CreateSuccessResult(metrics, findings);
+        var result = CreateSuccessResult(metrics, findings);
+        result.Extra["vulnerabilityAssessmentAvailable"] = true;
+        if (compatibilityAssessment != null)
+            result.Extra["dependencyCompatibility"] = new
+            {
+                status = compatibilityAssessment.Failures.Count == 0 ? "complete" : "failed",
+                compatibilityAssessment.UniquePackageVersions,
+                compatibilityAssessment.TotalObservations,
+                knownObservations = compatibilityAssessment.Results.Count,
+                compatibilityAssessment.ElapsedMilliseconds,
+                compatibilityAssessment.Failures
+            };
+        if (outdatedCounts.CompatibilityUnknown.Count == 0) return result;
+        return new DimensionResult
+        {
+            Status = "failed",
+            Basis = "Dependency compatibility assessment unavailable; no dependency score is assigned. " + result.Basis,
+            Findings = findings,
+            Extra = result.Extra
+        };
     }
 
     private static DimensionResult CreateFailureResult(
@@ -138,7 +159,27 @@ public static class DependencyProbe
             ? "One or more dotnet list package commands failed; command diagnostics were unavailable."
             : string.Join("; ", failedCommands.Select(FormatFailure));
 
-        return new DimensionResult
+        var verifiedFindings = new List<Finding>();
+        var vulnerabilityAvailable = false;
+        foreach (var command in commandResults?.Where(command => !command.Failed) ?? [])
+        {
+            try
+            {
+                PackageReport.Parse(command.StandardOutput);
+                if (command.Arguments.Contains("--vulnerable", StringComparison.Ordinal))
+                {
+                    AnalyzeVulnerabilities(command.StandardOutput, verifiedFindings);
+                    vulnerabilityAvailable = true;
+                }
+                else if (command.Arguments.Contains("--deprecated", StringComparison.Ordinal))
+                    CountDeprecatedPackages(command.StandardOutput, verifiedFindings);
+            }
+            catch (Exception exception) when (exception is JsonException or InvalidOperationException)
+            {
+                // Malformed successful reports cannot contribute verified findings.
+            }
+        }
+        var failure = new DimensionResult
         {
             Status = "failed",
             Basis = $"Dependency probe failed. {diagnostic}",
@@ -154,10 +195,13 @@ public static class DependencyProbe
             ],
             Extra =
             {
+                ["vulnerabilityAssessmentAvailable"] = vulnerabilityAvailable,
                 ["dependencyMetrics"] = new { anyCommandFailed = true },
                 ["dependencyCommands"] = BuildCommandDiagnostics(commandResults)
             }
         };
+        failure.Findings.AddRange(verifiedFindings);
+        return failure;
     }
 
     private static (int Direct, int Transitive) AnalyzeVulnerabilities(
@@ -313,7 +357,9 @@ public static class DependencyProbe
                 "Latest version is incompatible with this target framework; excluded from scoring."),
             OutdatedAssessment.Compatible => ("included", "compatible",
                 "Latest version has compatible framework assets; review breaking changes before upgrading."),
-            _ => ("included", "unknown", "Framework compatibility is unknown; review before upgrading.")
+            OutdatedAssessment.Unknown => ("unavailable", "unknown",
+                "Framework compatibility could not be assessed; this is missing evidence, not a confirmed upgrade issue."),
+            _ => ("included", "unknown", "Framework compatibility was not assessed in this historical report.")
         };
         var observations = package.Observations();
         observations["scoreDisposition"] = disposition;
@@ -579,7 +625,6 @@ public static class DependencyProbe
                     break;
                 case OutdatedAssessment.Unknown:
                     compatibilityUnknown.Add(upgrade);
-                    included++;
                     break;
                 default:
                     // No assessment retains the legacy count without adding an

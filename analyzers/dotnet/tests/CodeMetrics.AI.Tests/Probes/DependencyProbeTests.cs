@@ -8,7 +8,7 @@ public class DependencyProbeTests
 {
     [Theory]
     [InlineData("notAssessed", false, 1, 0, "included", "unknown")]
-    [InlineData("missing", false, 1, 1, "included", "unknown")]
+    [InlineData("missing", false, 0, 1, "unavailable", "unknown")]
     [InlineData("compatible", false, 1, 0, "included", "compatible")]
     [InlineData("incompatible", false, 0, 0, "excludedFrameworkIncompatible", "incompatible")]
     [InlineData("incompatible", true, 0, 0, "excludedAspire", "unknown")]
@@ -796,7 +796,7 @@ public class DependencyProbeTests
     }
 
     [Fact]
-    public void FrameworkCompatibilityUnknown_UpgradeRemainsScored()
+    public void FrameworkCompatibilityUnknown_WithholdsScore()
     {
         var dir = TempDir();
         try
@@ -816,7 +816,10 @@ public class DependencyProbeTests
                 anyCommandFailed: false,
                 frameworkCompatibility: new Dictionary<OutdatedPackageUpgrade, bool>());
 
-            result.Basis.Should().Contain("outdated=1");
+            result.Status.Should().Be("failed");
+            result.Score.Should().BeNull();
+            result.ScoringDecision.Should().BeNull();
+            result.Basis.Should().Contain("outdated=0");
             result.Basis.Should().Contain("outdatedFrameworkCompatibilityUnknown=1");
         }
         finally

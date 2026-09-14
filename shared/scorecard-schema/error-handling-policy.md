@@ -1,6 +1,6 @@
 # Error handling: source population and declared intent
 
-Implemented in the unpublished .NET 2.3.0 candidate, ruleset `dotnet-2026-09-13-security-catch-context`, policy `dotnet/errorHandling/catch-population-v2`. This supersedes the absolute-count ladder. Old runs retain their original interpretation and are incompatible baseline gates.
+Implemented in .NET 2.3.0, ruleset `dotnet-2026-09-14-dependency-availability`, policy `dotnet/errorHandling/catch-population-v2`. This supersedes the absolute-count ladder. Old runs retain their original interpretation and are incompatible baseline gates.
 
 ## Population and score
 

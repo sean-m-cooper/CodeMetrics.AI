@@ -526,7 +526,7 @@
       "category": "outdatedDependency",
       "kind": "finding",
       "title": "Outdated dependency",
-      "description": "The package feed reports a newer version. Evidence records target-framework compatibility and scoring exclusions; compatible assets do not establish a safe upgrade.",
+      "description": "The package feed reports a newer version. Compatible framework assets do not establish upgrade safety. Incompatible candidates are excluded. Unresolved compatibility is informational with scoreDisposition unavailable and withholds the dependency score; missing metadata is not a code defect.",
       "documentation": "Rules/rules.md#cmai7004",
       "annotation": {
         "supported": false,

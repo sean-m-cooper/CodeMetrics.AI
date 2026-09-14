@@ -1,6 +1,6 @@
 # Performance & Async classification
 
-The unpublished .NET 2.3.0 candidate uses ruleset `dotnet-2026-09-13-wait-boundaries`
+The .NET 2.3.0 release uses ruleset `dotnet-2026-09-14-dependency-availability`
 and policy `dotnet/performanceAsync/context-classification-v3`. This changes which
 observations qualify as scored signals. The numeric 0/2/4/6/8/10 ladder, thresholds,
 source-site counting and maximum-severity aggregation are unchanged. Population and

@@ -386,7 +386,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `dependencyManagement`
 - Kind: `finding`
 
-The package feed reports a newer version. Evidence records target-framework compatibility and scoring exclusions; compatible assets do not establish a safe upgrade.
+The package feed reports a newer version. Compatible framework assets do not establish upgrade safety. Incompatible candidates are excluded. Unresolved compatibility is informational with scoreDisposition unavailable and withholds the dependency score; missing metadata is not a code defect.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 

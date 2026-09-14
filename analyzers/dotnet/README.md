@@ -91,7 +91,7 @@ The tool automatically skips non-production projects:
 ## Performance & Async classification and source counting
 
 Policy `dotnet/performanceAsync/context-classification-v3`, ruleset
-`dotnet-2026-09-13-wait-boundaries`, preserves the existing 0/2/4/6/8/10 ladder and
+`dotnet-2026-09-14-dependency-availability`, preserves the existing 0/2/4/6/8/10 ladder and
 counts each physical file/span/rule once at maximum severity across frameworks.
 
 Proven completed-task reads are excluded. Synchronous contracts and local documented
@@ -255,7 +255,7 @@ The Performance & Async dimension also reports `sharedStateMutationInFanOut` whe
 
 Starting with 2.2.0, every scored dimension also includes `scoringDecision`, recording policy inputs, selected rules, nested components, binding/nonbinding caps and finding effects. That release preserved the scores and `dotnet-2026-09-08` ruleset. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md); these effects are not independent finding deductions.
 
-Version 2.3.0 uses ruleset `dotnet-2026-09-11`. Thresholds and score formulas are unchanged, but project populations and rule classification are corrected:
+Version 2.3.0 uses ruleset `dotnet-2026-09-14-dependency-availability`. It includes new source-function complexity and maintainability formulas, contextual classifications, and explicit dependency assessment failures. These changes require fresh baselines. Population and classification corrections include:
 
 - Solution runs honor build exclusions for the selected configuration and Any CPU. Dependency checks use the same enabled project scope; static dependency checks and architecture cycles do not scan unrelated projects elsewhere in the checkout. Project entry points retain their selected-project scope.
 - Framework suffixes no longer hide test, sample or benchmark roles. Test metadata, semantic test attributes and conventional test/support directories keep non-production code out of production metrics. Testing counts unique project/source sites across frameworks and reports loaded test instances separately.
@@ -398,4 +398,29 @@ Use `--coverage path/to/coverage.cobertura.xml` for an explicit report. Otherwis
 
 ## Security and error-handling context correction
 
-The unpublished .NET 2.3.0 candidate uses ruleset `dotnet-2026-09-13-security-catch-context`. It distinguishes descriptive identifiers from credential candidates, recognizes bounded CORS rejecting guards, accepts local catch rationale and diagnostic output parameters, and scores the severity-weighted source catch population. See the [policy and limitations](../../shared/scorecard-schema/error-handling-policy.md). Earlier absolute-count scores are incompatible baseline gates.
+The .NET 2.3.0 release includes the security and catch-context corrections under ruleset `dotnet-2026-09-14-dependency-availability`. It distinguishes descriptive identifiers from credential candidates, recognizes bounded CORS rejecting guards, accepts local catch rationale and diagnostic output parameters, and scores the severity-weighted source catch population. See the [policy and limitations](../../shared/scorecard-schema/error-handling-policy.md). Earlier absolute-count scores are incompatible baseline gates.
+
+
+## Dependency assessment availability (2.3.0)
+
+Missing evidence is an assessment limitation, not a code defect. Failed package
+commands or unresolved candidate framework compatibility make Dependency Management
+`status: failed`, with no score or scoring decision. The CLI returns 2, inspection
+is unusable for a complete scorecard, and the skill reports no overall score.
+An unknown candidate carries `scoreDisposition: unavailable` and informational
+severity; it cannot create an upgrade penalty or improve a reported score.
+
+`dependencyCompatibility` records completion status, unique package/version count,
+project/TFM observations, known observations, elapsed milliseconds and grouped
+failures with reasons (source discovery, HTTP status, size limit, budget, unavailable
+latest version, or unsupported metadata). `anyCommandFailed` still describes the
+NuGet CLI stage; it does not establish that metadata inspection succeeded.
+
+Confirmed vulnerabilities and deprecations from independently successful commands
+remain visible when another check fails. A failed vulnerability query also withholds
+Security's score while retaining static findings. A compatibility-only failure does
+not invalidate a successful vulnerability query. Restore/compiler errors continue
+to make affected source analysis incomplete. Retain original artifacts, address the
+recorded failure, and rerun; never recover a score from CSV or stale evidence.
+
+See [2.3.0 release notes](../../docs/releases/2.3.0.md).

@@ -9,7 +9,9 @@ internal static class NuGetServiceIndexClient
 
     public static async Task<IReadOnlyList<Uri>> FindPackageBaseAddressesAsync(
         IReadOnlyList<Uri> httpSources,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Action<string>? reportFailure = null,
+        HttpClient? client = null)
     {
         var result = new List<Uri>();
         // codemetrics-ignore: awaitedIoInsideLoop -- service indexes are ordered NuGet sources.
@@ -17,16 +19,18 @@ internal static class NuGetServiceIndexClient
         {
             try
             {
-                var addresses = await ReadPackageBaseAddressesAsync(source, cancellationToken);
+                var addresses = await ReadPackageBaseAddressesAsync(source, cancellationToken, client ?? HttpClient);
                 result.AddRange(addresses);
+                if (addresses.Count == 0) reportFailure?.Invoke("sourceIndexMissingPackageBaseAddress");
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 throw;
             }
             catch (Exception ex) when (
-                ex is HttpRequestException or IOException or JsonException or TaskCanceledException)
+                ex is HttpRequestException or IOException or JsonException or InvalidOperationException or TaskCanceledException)
             {
+                reportFailure?.Invoke("sourceIndex:" + ex.GetType().Name);
                 // Other configured sources may still provide the package.
                 continue;
             }
@@ -37,9 +41,10 @@ internal static class NuGetServiceIndexClient
 
     private static async Task<IReadOnlyList<Uri>> ReadPackageBaseAddressesAsync(
         Uri source,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        HttpClient client)
     {
-        using var stream = await HttpClient.GetStreamAsync(source, cancellationToken);
+        using var stream = await client.GetStreamAsync(source, cancellationToken);
         using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
         if (!document.RootElement.TryGetProperty("resources", out var resources))
             return [];

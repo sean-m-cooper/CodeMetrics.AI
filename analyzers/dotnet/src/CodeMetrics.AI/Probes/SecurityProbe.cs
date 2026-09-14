@@ -21,7 +21,8 @@ public static class SecurityProbe
     public static DimensionResult Analyze(
         IReadOnlyList<(string ProjectName, Compilation Compilation)> projects,
         int importedVulnerabilities = 0,
-        string? solutionDir = null)
+        string? solutionDir = null,
+        bool vulnerabilityAssessmentAvailable = true)
     {
         var findings = new List<Finding>();
 
@@ -73,6 +74,14 @@ public static class SecurityProbe
                     $"hardcodedSecrets={hardcodedSecrets}, rawSql={rawSqlCount}, " +
                     $"unsafeDeserialization={unsafeDeser}, allowAnyOriginWithCredentials={allowAnyOriginWithCreds}, " +
                     $"importedVulnerabilities={importedVulnerabilities}.";
+
+        if (!vulnerabilityAssessmentAvailable)
+            return new DimensionResult
+            {
+                Status = "failed",
+                Basis = "Vulnerability assessment unavailable; static security findings are retained, but no security score is assigned.",
+                Findings = findings
+            };
 
         return new DimensionResult
         {

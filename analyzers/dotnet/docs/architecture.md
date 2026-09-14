@@ -33,7 +33,7 @@ CodeMetrics.AI is a deterministic, read-only analyzer. It loads a .NET solution 
 4. Each class in `Probes/` evaluates one scorecard dimension. Probes receive immutable metric or compilation inputs and return a `DimensionResult`.
 5. `CsvWriter` and `EvidenceWriter` persist the two public output formats.
 
-The dependency probe is the only probe that invokes external commands or reads package feeds. Those operations are bounded, cancellable, and degrade to explicit failed or unknown evidence rather than silently inventing compatibility.
+The dependency probe is the only probe that invokes external commands or reads package feeds. Those operations are bounded, cancellable, and degrade to explicit failed assessment evidence. Unknown compatibility withholds the dependency score and is informational, not a penalty. PackageCompatibilityAssessment preserves grouped lookup reasons, coverage and elapsed time. Successful vulnerability/deprecation commands retain their findings independently; unavailable vulnerability evidence also withholds Security scoring.
 
 Dependency subprocesses remove the MSBuild paths installed by the analyzer's locator and resolve their own SDK from the repository working directory. When a solution excludes projects from its build, package commands receive a disposable solution containing only enabled projects. Static dependency checks use the same selected paths. Source architecture cycles use production paths, and testing aggregates a union of unique source sites across target frameworks. Test/support/sample exclusions do not remove enabled package dependencies from the dependency assessment.
 
