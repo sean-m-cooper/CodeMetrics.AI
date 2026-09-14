@@ -1,0 +1,60 @@
+{
+  "date": "2026-09-14",
+  "analyzerRevision": "2ef5851f4a33287f58cee229975808dac90894e1",
+  "testsPassed": 971,
+  "formatPassed": true,
+  "calibrationFixtures": 6,
+  "calibrationScoresFindingsPopulationsUnchanged": true,
+  "calibrationMetadataChange": "ruleset only",
+  "packageSha256": "2e1c989a2b3ddf3aad707dd0546485627deca346e32f982f34d61390d8b59bbe",
+  "packagedSkillIntegrationTestsPassed": 12,
+  "offlineSkillHarnessTestsPassed": 3,
+  "generatedDependencyReportPassed": true,
+  "smokeRuns": {
+    "unavailable": {
+      "runId": "91ae1634-72f5-40f2-a460-4b53a7d4920c",
+      "auditId": "32cd4b01-a481-4aa7-af1b-0a2536c1bb4c",
+      "status": "failed",
+      "analyzerExitCode": 2,
+      "validationExitCode": 2,
+      "dependencyStatus": "failed",
+      "dependencyScore": null,
+      "securityStatus": "scored",
+      "diagnostics": {
+        "status": "failed",
+        "uniquePackageVersions": 1,
+        "totalObservations": 1,
+        "knownObservations": 0,
+        "elapsedMilliseconds": 19.4043,
+        "failures": [
+          {
+            "package": "release.compatibility.fixture",
+            "latestVersion": "2.0.0",
+            "affectedObservations": 1,
+            "reasons": [
+              "frameworkMetadataUnsupported"
+            ]
+          }
+        ]
+      }
+    },
+    "recovered": {
+      "runId": "f56bf2d8-9455-45d7-86d2-de05d587482d",
+      "auditId": "55c65ddf-0a9d-4b6d-8ec6-e91f2c6d7387",
+      "status": "complete",
+      "analyzerExitCode": 0,
+      "validationExitCode": 0,
+      "dependencyStatus": "scored",
+      "dependencyScore": 8,
+      "securityStatus": "scored",
+      "diagnostics": {
+        "status": "complete",
+        "uniquePackageVersions": 1,
+        "totalObservations": 1,
+        "knownObservations": 1,
+        "elapsedMilliseconds": 25.4099,
+        "failures": []
+      }
+    }
+  }
+}
