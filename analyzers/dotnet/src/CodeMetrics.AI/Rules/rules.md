@@ -284,7 +284,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `errorHandling`
 - Kind: `finding`
 
-A recognized task wait blocks the calling thread. The finding is shared source context with performance rules but has its own scoring identity.
+A recognized task wait may block the calling thread. Proven completion guards, including ternary branches, and narrowly resolved completed-return helpers are excluded. Synchronous method/property contracts, bounded all-uses private helper chains, recognized synchronous callback APIs and local explanations remain unscored review leads, consistently with CMAI8001. Other waits retain the existing error-handling cap. A successful void Task.Wait establishes completion for subsequent access; timed waits and swallowed wait failures do not. These classifications do not prove runtime safety or absence of preceding synchronous I/O.
 
 Excludes this rule occurrence before scoring; raw metrics are unchanged.
 
@@ -446,7 +446,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-A recognized task wait blocks the calling thread. Review whether the synchronous boundary is required. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
+A recognized task wait may block the calling thread. Proven Task/ValueTask guards, completed ternary branches and narrowly resolved completed-return helpers are excluded. Synchronous interface/override methods and properties, bounded all-uses private helper chains, recognized synchronous callback APIs and local explanations remain unscored review leads. Arbitrary callbacks, mixed callers, async contracts and unknown virtual implementations are not exempted. A contract or explanation is not proof of runtime safety, and completed-return helpers may still perform synchronous I/O. Counts once per physical source span and rule at maximum severity across frameworks. A successful void Task.Wait establishes completion for subsequent access; timed waits and swallowed wait failures do not.
 
 Excludes this rule occurrence before scoring; raw metrics are unchanged.
 
@@ -464,7 +464,7 @@ Supported scopes: statement, member. Rationale required.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-Thread.Sleep blocks the calling thread. Review the runtime context and whether blocking is deliberate. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
+Thread.Sleep blocks the calling thread. Synchronous contracts or bounded local blocking rationale make this an unscored review lead; otherwise it retains warning severity. Review runtime cost before changing the execution contract. Counts once per physical source span and rule at maximum severity across frameworks; observations and classification reasons remain in evidence.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -476,7 +476,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-A recognized SaveChanges call occurs inside a loop. Review transaction, ordering and failure boundaries before batching. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
+SaveChanges occurs inside a loop. This is an unscored review lead: existing batches, session lifetime, transactions and notifications may require persistence there. Evidence identifies recognized iteration-scoped using declarations. Do not prescribe moving persistence outside a loop without reviewing those boundaries. Counts once per physical source span and rule at maximum severity across frameworks; observations and classification reasons remain in evidence.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -488,7 +488,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-An asynchronous API lacks the cancellation-token pattern recognized by the probe. Review the operation's lifetime and cancellation contract. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
+An asynchronous API has I/O-like calls without a recognized cancellation input. Direct tokens and context parameters with an accessible token member forwarded to task-returning calls are recognized. Other signatures remain unscored review leads; a missing parameter alone does not prove dropped cancellation. Counts once per physical source span and rule at maximum severity across frameworks; observations and classification reasons remain in evidence.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -500,7 +500,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-A query is materialized before recognized shaping operations. Review query-provider behavior and the intended execution boundary. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
+A query is materialized before recognized shaping operations. This is an unscored review lead because provider semantics, snapshots and input size can justify the boundary. Counts once per physical source span and rule at maximum severity across frameworks; observations and classification reasons remain in evidence.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 
@@ -512,7 +512,7 @@ Comment exclusion is not implemented for this rule in this analyzer version.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-Recognized I/O is awaited within a loop. Ordering, shared state, early exit or back-pressure can make sequential execution appropriate. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
+Recognized I/O is awaited within a loop. This is an unscored review lead: ordering, shared state, early exit and back-pressure can require sequential execution. Review those constraints before proposing concurrency. Counts once per physical source span and rule at maximum severity across frameworks; observations and classification reasons remain in evidence.
 
 Excludes this rule occurrence before scoring; raw metrics are unchanged.
 
@@ -530,7 +530,7 @@ Supported scopes: loop, member. Rationale required.
 - Dimension: `performanceAsync`
 - Kind: `finding`
 
-A recognized Task.WhenAll construction has no detected concurrency bound. Review input size and resource limits. Counts once per physical source span and rule, using the highest observed severity across frameworks; framework observations remain in evidence.
+A recognized Task.WhenAll construction has no detected concurrency bound. This remains an unscored review lead; review actual input size and resource limits. Counts once per physical source span and rule at maximum severity across frameworks; observations and classification reasons remain in evidence.
 
 Comment exclusion is not implemented for this rule in this analyzer version.
 

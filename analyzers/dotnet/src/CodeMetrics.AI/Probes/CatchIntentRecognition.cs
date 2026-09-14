@@ -37,7 +37,7 @@ internal static class CatchIntentRecognition
             if (statement.Expression is not AssignmentExpressionSyntax assignment ||
                 !assignment.IsKind(SyntaxKind.SimpleAssignmentExpression) ||
                 observation.SemanticModel.GetSymbolInfo(assignment.Left).Symbol is not IParameterSymbol
-                    { RefKind: RefKind.Out or RefKind.Ref } parameter || !IsErrorName(parameter.Name) ||
+                { RefKind: RefKind.Out or RefKind.Ref } parameter || !IsErrorName(parameter.Name) ||
                 !HasDiagnosticValue(assignment.Right))
                 continue;
             var laterWrites = observation.ActiveNodes.OfType<AssignmentExpressionSyntax>()

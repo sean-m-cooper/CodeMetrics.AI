@@ -154,6 +154,7 @@ public static class ErrorHandlingProbe
                      semanticModel,
                      "syncBlockingCall"))
         {
+            var contextReason = PerformanceFindingContext.SyncReason(access.Node, semanticModel);
             var operation = access.Kind switch
             {
                 SyncBlockingKind.Result => ".Result",
@@ -164,13 +165,16 @@ public static class ErrorHandlingProbe
             findings.Add(new Finding
             {
                 Category = "syncBlockingCall",
-                Severity = "warning",
+                Severity = contextReason == null ? "warning" : "info",
                 File = filePath,
                 Line = GetLine(access.Node),
-                Observations = SourceLocation(access.Node),
+                Observations = contextReason == null ? SourceLocation(access.Node) :
+                    PerformanceFindingContext.Review(access.Node, contextReason),
                 Project = projectName,
                 Type = GetContainingTypeName(access.Node),
-                Message = $"'{operation}' blocks the calling thread and can cause deadlocks. Use 'await' instead."
+                Message = contextReason == null
+                    ? $"'{operation}' synchronously waits for asynchronous work. Review blocking and deadlock risk."
+                    : $"'{operation}' is a synchronous wait at a declared or documented boundary. Review runtime behavior in that context."
             });
         }
     }

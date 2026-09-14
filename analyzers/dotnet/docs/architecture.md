@@ -1,5 +1,22 @@
 # CodeMetrics.AI architecture
 
+PerformanceFindingContext owns actionable-versus-review classification separately from
+the unchanged score ladder. CompletedTaskAccess recognizes semantic Task/ValueTask
+completion and bounded exiting fallback guards. Synchronous contract and local intent
+classification is shared by performance and error-handling waits; informational waits
+cannot activate either penalty. CancellationInputRecognition recognizes forwarded
+token-bearing context parameters. Review leads remain in evidence with classification
+reasons and excluded scoring effects. See the [policy and limitations](../../../shared/scorecard-schema/performance-async-policy.md).
+
+CompletedTaskReturn separately proves direct completed factories and non-dispatchable
+source helpers whose normal returns all produce completed tasks. Ternary guards preserve
+branch and receiver identity. SynchronousBoundaryContext owns property/method contracts
+and all-uses private call-chain propagation, bounded to four edges; recursion and unknown
+escapes remain unproven. SynchronousCallbackContract owns an explicit semantic API catalog
+for options configuration, Redis database factories and cancellation lifecycle callbacks.
+These helpers are shared across Performance & Async and Error Handling. They do not infer
+runtime safety, general callback intent, scripting API pair exemptions or cache invariants.
+
 PerformanceAsyncProbe and ConcurrentFanOutProbe attach exact syntax spans when they emit
 observations. PerformanceSourceFindings groups normalized physical file/span/category
 identities before Performance & Async scoring, selects maximum severity per site, and

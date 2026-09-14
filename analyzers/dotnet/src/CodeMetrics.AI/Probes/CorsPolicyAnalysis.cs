@@ -12,14 +12,14 @@ internal static class CorsPolicyAnalysis
             .Where(call => Name(call) is "AllowAnyOrigin" or "AllowCredentials").ToList();
         var reported = new HashSet<SyntaxNode>();
         foreach (var origin in calls.Where(call => Name(call) == "AllowAnyOrigin"))
-        foreach (var credentials in calls.Where(call => Name(call) == "AllowCredentials"))
-        {
-            if (Scope(origin) != Scope(credentials) || !SameBuilder(origin, credentials, model)) continue;
-            var conditions = Conditions(origin).Concat(Conditions(credentials)).ToList();
-            if (HasOppositeBranches(origin, credentials) || RejectedByGuard(origin, credentials, conditions)) continue;
-            var location = origin.AncestorsAndSelf().OfType<ExpressionStatementSyntax>().FirstOrDefault() ?? (SyntaxNode)origin;
-            if (reported.Add(location)) yield return location;
-        }
+            foreach (var credentials in calls.Where(call => Name(call) == "AllowCredentials"))
+            {
+                if (Scope(origin) != Scope(credentials) || !SameBuilder(origin, credentials, model)) continue;
+                var conditions = Conditions(origin).Concat(Conditions(credentials)).ToList();
+                if (HasOppositeBranches(origin, credentials) || RejectedByGuard(origin, credentials, conditions)) continue;
+                var location = origin.AncestorsAndSelf().OfType<ExpressionStatementSyntax>().FirstOrDefault() ?? (SyntaxNode)origin;
+                if (reported.Add(location)) yield return location;
+            }
     }
 
     private static string? Name(InvocationExpressionSyntax call) =>
@@ -66,15 +66,15 @@ internal static class CorsPolicyAnalysis
     private static bool RejectedByGuard(SyntaxNode first, SyntaxNode second, List<ExpressionSyntax> conditions)
     {
         foreach (var block in first.Ancestors().OfType<BlockSyntax>().Where(block => block.Span.Contains(second.Span)))
-        foreach (var guard in block.Statements.OfType<IfStatementSyntax>())
-        {
-            if (guard.Span.End > Math.Min(first.SpanStart, second.SpanStart) ||
-                !Exits(guard.Statement) || HasWritesBetween(guard, first) || HasWritesBetween(guard, second)) continue;
-            var required = Conjuncts(guard.Condition).ToList();
-            if (required.Count > 0 && required.All(condition =>
-                    IsStableCondition(condition) && conditions.Any(actual => SyntaxFactory.AreEquivalent(actual, condition))))
-                return true;
-        }
+            foreach (var guard in block.Statements.OfType<IfStatementSyntax>())
+            {
+                if (guard.Span.End > Math.Min(first.SpanStart, second.SpanStart) ||
+                    !Exits(guard.Statement) || HasWritesBetween(guard, first) || HasWritesBetween(guard, second)) continue;
+                var required = Conjuncts(guard.Condition).ToList();
+                if (required.Count > 0 && required.All(condition =>
+                        IsStableCondition(condition) && conditions.Any(actual => SyntaxFactory.AreEquivalent(actual, condition))))
+                    return true;
+            }
         return false;
     }
 

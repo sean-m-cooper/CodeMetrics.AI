@@ -1,5 +1,16 @@
 # Cross-Ecosystem Calibration
 
+The unpublished .NET 2.3.0 candidate now uses `dotnet-2026-09-13-wait-boundaries`.
+Performance and shared blocking observations separate actionable signals from unscored
+review leads under the [classification policy](performance-async-policy.md). Numeric
+ladders and catch-population weights are unchanged. Population/severity recalibration
+is deferred until these classification results have been reviewed.
+
+The [OrchardCore wait review](calibration-runs/dotnet-orchard-wait-review.md) supplies the
+source evidence for completed-return proofs, conditional guards and consistent synchronous
+contract propagation. The [wait-boundary corpus comparison](calibration-runs/dotnet-public-corpus-wait-boundaries.md)
+records the subsequent fresh runs; it does not change the numerical calibration.
+
 The shared contract promises a stable 0-10 scale per dimension. That promise is only meaningful across ecosystems if each analyzer's thresholds are tuned so that comparable codebases earn comparable scores. This document defines how an ecosystem earns "calibrated" status. The `dotnet` analyzer is the baseline: its thresholds define the reference distribution.
 
 ## Complexity scoring product decision

@@ -37,7 +37,7 @@ public class PerformanceSourceFindingsTests
         var finding = result.Findings.Should().ContainSingle().Subject;
         finding.Observations["observationCount"].Should().Be(frameworks);
         finding.Observations["affectedProjects"].Should().BeOfType<string[]>().Subject.Should().HaveCount(frameworks);
-        result.ScoringDecision!.Policy.Should().Be("dotnet/performanceAsync/source-findings-v1");
+        result.ScoringDecision!.Policy.Should().Be("dotnet/performanceAsync/context-classification-v3");
     }
 
     [Theory]
@@ -54,7 +54,7 @@ public class PerformanceSourceFindingsTests
     [Fact]
     public void FiveOperationsOnOneLineRemainFiveErrors()
     {
-        var result = Analyze(Compile("class C { void M(System.Threading.Tasks.Task task) { task.Wait(); task.Wait(); task.Wait(); task.Wait(); task.Wait(); } }"), 5);
+        var result = Analyze(Compile("class C { void M(System.Threading.Tasks.Task[] tasks) { tasks[0].Wait(); tasks[1].Wait(); tasks[2].Wait(); tasks[3].Wait(); tasks[4].Wait(); } }"), 5);
         result.Score.Should().Be(0);
         result.Findings.Should().HaveCount(5);
         result.Findings.Select(finding => finding.Observations["sourceSpanStart"]).Should().OnlyHaveUniqueItems();

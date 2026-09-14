@@ -9,9 +9,32 @@ internal static class CompletedTaskAccess
     public static bool IsKnownCompleted(
         SyntaxNode access, ExpressionSyntax receiver, SemanticModel semanticModel)
     {
+        if (CompletedTaskReturn.IsCompleted(receiver, semanticModel))
+            return true;
         var symbol = semanticModel.GetSymbolInfo(receiver).Symbol;
         return symbol is ILocalSymbol or IParameterSymbol &&
-            (HasCompletionGuard(access, symbol, semanticModel) || HasPrecedingCompletion(access, symbol, semanticModel));
+            (HasCompletionGuard(access, symbol, semanticModel) || HasConditionalGuard(access, symbol, semanticModel) ||
+             HasPrecedingCompletion(access, symbol, semanticModel));
+    }
+
+    private static bool HasConditionalGuard(SyntaxNode access, ISymbol receiver, SemanticModel model)
+    {
+        foreach (var conditional in access.Ancestors().OfType<ConditionalExpressionSyntax>())
+        {
+            if (access.Ancestors().TakeWhile(node => node != conditional)
+                .Any(node => node is AnonymousFunctionExpressionSyntax or LocalFunctionStatementSyntax))
+                continue;
+            var condition = Unwrap(conditional.Condition);
+            var negative = condition is PrefixUnaryExpressionSyntax prefix && prefix.IsKind(SyntaxKind.LogicalNotExpression);
+            var tested = negative ? ((PrefixUnaryExpressionSyntax)condition).Operand : condition;
+            var branch = negative ? conditional.WhenFalse : conditional.WhenTrue;
+            if (branch.Span.Contains(access.Span) && ProvesCompletion(tested, receiver, model) &&
+                !condition.DescendantNodesAndSelf().Any(node => WritesReceiver(node, receiver, model)) &&
+                !branch.DescendantNodesAndSelf().Where(node => node.SpanStart < access.SpanStart)
+                    .Any(node => WritesReceiver(node, receiver, model)))
+                return true;
+        }
+        return false;
     }
 
     private static bool HasCompletionGuard(SyntaxNode access, ISymbol receiver, SemanticModel model)
@@ -34,6 +57,12 @@ internal static class CompletedTaskAccess
         var statement = access.AncestorsAndSelf().OfType<StatementSyntax>().FirstOrDefault();
         if (statement?.Parent is not BlockSyntax block)
             return false;
+        if (access.Ancestors().TakeWhile(node => node != statement)
+            .Any(node => node is AnonymousFunctionExpressionSyntax or LocalFunctionStatementSyntax))
+            return false;
+        if (statement.DescendantNodes().Where(node => node.SpanStart < access.SpanStart)
+            .Any(node => WritesReceiver(node, receiver, model)))
+            return false;
 
         // Search backwards: a write invalidates earlier completion evidence, while
         // assignment of an awaited WhenAny result establishes a new completed value.
@@ -46,9 +75,58 @@ internal static class CompletedTaskAccess
                 return false;
             if (AwaitsWhenAll(preceding, receiver, model))
                 return true;
+            if (ExitsUnlessCompleted(preceding, receiver, model))
+                return true;
+            if (WaitCompleted(preceding, receiver, model))
+                return true;
         }
         return false;
     }
+
+    private static bool ExitsUnlessCompleted(StatementSyntax statement, ISymbol receiver, SemanticModel model)
+    {
+        if (statement is not IfStatementSyntax { Else: null } guard ||
+            Unwrap(guard.Condition) is not PrefixUnaryExpressionSyntax negative ||
+            !negative.IsKind(SyntaxKind.LogicalNotExpression) ||
+            !ProvesCompletion(negative.Operand, receiver, model))
+            return false;
+        // Only an unconditional return/throw from this branch establishes the fast path.
+        var terminal = guard.Statement is BlockSyntax block ? block.Statements.LastOrDefault() : guard.Statement;
+        return terminal is ReturnStatementSyntax or ThrowStatementSyntax;
+    }
+
+    private static ExpressionSyntax Unwrap(ExpressionSyntax expression) =>
+        expression is ParenthesizedExpressionSyntax parentheses ? Unwrap(parentheses.Expression) : expression;
+
+    private static bool WaitCompleted(StatementSyntax statement, ISymbol receiver, SemanticModel model)
+    {
+        if (statement is TryStatementSyntax attempt)
+        {
+            // A handled failed wait cannot prove completion. Only catches that leave the
+            // current flow allow the following result read to rely on a successful wait.
+            return attempt.Block.Statements.LastOrDefault() is { } last &&
+                WaitCompleted(last, receiver, model) && attempt.Catches.All(clause =>
+                    ExitsFlow(clause.Block.Statements.LastOrDefault(), model));
+        }
+        if (statement is not ExpressionStatementSyntax { Expression: InvocationExpressionSyntax invocation } ||
+            invocation.Expression is not MemberAccessExpressionSyntax member ||
+            !SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(member.Expression).Symbol, receiver) ||
+            model.GetSymbolInfo(invocation).Symbol is not IMethodSymbol method)
+            return false;
+        // Void Wait() / Wait(CancellationToken) complete or throw. Timed waits return
+        // bool and do not establish completion merely because the call returned.
+        return method is { Name: "Wait", ReturnsVoid: true } &&
+            method.ContainingType.ToDisplayString() == "System.Threading.Tasks.Task";
+    }
+
+    private static bool ExitsFlow(StatementSyntax? statement, SemanticModel model) => statement switch
+    {
+        ReturnStatementSyntax or ThrowStatementSyntax => true,
+        ExpressionStatementSyntax { Expression: InvocationExpressionSyntax invocation } =>
+            model.GetSymbolInfo(invocation).Symbol is IMethodSymbol { Name: "Throw" } method &&
+            method.ContainingType.ToDisplayString() == "System.Runtime.ExceptionServices.ExceptionDispatchInfo",
+        _ => false
+    };
 
     private static bool ProvesCompletion(ExpressionSyntax expression, ISymbol receiver, SemanticModel model)
     {
@@ -84,7 +162,7 @@ internal static class CompletedTaskAccess
     {
         if (!SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(member.Expression).Symbol, receiver) ||
             model.GetSymbolInfo(member).Symbol is not IPropertySymbol property ||
-            property.ContainingType.ToDisplayString() != "System.Threading.Tasks.Task")
+            !TaskTypes.IsTaskLike(property.ContainingType))
             return null;
         return property.Name;
     }

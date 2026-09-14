@@ -83,7 +83,7 @@ public class PerformanceAsyncProbeTests
             using System.Threading.Tasks;
             class C {
                 void M() {
-                    var v = Task.FromResult(1).Result;
+                    var v = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -100,7 +100,7 @@ public class PerformanceAsyncProbeTests
             using System.Threading.Tasks;
             class C {
                 void M() {
-                    var v = Task.FromResult(1).Result;
+                    var v = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -135,7 +135,7 @@ public class PerformanceAsyncProbeTests
             using System.Threading.Tasks;
             class C {
                 void M() {
-                    Task.FromResult(1).GetAwaiter().GetResult();
+                    new TaskCompletionSource<int>().Task.GetAwaiter().GetResult();
                 }
             }
             """;
@@ -153,7 +153,7 @@ public class PerformanceAsyncProbeTests
             class C {
                 // amp-metrics: sync-required
                 void M() {
-                    var value = Task.FromResult(1).Result;
+                    var value = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -175,7 +175,7 @@ public class PerformanceAsyncProbeTests
             }
             class C : Base {
                 public override string M() {
-                    return Task.FromResult("value").GetAwaiter().GetResult();
+                    return new TaskCompletionSource<string>().Task.GetAwaiter().GetResult();
                 }
             }
             """;
@@ -197,7 +197,7 @@ public class PerformanceAsyncProbeTests
             }
             class C : IFoo {
                 string IFoo.M() {
-                    return Task.FromResult("value").GetAwaiter().GetResult();
+                    return new TaskCompletionSource<string>().Task.GetAwaiter().GetResult();
                 }
             }
             """;
@@ -394,7 +394,7 @@ public class PerformanceAsyncProbeTests
             class C {
                 // codemetrics-ignore: syncOverAsync -- synchronous boundary
                 void M() {
-                    var value = Task.FromResult(1).Result;
+                    var value = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -523,7 +523,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void SaveChangesInsideLoop_SeverityIsError()
+    public void SaveChangesInsideLoop_SeverityIsInfo()
     {
         const string code = """
             class FakeContext {
@@ -541,7 +541,7 @@ public class PerformanceAsyncProbeTests
         var result = Analyze(code);
 
         result.Findings.Where(f => f.Category == "saveChangesInsideLoop")
-            .Should().AllSatisfy(f => f.Severity.Should().Be("error"));
+            .Should().AllSatisfy(f => f.Severity.Should().Be("info"));
     }
 
     // ── 4. missingCancellationToken ──────────────────────────────────────────
@@ -596,7 +596,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void MissingCancellationToken_SeverityIsWarning()
+    public void MissingCancellationToken_SeverityIsInfo()
     {
         const string code = """
             using System.Threading.Tasks;
@@ -614,7 +614,7 @@ public class PerformanceAsyncProbeTests
         var result = Analyze(code, addTasksRef: true);
 
         result.Findings.Where(f => f.Category == "missingCancellationToken")
-            .Should().AllSatisfy(f => f.Severity.Should().Be("warning"));
+            .Should().AllSatisfy(f => f.Severity.Should().Be("info"));
     }
 
     [Fact]
@@ -788,7 +788,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void MaterializationBeforeQueryShape_SeverityIsWarning()
+    public void MaterializationBeforeQueryShape_SeverityIsInfo()
     {
         const string code = """
             using System.Collections.Generic;
@@ -803,7 +803,7 @@ public class PerformanceAsyncProbeTests
         var result = Analyze(code);
 
         result.Findings.Where(f => f.Category == "materializationBeforeQueryShape")
-            .Should().AllSatisfy(f => f.Severity.Should().Be("warning"));
+            .Should().AllSatisfy(f => f.Severity.Should().Be("info"));
     }
 
     // ── 6. awaitedIoInsideLoop ───────────────────────────────────────────────
@@ -856,7 +856,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void AwaitedIoInsideLoop_SeverityIsWarning()
+    public void AwaitedIoInsideLoop_SeverityIsInfo()
     {
         const string code = """
             using System.Collections.Generic;
@@ -877,7 +877,7 @@ public class PerformanceAsyncProbeTests
         var result = Analyze(code, addTasksRef: true);
 
         result.Findings.Where(f => f.Category == "awaitedIoInsideLoop")
-            .Should().AllSatisfy(f => f.Severity.Should().Be("warning"));
+            .Should().AllSatisfy(f => f.Severity.Should().Be("info"));
     }
 
     [Fact]
@@ -1553,7 +1553,7 @@ public class PerformanceAsyncProbeTests
             using System.Threading.Tasks;
             class C {
                 void M() {
-                    var v = Task.FromResult(1).Result;
+                    var v = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -1564,7 +1564,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void SaveChangesInsideLoopPresent_ScoreIs2()
+    public void SaveChangesReviewLead_DoesNotReduceScore()
     {
         const string code = """
             class FakeContext {
@@ -1581,7 +1581,7 @@ public class PerformanceAsyncProbeTests
 
         var result = Analyze(code);
 
-        result.Score.Should().Be(2);
+        result.Score.Should().Be(10);
     }
 
     [Fact]
@@ -1590,11 +1590,11 @@ public class PerformanceAsyncProbeTests
         const string code = """
             using System.Threading.Tasks;
             class C {
-                void M1() { var v = Task.FromResult(1).Result; }
-                void M2() { var v = Task.FromResult(1).Result; }
-                void M3() { var v = Task.FromResult(1).Result; }
-                void M4() { var v = Task.FromResult(1).Result; }
-                void M5() { var v = Task.FromResult(1).Result; }
+                void M1() { var v = new TaskCompletionSource<int>().Task.Result; }
+                void M2() { var v = new TaskCompletionSource<int>().Task.Result; }
+                void M3() { var v = new TaskCompletionSource<int>().Task.Result; }
+                void M4() { var v = new TaskCompletionSource<int>().Task.Result; }
+                void M5() { var v = new TaskCompletionSource<int>().Task.Result; }
             }
             """;
 

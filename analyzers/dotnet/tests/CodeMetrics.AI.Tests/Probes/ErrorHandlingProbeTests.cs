@@ -612,7 +612,7 @@ public class ErrorHandlingProbeTests
             class C {
                 void M() {
                     var t = Task.CompletedTask;
-                    var _ = Task.FromResult(1).Result;
+                    var _ = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -666,7 +666,7 @@ public class ErrorHandlingProbeTests
             using System.Threading.Tasks;
             class C {
                 void M() {
-                    Task.FromResult(1).GetAwaiter().GetResult();
+                    new TaskCompletionSource<int>().Task.GetAwaiter().GetResult();
                 }
             }
             """;

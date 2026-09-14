@@ -58,7 +58,9 @@ internal static class PerformanceSourceFindings
         {
             project = finding.Project,
             severity = finding.Severity,
-            message = finding.Message
+            message = finding.Message,
+            classification = finding.Observations.GetValueOrDefault("classification"),
+            classificationReason = finding.Observations.GetValueOrDefault("classificationReason")
         }).ToArray();
         return representative;
     }

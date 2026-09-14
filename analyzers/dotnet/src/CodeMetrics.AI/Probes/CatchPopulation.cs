@@ -40,7 +40,7 @@ internal sealed class CatchPopulation(string? solutionDir)
         var weighted = sites.Values.Sum(site => site.Weight);
         var rate = sites.Count == 0 ? 0m : weighted / sites.Count;
         var critical = sites.Values.Any(site => site.Weight == 1m);
-        var syncBlock = findings.Any(finding => finding.Category == "syncBlockingCall");
+        var syncBlock = findings.Any(finding => finding.Category == "syncBlockingCall" && finding.Severity != "info");
         string[] catchCategories = ["emptyCatch", "throwEx", "broadCatchReturnsDefault", "broadCatchWithoutLoggingOrRethrow"];
         var decision = ScoringDecision.Minimum("dotnet/errorHandling/catch-population-v2", 1, MidpointRounding.AwayFromZero,
             ScoringStep.Component("catchPopulation", (double)(10m - 10m * rate), catchCategories),
@@ -64,6 +64,7 @@ internal sealed class CatchPopulation(string? solutionDir)
         inputs["throwExes"] = findings.Count(f => f.Category == "throwEx");
         inputs["broadDefaults"] = findings.Count(f => f.Category == "broadCatchReturnsDefault");
         inputs["hasSyncBlock"] = syncBlock;
+        inputs["syncBlockingClassification"] = "context-classification-v3";
         foreach (var finding in findings.Where(f => f.Category is "missingLoggerForMultipleCatches" or "consoleWriteLine"))
             finding.Observations["scoreDisposition"] = "excludedAdvisoryContext";
         return decision;

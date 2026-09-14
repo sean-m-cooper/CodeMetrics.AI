@@ -88,20 +88,33 @@ The tool automatically skips non-production projects:
 - Aspire hosts (AppHost, ServiceDefaults, Hosting)
 - Benchmarks, Samples, Demo, Playground projects
 
-## Performance & Async source counting
+## Performance & Async classification and source counting
 
-Policy `dotnet/performanceAsync/source-findings-v1` counts each normalized physical file,
-exact syntax span and rule category once across project/target-framework compilations.
-The highest observed severity at that site participates in the unchanged score ladder.
-Evidence retains the observation count, affected projects, and every framework's severity
-and message. Distinct operations on one line, different files, different rules
-at the same operation, and different conditional-compilation spans remain distinct.
-Missing file/span identity is conservatively left unmerged.
+Policy `dotnet/performanceAsync/context-classification-v3`, ruleset
+`dotnet-2026-09-13-wait-boundaries`, preserves the existing 0/2/4/6/8/10 ladder and
+counts each physical file/span/rule once at maximum severity across frameworks.
 
-Ruleset `dotnet-2026-09-13-async-source-findings` records this counting correction.
-Older framework-row scores are historical, not compatible baseline gates. Recognition,
-annotation behavior, raw metrics and CSV are unchanged; this counting policy does not
-establish that a reported pattern is a defect.
+Proven completed-task reads are excluded. Synchronous contracts and local documented
+blocking choices remain visible as informational review leads. Persistence within loops,
+missing cancellation signatures, materialization order, sequential I/O and unbounded
+fan-out are also review leads because the observed pattern alone does not establish a
+correctness or performance problem. Direct token parameters and forwarded contexts
+carrying an accessible token are recognized cancellation inputs.
+
+Completion proofs include ternary guards and narrowly resolved completed-return helpers.
+Contract context covers interface properties, a bounded catalog of synchronous callbacks,
+and private helper chains whose visible callers all have recognized context. Arbitrary
+callbacks, mixed callers and unknown virtual implementations retain their findings.
+
+Findings record `classification`, `classificationReason` and `scoreDisposition`.
+Review leads are `excludedReviewLead`, contribute no penalty, and retain source and
+framework evidence. A score of 10 means no scored signals under this static scope;
+it does not establish excellent measured runtime performance. Other blocking signals
+and demonstrated shared-state mutation still participate in the unchanged ladder.
+
+See the [classification policy and limits](../../shared/scorecard-schema/performance-async-policy.md).
+Earlier rulesets are historical and incompatible baseline gates. No population/severity
+calibration is introduced by this change; raw metrics and CSV are unchanged.
 
 ## Code annotations and recognized attributes
 
