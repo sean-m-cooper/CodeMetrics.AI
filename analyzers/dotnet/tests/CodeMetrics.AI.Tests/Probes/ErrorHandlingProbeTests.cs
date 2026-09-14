@@ -7,6 +7,33 @@ namespace CodeMetrics.AI.Tests.Probes;
 
 public class ErrorHandlingProbeTests
 {
+    [Theory]
+    [InlineData("null", true)]
+    [InlineData("false", true)]
+    [InlineData("0", true)]
+    [InlineData("default", true)]
+    [InlineData("default(object)", true)]
+    [InlineData("string.Empty", true)]
+    [InlineData("System.String.Empty", false)]
+    [InlineData("1", false)]
+    [InlineData("true", false)]
+    [InlineData("(0)", false)]
+    public void BroadCatch_ReturnExpression_PreservesDefaultRecognition(string expression, bool expected)
+    {
+        var code = $$"""
+            class Sample
+            {
+                object Read()
+                {
+                    try { return new object(); }
+                    catch (System.Exception) { return {{expression}}; }
+                }
+            }
+            """;
+        var result = Analyze(code);
+        result.Findings.Any(f => f.Category == "broadCatchReturnsDefault").Should().Be(expected);
+    }
+
     private static DimensionResult Analyze(string code)
     {
         var (_, _, compilation) = RoslynTestHelper.CompileCode(code);
@@ -77,7 +104,7 @@ public class ErrorHandlingProbeTests
     }
 
     [Fact]
-    public void DocumentedBroadCatchWithFallbackReturn_StillFindsEmptyCatch()
+    public void DocumentedBroadCatchWithFallbackReturn_RespectsIntent()
     {
         const string code = """
             using System;
@@ -85,7 +112,7 @@ public class ErrorHandlingProbeTests
                 string Parse(string value) {
                     try { return value.Trim(); }
                     catch (Exception) {
-                        // This is too broad to establish an expected alternate shape.
+                        // Alternate input uses the literal fallback below.
                     }
                     return value;
                 }
@@ -94,7 +121,7 @@ public class ErrorHandlingProbeTests
 
         var result = Analyze(code);
 
-        result.Findings.Should().Contain(f => f.Category == "emptyCatch");
+        result.Findings.Should().NotContain(f => f.Category == "emptyCatch");
     }
 
     // ── 2. throwEx ────────────────────────────────────────────────────────────
@@ -585,7 +612,7 @@ public class ErrorHandlingProbeTests
             class C {
                 void M() {
                     var t = Task.CompletedTask;
-                    var _ = Task.FromResult(1).Result;
+                    var _ = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -639,7 +666,7 @@ public class ErrorHandlingProbeTests
             using System.Threading.Tasks;
             class C {
                 void M() {
-                    Task.FromResult(1).GetAwaiter().GetResult();
+                    new TaskCompletionSource<int>().Task.GetAwaiter().GetResult();
                 }
             }
             """;
@@ -1063,7 +1090,7 @@ public class ErrorHandlingProbeTests
     // ── Scoring ───────────────────────────────────────────────────────────────
 
     [Fact]
-    public void EmptyCatchPresent_ScoreIs2()
+    public void EmptyCatchIsEntirePopulation_ScoreIs0()
     {
         const string code = """
             using System;
@@ -1077,11 +1104,11 @@ public class ErrorHandlingProbeTests
 
         var result = Analyze(code);
 
-        result.Score.Should().Be(2);
+        result.Score.Should().Be(0);
     }
 
     [Fact]
-    public void ThrowExPresent_ScoreIs2()
+    public void ThrowExIsEntirePopulation_ScoreIs0()
     {
         const string code = """
             using System;
@@ -1095,7 +1122,7 @@ public class ErrorHandlingProbeTests
 
         var result = Analyze(code);
 
-        result.Score.Should().Be(2);
+        result.Score.Should().Be(0);
     }
 
     [Fact]
@@ -1135,7 +1162,7 @@ public class ErrorHandlingProbeTests
     }
 
     [Fact]
-    public void BroadCatchReturnsDefault_ScoreIs4()
+    public void BroadDefaultIsEntirePopulation_ScoreIs2Point5()
     {
         const string code = """
             using System;
@@ -1149,11 +1176,11 @@ public class ErrorHandlingProbeTests
 
         var result = Analyze(code);
 
-        result.Score.Should().Be(4);
+        result.Score.Should().Be(2.5);
     }
 
     [Fact]
-    public void MoreThanThreeWarnings_ScoreIs6()
+    public void UnhandledBroadCatchesEntirePopulation_ScoreIs5()
     {
         // Four silent broad catches, one per type so missingLoggerForMultipleCatches
         // (which needs two catches in one type) does not add a fifth warning.
@@ -1169,13 +1196,13 @@ public class ErrorHandlingProbeTests
 
         result.Findings.Count(f => f.Severity == "warning").Should().Be(4);
         result.Findings.Should().NotContain(f => f.Severity == "error");
-        result.Score.Should().Be(6);
+        result.Score.Should().Be(5);
     }
 
     [Fact]
-    public void OneToThreeWarnings_ScoreIs8()
+    public void SingleUnhandledBroadCatch_ScoreIs5()
     {
-        // A single silent broad catch — the "minor gaps, no systemic issues" rung.
+        // The sole catch has unrecognized broad handling (weight 0.5).
         const string code = """
             using System;
             class C {
@@ -1190,11 +1217,11 @@ public class ErrorHandlingProbeTests
 
         result.Findings.Count(f => f.Severity == "warning").Should().Be(1);
         result.Findings.Should().NotContain(f => f.Severity == "error");
-        result.Score.Should().Be(8);
+        result.Score.Should().Be(5);
     }
 
     [Fact]
-    public void ThreeWarnings_ScoreIs8()
+    public void ThreeUnhandledBroadCatches_ScoreIs5()
     {
         const string code = """
             using System;
@@ -1206,11 +1233,11 @@ public class ErrorHandlingProbeTests
         var result = Analyze(code);
 
         result.Findings.Count(f => f.Severity == "warning").Should().Be(3);
-        result.Score.Should().Be(8);
+        result.Score.Should().Be(5);
     }
 
     [Fact]
-    public void OnlyWarning_ScoreIs8()
+    public void LoggerAdvisory_DoesNotDuplicateCatchScoring()
     {
         const string code = """
             using System;
@@ -1225,59 +1252,8 @@ public class ErrorHandlingProbeTests
 
         var result = Analyze(code);
 
-        // missingLoggerForMultipleCatches is the only warning → score 8
-        result.Score.Should().Be(8);
-    }
-
-    [Fact]
-    public void EveryRungIsReachable_NoLadderGaps()
-    {
-        // Guards against a rung being unreachable, which is what left 8 missing and
-        // the trailing 'errors != 0 || warnings != 0' branch dead.
-        const string severe = """
-            using System;
-            class C {
-                void M1() { try { } catch (Exception) { } }
-                void M2() { try { } catch (Exception) { } }
-                void M3() { try { } catch (Exception) { } }
-                void M4() { try { } catch (Exception) { } }
-                void M5() { try { } catch (Exception) { } }
-            }
-            """;
-        const string errorRung = """
-            using System;
-            class C { void M() { try { } catch (Exception) { } } }
-            """;
-        const string structural = """
-            using System;
-            class C {
-                object M() {
-                    try { return new object(); }
-                    catch (Exception) { return null; }
-                }
-            }
-            """;
-        const string noisy = """
-            using System;
-            class C1 { void M() { try { } catch (Exception) { var x = 1; } } }
-            class C2 { void M() { try { } catch (Exception) { var x = 2; } } }
-            class C3 { void M() { try { } catch (Exception) { var x = 3; } } }
-            class C4 { void M() { try { } catch (Exception) { var x = 4; } } }
-            """;
-        const string minor = """
-            using System;
-            class C { void M() { try { } catch (Exception) { var x = 1; } } }
-            """;
-        const string clean = """
-            class C { void M() { int x = 1 + 1; } }
-            """;
-
-        Analyze(severe).Score.Should().Be(0);
-        Analyze(errorRung).Score.Should().Be(2);
-        Analyze(structural).Score.Should().Be(4);
-        Analyze(noisy).Score.Should().Be(6);
-        Analyze(minor).Score.Should().Be(8);
-        Analyze(clean).Score.Should().Be(10);
+        // Logger presence is advisory; it adds no duplicate catch penalty.
+        result.Score.Should().Be(10);
     }
 
     // ── Metadata ──────────────────────────────────────────────────────────────

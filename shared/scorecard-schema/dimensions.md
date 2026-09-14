@@ -18,7 +18,7 @@ Analyzers may use language-specific rules inside each dimension. The key names, 
 
 ## Score Comparability
 
-Scores are always comparable **within** an ecosystem: the same analyzer version applies the same thresholds to every repository it scores.
+Within an ecosystem, compare scores using compatible measurement/scoring policies, rulesets and analysis scope. An analyzer version alone is insufficient for development packages that share a version label; retain package identity and run provenance. A change in policy can change scores on identical source, and consistent scoring does not establish equal business risk across repositories.
 
 Scores are comparable **across** ecosystems only after the analyzer has completed the corpus calibration procedure in `calibration.md`. Until then, consumers must present per-ecosystem scores side by side without averaging or ranking them against each other, and must caveat uncalibrated ecosystems.
 

@@ -8,6 +8,31 @@ namespace CodeMetrics.AI.Tests.Probes;
 
 public class TestingProbeTests
 {
+    [Fact]
+    public void MixedAttributeLists_OnlyTestAttributeArgumentsMarkMethodsSkipped()
+    {
+        const string code = """
+            public class FactAttribute : System.Attribute
+            {
+                public FactAttribute(string Ignore = "") { }
+                public string Skip { get; set; }
+            }
+            public class OtherAttribute : System.Attribute { public string Skip { get; set; } }
+            public static class Assert { public static void True(bool value) { } }
+            public class Cases
+            {
+                [Other(Skip = "unrelated"), Fact] public void Runs() { Assert.True(true); }
+                [Other][Fact(Skip = "reason")] public void NamedProperty() { Assert.True(true); }
+                [Fact(Ignore: "reason")] public void NamedConstructorArgument() { Assert.True(true); }
+            }
+            """;
+        var result = TestingProbe.Analyze([Project("Application.Tests", code)], ["Application"], TempDir());
+        var metrics = System.Text.Json.JsonSerializer.SerializeToElement(result.Extra["testMetrics"]);
+        metrics.GetProperty("testMethods").GetInt32().Should().Be(3);
+        metrics.GetProperty("skippedTests").GetInt32().Should().Be(2);
+        metrics.GetProperty("assertions").GetInt32().Should().Be(3);
+    }
+
     // ── Helper ────────────────────────────────────────────────────────────────
 
     private static string TempDir() =>

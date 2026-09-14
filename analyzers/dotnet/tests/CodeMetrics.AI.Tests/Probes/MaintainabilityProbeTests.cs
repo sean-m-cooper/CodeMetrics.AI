@@ -30,13 +30,13 @@ public class MaintainabilityProbeTests
         };
 
     [Fact]
-    public void EmptyInput_ReturnsScore10()
+    public void EmptyInput_IsUnmeasured()
     {
         var result = MaintainabilityProbe.Analyze([]);
 
-        result.Status.Should().Be("scored");
-        result.Score.Should().Be(10);
-        result.Basis.Should().Be("No types found.");
+        result.Status.Should().Be("skipped");
+        result.Score.Should().BeNull();
+        result.Basis.Should().Contain("unmeasured");
     }
 
     [Fact]

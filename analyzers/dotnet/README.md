@@ -37,8 +37,8 @@ The tool scores your codebase across 9 quality dimensions (0-10 scale):
 
 | Dimension | Method |
 |-----------|--------|
-| Code Quality | Statistical — decomposition ratio and max member cyclomatic complexity |
-| Maintainability | Statistical — maintainability index population/tail/extreme analysis |
+| Complexity & Decomposition | Separate method-complexity and decomposition components, retaining one combined score |
+| Maintainability | Statistical — distinct executable-function MI, weakest fifth / remaining population |
 | Error Handling | Rule-based — empty catches, throw ex, broad catches, sync blocking |
 | Performance & Async | Rule-based — sync-over-async, sequential I/O, unbounded fan-out, shared-state concurrency |
 | Security | Rule-based — hardcoded secrets, SQL interpolation, unsafe deserialization |
@@ -46,6 +46,10 @@ The tool scores your codebase across 9 quality dimensions (0-10 scale):
 | Documentation | Deduction-based — README, docs/, XML docs, public API coverage, unresolved `cref` references |
 | Dependency Management | Rule-based — vulnerabilities, outdated, deprecated, version drift; failed commands are unscored |
 | Architecture & SOLID | Rule-based — project cycles, layering violations, metric hotspots |
+
+**Complexity & Decomposition** retains the `codeQuality` evidence key and one combined score. Development ruleset `dotnet-2026-09-12-method-population` scores Method complexity as 40% of one worst individual-function score plus 60% of the mean of the remaining functions. Own CC 3/5/10/20/40 maps to individual scores 10/8/6/4/0 with linear interpolation and clamping. A single-function scope uses its individual score. Repeated observations across projects/frameworks count once at maximum variant CC; function hotspots retain names, locations and variant details. The aggregate uses decimal arithmetic and half-up rounding to one decimal.
+
+Decomposition retains its executable complexity per qualifying function within each type instance, with separate type hotspots. Fields, bodyless members and branch-free callbacks/initializers do not inflate that denominator. The combined C&D score remains the mean of its two rounded components, and overall weighting is unchanged. Interpret 10 as exceptional and 8 as a strong engineering target; high CC describes branching burden, not proof of defects or poor runtime performance. Raw CSV metrics remain unchanged. Read the recorded policy when interpreting older evidence or legacy-input fallbacks. See [component presentation and compatibility](../../shared/scorecard-schema/scoring-decisions.md#complexity-and-decomposition-presentation).
 
 ## Raw Metrics
 
@@ -84,11 +88,61 @@ The tool automatically skips non-production projects:
 - Aspire hosts (AppHost, ServiceDefaults, Hosting)
 - Benchmarks, Samples, Demo, Playground projects
 
+## Performance & Async classification and source counting
+
+Policy `dotnet/performanceAsync/context-classification-v3`, ruleset
+`dotnet-2026-09-14-dependency-availability`, preserves the existing 0/2/4/6/8/10 ladder and
+counts each physical file/span/rule once at maximum severity across frameworks.
+
+Proven completed-task reads are excluded. Synchronous contracts and local documented
+blocking choices remain visible as informational review leads. Persistence within loops,
+missing cancellation signatures, materialization order, sequential I/O and unbounded
+fan-out are also review leads because the observed pattern alone does not establish a
+correctness or performance problem. Direct token parameters and forwarded contexts
+carrying an accessible token are recognized cancellation inputs.
+
+Completion proofs include ternary guards and narrowly resolved completed-return helpers.
+Contract context covers interface properties, a bounded catalog of synchronous callbacks,
+and private helper chains whose visible callers all have recognized context. Arbitrary
+callbacks, mixed callers and unknown virtual implementations retain their findings.
+
+Findings record `classification`, `classificationReason` and `scoreDisposition`.
+Review leads are `excludedReviewLead`, contribute no penalty, and retain source and
+framework evidence. A score of 10 means no scored signals under this static scope;
+it does not establish excellent measured runtime performance. Other blocking signals
+and demonstrated shared-state mutation still participate in the unchanged ladder.
+
+See the [classification policy and limits](../../shared/scorecard-schema/performance-async-policy.md).
+Earlier rulesets are historical and incompatible baseline gates. No population/severity
+calibration is introduced by this change; raw metrics and CSV are unchanged.
+
 ## Code annotations and recognized attributes
 
 CodeMetrics.AI recognizes category-scoped suppression comments and selected framework attributes whose meaning affects a scorecard dimension. It does not require a CodeMetrics.AI package reference in the analyzed solution.
 
 ### Category-scoped suppression
+
+The package includes a [CMAI rule catalog](src/CodeMetrics.AI/Rules/rules.md), with JSON and Markdown copies under `Rules/` in the tool installation. Read the catalog from the analyzer version used for the run:
+
+```powershell
+code-metrics rules
+code-metrics rules --code CMAI5001
+code-metrics rules --format json
+code-metrics rules --format markdown --output rules.md
+```
+
+This command needs no solution, restore, package-feed access or MSBuild workspace. Codes are permanent aliases for existing `dotnet/<dimension>/<category>` identities. Findings expose the alias in `observations.diagnosticCode`; each dimension's `ruleCatalog` references also identify aggregate metric components. These additions do not change finding fingerprints, scores or schema-v3 compatibility.
+
+The first catalog covers 44 findings/components across all nine dimensions. Four codes currently support annotations: `CMAI5001` (empty catch), `CMAI5005` (error-handling sync block), `CMAI8001` (performance sync-over-async), and `CMAI8006` (sequential awaited I/O). Each **CMAI** directive requires a nonempty rationale after ` -- ` or `—`. The analyzer accepts the explanation without judging the business decision. Unsupported rules, including architecture/decomposition metrics, are explicitly marked in the catalog; their annotations do not yet exclude penalties. One source operation can participate in multiple rules, each with its own code.
+
+```csharp
+// codemetrics-ignore: CMAI5001 -- Cleanup failure must not replace the original exception.
+catch (Exception)
+{
+}
+```
+
+The code-scorecard skill reads this catalog from the exact package used by a fresh run, shows codes with relevant findings, and offers only supported annotation examples. A catalog failure leaves validated scores intact and makes code guidance unavailable. Suppression declarations retain their location and rationale in evidence; `status: declared` alone does not prove that a finding was matched.
 
 Place a directive immediately before the affected statement, loop, catch, or method:
 
@@ -199,7 +253,18 @@ The Performance & Async dimension also reports `sharedStateMutationInFanOut` whe
 
 ### Evidence population and samples
 
-Starting with 2.2.0, every scored dimension also includes `scoringDecision`, recording policy inputs, selected rules, nested components, binding/nonbinding caps and finding effects. The existing scores and `dotnet-2026-09-08` ruleset are unchanged. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md); these effects are not independent finding deductions.
+Starting with 2.2.0, every scored dimension also includes `scoringDecision`, recording policy inputs, selected rules, nested components, binding/nonbinding caps and finding effects. That release preserved the scores and `dotnet-2026-09-08` ruleset. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md); these effects are not independent finding deductions.
+
+Version 2.3.0 uses ruleset `dotnet-2026-09-14-dependency-availability`. It includes new source-function complexity and maintainability formulas, contextual classifications, and explicit dependency assessment failures. These changes require fresh baselines. Population and classification corrections include:
+
+- Solution runs honor build exclusions for the selected configuration and Any CPU. Dependency checks use the same enabled project scope; static dependency checks and architecture cycles do not scan unrelated projects elsewhere in the checkout. Project entry points retain their selected-project scope.
+- Framework suffixes no longer hide test, sample or benchmark roles. Test metadata, semantic test attributes and conventional test/support directories keep non-production code out of production metrics. Testing counts unique project/source sites across frameworks and reports loaded test instances separately.
+- Controller-specific architecture rules require a web-controller base type or attribute. Delegates and generic execution contexts are not data-layer dependencies.
+- `.Result` and equivalent blocking checks recognize direct completion guards and simple semantically verified helpers. Reassigned tasks, unverified helpers and deferred lambda bodies remain conservative review candidates.
+- Documentation presence is checked from the Git repository root, while API documentation remains limited to selected source.
+- Dependency subprocesses resolve their own repository SDK without inherited MSBuild locator paths. Failed commands retain stdout diagnostics and timeout cleanup terminates their process trees.
+
+These corrections can change scores without source changes. Evidence from the earlier ruleset is incompatible for baseline gates. A complete run still provides a partial static assessment, and test signals do not establish measured coverage.
 
 Starting with 2.1.0 (`dotnet-2026-09-08`), Architecture metric hotspots use a population/severity policy. Coupling, complexity, and size each have a component score:
 
@@ -247,16 +312,19 @@ and scored.
 
 Passive data carriers are identified structurally rather than by names such as `Request`, `Response`, or `Dto`. Records, classes, and structs that only declare state through primary-constructor parameters, auto-properties, fields, or assignment-only constructors are treated as data carriers.
 
-Their raw metrics remain in `metrics.csv`, but they are excluded from the scored Code Quality,
-Maintainability, and Architecture-hotspot populations. References to them remain visible in raw
+Their raw metrics remain in `metrics.csv`, but they are excluded from the scored Complexity & Decomposition
+and Architecture-hotspot populations. Function-based Maintainability ignores state declarations while still measuring explicit executable bodies, including assignment constructors. References to them remain visible in raw
 coupling evidence but do not contribute to structural `highCoupling` scoring.
 
 Types are scored normally as soon as they define behavior, including methods, computed properties, custom accessors, operators, validation logic, or nontrivial constructor logic.
 
-`Program` and `Startup` composition-root types remain in `metrics.csv` and in the scored
-Maintainability population, but receive a 10-point MI adjustment when thresholds are
-evaluated and stay out of the general offender sample. This gives their expected
-registration density more room without hiding a severely degraded composition root.
+The legacy type-based Maintainability policy gives `Program` and `Startup` a 10-point MI adjustment and omits them from its general offender sample. The new function-based policy measures their owned bodies without a name-based bonus.
+
+### Function-based maintainability
+
+Development policy `dotnet/maintainability/source-functions-quintile-40-60-v1` uses 40% of the mean score of the weakest fifth of distinct executable functions and 60% of the remaining mean. Every function contributes once. Enums and non-executable declarations provide no credit or penalty; nested bodies own their own MI inputs. Runtime initializers are included, constant declarations are neutral, and repeated project/TFM observations count once at the lowest observed own MI. Low-MI prevalence and percentiles are diagnostics only.
+
+Own MI 40/52/58/65/70/75 maps linearly to scores 0/2/4/6/8/10. The final weighted aggregate rounds once to one decimal, midpoint ties up. One function uses its own score; no functions is unmeasured. Raw type/member MI and CSV retain their previous definitions and cannot reconstruct this score. See the [measurement, evidence and calibration policy](../../shared/scorecard-schema/maintainability-policy.md). Earlier type-policy scores remain historical, not compatible baselines.
 
 Documented empty catches are exempt only for a narrow exception type in a conservative
 try/fallback shape: the catch contains an explanatory comment, the try has a success
@@ -327,3 +395,32 @@ Starting with 2.0.1, project-loading warnings (including NuGet vulnerability adv
 Use `--coverage path/to/coverage.cobertura.xml` for an explicit report. Otherwise the analyzer checks `.scorecard/coverage.cobertura.xml` beneath the solution directory. Evidence records the report path, content SHA-256, matching status, matched/unmatched files, and nullable branch rate. When file-level observations exist, only matching production files contribute line coverage. Root-only reports retain aggregate compatibility and are labeled `aggregateUnverified`; they cannot establish project coverage. An explicitly requested missing, invalid, or unmatched report fails the testing dimension. The analyzer reads coverage; it does not execute tests or generate coverage.
 
 `--solution` also accepts an explicit `.csproj`; this scores only that project, with references available for semantic resolution. Source filtering remains bounded by the entry point directory. See [consumer integration](../../docs/evidence-workflows.md#skill-and-other-evidence-consumers) for structured scope and validated v2/v3 reads.
+
+## Security and error-handling context correction
+
+The .NET 2.3.0 release includes the security and catch-context corrections under ruleset `dotnet-2026-09-14-dependency-availability`. It distinguishes descriptive identifiers from credential candidates, recognizes bounded CORS rejecting guards, accepts local catch rationale and diagnostic output parameters, and scores the severity-weighted source catch population. See the [policy and limitations](../../shared/scorecard-schema/error-handling-policy.md). Earlier absolute-count scores are incompatible baseline gates.
+
+
+## Dependency assessment availability (2.3.0)
+
+Missing evidence is an assessment limitation, not a code defect. Failed package
+commands or unresolved candidate framework compatibility make Dependency Management
+`status: failed`, with no score or scoring decision. The CLI returns 2, inspection
+is unusable for a complete scorecard, and the skill reports no overall score.
+An unknown candidate carries `scoreDisposition: unavailable` and informational
+severity; it cannot create an upgrade penalty or improve a reported score.
+
+`dependencyCompatibility` records completion status, unique package/version count,
+project/TFM observations, known observations, elapsed milliseconds and grouped
+failures with reasons (source discovery, HTTP status, size limit, budget, unavailable
+latest version, or unsupported metadata). `anyCommandFailed` still describes the
+NuGet CLI stage; it does not establish that metadata inspection succeeded.
+
+Confirmed vulnerabilities and deprecations from independently successful commands
+remain visible when another check fails. A failed vulnerability query also withholds
+Security's score while retaining static findings. A compatibility-only failure does
+not invalidate a successful vulnerability query. Restore/compiler errors continue
+to make affected source analysis incomplete. Retain original artifacts, address the
+recorded failure, and rerun; never recover a score from CSV or stale evidence.
+
+See [2.3.0 release notes](../../docs/releases/2.3.0.md).

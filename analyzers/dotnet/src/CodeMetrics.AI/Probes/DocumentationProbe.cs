@@ -12,19 +12,20 @@ public static class DocumentationProbe
         IReadOnlyList<(string Name, Compilation Compilation, string? ProjectFilePath)> projects)
     {
         var findings = FindUnresolvedCrefs(projects, solutionDir);
-        var (readmePath, hasReadme, readmeNonBlankLines) = InspectReadme(solutionDir);
-        var docsDir = FindDocsDirectory(solutionDir);
+        var repositoryRoot = Output.EvidenceEnricher.RepositoryRoot(solutionDir);
+        var (readmePath, hasReadme, readmeNonBlankLines) = InspectReadme(repositoryRoot);
+        var docsDir = FindDocsDirectory(repositoryRoot);
         var libraryDocumentation = InspectLibraryDocumentation(projects, solutionDir);
         var snapshot = new DocumentationSnapshot(
             hasReadme,
             readmeNonBlankLines,
             docsDir != null,
             CountArchitectureDocuments(docsDir),
-            HasAiInstructions(solutionDir),
+            HasAiInstructions(repositoryRoot),
             libraryDocumentation.XmlDocRatio,
             libraryDocumentation.AllHaveXmlDocs,
             libraryDocumentation.PublicApiCoverage,
-            CountStaleMarkers(solutionDir, hasReadme, readmePath, docsDir != null, docsDir),
+            CountStaleMarkers(repositoryRoot, hasReadme, readmePath, docsDir != null, docsDir),
             findings.Count);
         return CreateResult(snapshot, findings);
     }

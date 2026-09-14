@@ -116,8 +116,9 @@ public static class ClassCouplingCalculator
             if (node.AncestorsAndSelf().OfType<AttributeSyntax>().Any())
                 continue;
 
-            CollectFromTypeInfo(model.GetTypeInfo(node).Type, coupled, selfSymbol);
-            CollectFromTypeInfo(model.GetTypeInfo(node).ConvertedType, coupled, selfSymbol);
+            var typeInfo = model.GetTypeInfo(node);
+            CollectFromTypeInfo(typeInfo.Type, coupled, selfSymbol);
+            CollectFromTypeInfo(typeInfo.ConvertedType, coupled, selfSymbol);
 
             if (model.GetSymbolInfo(node).Symbol is not IMethodSymbol method)
                 continue;
@@ -155,42 +156,47 @@ public static class ClassCouplingCalculator
             .ToHashSet<IParameterSymbol>(SymbolEqualityComparer.Default);
 
         foreach (var node in typeDecl.DescendantNodesAndSelf())
-        {
-            if (IsInsideFromServicesParameter(node) ||
-                model.GetSymbolInfo(node).Symbol is IParameterSymbol parameterSymbol &&
-                fromServicesParameters.Contains(parameterSymbol))
-            {
-                continue;
-            }
+            CollectRawNodeTypes(node, model, coupled, selfSymbol, fromServicesParameters);
 
-            CollectFromTypeInfo(model.GetTypeInfo(node).Type, coupled, selfSymbol);
-            CollectFromTypeInfo(model.GetTypeInfo(node).ConvertedType, coupled, selfSymbol);
+        CollectRawDeclarationTypes(typeDecl, model, coupled, selfSymbol);
+        return coupled;
+    }
 
-            var symbolInfo = model.GetSymbolInfo(node);
-            if (symbolInfo.Symbol is IMethodSymbol method)
-            {
-                CollectFromTypeInfo(method.ReturnType, coupled, selfSymbol);
-                foreach (var parameter in GetAnalyzableParameters(node, method))
-                    CollectFromTypeInfo(parameter.Type, coupled, selfSymbol);
-            }
-        }
+    private static void CollectRawNodeTypes(
+        SyntaxNode node, SemanticModel model, HashSet<INamedTypeSymbol> coupled,
+        INamedTypeSymbol? selfSymbol, IReadOnlySet<IParameterSymbol> fromServicesParameters)
+    {
+        if (IsInsideFromServicesParameter(node))
+            return;
+        var symbol = model.GetSymbolInfo(node).Symbol;
+        if (symbol is IParameterSymbol parameterSymbol && fromServicesParameters.Contains(parameterSymbol))
+            return;
 
+        var typeInfo = model.GetTypeInfo(node);
+        CollectFromTypeInfo(typeInfo.Type, coupled, selfSymbol);
+        CollectFromTypeInfo(typeInfo.ConvertedType, coupled, selfSymbol);
+        if (symbol is not IMethodSymbol method)
+            return;
+        CollectFromTypeInfo(method.ReturnType, coupled, selfSymbol);
+        foreach (var parameter in GetAnalyzableParameters(node, method))
+            CollectFromTypeInfo(parameter.Type, coupled, selfSymbol);
+    }
+
+    private static void CollectRawDeclarationTypes(
+        TypeDeclarationSyntax typeDecl, SemanticModel model,
+        HashSet<INamedTypeSymbol> coupled, INamedTypeSymbol? selfSymbol)
+    {
         if (typeDecl.BaseList != null)
         {
             foreach (var baseType in typeDecl.BaseList.Types)
                 CollectFromTypeInfo(model.GetTypeInfo(baseType.Type).Type, coupled, selfSymbol);
         }
 
-        foreach (var attrList in typeDecl.AttributeLists)
-            foreach (var attr in attrList.Attributes)
-                CollectFromTypeInfo(model.GetTypeInfo(attr).Type, coupled, selfSymbol);
-
-        foreach (var member in typeDecl.Members)
-            foreach (var attrList in member.AttributeLists)
-                foreach (var attr in attrList.Attributes)
-                    CollectFromTypeInfo(model.GetTypeInfo(attr).Type, coupled, selfSymbol);
-
-        return coupled;
+        var attributes = typeDecl.AttributeLists
+            .Concat(typeDecl.Members.SelectMany(member => member.AttributeLists))
+            .SelectMany(list => list.Attributes);
+        foreach (var attribute in attributes)
+            CollectFromTypeInfo(model.GetTypeInfo(attribute).Type, coupled, selfSymbol);
     }
 
     private static HashSet<INamedTypeSymbol> CollectStructuralTypeSymbols(
@@ -478,73 +484,53 @@ public static class ClassCouplingCalculator
         HashSet<INamedTypeSymbol> set,
         INamedTypeSymbol? self)
     {
-        if (type is null)
+        var named = CoupledNamedType(type, self);
+        if (named == null)
             return;
 
-        while (type is IArrayTypeSymbol arrayType)
-            type = arrayType.ElementType;
-
-        if (type is ITypeParameterSymbol || type.TypeKind is TypeKind.Error or TypeKind.Dynamic)
+        set.Add(named.OriginalDefinition);
+        if (StopsStructuralTypeExpansion(named))
             return;
-
-        if (type is not INamedTypeSymbol named)
-            return;
-
-        var definition = named.OriginalDefinition;
-        if (SymbolEqualityComparer.Default.Equals(definition, self?.OriginalDefinition) ||
-            named.ContainingType != null &&
-            SymbolEqualityComparer.Default.Equals(
-                named.ContainingType.OriginalDefinition, self?.OriginalDefinition) ||
-            PrimitiveTypes.Contains(named.SpecialType))
-        {
-            return;
-        }
-
-        set.Add(definition);
-
-        if (IsCompilerGeneratedCarrier(named) ||
-            DataCarrierClassifier.IsPassiveDataCarrier(definition) ||
-            FrameworkPresentationTypes.Contains(QualifiedMetadataName(definition)))
-        {
-            return;
-        }
 
         foreach (var typeArgument in named.TypeArguments)
             CollectStructuralType(typeArgument, set, self);
     }
+
+    private static bool StopsStructuralTypeExpansion(INamedTypeSymbol type) =>
+        IsCompilerGeneratedCarrier(type) ||
+        DataCarrierClassifier.IsPassiveDataCarrier(type.OriginalDefinition) ||
+        FrameworkPresentationTypes.Contains(QualifiedMetadataName(type.OriginalDefinition));
 
     private static void CollectFromTypeInfo(
         ITypeSymbol? type,
         HashSet<INamedTypeSymbol> set,
         INamedTypeSymbol? self)
     {
-        if (type is null)
+        var named = CoupledNamedType(type, self);
+        if (named == null)
             return;
 
+        set.Add(named.OriginalDefinition);
+        // Repeated generic definitions can carry different arguments. Do not stop
+        // traversal just because the definition is already in the result set.
+        foreach (var typeArgument in named.TypeArguments)
+            CollectFromTypeInfo(typeArgument, set, self);
+    }
+
+    private static INamedTypeSymbol? CoupledNamedType(ITypeSymbol? type, INamedTypeSymbol? self)
+    {
         while (type is IArrayTypeSymbol arrayType)
             type = arrayType.ElementType;
 
-        if (type is ITypeParameterSymbol || type.TypeKind is TypeKind.Error or TypeKind.Dynamic)
-            return;
-
-        if (type is INamedTypeSymbol named)
-        {
-            if (SymbolEqualityComparer.Default.Equals(named.OriginalDefinition, self?.OriginalDefinition))
-                return;
-            if (named.ContainingType != null &&
-                SymbolEqualityComparer.Default.Equals(
-                    named.ContainingType.OriginalDefinition, self?.OriginalDefinition))
-            {
-                return;
-            }
-
-            if (PrimitiveTypes.Contains(named.SpecialType))
-                return;
-
-            set.Add(named.OriginalDefinition);
-
-            foreach (var typeArgument in named.TypeArguments)
-                CollectFromTypeInfo(typeArgument, set, self);
-        }
+        if (type is not INamedTypeSymbol named || type.TypeKind is TypeKind.Error or TypeKind.Dynamic)
+            return null;
+        if (PrimitiveTypes.Contains(named.SpecialType) || IsSelfOrNestedType(named, self))
+            return null;
+        return named;
     }
+
+    private static bool IsSelfOrNestedType(INamedTypeSymbol type, INamedTypeSymbol? self) =>
+        SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, self?.OriginalDefinition) ||
+        type.ContainingType != null && SymbolEqualityComparer.Default.Equals(
+            type.ContainingType.OriginalDefinition, self?.OriginalDefinition);
 }

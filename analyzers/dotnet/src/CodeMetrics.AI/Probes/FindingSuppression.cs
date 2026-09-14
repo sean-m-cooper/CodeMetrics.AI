@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using CodeMetrics.AI.Rules;
 
 namespace CodeMetrics.AI.Probes;
 
@@ -37,19 +38,28 @@ internal static class FindingSuppression
             return false;
 
         var categories = comment[(marker + Directive.Length)..];
+        string? reason = null;
         var reasonDelimiter = categories.IndexOf('—');
         if (reasonDelimiter >= 0)
+        {
+            reason = categories[(reasonDelimiter + 1)..].Trim().TrimEnd('*', '/').Trim();
             categories = categories[..reasonDelimiter];
+        }
 
         reasonDelimiter = categories.IndexOf(" -- ", StringComparison.Ordinal);
         if (reasonDelimiter >= 0)
+        {
+            reason = categories[(reasonDelimiter + 4)..].Trim().TrimEnd('*', '/').Trim();
             categories = categories[..reasonDelimiter];
+        }
 
         return categories
             .Split([',', ' ', '\t'], StringSplitOptions.RemoveEmptyEntries)
             .Any(candidate =>
                 candidate.Equals(category, StringComparison.OrdinalIgnoreCase) ||
                 candidate.Equals("all", StringComparison.OrdinalIgnoreCase) ||
-                candidate == "*");
+                candidate == "*" ||
+                (!string.IsNullOrWhiteSpace(reason) && RuleCatalog.Find(candidate) is { } rule &&
+                 rule.Annotation.Supported && rule.Category.Equals(category, StringComparison.OrdinalIgnoreCase)));
     }
 }

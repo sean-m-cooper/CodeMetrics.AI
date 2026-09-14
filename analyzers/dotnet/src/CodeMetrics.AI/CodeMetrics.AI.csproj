@@ -7,7 +7,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>code-metrics</ToolCommandName>
     <PackageId>CodeMetrics.AI</PackageId>
-    <Version>2.2.0</Version>
+    <Version>2.3.0</Version>
     <Description>Deterministic code metrics and scorecard evidence for .NET solutions</Description>
     <Authors>Sean Cooper</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -18,10 +18,17 @@
     <PackageTags>code-metrics;roslyn;static-analysis;scorecard;dotnet-tool</PackageTags>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="CodeMetrics.AI.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <EmbeddedResource Include="Rules\rules.json" LogicalName="CodeMetrics.AI.Rules.rules.json" />
+    <None Update="Rules\rules.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Update="Rules\rules.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Locator" />
+    <PackageReference Include="Microsoft.VisualStudio.SolutionPersistence" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
     <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" PrivateAssets="all" />

@@ -19,12 +19,17 @@ internal static class DimensionScopes
             ["architecture"] = ["static-coupling-and-project-structure"]
         };
         foreach (var (key, value) in dimensions)
-            ((DimensionResult)value).Extra["scope"] = new
+        {
+            var result = (DimensionResult)value;
+            var functionMi = key == "maintainability" &&
+                result.Extra.GetValueOrDefault("measurementPolicy") as string == FunctionMaintainabilityProbe.MeasurementPolicy;
+            result.Extra["scope"] = new
             {
                 id = $"dotnet/{key}/v1",
                 coverage = "partial",
-                includes = includes[key],
+                includes = functionMi ? ["production-executable-function-maintainability-index"] : includes[key],
                 excludes = new[] { "runtime-behavior", "comprehensive-human-review" }
             };
+        }
     }
 }

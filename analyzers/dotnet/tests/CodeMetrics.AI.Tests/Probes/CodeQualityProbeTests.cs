@@ -34,6 +34,54 @@ public class CodeQualityProbeTests
         };
 
     [Fact]
+    public void ComponentHotspots_AreRankedIndependently_AndKeepDistinctPopulations()
+    {
+        var result = CodeQualityProbe.Analyze([
+            MakeType("DecompositionHotspot", memberCount: 2, decompositionRatio: 18, maxMemberCC: 20),
+            MakeType("ComplexityHotspot", memberCount: 1, decompositionRatio: 60, maxMemberCC: 60),
+            MakeType("Passive", memberCount: 2, decompositionRatio: 99, maxMemberCC: 99, isDataCarrier: true)
+        ]);
+        result.Extra["displayName"].Should().Be("Complexity & Decomposition");
+        var details = (JsonElement)result.Extra["componentDetails"]!;
+        var complexity = details.GetProperty("methodComplexity");
+        var decomposition = details.GetProperty("decomposition");
+        complexity.GetProperty("eligibleTypes").GetInt32().Should().Be(2);
+        decomposition.GetProperty("eligibleTypes").GetInt32().Should().Be(1);
+        complexity.GetProperty("topOffenders")[0].GetProperty("type").GetString().Should().Be("ComplexityHotspot");
+        decomposition.GetProperty("topOffenders")[0].GetProperty("type").GetString().Should().Be("DecompositionHotspot");
+        var metrics = (JsonElement)result.Extra["metrics"]!;
+        complexity.GetProperty("score").GetDouble().Should().Be(metrics.GetProperty("maxMemberCyclomaticComplexity").GetProperty("ccScore").GetDouble());
+        decomposition.GetProperty("score").GetDouble().Should().Be(metrics.GetProperty("decomposition").GetProperty("decompScore").GetDouble());
+        result.Score.Should().Be(result.ScoringDecision!.FinalScore);
+        result.ScoringDecision.Steps.Count.Should().Be(2);
+    }
+
+    [Fact]
+    public void EmptyComponents_DoNotInventMeasuredScoresOrHotspots()
+    {
+        var result = CodeQualityProbe.Analyze([]);
+        var details = (JsonElement)result.Extra["componentDetails"]!;
+        foreach (var component in details.EnumerateObject())
+        {
+            component.Value.GetProperty("score").ValueKind.Should().Be(JsonValueKind.Null);
+            component.Value.GetProperty("eligibleTypes").GetInt32().Should().Be(0);
+            component.Value.GetProperty("topOffenders").GetArrayLength().Should().Be(0);
+        }
+        result.Score.Should().Be(10); // Preserve the existing empty-population policy.
+    }
+
+    [Fact]
+    public void SingleMemberPopulation_ExposesDecompositionAsAnEmptyPopulationDefault()
+    {
+        var result = CodeQualityProbe.Analyze([MakeType(memberCount: 1, maxMemberCC: 60)]);
+        var details = (JsonElement)result.Extra["componentDetails"]!;
+        details.GetProperty("decomposition").GetProperty("eligibleTypes").GetInt32().Should().Be(0);
+        details.GetProperty("decomposition").GetProperty("score").GetDouble().Should().Be(10);
+        details.GetProperty("methodComplexity").GetProperty("score").GetDouble().Should().Be(0);
+        result.Score.Should().Be(5);
+    }
+
+    [Fact]
     public void EmptyInput_ReturnsScore10()
     {
         var result = CodeQualityProbe.Analyze([]);
@@ -231,6 +279,44 @@ public class CodeQualityProbeTests
     {
         var values = new List<double> { 42.0 };
         CodeQualityProbe.Percentile(values, 90).Should().Be(42.0);
+    }
+
+    [Fact]
+    public void Percentile_ExactBoundaryDoesNotAddALegacyComplexityPenalty()
+    {
+        var types = Enumerable.Range(0, 59).Select(i => new TypeMetrics
+        {
+            Project = "Controlled",
+            Namespace = "Calibration",
+            Type = $"T{i}",
+            FilePath = "controlled.cs",
+            MemberCount = 2,
+            MaxMemberCyclomaticComplexity = i < 6 ? 16 : 1,
+            DecompositionRatio = i < 6 ? 9 : 1.5
+        }).ToArray();
+
+        var result = CodeQualityProbe.Analyze(types);
+        var complexity = result.ScoringDecision!.Steps.Single(step => step.Id == "complexity").Decision!;
+        var tail = complexity.Steps.Single(step => step.Id == "complexity/tail");
+        tail.Decision!.Inputs["measured"].Should().Be(4.0);
+        tail.Score.Should().Be(10);
+        complexity.FinalScore.Should().Be(6.7);
+        result.Score.Should().Be(6.4);
+        result.ScoringDecision.Inputs["percentileInterpolation"].Should().Be("linear-decimal-v1");
+    }
+
+    [Theory]
+    [InlineData(1, 16, 90, 4)]
+    [InlineData(1, 16.00000001, 90, 4.000000002)]
+    [InlineData(60, 85, 10, 80)]
+    public void Percentile_PreservesDecimalBoundariesAndRealExceedances(double low, double high, double percentile, double expected)
+    {
+        var lowCount = percentile == 90 ? 53 : 6;
+        var values = Enumerable.Repeat(low, lowCount).Concat(Enumerable.Repeat(high, 59 - lowCount)).ToList();
+        var measured = CodeQualityProbe.Percentile(values, percentile);
+        measured.Should().Be(expected);
+        if (percentile == 90)
+            ScoringDecision.Threshold("tail", measured, [4, 6, 9, 12, 16]).Score.Should().Be(expected > 4 ? 8 : 10);
     }
 
     [Fact]

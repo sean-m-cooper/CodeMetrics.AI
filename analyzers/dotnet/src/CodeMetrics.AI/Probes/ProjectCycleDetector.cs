@@ -4,14 +4,14 @@ namespace CodeMetrics.AI.Probes;
 
 internal static class ProjectCycleDetector
 {
-    public static List<List<string>> Find(string solutionDir)
+    public static List<List<string>> Find(string solutionDir, IReadOnlyList<string>? projectPaths = null)
     {
         return Directory.Exists(solutionDir)
-            ? FindCycles(BuildGraph(solutionDir))
+            ? FindCycles(BuildGraph(solutionDir, projectPaths))
             : [];
     }
 
-    private static Dictionary<string, List<string>> BuildGraph(string solutionDir)
+    private static Dictionary<string, List<string>> BuildGraph(string solutionDir, IReadOnlyList<string>? projectPaths)
     {
         var graph = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
         var options = new EnumerationOptions
@@ -20,7 +20,7 @@ internal static class ProjectCycleDetector
             IgnoreInaccessible = true
         };
 
-        foreach (var projectFile in Directory.GetFiles(solutionDir, "*.csproj", options))
+        foreach (var projectFile in projectPaths ?? Directory.GetFiles(solutionDir, "*.csproj", options))
         {
             var projectName = Path.GetFileNameWithoutExtension(projectFile);
             graph[projectName] = ReadReferences(projectFile)

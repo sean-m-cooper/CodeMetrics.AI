@@ -22,7 +22,8 @@ public static class CsvWriter
             await writer.WriteLineAsync(typeLine.AsMemory(), cancellationToken);
 
             var typeMembers = members
-                .Where(m => m.Project == t.Project && m.Namespace == t.Namespace && m.Type == t.Type)
+                .Where(m => m.Project == t.Project &&
+                    (t.TypeId != null ? m.TypeId == t.TypeId : m.Namespace == t.Namespace && m.Type == t.Type))
                 .OrderBy(m => m.Member);
 
             foreach (var m in typeMembers)

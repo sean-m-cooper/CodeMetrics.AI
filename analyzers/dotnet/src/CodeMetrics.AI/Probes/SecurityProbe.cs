@@ -21,7 +21,8 @@ public static class SecurityProbe
     public static DimensionResult Analyze(
         IReadOnlyList<(string ProjectName, Compilation Compilation)> projects,
         int importedVulnerabilities = 0,
-        string? solutionDir = null)
+        string? solutionDir = null,
+        bool vulnerabilityAssessmentAvailable = true)
     {
         var findings = new List<Finding>();
 
@@ -35,7 +36,7 @@ public static class SecurityProbe
                 AnalyzeHardcodedSecrets(root, filePath, projectName, findings);
                 AnalyzeRawSqlInterpolation(root, filePath, projectName, findings);
                 AnalyzeUnsafeDeserialization(root, filePath, projectName, findings);
-                AnalyzeAllowAnyOriginWithCredentials(root, filePath, projectName, findings);
+                AnalyzeAllowAnyOriginWithCredentials(root, compilation.GetSemanticModel(tree), filePath, projectName, findings);
                 AnalyzeAllowAnonymous(root, filePath, projectName, findings);
             }
 
@@ -50,7 +51,7 @@ public static class SecurityProbe
         var errors = findings.Count(f => f.Severity == "error");
         var warnings = findings.Count(f => f.Severity == "warning");
 
-        var decision = ScoringDecision.FirstMatch("dotnet/security/v1", new()
+        var decision = ScoringDecision.FirstMatch("dotnet/security/identifier-cors-flow-v2", new()
         {
             ["hardcodedSecrets"] = hardcodedSecrets,
             ["allowAnyOriginWithCreds"] = allowAnyOriginWithCreds,
@@ -74,6 +75,14 @@ public static class SecurityProbe
                     $"unsafeDeserialization={unsafeDeser}, allowAnyOriginWithCredentials={allowAnyOriginWithCreds}, " +
                     $"importedVulnerabilities={importedVulnerabilities}.";
 
+        if (!vulnerabilityAssessmentAvailable)
+            return new DimensionResult
+            {
+                Status = "failed",
+                Basis = "Vulnerability assessment unavailable; static security findings are retained, but no security score is assigned.",
+                Findings = findings
+            };
+
         return new DimensionResult
         {
             Status = "scored",
@@ -89,67 +98,46 @@ public static class SecurityProbe
     private static void AnalyzeHardcodedSecrets(
         SyntaxNode root, string filePath, string projectName, List<Finding> findings)
     {
-        // Variable declarations: string ApiKey = "abcdef...";
-        var varDecls = root.DescendantNodes().OfType<VariableDeclaratorSyntax>();
-        foreach (var varDecl in varDecls)
+        // Preserve declaration-before-assignment finding order, even when source
+        // locations interleave. Both forms use the same literal/placeholder policy.
+        foreach (var variable in root.DescendantNodes().OfType<VariableDeclaratorSyntax>())
         {
-            var name = varDecl.Identifier.Text;
-            if (!ContainsSecretKeyword(name))
-                continue;
-
-            if (varDecl.Initializer?.Value is LiteralExpressionSyntax lit &&
-                lit.IsKind(SyntaxKind.StringLiteralExpression))
-            {
-                var value = lit.Token.ValueText;
-                if (value.Length >= 16 && !ContainsSafePlaceholder(value))
-                {
-                    findings.Add(new Finding
-                    {
-                        Category = "hardcodedSecret",
-                        Severity = "error",
-                        File = filePath,
-                        Line = GetLine(varDecl),
-                        Project = projectName,
-                        Type = GetContainingTypeName(varDecl),
-                        Message = $"Variable '{name}' appears to contain a hardcoded secret."
-                    });
-                }
-            }
+            var name = variable.Identifier.Text;
+            if (IsSecretLiteral(name, variable.Initializer?.Value))
+                findings.Add(CreateSecretFinding(variable, filePath, projectName,
+                    $"Variable '{name}' appears to contain a hardcoded secret."));
         }
-
-        // Assignment expressions: ApiKey = "abcdef...";
-        var assignments = root.DescendantNodes().OfType<AssignmentExpressionSyntax>();
-        foreach (var assignment in assignments)
+        foreach (var assignment in root.DescendantNodes().OfType<AssignmentExpressionSyntax>())
         {
-            var leftText = assignment.Left.ToString();
-            // Extract just the identifier name (last segment if member access)
-            var namePart = leftText.Contains('.')
-                ? leftText.Substring(leftText.LastIndexOf('.') + 1)
-                : leftText;
-
-            if (!ContainsSecretKeyword(namePart))
-                continue;
-
-            if (assignment.Right is LiteralExpressionSyntax lit &&
-                lit.IsKind(SyntaxKind.StringLiteralExpression))
-            {
-                var value = lit.Token.ValueText;
-                if (value.Length >= 16 && !ContainsSafePlaceholder(value))
-                {
-                    findings.Add(new Finding
-                    {
-                        Category = "hardcodedSecret",
-                        Severity = "error",
-                        File = filePath,
-                        Line = GetLine(assignment),
-                        Project = projectName,
-                        Type = GetContainingTypeName(assignment),
-                        Message = $"Assignment to '{namePart}' appears to contain a hardcoded secret."
-                    });
-                }
-            }
+            var name = AssignmentName(assignment);
+            if (IsSecretLiteral(name, assignment.Right))
+                findings.Add(CreateSecretFinding(assignment, filePath, projectName,
+                    $"Assignment to '{name}' appears to contain a hardcoded secret."));
         }
     }
+
+    private static string AssignmentName(AssignmentExpressionSyntax assignment)
+    {
+        var text = assignment.Left.ToString();
+        return text[(text.LastIndexOf('.') + 1)..];
+    }
+
+    private static bool IsSecretLiteral(string name, ExpressionSyntax? expression) =>
+        ContainsSecretKeyword(name) && expression is LiteralExpressionSyntax literal &&
+        literal.IsKind(SyntaxKind.StringLiteralExpression) && literal.Token.ValueText.Length >= 16 &&
+        !ContainsSafePlaceholder(literal.Token.ValueText) &&
+        !SecretIdentifierRecognition.IsIdentifier(name, literal.Token.ValueText);
+
+    private static Finding CreateSecretFinding(SyntaxNode node, string filePath, string projectName, string message) => new()
+    {
+        Category = "hardcodedSecret",
+        Severity = "error",
+        File = filePath,
+        Line = GetLine(node),
+        Project = projectName,
+        Type = GetContainingTypeName(node),
+        Message = message
+    };
 
     private static bool ContainsSecretKeyword(string name)
     {
@@ -251,35 +239,22 @@ public static class SecurityProbe
     // ── Finding 4: AllowAnyOrigin + AllowCredentials ──────────────────────────
 
     private static void AnalyzeAllowAnyOriginWithCredentials(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel model, string filePath, string projectName, List<Finding> findings)
     {
-        var statements = root.DescendantNodes().OfType<ExpressionStatementSyntax>();
-
-        foreach (var stmt in statements)
+        foreach (var node in CorsPolicyAnalysis.FindUnsafePairs(root, model))
         {
-            var invocationNames = stmt.DescendantNodes()
-                .OfType<InvocationExpressionSyntax>()
-                .Select(inv => GetMethodName(inv))
-                .Where(n => n != null)
-                .ToHashSet(StringComparer.Ordinal)!;
-
-            if (invocationNames.Contains("AllowAnyOrigin") &&
-                invocationNames.Contains("AllowCredentials"))
+            findings.Add(new Finding
             {
-                findings.Add(new Finding
-                {
-                    Category = "allowAnyOriginWithCredentials",
-                    Severity = "error",
-                    File = filePath,
-                    Line = GetLine(stmt),
-                    Project = projectName,
-                    Type = GetContainingTypeName(stmt),
-                    Message = "Combining AllowAnyOrigin() and AllowCredentials() is a CORS misconfiguration that violates the spec."
-                });
-            }
+                Category = "allowAnyOriginWithCredentials",
+                Severity = "error",
+                File = filePath,
+                Line = GetLine(node),
+                Project = projectName,
+                Type = GetContainingTypeName(node),
+                Message = "The same CORS builder enables AllowAnyOrigin() and AllowCredentials() without a recognized rejecting guard."
+            });
         }
     }
-
     // ── Finding 5: AllowAnonymous ─────────────────────────────────────────────
 
     private static void AnalyzeAllowAnonymous(
@@ -317,75 +292,28 @@ public static class SecurityProbe
     private static void AnalyzeMissingAuthorization(
         Compilation compilation, string projectName, List<Finding> findings, string? solutionDir)
     {
-        var allRoots = SourceFileFilter.AnalyzableTrees(compilation, solutionDir)
-            .Select(t => t.GetRoot())
-            .ToList();
+        foreach (var issue in ControllerAuthorizationAnalysis.FindMissingIntent(compilation, solutionDir))
+            findings.Add(CreateMissingAuthorizationFinding(issue, projectName));
+    }
 
-        // Attribute spelling, aliases, and partial declarations are compiler concerns.
-        // Resolve source symbols instead of inferring authorization from syntax text.
-        var sourceMemberSymbols = allRoots
-            .SelectMany(root => root.DescendantNodes().OfType<MemberDeclarationSyntax>())
-            .Select(member => compilation.GetSemanticModel(member.SyntaxTree).GetDeclaredSymbol(member))
-            .Where(symbol => symbol != null)
-            .Cast<ISymbol>()
-            .ToList();
-
-        bool projectUsesAuthorize = sourceMemberSymbols.Any(symbol => HasAttribute(symbol, "Authorize"));
-
-        if (!projectUsesAuthorize)
-            return;
-
-        var controllersBySymbol = new Dictionary<INamedTypeSymbol, List<ClassDeclarationSyntax>>(
-            SymbolEqualityComparer.Default);
-        foreach (var declaration in allRoots
-                     .SelectMany(root => root.DescendantNodes().OfType<ClassDeclarationSyntax>())
-                     .Where(candidate => candidate.Identifier.Text.EndsWith("Controller", StringComparison.Ordinal)))
+    private static Finding CreateMissingAuthorizationFinding(
+        ControllerAuthorizationAnalysis.MissingIntent issue, string projectName)
+    {
+        var controller = issue.Controller;
+        return new Finding
         {
-            var model = compilation.GetSemanticModel(declaration.SyntaxTree);
-            if (model.GetDeclaredSymbol(declaration) is not INamedTypeSymbol controllerSymbol)
-                continue;
-
-            if (!controllersBySymbol.TryGetValue(controllerSymbol, out var declarations))
-            {
-                declarations = [];
-                controllersBySymbol.Add(controllerSymbol, declarations);
-            }
-
-            declarations.Add(declaration);
-        }
-
-        foreach (var (controllerSymbol, declarations) in controllersBySymbol)
-        {
-            bool hasAuthorize = HasAttributeInTypeHierarchy(controllerSymbol, "Authorize");
-            bool hasAllowAnonymous = HasAttributeInTypeHierarchy(controllerSymbol, "AllowAnonymous");
-            var actions = controllerSymbol.GetMembers()
-                .OfType<IMethodSymbol>()
-                .Where(IsControllerAction)
-                .ToList();
-            bool everyActionHasExplicitIntent = actions.Count > 0 && actions.All(action =>
-                HasAttribute(action, "Authorize") || HasAttribute(action, "AllowAnonymous"));
-
-            if (!hasAuthorize && !hasAllowAnonymous && !everyActionHasExplicitIntent)
-            {
-                var cls = declarations[0];
-                var unannotatedActionCount = actions.Count(action =>
-                    !HasAttribute(action, "Authorize") && !HasAttribute(action, "AllowAnonymous"));
-                findings.Add(new Finding
-                {
-                    Category = "missingAuthorization",
-                    Severity = "warning",
-                    Confidence = "medium",
-                    File = cls.SyntaxTree.FilePath,
-                    Line = GetLine(cls),
-                    Project = projectName,
-                    Type = controllerSymbol.Name,
-                    Message = $"Controller '{controllerSymbol.ToDisplayString()}' has no explicit class-level " +
-                              $"[Authorize]/[AllowAnonymous] intent and {unannotatedActionCount} public action(s) " +
-                              "also lack an explicit authorization attribute. Global filters or a fallback policy " +
-                              "may still protect the endpoint; verify the effective policy."
-                });
-            }
-        }
+            Category = "missingAuthorization",
+            Severity = "warning",
+            Confidence = "medium",
+            File = controller.Declaration.SyntaxTree.FilePath,
+            Line = GetLine(controller.Declaration),
+            Project = projectName,
+            Type = controller.Symbol.Name,
+            Message = $"Controller '{controller.Symbol.ToDisplayString()}' has no explicit class-level " +
+                      $"[Authorize]/[AllowAnonymous] intent and {issue.UnannotatedActionCount} public action(s) " +
+                      "also lack an explicit authorization attribute. Global filters or a fallback policy " +
+                      "may still protect the endpoint; verify the effective policy."
+        };
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -403,35 +331,6 @@ public static class SecurityProbe
                        name.EndsWith("." + attributeName, StringComparison.Ordinal) ||
                        name.EndsWith("." + attributeName + "Attribute", StringComparison.Ordinal);
             });
-    }
-
-    private static bool HasAttribute(ISymbol symbol, string attributeName)
-    {
-        return symbol.GetAttributes().Any(attribute =>
-        {
-            var name = attribute.AttributeClass?.Name;
-            return name == attributeName || name == attributeName + "Attribute";
-        });
-    }
-
-    private static bool HasAttributeInTypeHierarchy(INamedTypeSymbol type, string attributeName)
-    {
-        for (var current = type; current != null; current = current.BaseType)
-        {
-            if (HasAttribute(current, attributeName))
-                return true;
-        }
-
-        return false;
-    }
-
-    private static bool IsControllerAction(IMethodSymbol method)
-    {
-        return method.MethodKind == MethodKind.Ordinary &&
-               method.DeclaredAccessibility == Accessibility.Public &&
-               !method.IsStatic &&
-               !method.IsImplicitlyDeclared &&
-               !HasAttribute(method, "NonAction");
     }
 
     private static string? GetContainingTypeName(SyntaxNode node)

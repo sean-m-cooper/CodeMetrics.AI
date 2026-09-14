@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -21,41 +20,60 @@ public static class DependencyProbe
     public static async Task<DimensionResult> AnalyzeAsync(
         string solutionPath,
         string solutionDir,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        IReadOnlyList<string>? projectPaths = null,
+        SolutionScope? scope = null)
     {
-        var vulnerable = await RunDotnetListAsync(
-            solutionPath, "--vulnerable --include-transitive", cancellationToken);
-        var outdated = await RunDotnetListAsync(
-            solutionPath, "--outdated", cancellationToken);
-        var deprecated = await RunDotnetListAsync(
-            solutionPath, "--deprecated", cancellationToken);
-        DependencyCommandResult[] commands = [vulnerable, outdated, deprecated];
-
-        bool anyCommandFailed = commands.Any(command => command.Failed);
-        IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? frameworkCompatibility = null;
-        if (!outdated.Failed)
+        string? temporaryDirectory = null;
+        var packageEntryPoint = solutionPath;
+        try
         {
-            var aspireProjects = FindAspireProjectNames(solutionDir);
-            var assessableUpgrades = PackageFrameworkCompatibility
-                .ParseOutdatedOutput(outdated.StandardOutput)
-                .Where(upgrade =>
-                    upgrade.Project == null ||
-                    !IsAspireProjectSection(upgrade.Project, aspireProjects))
-                .ToList();
-            frameworkCompatibility = await PackageFrameworkCompatibility.AssessAsync(
-                assessableUpgrades,
-                outdated.StandardOutput,
-                cancellationToken);
-        }
+            if (scope?.DisabledPaths.Count > 0)
+            {
+                temporaryDirectory = Path.Combine(Path.GetTempPath(), "codemetrics-packages-" + Guid.NewGuid().ToString("N"));
+                Directory.CreateDirectory(temporaryDirectory);
+                packageEntryPoint = await scope.WriteDependencySolutionAsync(temporaryDirectory, cancellationToken);
+            }
+            var vulnerable = await RunDotnetListAsync(
+                packageEntryPoint, "--vulnerable --include-transitive", cancellationToken, solutionDir);
+            var outdated = await RunDotnetListAsync(
+                packageEntryPoint, "--outdated", cancellationToken, solutionDir);
+            var deprecated = await RunDotnetListAsync(
+                packageEntryPoint, "--deprecated", cancellationToken, solutionDir);
+            DependencyCommandResult[] commands = [vulnerable, outdated, deprecated];
 
-        return AnalyzeOutput(
-            vulnerable.StandardOutput,
-            outdated.StandardOutput,
-            deprecated.StandardOutput,
-            solutionDir,
-            anyCommandFailed,
-            commands,
-            frameworkCompatibility);
+            bool anyCommandFailed = commands.Any(command => command.Failed);
+            PackageCompatibilityAssessment? compatibilityAssessment = null;
+            if (!outdated.Failed)
+            {
+                var aspireProjects = FindAspireProjectNames(solutionDir, projectPaths);
+                var assessableUpgrades = PackageFrameworkCompatibility
+                    .ParseOutdatedOutput(outdated.StandardOutput)
+                    .Where(upgrade =>
+                        upgrade.Project == null ||
+                        !IsAspireProjectSection(upgrade.Project, aspireProjects))
+                    .ToList();
+                compatibilityAssessment = await PackageFrameworkCompatibility.AssessAsync(
+                    assessableUpgrades,
+                    outdated.StandardOutput,
+                    cancellationToken);
+            }
+
+            return AnalyzeOutput(
+                vulnerable.StandardOutput,
+                outdated.StandardOutput,
+                deprecated.StandardOutput,
+                solutionDir,
+                anyCommandFailed,
+                commands,
+                compatibilityAssessment?.Results,
+                projectPaths,
+                compatibilityAssessment);
+        }
+        finally
+        {
+            if (temporaryDirectory != null) Directory.Delete(temporaryDirectory, recursive: true);
+        }
     }
 
     // ── Output processor (public for testability) ─────────────────────────────
@@ -67,7 +85,9 @@ public static class DependencyProbe
         string solutionDir,
         bool anyCommandFailed,
         IReadOnlyList<DependencyCommandResult>? commandResults = null,
-        IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? frameworkCompatibility = null)
+        IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? frameworkCompatibility = null,
+        IReadOnlyList<string>? projectPaths = null,
+        PackageCompatibilityAssessment? compatibilityAssessment = null)
     {
         if (anyCommandFailed)
             return CreateFailureResult(commandResults);
@@ -88,16 +108,16 @@ public static class DependencyProbe
         var (vulnerableDirect, vulnerableTransitive) = AnalyzeVulnerabilities(
             vulnerableOutput,
             findings);
-        var aspireProjects = FindAspireProjectNames(solutionDir);
+        var aspireProjects = FindAspireProjectNames(solutionDir, projectPaths);
         var outdatedCounts = CountOutdatedPackages(
             outdatedOutput,
             aspireProjects,
             frameworkCompatibility);
         AddOutdatedFindings(outdatedOutput, aspireProjects, frameworkCompatibility, findings);
         var deprecated = CountDeprecatedPackages(deprecatedOutput, findings);
-        var (unsupportedTFMs, unsupportedTFMList) = FindUnsupportedTargetFrameworks(solutionDir);
+        var (unsupportedTFMs, unsupportedTFMList) = FindUnsupportedTargetFrameworks(solutionDir, projectPaths);
         var cpmEnabled = FindCpm(solutionDir);
-        var versionDrift = cpmEnabled ? 0 : FindVersionDrift(solutionDir);
+        var versionDrift = cpmEnabled ? 0 : FindVersionDrift(solutionDir, projectPaths);
         AddStaticFindings(findings, unsupportedTFMList, versionDrift, cpmEnabled);
 
         var metrics = new DependencyMetrics(
@@ -109,7 +129,26 @@ public static class DependencyProbe
             unsupportedTFMs,
             versionDrift,
             cpmEnabled);
-        return CreateSuccessResult(metrics, findings);
+        var result = CreateSuccessResult(metrics, findings);
+        result.Extra["vulnerabilityAssessmentAvailable"] = true;
+        if (compatibilityAssessment != null)
+            result.Extra["dependencyCompatibility"] = new
+            {
+                status = compatibilityAssessment.Failures.Count == 0 ? "complete" : "failed",
+                compatibilityAssessment.UniquePackageVersions,
+                compatibilityAssessment.TotalObservations,
+                knownObservations = compatibilityAssessment.Results.Count,
+                compatibilityAssessment.ElapsedMilliseconds,
+                compatibilityAssessment.Failures
+            };
+        if (outdatedCounts.CompatibilityUnknown.Count == 0) return result;
+        return new DimensionResult
+        {
+            Status = "failed",
+            Basis = "Dependency compatibility assessment unavailable; no dependency score is assigned. " + result.Basis,
+            Findings = findings,
+            Extra = result.Extra
+        };
     }
 
     private static DimensionResult CreateFailureResult(
@@ -120,7 +159,27 @@ public static class DependencyProbe
             ? "One or more dotnet list package commands failed; command diagnostics were unavailable."
             : string.Join("; ", failedCommands.Select(FormatFailure));
 
-        return new DimensionResult
+        var verifiedFindings = new List<Finding>();
+        var vulnerabilityAvailable = false;
+        foreach (var command in commandResults?.Where(command => !command.Failed) ?? [])
+        {
+            try
+            {
+                PackageReport.Parse(command.StandardOutput);
+                if (command.Arguments.Contains("--vulnerable", StringComparison.Ordinal))
+                {
+                    AnalyzeVulnerabilities(command.StandardOutput, verifiedFindings);
+                    vulnerabilityAvailable = true;
+                }
+                else if (command.Arguments.Contains("--deprecated", StringComparison.Ordinal))
+                    CountDeprecatedPackages(command.StandardOutput, verifiedFindings);
+            }
+            catch (Exception exception) when (exception is JsonException or InvalidOperationException)
+            {
+                // Malformed successful reports cannot contribute verified findings.
+            }
+        }
+        var failure = new DimensionResult
         {
             Status = "failed",
             Basis = $"Dependency probe failed. {diagnostic}",
@@ -136,10 +195,13 @@ public static class DependencyProbe
             ],
             Extra =
             {
+                ["vulnerabilityAssessmentAvailable"] = vulnerabilityAvailable,
                 ["dependencyMetrics"] = new { anyCommandFailed = true },
                 ["dependencyCommands"] = BuildCommandDiagnostics(commandResults)
             }
         };
+        failure.Findings.AddRange(verifiedFindings);
+        return failure;
     }
 
     private static (int Direct, int Transitive) AnalyzeVulnerabilities(
@@ -267,26 +329,51 @@ public static class DependencyProbe
         if (!PackageReport.IsJson(output)) return;
         foreach (var package in PackageReport.Parse(output))
         {
-            var aspire = IsAspireProjectSection(package.Project, aspireProjects);
-            var assessed = compatibility != null && compatibility.TryGetValue(package.Upgrade, out _);
-            var incompatible = assessed && !compatibility![package.Upgrade];
-            var disposition = aspire ? "excludedAspire" : incompatible ? "excludedFrameworkIncompatible" : "included";
-            var observations = package.Observations();
-            observations["scoreDisposition"] = disposition;
-            observations["frameworkCompatibility"] = aspire || !assessed ? "unknown" : incompatible ? "incompatible" : "compatible";
-            findings.Add(new Finding
-            {
-                Category = "outdatedDependency",
-                Severity = disposition == "included" ? "warning" : "info",
-                Confidence = "high",
-                Project = package.Project,
-                Package = package.Package,
-                Message = $"Package '{package.Package}' {package.ResolvedVersion} ({package.TargetFramework}) has latest version {package.LatestVersion}. " +
-                    (aspire ? "Excluded from outdated scoring by Aspire policy." : incompatible ? "Latest version is incompatible with this target framework; excluded from scoring." :
-                        assessed ? "Latest version has compatible framework assets; review breaking changes before upgrading." : "Framework compatibility is unknown; review before upgrading."),
-                Observations = observations
-            });
+            var assessment = AssessOutdatedPackage(package.Upgrade, aspireProjects, compatibility);
+            findings.Add(CreateOutdatedFinding(package, assessment));
         }
+    }
+
+    private enum OutdatedAssessment { Aspire, NotAssessed, Unknown, Compatible, Incompatible }
+
+    private static OutdatedAssessment AssessOutdatedPackage(OutdatedPackageUpgrade upgrade,
+        IReadOnlySet<string> aspireProjects, IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? compatibility)
+    {
+        if (upgrade.Project != null && IsAspireProjectSection(upgrade.Project, aspireProjects))
+            return OutdatedAssessment.Aspire;
+        if (compatibility == null)
+            return OutdatedAssessment.NotAssessed;
+        if (!compatibility.TryGetValue(upgrade, out var compatible))
+            return OutdatedAssessment.Unknown;
+        return compatible ? OutdatedAssessment.Compatible : OutdatedAssessment.Incompatible;
+    }
+
+    private static Finding CreateOutdatedFinding(PackageReport.PackageRow package, OutdatedAssessment assessment)
+    {
+        var (disposition, compatibility, explanation) = assessment switch
+        {
+            OutdatedAssessment.Aspire => ("excludedAspire", "unknown", "Excluded from outdated scoring by Aspire policy."),
+            OutdatedAssessment.Incompatible => ("excludedFrameworkIncompatible", "incompatible",
+                "Latest version is incompatible with this target framework; excluded from scoring."),
+            OutdatedAssessment.Compatible => ("included", "compatible",
+                "Latest version has compatible framework assets; review breaking changes before upgrading."),
+            OutdatedAssessment.Unknown => ("unavailable", "unknown",
+                "Framework compatibility could not be assessed; this is missing evidence, not a confirmed upgrade issue."),
+            _ => ("included", "unknown", "Framework compatibility was not assessed in this historical report.")
+        };
+        var observations = package.Observations();
+        observations["scoreDisposition"] = disposition;
+        observations["frameworkCompatibility"] = compatibility;
+        return new Finding
+        {
+            Category = "outdatedDependency",
+            Severity = disposition == "included" ? "warning" : "info",
+            Confidence = "high",
+            Project = package.Project,
+            Package = package.Package,
+            Message = $"Package '{package.Package}' {package.ResolvedVersion} ({package.TargetFramework}) has latest version {package.LatestVersion}. " + explanation,
+            Observations = observations
+        };
     }
 
     private static void AddStaticFindings(
@@ -426,36 +513,13 @@ public static class DependencyProbe
     // ── Private helpers ───────────────────────────────────────────────────────
 
     private static async Task<DependencyCommandResult> RunDotnetListAsync(
-        string solutionPath, string args, CancellationToken cancellationToken)
+        string solutionPath, string args, CancellationToken cancellationToken, string workingDirectory)
     {
         try
         {
-            var psi = new ProcessStartInfo("dotnet", $"list \"{solutionPath}\" package {args} --format json --output-version 1")
-            {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using var process = Process.Start(psi);
-            if (process == null)
-            {
-                return new DependencyCommandResult(
-                    args, string.Empty, string.Empty, null,
-                    nameof(InvalidOperationException), "dotnet process could not be started.");
-            }
-
-            var stdout = process.StandardOutput.ReadToEndAsync(cancellationToken);
-            var stderr = process.StandardError.ReadToEndAsync(cancellationToken);
-            var exited = process.WaitForExitAsync(cancellationToken);
-            await Task.WhenAll(stdout, stderr, exited);
-
-            var output = await stdout;
-            if (process.ExitCode == 0)
-                PackageReport.Parse(output); // Never turn missing or malformed output into a clean score.
-            return new DependencyCommandResult(
-                args, output, await stderr, process.ExitCode);
+            var command = await DependencyCommandRunner.RunAsync(
+                solutionPath, args, cancellationToken, workingDirectory);
+            return ValidateCommandResult(command);
         }
         catch (OperationCanceledException)
         {
@@ -469,12 +533,20 @@ public static class DependencyProbe
         }
     }
 
+    internal static DependencyCommandResult ValidateCommandResult(DependencyCommandResult command)
+    {
+        if (command.ExitCode == 0)
+            PackageReport.Parse(command.StandardOutput); // Missing or malformed output cannot restore a clean score.
+        return command;
+    }
+
     private static string FormatFailure(DependencyCommandResult command)
     {
         var outcome = command.ExitCode is { } exitCode
             ? $"exit code {exitCode}"
             : command.ExceptionType ?? "unknown failure";
         var detail = FirstDiagnosticLine(command.StandardError)
+                     ?? (command.Failed ? FirstDiagnosticLine(command.StandardOutput) : null)
                      ?? FirstDiagnosticLine(command.ExceptionMessage);
         return detail == null
             ? $"dotnet list package {command.Arguments}: {outcome}"
@@ -491,6 +563,7 @@ public static class DependencyProbe
                 command.ExitCode,
                 failed = command.Failed,
                 stderr = FirstDiagnosticLine(command.StandardError),
+                stdout = command.Failed ? FirstDiagnosticLine(command.StandardOutput) : null,
                 command.ExceptionType,
                 exception = FirstDiagnosticLine(command.ExceptionMessage)
             })
@@ -542,30 +615,23 @@ public static class DependencyProbe
 
         foreach (var upgrade in PackageFrameworkCompatibility.ParseOutdatedOutput(output))
         {
-            if (upgrade.Project != null &&
-                IsAspireProjectSection(upgrade.Project, aspireProjects))
+            switch (AssessOutdatedPackage(upgrade, aspireProjects, frameworkCompatibility))
             {
-                aspireExcluded++;
-                continue;
+                case OutdatedAssessment.Aspire:
+                    aspireExcluded++;
+                    break;
+                case OutdatedAssessment.Incompatible:
+                    frameworkIncompatible.Add(upgrade);
+                    break;
+                case OutdatedAssessment.Unknown:
+                    compatibilityUnknown.Add(upgrade);
+                    break;
+                default:
+                    // No assessment retains the legacy count without adding an
+                    // unknown-upgrade diagnostic; an explicitly missing entry does.
+                    included++;
+                    break;
             }
-
-            if (frameworkCompatibility == null)
-            {
-                included++;
-                continue;
-            }
-
-            if (!frameworkCompatibility.TryGetValue(upgrade, out var compatible))
-            {
-                included++;
-                compatibilityUnknown.Add(upgrade);
-                continue;
-            }
-
-            if (compatible)
-                included++;
-            else
-                frameworkIncompatible.Add(upgrade);
         }
 
         return new OutdatedPackageCounts(
@@ -583,13 +649,13 @@ public static class DependencyProbe
                aspireProjects.Contains(Path.GetFileNameWithoutExtension(projectSection));
     }
 
-    private static HashSet<string> FindAspireProjectNames(string solutionDir)
+    private static HashSet<string> FindAspireProjectNames(string solutionDir, IReadOnlyList<string>? projectPaths = null)
     {
         var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if (string.IsNullOrEmpty(solutionDir) || !Directory.Exists(solutionDir))
             return result;
 
-        foreach (var csproj in Directory.GetFiles(solutionDir, "*.csproj", SearchOption.AllDirectories))
+        foreach (var csproj in projectPaths ?? Directory.GetFiles(solutionDir, "*.csproj", SearchOption.AllDirectories))
         {
             try
             {
@@ -636,12 +702,12 @@ public static class DependencyProbe
     }
 
     // Returns (count, list of TFM strings) for unsupported target frameworks
-    private static (int Count, List<string> Tfms) FindUnsupportedTargetFrameworks(string solutionDir)
+    private static (int Count, List<string> Tfms) FindUnsupportedTargetFrameworks(string solutionDir, IReadOnlyList<string>? projectPaths)
     {
         if (string.IsNullOrEmpty(solutionDir) || !Directory.Exists(solutionDir))
             return (0, []);
 
-        var csprojFiles = Directory.GetFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
+        var csprojFiles = projectPaths ?? Directory.GetFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
         var unsupported = new List<string>();
 
         foreach (var csproj in csprojFiles)
@@ -711,12 +777,12 @@ public static class DependencyProbe
         return false;
     }
 
-    private static int FindVersionDrift(string solutionDir)
+    private static int FindVersionDrift(string solutionDir, IReadOnlyList<string>? projectPaths)
     {
         if (string.IsNullOrEmpty(solutionDir) || !Directory.Exists(solutionDir))
             return 0;
 
-        var csprojFiles = Directory.GetFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
+        var csprojFiles = projectPaths ?? Directory.GetFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
         // package name → set of distinct versions
         var packageVersions = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 

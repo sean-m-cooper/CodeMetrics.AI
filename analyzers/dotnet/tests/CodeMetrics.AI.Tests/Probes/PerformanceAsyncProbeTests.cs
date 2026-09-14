@@ -7,6 +7,47 @@ namespace CodeMetrics.AI.Tests.Probes;
 
 public class PerformanceAsyncProbeTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void FanOut_InterfacePropagationRetainsFirstMutatedArgumentAcrossDeclarationOrders(bool implementationFirst)
+    {
+        const string implementation = """
+            public class Request { public int Value; }
+            public interface IWriter { Task Write(Request first, Request second); }
+            public class Writer : IWriter
+            {
+                public Task Write(Request first, Request second)
+                {
+                    second.Value = 1;
+                    first.Value = 2;
+                    return Task.CompletedTask;
+                }
+            }
+            """;
+        const string caller = """
+            public class Driver
+            {
+                private readonly IWriter writer = new Writer();
+                private Task Relay(Request first, Request second)
+                {
+                    var alias = second;
+                    return writer.Write(first, alias);
+                }
+                private Task Bridge(Request first, Request second) => Relay(first, second);
+                public async Task Run(int[] items, Request left, Request right)
+                {
+                    await Task.WhenAll(items.Select(item => Bridge(left, right)));
+                }
+            }
+            """;
+        var code = "using System.Linq; using System.Threading.Tasks;\n" +
+                   (implementationFirst ? implementation + caller : caller + implementation);
+        var result = Analyze(code, addTasksRef: true);
+        result.Findings.Should().ContainSingle(f => f.Category == "sharedStateMutationInFanOut")
+            .Which.Message.Should().Be("Concurrent fan-out passes captured state 'right' to 'Bridge', whose implementation mutates that state.");
+    }
+
     private static readonly string TasksRef =
         Path.Combine(
             Path.GetDirectoryName(typeof(object).Assembly.Location)!,
@@ -42,7 +83,7 @@ public class PerformanceAsyncProbeTests
             using System.Threading.Tasks;
             class C {
                 void M() {
-                    var v = Task.FromResult(1).Result;
+                    var v = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -59,7 +100,7 @@ public class PerformanceAsyncProbeTests
             using System.Threading.Tasks;
             class C {
                 void M() {
-                    var v = Task.FromResult(1).Result;
+                    var v = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -94,7 +135,7 @@ public class PerformanceAsyncProbeTests
             using System.Threading.Tasks;
             class C {
                 void M() {
-                    Task.FromResult(1).GetAwaiter().GetResult();
+                    new TaskCompletionSource<int>().Task.GetAwaiter().GetResult();
                 }
             }
             """;
@@ -112,7 +153,7 @@ public class PerformanceAsyncProbeTests
             class C {
                 // amp-metrics: sync-required
                 void M() {
-                    var value = Task.FromResult(1).Result;
+                    var value = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -134,7 +175,7 @@ public class PerformanceAsyncProbeTests
             }
             class C : Base {
                 public override string M() {
-                    return Task.FromResult("value").GetAwaiter().GetResult();
+                    return new TaskCompletionSource<string>().Task.GetAwaiter().GetResult();
                 }
             }
             """;
@@ -156,7 +197,7 @@ public class PerformanceAsyncProbeTests
             }
             class C : IFoo {
                 string IFoo.M() {
-                    return Task.FromResult("value").GetAwaiter().GetResult();
+                    return new TaskCompletionSource<string>().Task.GetAwaiter().GetResult();
                 }
             }
             """;
@@ -247,6 +288,24 @@ public class PerformanceAsyncProbeTests
         result.Findings.Should().Contain(f => f.Category == "syncOverAsync");
     }
 
+    [Theory]
+    [InlineData("task = other; await Task.WhenAll(task);", false)]
+    [InlineData("await Task.WhenAll(task); task = other;", true)]
+    [InlineData("task = await Task.WhenAny(task, other);", false)]
+    public void CompletionHistory_UsesTheMostRecentReceiverValue(string history, bool blocking)
+    {
+        var result = Analyze($$"""
+            using System.Threading.Tasks;
+            class C {
+                async Task<int> Read(Task<int> task, Task<int> other) {
+                    {{history}}
+                    return task.Result;
+                }
+            }
+            """, addTasksRef: true);
+        result.Findings.Any(f => f.Category == "syncOverAsync").Should().Be(blocking);
+    }
+
     [Fact]
     public void ResultAfterAwaitedWhenAll_DoesNotFindSyncOverAsync()
     {
@@ -335,7 +394,7 @@ public class PerformanceAsyncProbeTests
             class C {
                 // codemetrics-ignore: syncOverAsync -- synchronous boundary
                 void M() {
-                    var value = Task.FromResult(1).Result;
+                    var value = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -464,7 +523,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void SaveChangesInsideLoop_SeverityIsError()
+    public void SaveChangesInsideLoop_SeverityIsInfo()
     {
         const string code = """
             class FakeContext {
@@ -482,7 +541,7 @@ public class PerformanceAsyncProbeTests
         var result = Analyze(code);
 
         result.Findings.Where(f => f.Category == "saveChangesInsideLoop")
-            .Should().AllSatisfy(f => f.Severity.Should().Be("error"));
+            .Should().AllSatisfy(f => f.Severity.Should().Be("info"));
     }
 
     // ── 4. missingCancellationToken ──────────────────────────────────────────
@@ -537,7 +596,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void MissingCancellationToken_SeverityIsWarning()
+    public void MissingCancellationToken_SeverityIsInfo()
     {
         const string code = """
             using System.Threading.Tasks;
@@ -555,7 +614,7 @@ public class PerformanceAsyncProbeTests
         var result = Analyze(code, addTasksRef: true);
 
         result.Findings.Where(f => f.Category == "missingCancellationToken")
-            .Should().AllSatisfy(f => f.Severity.Should().Be("warning"));
+            .Should().AllSatisfy(f => f.Severity.Should().Be("info"));
     }
 
     [Fact]
@@ -729,7 +788,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void MaterializationBeforeQueryShape_SeverityIsWarning()
+    public void MaterializationBeforeQueryShape_SeverityIsInfo()
     {
         const string code = """
             using System.Collections.Generic;
@@ -744,7 +803,7 @@ public class PerformanceAsyncProbeTests
         var result = Analyze(code);
 
         result.Findings.Where(f => f.Category == "materializationBeforeQueryShape")
-            .Should().AllSatisfy(f => f.Severity.Should().Be("warning"));
+            .Should().AllSatisfy(f => f.Severity.Should().Be("info"));
     }
 
     // ── 6. awaitedIoInsideLoop ───────────────────────────────────────────────
@@ -797,7 +856,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void AwaitedIoInsideLoop_SeverityIsWarning()
+    public void AwaitedIoInsideLoop_SeverityIsInfo()
     {
         const string code = """
             using System.Collections.Generic;
@@ -818,7 +877,7 @@ public class PerformanceAsyncProbeTests
         var result = Analyze(code, addTasksRef: true);
 
         result.Findings.Where(f => f.Category == "awaitedIoInsideLoop")
-            .Should().AllSatisfy(f => f.Severity.Should().Be("warning"));
+            .Should().AllSatisfy(f => f.Severity.Should().Be("info"));
     }
 
     [Fact]
@@ -1394,6 +1453,52 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
+    public void FanOutTransitiveMutation_ReportsOncePerSiteAndRetainsFirstCall()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Threading.Tasks;
+            sealed class Request { public List<int> Values { get; } = new(); }
+            static class Mutator {
+                public static void First(Request request) { var alias = request; Second(alias); }
+                public static void Second(Request request) { Third(request); }
+                public static void Third(Request request) { request.Values.Add(1); }
+            }
+            class Orchestrator {
+                public Task RunAsync(IEnumerable<int> items, Request request) =>
+                    Task.WhenAll(items.Select(item => { Mutator.First(request); Mutator.Third(request); return Task.CompletedTask; }));
+                public Task AgainAsync(IEnumerable<int> items, Request request) =>
+                    Task.WhenAll(items.Select(item => { Mutator.First(request); return Task.CompletedTask; }));
+            }
+            """;
+        var findings = Analyze(code, addTasksRef: true).Findings
+            .Where(f => f.Category == "sharedStateMutationInFanOut").ToList();
+        findings.Should().HaveCount(2);
+        findings.Should().OnlyContain(f => f.Message.Contains("'First'") && f.Message.Contains("'request'"));
+        findings.Select(f => f.Line).Distinct().Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void FanOutMutatesOnlyItsOwnItem_DoesNotReportCapturedState()
+    {
+        const string code = """
+            using System.Collections.Generic;
+            using System.Linq;
+            using System.Threading.Tasks;
+            sealed class Request { public List<int> Values { get; } = new(); }
+            static class Mutator {
+                public static Task Apply(Request request) { request.Values.Add(1); return Task.CompletedTask; }
+            }
+            class Orchestrator {
+                public Task RunAsync(IEnumerable<Request> requests) =>
+                    Task.WhenAll(requests.Select(request => Mutator.Apply(request)));
+            }
+            """;
+        Analyze(code, addTasksRef: true).Findings.Should().NotContain(f => f.Category == "sharedStateMutationInFanOut");
+    }
+
+    [Fact]
     public void FanOutReturnsResultsWithoutMutatingRequest_DoesNotFindSharedStateMutation()
     {
         const string code = """
@@ -1448,7 +1553,7 @@ public class PerformanceAsyncProbeTests
             using System.Threading.Tasks;
             class C {
                 void M() {
-                    var v = Task.FromResult(1).Result;
+                    var v = new TaskCompletionSource<int>().Task.Result;
                 }
             }
             """;
@@ -1459,7 +1564,7 @@ public class PerformanceAsyncProbeTests
     }
 
     [Fact]
-    public void SaveChangesInsideLoopPresent_ScoreIs2()
+    public void SaveChangesReviewLead_DoesNotReduceScore()
     {
         const string code = """
             class FakeContext {
@@ -1476,7 +1581,7 @@ public class PerformanceAsyncProbeTests
 
         var result = Analyze(code);
 
-        result.Score.Should().Be(2);
+        result.Score.Should().Be(10);
     }
 
     [Fact]
@@ -1485,11 +1590,11 @@ public class PerformanceAsyncProbeTests
         const string code = """
             using System.Threading.Tasks;
             class C {
-                void M1() { var v = Task.FromResult(1).Result; }
-                void M2() { var v = Task.FromResult(1).Result; }
-                void M3() { var v = Task.FromResult(1).Result; }
-                void M4() { var v = Task.FromResult(1).Result; }
-                void M5() { var v = Task.FromResult(1).Result; }
+                void M1() { var v = new TaskCompletionSource<int>().Task.Result; }
+                void M2() { var v = new TaskCompletionSource<int>().Task.Result; }
+                void M3() { var v = new TaskCompletionSource<int>().Task.Result; }
+                void M4() { var v = new TaskCompletionSource<int>().Task.Result; }
+                void M5() { var v = new TaskCompletionSource<int>().Task.Result; }
             }
             """;
 

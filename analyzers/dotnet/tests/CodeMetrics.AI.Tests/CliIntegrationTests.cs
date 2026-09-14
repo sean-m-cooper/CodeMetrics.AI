@@ -6,6 +6,44 @@ namespace CodeMetrics.AI.Tests;
 
 public class CliIntegrationTests
 {
+    [Fact]
+    public async Task Cli_UsesBuildScopeForSourceAndDependencies_WithoutHidingSelectedErrors()
+    {
+        var root = Directory.CreateTempSubdirectory("codemetrics-build-scope-").FullName;
+        try
+        {
+            var repository = new DirectoryInfo(AppContext.BaseDirectory);
+            while (repository != null && !Directory.Exists(Path.Combine(repository.FullName, "shared", "scorecard-schema"))) repository = repository.Parent;
+            var configuration = new DirectoryInfo(AppContext.BaseDirectory).Parent!.Name;
+            var tool = Path.Combine(repository!.FullName, "analyzers", "dotnet", "src", "CodeMetrics.AI", "bin", configuration, "net10.0", "CodeMetrics.AI.dll");
+            foreach (var name in new[] { "App", "Broken", "Unselected" })
+            {
+                Directory.CreateDirectory(Path.Combine(root, name));
+                await File.WriteAllTextAsync(Path.Combine(root, name, name + ".csproj"),
+                    $"<Project Sdk='Microsoft.NET.Sdk'><PropertyGroup><TargetFramework>{(name == "Unselected" ? "netcoreapp2.0" : "net10.0")}</TargetFramework></PropertyGroup></Project>", TestContext.Current.CancellationToken);
+                await File.WriteAllTextAsync(Path.Combine(root, name, "Source.cs"), name == "App" ? "public class App { public int Run() => 1; }" : "public class Broken { MissingType value; }", TestContext.Current.CancellationToken);
+            }
+            var entry = Path.Combine(root, "App.slnx");
+            await File.WriteAllTextAsync(entry, "<Solution><Project Path='App/App.csproj'/><Project Path='Broken/Broken.csproj'><Build Project='false'/></Project></Solution>", TestContext.Current.CancellationToken);
+            (await Run(root, "restore", "App/App.csproj", "--ignore-failed-sources")).Code.Should().Be(0);
+            var result = await Run(root, tool, "--solution", entry, "--configuration", "Release", "--scorecard-output", "scoped.json");
+            result.Code.Should().Be(0, result.Output);
+            using var evidence = JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(root, "scoped.json"), TestContext.Current.CancellationToken));
+            evidence.RootElement.GetProperty("analysis").GetProperty("status").GetString().Should().Be("complete");
+            evidence.RootElement.GetProperty("filters").GetProperty("analyzedUnits").GetInt32().Should().Be(1);
+            evidence.RootElement.GetProperty("filters").GetProperty("skipped").EnumerateArray().Should()
+                .Contain(item => item.GetProperty("reason").GetString() == "Excluded by solution build configuration");
+            var dependencies = evidence.RootElement.GetProperty("dimensions").GetProperty("dependencyManagement");
+            dependencies.GetProperty("status").GetString().Should().Be("scored");
+            dependencies.GetProperty("findings").EnumerateArray().Should().NotContain(item => item.GetProperty("category").GetString() == "unsupportedTargetFramework");
+            await File.WriteAllTextAsync(entry, "<Solution><Project Path='App/App.csproj'/><Project Path='Broken/Broken.csproj'/></Solution>", TestContext.Current.CancellationToken);
+            (await Run(root, "restore", "Broken/Broken.csproj", "--ignore-failed-sources")).Code.Should().Be(0);
+            var failed = await Run(root, tool, "--solution", entry, "--skip-dependency-probe");
+            failed.Code.Should().Be(2, failed.Output);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
     [Theory]
     [InlineData("Warning", false, false, 0)]
     [InlineData("Error", false, false, 2)]

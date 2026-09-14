@@ -27,8 +27,8 @@ public static class PerformanceAsyncProbe
                 var semanticModel = compilation.GetSemanticModel(tree);
 
                 AnalyzeSyncOverAsync(root, semanticModel, filePath, projectName, findings);
-                AnalyzeThreadSleep(root, filePath, projectName, findings);
-                AnalyzeSaveChangesInsideLoop(root, filePath, projectName, findings);
+                AnalyzeThreadSleep(root, semanticModel, filePath, projectName, findings);
+                AnalyzeSaveChangesInsideLoop(root, semanticModel, filePath, projectName, findings);
                 AnalyzeMissingCancellationToken(root, semanticModel, filePath, projectName, findings);
                 AnalyzeMaterializationBeforeQueryShape(root, filePath, projectName, findings);
                 AnalyzeAwaitedIoInsideLoop(
@@ -38,23 +38,32 @@ public static class PerformanceAsyncProbe
         }
 
         findings.AddRange(ConcurrentFanOutProbe.Analyze(projects, solutionDir));
+        PerformanceFindingContext.CompleteMetadata(findings);
+        var observationCount = findings.Count;
+        findings = PerformanceSourceFindings.Collapse(findings, solutionDir);
 
         var errors = findings.Count(f => f.Severity == "error");
         var warnings = findings.Count(f => f.Severity == "warning");
         var hasSyncOverAsync = findings.Any(f => f.Category == "syncOverAsync" && f.Severity == "error");
-        var hasSaveChangesInsideLoop = findings.Any(f => f.Category == "saveChangesInsideLoop");
+        var hasSaveChangesInsideLoop = findings.Any(f => f.Category == "saveChangesInsideLoop" && f.Severity == "error");
 
         // Ladder rungs. The warning tail spans 4/6/8 rather than SecurityProbe's 6/8
         // because rung 4 has no structural condition of its own here — collapsing
         // 'warnings > 3' upward would make 4 unreachable while fixing the missing 8.
         //   0  systemic  — five or more error-severity findings
         //   2  errors    — sync-over-async, SaveChanges in a loop, or any error finding
-        //   4  noisy     — more than three advisory warnings
-        //   6  several   — two or three advisory warnings
-        //   8  minor     — a single advisory warning, no errors
-        //  10  clean     — no findings
-        var decision = ScoringDecision.FirstMatch("dotnet/performanceAsync/v1", new()
+        //   4  noisy     — more than three scored warnings
+        //   6  several   — two or three scored warnings
+        //   8  minor     — a single scored warning, no errors
+        //  10  clean     — no scored findings; review leads can remain
+        var decision = ScoringDecision.FirstMatch("dotnet/performanceAsync/context-classification-v3", new()
         {
+            ["countingUnit"] = "distinctSourceFinding",
+            ["variantAggregation"] = "maximumSeverityPerSourceSite",
+            ["sourceFindings"] = findings.Count,
+            ["reviewLeads"] = findings.Count(f => f.Severity == "info"),
+            ["actionableSignals"] = errors + warnings,
+            ["projectFrameworkObservations"] = observationCount,
             ["errors"] = errors,
             ["warnings"] = warnings,
             ["hasSyncOverAsync"] = hasSyncOverAsync,
@@ -69,7 +78,8 @@ public static class PerformanceAsyncProbe
         ScoringStep.Rule("warnings", "warnings > 0", warnings > 0, 8, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
         ScoringStep.Rule("clean", "otherwise", true, 10, []));
 
-        var basis = $"Findings: {findings.Count} (errors: {errors}, warnings: {warnings}). " +
+        var basis = $"Distinct source findings: {findings.Count} across {observationCount} project/framework observations " +
+                    $"(errors: {errors}, warnings: {warnings}, unscored review leads: {findings.Count(f => f.Severity == "info")}). " +
                     $"syncOverAsync={findings.Count(f => f.Category == "syncOverAsync")}, " +
                     $"threadSleep={findings.Count(f => f.Category == "threadSleep")}, " +
                     $"saveChangesInsideLoop={findings.Count(f => f.Category == "saveChangesInsideLoop")}, " +
@@ -96,6 +106,7 @@ public static class PerformanceAsyncProbe
     {
         foreach (var access in SyncBlockingDetector.Find(root, semanticModel, "syncOverAsync"))
         {
+            var contextReason = PerformanceFindingContext.SyncReason(access.Node, semanticModel);
             var operation = access.Kind switch
             {
                 SyncBlockingKind.Result => ".Result",
@@ -106,19 +117,23 @@ public static class PerformanceAsyncProbe
             findings.Add(new Finding
             {
                 Category = "syncOverAsync",
-                Severity = SyncOverAsyncSeverity(access.Node),
+                Severity = contextReason == null ? "error" : "info",
                 File = filePath,
                 Line = GetLine(access.Node),
+                Observations = contextReason == null ? PerformanceSourceFindings.Location(access.Node) :
+                    PerformanceFindingContext.Review(access.Node, contextReason),
                 Project = projectName,
                 Type = GetContainingTypeName(access.Node),
-                Message = $"'{operation}' blocks the calling thread synchronously. Use 'await' instead."
+                Message = contextReason == null
+                    ? $"'{operation}' synchronously waits for asynchronous work. Review an asynchronous path and blocking risk."
+                    : $"'{operation}' is a synchronous wait at a declared or documented boundary. Review its runtime cost; an asynchronous replacement is not established."
             });
         }
     }
 
     // 2. threadSleep: Thread.Sleep(...)
     private static void AnalyzeThreadSleep(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName, List<Finding> findings)
     {
         var invocations = root.DescendantNodes().OfType<InvocationExpressionSyntax>();
         foreach (var inv in invocations)
@@ -128,15 +143,18 @@ public static class PerformanceAsyncProbe
                 id.Identifier.Text == "Thread" &&
                 ma.Name.Identifier.Text == "Sleep")
             {
+                var contextReason = PerformanceFindingContext.SyncReason(inv, semanticModel);
                 findings.Add(new Finding
                 {
                     Category = "threadSleep",
-                    Severity = "warning",
+                    Severity = contextReason == null ? "warning" : "info",
                     File = filePath,
                     Line = GetLine(inv),
+                    Observations = contextReason == null ? PerformanceSourceFindings.Location(inv) :
+                        PerformanceFindingContext.Review(inv, contextReason),
                     Project = projectName,
                     Type = GetContainingTypeName(inv),
-                    Message = "'Thread.Sleep' blocks the thread. Use 'await Task.Delay' instead."
+                    Message = "'Thread.Sleep' blocks the thread. Review the execution contract and whether asynchronous delay is appropriate."
                 });
             }
         }
@@ -144,7 +162,7 @@ public static class PerformanceAsyncProbe
 
     // 3. saveChangesInsideLoop: SaveChanges()/SaveChangesAsync() inside for/foreach/while/do
     private static void AnalyzeSaveChangesInsideLoop(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel semanticModel, string filePath, string projectName, List<Finding> findings)
     {
         var invocations = root.DescendantNodes().OfType<InvocationExpressionSyntax>();
         foreach (var inv in invocations)
@@ -159,12 +177,14 @@ public static class PerformanceAsyncProbe
                         findings.Add(new Finding
                         {
                             Category = "saveChangesInsideLoop",
-                            Severity = "error",
+                            Severity = "info",
                             File = filePath,
                             Line = GetLine(inv),
+                            Observations = PerformanceFindingContext.Review(inv,
+                                PerformanceFindingContext.PersistenceReason(inv, semanticModel)),
                             Project = projectName,
                             Type = GetContainingTypeName(inv),
-                            Message = $"'{memberName}' called inside a loop. Batch changes and call once outside the loop."
+                            Message = $"'{memberName}' is called inside a loop. Review existing batch, session, transaction and notification boundaries before changing persistence."
                         });
                     }
                 }
@@ -201,20 +221,20 @@ public static class PerformanceAsyncProbe
                 continue;
 
             // Must NOT already have a CancellationToken parameter
-            bool hasCt = method.ParameterList.Parameters
-                .Any(p => p.Type?.ToString().Contains("CancellationToken") == true);
+            bool hasCt = CancellationInputRecognition.HasInput(method, semanticModel);
 
             if (!hasCt)
             {
                 findings.Add(new Finding
                 {
                     Category = "missingCancellationToken",
-                    Severity = "warning",
+                    Severity = "info",
                     File = filePath,
                     Line = GetLine(method),
+                    Observations = PerformanceFindingContext.Review(method, "cancellationContractRequiresReview"),
                     Project = projectName,
                     Type = GetContainingTypeName(method),
-                    Message = $"Method '{method.Identifier.Text}' performs async I/O but has no CancellationToken parameter."
+                    Message = $"Method '{method.Identifier.Text}' contains I/O-like async calls without a recognized cancellation input. Review overloads and the cancellation contract; dropped cancellation is not proven."
                 });
             }
         }
@@ -249,12 +269,13 @@ public static class PerformanceAsyncProbe
                 findings.Add(new Finding
                 {
                     Category = "materializationBeforeQueryShape",
-                    Severity = "warning",
+                    Severity = "info",
                     File = filePath,
                     Line = GetLine(inv),
+                    Observations = PerformanceFindingContext.Review(inv, "querySemanticsAndCostRequireReview"),
                     Project = projectName,
                     Type = GetContainingTypeName(inv),
-                    Message = $"'.ToList()' called before '.{outerMa.Name.Identifier.Text}()' forces in-memory evaluation. Apply query operators before materializing."
+                    Message = $"'.ToList()' precedes '.{outerMa.Name.Identifier.Text}()'. Review provider semantics, snapshot needs and input size before moving materialization."
                 });
             }
         }
@@ -290,12 +311,13 @@ public static class PerformanceAsyncProbe
             findings.Add(new Finding
             {
                 Category = "awaitedIoInsideLoop",
-                Severity = "warning",
+                Severity = "info",
                 File = filePath,
                 Line = GetLine(awaitExpression),
+                Observations = PerformanceFindingContext.Review(awaitExpression, "orderingAndConcurrencySafetyRequireReview"),
                 Project = projectName,
                 Type = GetContainingTypeName(awaitExpression),
-                Message = $"'await {methodName}(...)' inside a loop causes sequential I/O. Consider batching or using Task.WhenAll."
+                Message = $"'await {methodName}(...)' inside a loop is sequential. Review ordering, shared state and resource limits before introducing concurrency."
             });
         }
     }
@@ -371,6 +393,7 @@ public static class PerformanceAsyncProbe
                 Confidence = "medium",
                 File = filePath,
                 Line = GetLine(inv),
+                Observations = PerformanceSourceFindings.Location(inv),
                 Project = projectName,
                 Type = GetContainingTypeName(inv),
                 Message = "Task.WhenAll enumerates a task-producing projection whose input size is not bounded here. Consider explicit concurrency control."
@@ -419,29 +442,11 @@ public static class PerformanceAsyncProbe
                containingType.Name.EndsWith("Middleware", StringComparison.Ordinal);
     }
 
-    private static string SyncOverAsyncSeverity(SyntaxNode node)
-    {
-        var method = node.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault();
-        if (method == null)
-            return "error";
-
-        return HasSyncRequiredSuppression(method) ||
-               IsOverrideOrExplicitInterfaceImplementation(method)
-            ? "info"
-            : "error";
-    }
-
     private static bool HasSyncRequiredSuppression(MethodDeclarationSyntax method)
     {
         return method.GetLeadingTrivia()
             .Any(trivia => trivia.IsKind(SyntaxKind.SingleLineCommentTrivia) &&
                            trivia.ToString().Contains("amp-metrics: sync-required", StringComparison.OrdinalIgnoreCase));
-    }
-
-    private static bool IsOverrideOrExplicitInterfaceImplementation(MethodDeclarationSyntax method)
-    {
-        return method.Modifiers.Any(m => m.IsKind(SyntaxKind.OverrideKeyword)) ||
-               method.ExplicitInterfaceSpecifier != null;
     }
 
     // ── Sequential-by-necessity loop shapes ───────────────────────────────────

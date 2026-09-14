@@ -68,8 +68,9 @@ public sealed class DependencyDetailTests : IDisposable
         var upgrades = PackageFrameworkCompatibility.ParseOutdatedOutput(report);
         var compatibility = new Dictionary<OutdatedPackageUpgrade, bool> { [upgrades[0]] = true, [upgrades[1]] = false };
         var result = DependencyProbe.AnalyzeOutput(Empty, report, Empty, directory, false, frameworkCompatibility: compatibility);
-        result.Score.Should().Be(8);
-        result.Basis.Should().Contain("outdated=2,").And.Contain("outdatedFrameworkIncompatibleExcluded=1");
+        result.Status.Should().Be("failed");
+        result.Score.Should().BeNull();
+        result.Basis.Should().Contain("outdated=1,").And.Contain("outdatedFrameworkIncompatibleExcluded=1");
         result.Findings.Single(f => f.Package == "Compatible").Observations["frameworkCompatibility"].Should().Be("compatible");
         var excluded = result.Findings.Single(f => f.Package == "Incompatible");
         excluded.Severity.Should().Be("info");

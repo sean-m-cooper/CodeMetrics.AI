@@ -12,15 +12,18 @@ internal static class NuGetPackageClient
         string package,
         string version,
         IReadOnlyList<Uri> packageBaseAddresses,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Action<string>? reportFailure = null,
+        HttpClient? client = null)
     {
+        if (packageBaseAddresses.Count == 0) reportFailure?.Invoke("noPackageBaseAddress");
         // codemetrics-ignore: awaitedIoInsideLoop -- package sources are ordered fallbacks.
         foreach (var baseAddress in packageBaseAddresses)
         {
             try
             {
                 var packageUri = CreatePackageUri(baseAddress, package, version);
-                var frameworks = await DownloadAndInspectAsync(packageUri, cancellationToken);
+                var frameworks = await DownloadAndInspectAsync(packageUri, cancellationToken, reportFailure, client ?? HttpClient);
                 if (frameworks != null)
                     return frameworks;
             }
@@ -31,6 +34,7 @@ internal static class NuGetPackageClient
             catch (Exception ex) when (
                 ex is HttpRequestException or IOException or InvalidDataException or TaskCanceledException)
             {
+                reportFailure?.Invoke("packageDownload:" + ex.GetType().Name);
                 // Try the next configured source. If all fail, compatibility remains unknown.
                 continue;
             }
@@ -41,15 +45,22 @@ internal static class NuGetPackageClient
 
     private static async Task<PackageFrameworkSet?> DownloadAndInspectAsync(
         Uri packageUri,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Action<string>? reportFailure,
+        HttpClient client)
     {
-        using var response = await HttpClient.GetAsync(
+        using var response = await client.GetAsync(
             packageUri,
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
-        if (!response.IsSuccessStatusCode ||
-            response.Content.Headers.ContentLength is > MaximumPackageBytes)
+        if (!response.IsSuccessStatusCode)
         {
+            reportFailure?.Invoke($"packageHttpStatus:{(int)response.StatusCode}");
+            return null;
+        }
+        if (response.Content.Headers.ContentLength is > MaximumPackageBytes)
+        {
+            reportFailure?.Invoke("packageSizeLimit");
             return null;
         }
 

@@ -85,87 +85,75 @@ public static class PackageFrameworkCompatibility
             : IsCompatible(projectTargetFramework, frameworks.Frameworks);
     }
 
-    internal static async Task<IReadOnlyDictionary<OutdatedPackageUpgrade, bool>> AssessAsync(
+    internal static async Task<PackageCompatibilityAssessment> AssessAsync(
         IReadOnlyList<OutdatedPackageUpgrade> upgrades,
         string commandOutput,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        TimeSpan? budget = null,
+        HttpClient? client = null)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        var groups = upgrades.GroupBy(upgrade => (upgrade.Package, upgrade.LatestVersion),
+            StringTupleComparer.OrdinalIgnoreCase).ToList();
         var result = new Dictionary<OutdatedPackageUpgrade, bool>();
-        var assessable = upgrades
-            .Where(upgrade =>
-                !string.IsNullOrWhiteSpace(upgrade.TargetFramework) &&
-                !string.IsNullOrWhiteSpace(upgrade.LatestVersion))
-            .GroupBy(
-                upgrade => (upgrade.Package, upgrade.LatestVersion),
-                StringTupleComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        if (assessable.Count == 0)
-            return result;
+        var failures = new List<PackageCompatibilityFailure>();
+        if (groups.Count == 0) return new(result, failures, 0, 0, 0);
 
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        timeout.CancelAfter(TimeSpan.FromSeconds(20));
-        var resolver = await NuGetPackageFrameworkResolver.CreateAsync(
-            commandOutput,
-            timeout.Token);
-        using var gate = new SemaphoreSlim(4);
-        var tasks = assessable
-            .Select(group => AssessGroupAsync(group, resolver, gate, timeout.Token, cancellationToken))
-            .ToList();
-
-        foreach (var assessment in await Task.WhenAll(tasks))
-            AddAssessmentResults(result, assessment.Group, assessment.Frameworks);
-
-        return result;
-    }
-
-    private static async Task<(
-        IGrouping<(string Package, string? LatestVersion), OutdatedPackageUpgrade> Group,
-        PackageFrameworkSet? Frameworks)> AssessGroupAsync(
-        IGrouping<(string Package, string? LatestVersion), OutdatedPackageUpgrade> group,
-        NuGetPackageFrameworkResolver resolver,
-        SemaphoreSlim gate,
-        CancellationToken timeoutToken,
-        CancellationToken callerToken)
-    {
-        var entered = false;
+        timeout.CancelAfter(budget ?? TimeSpan.FromSeconds(20));
+        NuGetPackageFrameworkResolver resolver;
         try
         {
-            await gate.WaitAsync(timeoutToken);
-            entered = true;
-            var frameworks = await resolver.FindAsync(
-                group.Key.Package,
-                group.Key.LatestVersion!,
-                timeoutToken);
-            return (group, frameworks);
+            resolver = await NuGetPackageFrameworkResolver.CreateAsync(commandOutput, timeout.Token, client);
         }
-        catch (OperationCanceledException) when (!callerToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            return (group, null);
+            foreach (var group in groups)
+                failures.Add(new(group.Key.Package, group.Key.Item2, group.Count(), ["sourceDiscoveryBudgetExceeded"]));
+            return new(result, failures, groups.Count, upgrades.Count, watch.Elapsed.TotalMilliseconds);
         }
-        finally
+        using var gate = new SemaphoreSlim(4);
+        var tasks = groups.Select(async group =>
         {
-            if (entered)
-                gate.Release();
-        }
-    }
-
-    private static void AddAssessmentResults(
-        IDictionary<OutdatedPackageUpgrade, bool> result,
-        IEnumerable<OutdatedPackageUpgrade> upgrades,
-        PackageFrameworkSet? frameworks)
-    {
-        if (frameworks == null)
-            return;
-
-        foreach (var upgrade in upgrades)
+            var reasons = new List<string>();
+            var entered = false;
+            PackageFrameworkSet? frameworks = null;
+            try
+            {
+                await gate.WaitAsync(timeout.Token);
+                entered = true;
+                if (!Regex.IsMatch(group.Key.Item2, @"^[0-9]+(?:\.[0-9]+){0,3}(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$"))
+                    reasons.Add("latestVersionUnavailable");
+                else
+                    frameworks = await resolver.FindAsync(group.Key.Package, group.Key.Item2, timeout.Token, reasons.Add);
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                reasons.Add(entered ? "packageBudgetExceeded" : "queueBudgetExceeded");
+            }
+            finally
+            {
+                if (entered) gate.Release();
+            }
+            return (Group: group, Frameworks: frameworks, Reasons: reasons);
+        }).ToList();
+        foreach (var assessment in await Task.WhenAll(tasks))
         {
-            var compatible = frameworks.IsFrameworkAgnostic
-                ? true
-                : IsCompatible(upgrade.TargetFramework!, frameworks.Frameworks);
-            if (compatible.HasValue)
-                result[upgrade] = compatible.Value;
+            var missing = 0;
+            foreach (var upgrade in assessment.Group)
+            {
+                bool? compatible = assessment.Frameworks == null ? null :
+                    assessment.Frameworks.IsFrameworkAgnostic ? true :
+                    IsCompatible(upgrade.TargetFramework ?? "", assessment.Frameworks.Frameworks);
+                if (compatible.HasValue) result[upgrade] = compatible.Value;
+                else missing++;
+            }
+            if (missing > 0)
+                failures.Add(new(assessment.Group.Key.Package, assessment.Group.Key.Item2,
+                    missing, assessment.Reasons.Count > 0 ? assessment.Reasons.Distinct().ToArray() : ["frameworkMetadataUnsupported"]));
         }
+        return new(result, failures, groups.Count, upgrades.Count, watch.Elapsed.TotalMilliseconds);
     }
 
     private static IEnumerable<string> SplitLines(string text)
@@ -175,19 +163,19 @@ public static class PackageFrameworkCompatibility
             : text.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
     }
 
-    private sealed class StringTupleComparer : IEqualityComparer<(string Package, string? Version)>
+    private sealed class StringTupleComparer : IEqualityComparer<(string Package, string Version)>
     {
         public static readonly StringTupleComparer OrdinalIgnoreCase = new();
 
         public bool Equals(
-            (string Package, string? Version) x,
-            (string Package, string? Version) y)
+            (string Package, string Version) x,
+            (string Package, string Version) y)
         {
             return StringComparer.OrdinalIgnoreCase.Equals(x.Package, y.Package) &&
                    StringComparer.OrdinalIgnoreCase.Equals(x.Version, y.Version);
         }
 
-        public int GetHashCode((string Package, string? Version) obj)
+        public int GetHashCode((string Package, string Version) obj)
         {
             return HashCode.Combine(
                 StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Package),
@@ -197,3 +185,13 @@ public static class PackageFrameworkCompatibility
         }
     }
 }
+
+public sealed record PackageCompatibilityFailure(
+    string Package, string LatestVersion, int AffectedObservations, IReadOnlyList<string> Reasons);
+
+public sealed record PackageCompatibilityAssessment(
+    IReadOnlyDictionary<OutdatedPackageUpgrade, bool> Results,
+    IReadOnlyList<PackageCompatibilityFailure> Failures,
+    int UniquePackageVersions,
+    int TotalObservations,
+    double ElapsedMilliseconds);

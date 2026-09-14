@@ -6,6 +6,42 @@ namespace CodeMetrics.AI.Tests.Probes;
 
 public class DependencyProbeTests
 {
+    [Theory]
+    [InlineData("notAssessed", false, 1, 0, "included", "unknown")]
+    [InlineData("missing", false, 0, 1, "unavailable", "unknown")]
+    [InlineData("compatible", false, 1, 0, "included", "compatible")]
+    [InlineData("incompatible", false, 0, 0, "excludedFrameworkIncompatible", "incompatible")]
+    [InlineData("incompatible", true, 0, 0, "excludedAspire", "unknown")]
+    public void OutdatedCountsAndFindingDisposition_PreserveAssessmentStates(
+        string assessment, bool aspire, int included, int unknown, string disposition, string compatibilityLabel)
+    {
+        var dir = TempDir();
+        try
+        {
+            WriteCsproj(dir, "App.csproj", aspire
+                ? "<Project Sdk=\"Aspire.AppHost.Sdk/13.0.0\"><PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup></Project>"
+                : SimpleCsproj());
+            const string output = """
+                { "version": 1, "projects": [{ "path": "App.csproj", "frameworks": [{
+                  "framework": "net10.0", "topLevelPackages": [{ "id": "Library", "resolvedVersion": "1.0.0", "latestVersion": "2.0.0" }]
+                }] }] }
+                """;
+            var upgrade = PackageFrameworkCompatibility.ParseOutdatedOutput(output).Single();
+            Dictionary<OutdatedPackageUpgrade, bool>? compatibility = assessment == "notAssessed" ? null : new();
+            if (assessment is "compatible" or "incompatible")
+                compatibility![upgrade] = assessment == "compatible";
+            var result = DependencyProbe.AnalyzeOutput(EmptyVulnerableOutput, output, EmptyDeprecatedOutput,
+                dir, false, frameworkCompatibility: compatibility);
+            result.Basis.Should().Contain($"outdated={included},")
+                .And.Contain($"outdatedFrameworkCompatibilityUnknown={unknown},");
+            var finding = result.Findings.Single(item => item.Category == "outdatedDependency");
+            finding.Observations["scoreDisposition"].Should().Be(disposition);
+            finding.Observations["frameworkCompatibility"].Should().Be(compatibilityLabel);
+            finding.Severity.Should().Be(included == 1 ? "warning" : "info");
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
     // ── Helper: build empty temp directory ────────────────────────────────────
 
     private static string TempDir()
@@ -639,6 +675,13 @@ public class DependencyProbeTests
     [InlineData("net9.0-windows10.0", "net9.0-windows11.0", false)]
     [InlineData("net48", "netstandard2.0", true)]
     [InlineData("net48", "netstandard2.1", false)]
+    [InlineData(".NETCoreApp,Version=v9.0", "net8.0", true)]
+    [InlineData("NETFramework4.6.1", "netstandard2.0", true)]
+    [InlineData("netcoreapp3.1", ".NETStandard,Version=v2.1", true)]
+    [InlineData(" NET9.0-WINDOWS10.0 ", "net9.0-windows10.0", true)]
+    [InlineData("net9.0-linux", "net9.0-windows", false)]
+    [InlineData("net9.0-windows", "net9.0-windows10.0", false)]
+    [InlineData("net9.0", "any", true)]
     public void FrameworkCompatibility_UsesTargetFrameworkSemantics(
         string projectFramework,
         string packageFramework,
@@ -653,6 +696,13 @@ public class DependencyProbeTests
     {
         PackageFrameworkCompatibility.IsCompatible("xamarinios10", ["net10.0"])
             .Should().BeNull();
+    }
+
+    [Fact]
+    public void FrameworkCompatibility_CompatibleAssetWinsOverUnknownAlternative()
+    {
+        PackageFrameworkCompatibility.IsCompatible("net9.0", ["uap10.0", "net8.0"])
+            .Should().BeTrue();
     }
 
     [Fact]
@@ -746,7 +796,7 @@ public class DependencyProbeTests
     }
 
     [Fact]
-    public void FrameworkCompatibilityUnknown_UpgradeRemainsScored()
+    public void FrameworkCompatibilityUnknown_WithholdsScore()
     {
         var dir = TempDir();
         try
@@ -766,7 +816,10 @@ public class DependencyProbeTests
                 anyCommandFailed: false,
                 frameworkCompatibility: new Dictionary<OutdatedPackageUpgrade, bool>());
 
-            result.Basis.Should().Contain("outdated=1");
+            result.Status.Should().Be("failed");
+            result.Score.Should().BeNull();
+            result.ScoringDecision.Should().BeNull();
+            result.Basis.Should().Contain("outdated=0");
             result.Basis.Should().Contain("outdatedFrameworkCompatibilityUnknown=1");
         }
         finally

@@ -15,6 +15,7 @@ internal sealed record SolutionAnalysisContext(
     IReadOnlyList<MemberMetrics> MemberMetrics)
 {
     public List<AnalysisDiagnostic> Diagnostics { get; } = [];
+    public IReadOnlyList<string> ScopedProjectPaths { get; init; } = [];
     public bool HasErrors => Diagnostics.Any(diagnostic => diagnostic.Kind != "workspaceWarning");
 }
 
@@ -24,58 +25,28 @@ internal static class SolutionCompilationLoader
         Solution solution,
         string solutionDir,
         CancellationToken cancellationToken,
-        ProjectId? entryProjectId = null)
+        ProjectId? entryProjectId = null,
+        SolutionScope? scope = null)
     {
-        // References remain in the workspace for semantic resolution; project entry points score only that project.
-        var projects = solution.Projects.Where(project => entryProjectId == null || project.Id == entryProjectId).ToList();
-        var (skipped, analyzedProjectIds) = ClassifyProjects(projects);
-        var compiledProjects = await CompileAsync(projects, cancellationToken);
-        var loaded = CollectMetrics(compiledProjects, analyzedProjectIds, solutionDir);
+        var selection = SolutionProjectSelection.Create(solution, solutionDir, entryProjectId, scope);
+        var compiledProjects = await CompileAsync(selection.CompilationProjects, cancellationToken);
+        selection.ExcludeSemanticTests(compiledProjects, solutionDir);
+        var loaded = CollectMetrics(compiledProjects, selection.AnalyzedProjectIds, solutionDir);
 
         var context = new SolutionAnalysisContext(
-            projects.Count,
+            selection.TotalProjectCount,
             loaded.AnalyzedCompilations.Select(project => project.ProjectName).ToList(),
-            skipped,
+            selection.SkippedProjects,
             loaded.AllCompilations,
             loaded.AnalyzedCompilations,
             loaded.ProjectsWithPaths,
             loaded.Types,
-            loaded.Members);
-        foreach (var (project, compilation) in compiledProjects)
+            loaded.Members)
         {
-            if (compilation == null)
-            {
-                context.Diagnostics.Add(new AnalysisDiagnostic("compilationUnavailable", "No compilation was available.", project.Name));
-                if (analyzedProjectIds.Contains(project.Id))
-                    skipped.Add(new SkippedProjectInfo { Name = project.Name, Reason = "Compilation unavailable" });
-            }
-            else
-            {
-                foreach (var diagnostic in compilation.GetDiagnostics(cancellationToken)
-                    .Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error).Take(20))
-                    context.Diagnostics.Add(new AnalysisDiagnostic("compilationError", diagnostic.ToString(), project.Name));
-            }
-        }
-        if (context.AnalyzedProjectNames.Count == 0)
-            context.Diagnostics.Add(new AnalysisDiagnostic("emptyPopulation", "No production projects could be analyzed."));
+            ScopedProjectPaths = selection.ActiveProjects.Select(p => p.FilePath).OfType<string>().Distinct(SolutionScope.PathComparer).ToArray()
+        };
+        SolutionCompilationDiagnostics.Append(context, compiledProjects, selection, cancellationToken);
         return context;
-    }
-
-    private static (
-        List<SkippedProjectInfo> Skipped,
-        HashSet<ProjectId> AnalyzedProjectIds) ClassifyProjects(IEnumerable<Project> projects)
-    {
-        var skipped = new List<SkippedProjectInfo>();
-        var analyzedProjectIds = new HashSet<ProjectId>();
-        foreach (var project in projects)
-        {
-            if (ProjectFilter.ShouldSkip(project.Name, out var reason))
-                skipped.Add(new SkippedProjectInfo { Name = project.Name, Reason = reason });
-            else
-                analyzedProjectIds.Add(project.Id);
-        }
-
-        return (skipped, analyzedProjectIds);
     }
 
     private static async Task<(Project Project, Compilation? Compilation)[]> CompileAsync(

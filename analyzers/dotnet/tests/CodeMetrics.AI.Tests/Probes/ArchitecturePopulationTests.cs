@@ -39,6 +39,44 @@ public sealed class ArchitecturePopulationTests : IDisposable
     }
 
     [Fact]
+    public void CycleCapRetainsCompleteMetricCensusAndStableDisplaySample()
+    {
+        File.WriteAllText(Path.Combine(directory, "A.csproj"),
+            "<Project><ItemGroup><ProjectReference Include=\"B.csproj\" /></ItemGroup></Project>");
+        File.WriteAllText(Path.Combine(directory, "B.csproj"),
+            "<Project><ItemGroup><ProjectReference Include=\"A.csproj\" /></ItemGroup></Project>");
+        var metrics = Enumerable.Range(0, 12).Select(index => new TypeMetrics
+        {
+            Project = "App",
+            Namespace = "App",
+            Type = $"Type{index:D2}",
+            FilePath = $"Type{index:D2}.cs",
+            StructuralClassCoupling = 11,
+            CyclomaticComplexity = 80,
+            DecompositionRatio = 8,
+            LinesOfSource = 500
+        }).ToArray();
+
+        var result = Analyze(metrics);
+        result.Score.Should().Be(0);
+        result.Findings.Should().HaveCount(37);
+        result.Findings[0].Category.Should().Be("projectCycle");
+        result.Extra["hotspotCount"].Should().Be(36);
+        result.Extra["hotspotsTruncated"].Should().Be(true);
+        result.Basis.Should().Contain("Findings: 37 (errors: 1, warnings: 36)")
+            .And.Contain("hotspots: 36 (showing 10)");
+        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        var sample = JsonSerializer.SerializeToElement(result.Extra["hotspots"], options).EnumerateArray().ToArray();
+        sample.Select(item => item.GetProperty("type").GetString())
+            .Should().Equal(Enumerable.Range(0, 10).Select(index => $"Type{index:D2}"));
+        sample.Should().OnlyContain(item => item.GetProperty("category").GetString() == "highCyclomaticComplexity");
+        var details = JsonSerializer.SerializeToElement(result.Extra["architectureMetrics"], options);
+        details.GetProperty("graphLayeringReason").GetString().Should().Be("projectCycle");
+        details.GetProperty("metricScore").GetDouble().Should().BeApproximately(3.8, 0.00001);
+        result.ScoringDecision!.Steps.Single(step => step.Id == "graphLayeringCap").Disposition.Should().Be("selected");
+    }
+
+    [Fact]
     public void ReplicatingPopulation_PreservesScore()
     {
         var small = Analyze(Enumerable.Range(0, 10).Select(index => Metric(index, index == 0 ? 15 : 0)));
@@ -87,7 +125,7 @@ public sealed class ArchitecturePopulationTests : IDisposable
     [Fact]
     public void Controller_UsesItsOwnThreshold()
     {
-        var controller = new TypeMetrics { Project = "App", Namespace = "App", Type = "HomeController", FilePath = "HomeController.cs", StructuralClassCoupling = 8 };
+        var controller = new TypeMetrics { Project = "App", Namespace = "App", Type = "HomeController", FilePath = "HomeController.cs", StructuralClassCoupling = 8, IsWebController = true };
         Analyze(new[] { controller }.Concat(Enumerable.Range(1, 99).Select(index => Metric(index)))).Score.Should().Be(9.9);
     }
 }
