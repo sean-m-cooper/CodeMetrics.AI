@@ -1,4 +1,10 @@
-# Performance & Async classification
+# Async/Blocking Usage classification
+
+Evaluates asynchronous operations and blocking calls for avoidable hazards, accounting
+for documented intent and supported usage patterns. Scores reflect code usage, not
+runtime speed or throughput. I/O latency, external rate limits and deliberate
+throttling do not inherently indicate misuse. The evidence key remains
+`performanceAsync`; this display-name clarification does not change scoring.
 
 The .NET 2.3.0 release uses ruleset `dotnet-2026-09-14-dependency-availability`
 and policy `dotnet/performanceAsync/context-classification-v3`. This changes which
@@ -105,7 +111,7 @@ The earlier descriptions above remain applicable except for these two bounded ad
   do not qualify. Having a paired async member alone grants no exemption.
 
 Both classifications retain the original finding, code, source span and confidence as
-informational review leads excluded from penalties in Performance & Async and Error
+informational review leads excluded from penalties in Async/Blocking Usage and Error
 Handling. Existing CMAI8001/CMAI5005 rationale-bearing annotations remain available for
 explicit reviewed intent outside these shapes; see the catalog shipped with the package.
 Internal helper propagation, cache completion inference, obsolete APIs and hidden base
@@ -137,4 +143,4 @@ it is not a throughput, latency, allocation or scalability measurement. Old/new 
 across these rulesets are classification comparisons, not compatible baseline gates
 or evidence of improvements to unchanged corpus source.
 
-The unpublished `dotnet-2026-09-14-short-circuit-completion` ruleset recognizes accesses in the right operand of built-in boolean `&&` when the left proves completion of the same Task/ValueTask local or parameter. A negated completion proof on the left of `||` also qualifies. Parentheses and nested boolean guards are supported; wrong receivers, mixed unproven alternatives, eager `&`/`|`, writes/ref/out uses within the guarded expression, user-defined operators and deferred functions do not establish this proof. Write detection is deliberately conservative across the whole expression; general interprocedural mutation is outside scope. Completion proves nonblocking access, not successful completion or safe repeated ValueTask consumption. Both Performance & Async and Error Handling use the shared classifier. Numerical ladders and raw metrics are unchanged; prior rulesets are incompatible baseline gates.
+The unpublished `dotnet-2026-09-14-short-circuit-completion` ruleset recognizes accesses in the right operand of built-in boolean `&&` when the left proves completion of the same Task/ValueTask local or parameter. A negated completion proof on the left of `||` also qualifies. Parentheses and nested boolean guards are supported; wrong receivers, mixed unproven alternatives, eager `&`/`|`, writes/ref/out uses within the guarded expression, user-defined operators and deferred functions do not establish this proof. Write detection is deliberately conservative across the whole expression; general interprocedural mutation is outside scope. Completion proves nonblocking access, not successful completion or safe repeated ValueTask consumption. Both Async/Blocking Usage and Error Handling use the shared classifier. Numerical ladders and raw metrics are unchanged; prior rulesets are incompatible baseline gates.

@@ -14,7 +14,7 @@ branch and receiver identity. SynchronousBoundaryContext owns property/method co
 and all-uses private call-chain propagation, bounded to four edges; recursion and unknown
 escapes remain unproven. SynchronousCallbackContract owns an explicit semantic API catalog
 for options configuration, Redis database factories and cancellation lifecycle callbacks.
-These helpers are shared across Performance & Async and Error Handling. They do not infer
+These helpers are shared across Async/Blocking Usage and Error Handling. They do not infer
 runtime safety, general callback intent, arbitrary scripting API pair exemptions or cache invariants.
 ScriptingCallbackContract recognizes the synchronous delegate directly returned by an
 OrchardCore.Scripting.GlobalMethod.Method factory using the resolved property and delegate
@@ -24,7 +24,7 @@ leads shared by both wait dimensions, not completion proofs.
 
 PerformanceAsyncProbe and ConcurrentFanOutProbe attach exact syntax spans when they emit
 observations. SourceFindings groups normalized physical file/span/category
-identities before Performance & Async scoring, selects maximum severity per site, and
+identities before Async/Blocking Usage scoring, selects maximum severity per site, and
 retains framework-specific evidence. Missing identities remain separate. This ownership
 keeps source counting independent of pattern recognition and of the score ladder.
 
@@ -145,12 +145,12 @@ The unpublished `dotnet-2026-09-14-evidence-fidelity` ruleset corrects evidence 
 
 The six pinned calibration fixtures retain their scores and finding expectations; only the expected ruleset identifier changes. The released 2.3.0 public-corpus baseline is preserved before any new runs.
 
-The following unpublished `dotnet-2026-09-14-source-package-populations` ruleset retains those corrections and changes Security/Dependency counting. `SourceFindings` is shared by Security and Performance & Async; Security supplies exact syntax spans and preserves first-observation group order. Maximum severity per physical site is scored once while original variant evidence remains attached. `RegexPatternRecognition` excludes only private/local constants whose symbol-resolved uses are exclusively BCL regex pattern arguments; public, mutable, unused, unresolved and mixed-use candidates remain findings.
+The following unpublished `dotnet-2026-09-14-source-package-populations` ruleset retains those corrections and changes Security/Dependency counting. `SourceFindings` is shared by Security and Async/Blocking Usage; Security supplies exact syntax spans and preserves first-observation group order. Maximum severity per physical site is scored once while original variant evidence remains attached. `RegexPatternRecognition` excludes only private/local constants whose symbol-resolved uses are exclusively BCL regex pattern arguments; public, mutable, unused, unresolved and mixed-use candidates remain findings.
 
 `DependencyFindingPopulation` counts distinct package/versions per scored input, retaining original project/TFM rows, advisories and compatibility dispositions. Missing version identities remain separate. `DependencyProjectScope` maps the loaded selection to physical project paths, with any production variant taking precedence. Security imports production/unknown vulnerability versions and discloses excluded test/benchmark observations. Dependency Management continues to assess every enabled project's packages, including development dependencies. Unknown compatibility and failed commands remain unavailable assessments; there is no numerical ladder change. See the [counting and scope policy](../../../shared/scorecard-schema/security-dependency-populations.md).
 
 The unpublished `dotnet-2026-09-14-scope-explicit-intent` ruleset adds benchmark scope recognition, terminal Task.Status switch proofs and informational semantic anonymous-access intent. Numerical ladders remain unchanged. See [scope and intent policy](../../../shared/scorecard-schema/scope-explicit-intent.md) for explicit boundaries.
 
-The unpublished `dotnet-2026-09-14-short-circuit-completion` ruleset recognizes accesses in the right operand of built-in boolean `&&` when the left proves completion of the same Task/ValueTask local or parameter. A negated completion proof on the left of `||` also qualifies. Parentheses and nested boolean guards are supported; wrong receivers, mixed unproven alternatives, eager `&`/`|`, writes/ref/out uses within the guarded expression, user-defined operators and deferred functions do not establish this proof. Write detection is deliberately conservative across the whole expression; general interprocedural mutation is outside scope. Completion proves nonblocking access, not successful completion or safe repeated ValueTask consumption. Both Performance & Async and Error Handling use the shared classifier. Numerical ladders and raw metrics are unchanged; prior rulesets are incompatible baseline gates.
+The unpublished `dotnet-2026-09-14-short-circuit-completion` ruleset recognizes accesses in the right operand of built-in boolean `&&` when the left proves completion of the same Task/ValueTask local or parameter. A negated completion proof on the left of `||` also qualifies. Parentheses and nested boolean guards are supported; wrong receivers, mixed unproven alternatives, eager `&`/`|`, writes/ref/out uses within the guarded expression, user-defined operators and deferred functions do not establish this proof. Write detection is deliberately conservative across the whole expression; general interprocedural mutation is outside scope. Completion proves nonblocking access, not successful completion or safe repeated ValueTask consumption. Both Async/Blocking Usage and Error Handling use the shared classifier. Numerical ladders and raw metrics are unchanged; prior rulesets are incompatible baseline gates.
 
 The unpublished `dotnet-2026-09-15-package-metadata` ruleset separates explicit no-upgrade-candidate observations from unknown compatibility and adds bounded HTTP range inspection for large packages. `PackageZipDirectory` validates classic ZIP metadata; `PackageMetadataRanges` owns version-consistent range reads and bounded manifest decoding. See the [candidate and metadata policy](../../../shared/scorecard-schema/dependency-metadata-policy.md). Numerical ladders remain unchanged.

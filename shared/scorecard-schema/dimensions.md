@@ -7,7 +7,7 @@ All analyzers use a 0-10 score scale and these stable dimension keys.
 | `codeQuality` | Complexity, decomposition, and local code-shape risks |
 | `maintainability` | Maintainability index distribution and difficult-to-change areas |
 | `errorHandling` | Exception, rejection, logging, and failure-path quality |
-| `performanceAsync` | Async, concurrency, blocking, and avoidable performance risks |
+| `performanceAsync` | Async/Blocking Usage: avoidable hazards in asynchronous operations, concurrency and blocking calls |
 | `security` | Static security findings and imported vulnerability signals |
 | `testing` | Test presence, assertion quality, skipped tests, and coverage signals |
 | `documentation` | README, docs, API docs, and onboarding material |
@@ -15,6 +15,14 @@ All analyzers use a 0-10 score scale and these stable dimension keys.
 | `architecture` | Cycles, layering, coupling hotspots, and framework-specific structure risks |
 
 Analyzers may use language-specific rules inside each dimension. The key names, the 0-10 scale, and the `scored` / `skipped` / `failed` status values are stable.
+
+## Async/Blocking Usage
+
+Display `performanceAsync` as **Async/Blocking Usage**. It evaluates asynchronous operations and blocking calls for avoidable hazards, accounting for documented intent and supported usage patterns. Scores reflect code usage, not runtime speed or throughput. I/O latency, external rate limits and deliberate throttling do not inherently indicate misuse.
+
+Retain the evidence's declared scope. For example, a React-hooks-only probe is displayed as **Async/Blocking Usage — React hooks only**. The display name does not broaden that probe's coverage. For the current .NET policy, 10 means no scored hazards detected within the measured scope, not exceptional runtime performance.
+
+This is a presentation and purpose clarification. The `performanceAsync` key, rule IDs, findings, numerical scores and comparison compatibility are unchanged. The proposed function-population scoring ladder remains an experimental preview pending adoption.
 
 ## Score Comparability
 
