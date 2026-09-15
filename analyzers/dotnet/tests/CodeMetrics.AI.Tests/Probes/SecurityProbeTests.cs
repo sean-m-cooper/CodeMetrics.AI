@@ -358,7 +358,8 @@ public class SecurityProbeTests
     public void AllowAnonymous_ClassWithAllowAnonymousAttribute_FindsAllowAnonymous()
     {
         const string code = """
-            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute, Microsoft.AspNetCore.Authorization.IAllowAnonymous { }
+            namespace Microsoft.AspNetCore.Authorization { public interface IAllowAnonymous {} }
             public class AuthorizeAttribute : System.Attribute { }
             [AllowAnonymous]
             public class PublicController { }
@@ -370,10 +371,11 @@ public class SecurityProbeTests
     }
 
     [Fact]
-    public void AllowAnonymous_SeverityIsWarning()
+    public void AllowAnonymous_SeverityIsInformational()
     {
         const string code = """
-            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute, Microsoft.AspNetCore.Authorization.IAllowAnonymous { }
+            namespace Microsoft.AspNetCore.Authorization { public interface IAllowAnonymous {} }
             [AllowAnonymous]
             public class PublicController { }
             """;
@@ -381,7 +383,7 @@ public class SecurityProbeTests
         var result = Analyze(code);
 
         result.Findings.Where(f => f.Category == "allowAnonymous")
-            .Should().AllSatisfy(f => f.Severity.Should().Be("warning"));
+            .Should().AllSatisfy(f => f.Severity.Should().Be("info"));
     }
 
     [Fact]
@@ -402,7 +404,8 @@ public class SecurityProbeTests
     public void MissingAuthorization_ControllerWithoutAuthorize_InProjectThatUsesIt_Found()
     {
         const string code = """
-            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute, Microsoft.AspNetCore.Authorization.IAllowAnonymous { }
+            namespace Microsoft.AspNetCore.Authorization { public interface IAllowAnonymous {} }
             public class AuthorizeAttribute : System.Attribute { }
             [Authorize] public class AuthController { }
             public class OpenController { }
@@ -417,7 +420,8 @@ public class SecurityProbeTests
     public void MissingAuthorization_SeverityIsWarning()
     {
         const string code = """
-            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute, Microsoft.AspNetCore.Authorization.IAllowAnonymous { }
+            namespace Microsoft.AspNetCore.Authorization { public interface IAllowAnonymous {} }
             public class AuthorizeAttribute : System.Attribute { }
             [Authorize] public class AuthController { }
             public class OpenController { }
@@ -446,7 +450,8 @@ public class SecurityProbeTests
     public void MissingAuthorization_ControllerWithAllowAnonymous_NotFound()
     {
         const string code = """
-            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute, Microsoft.AspNetCore.Authorization.IAllowAnonymous { }
+            namespace Microsoft.AspNetCore.Authorization { public interface IAllowAnonymous {} }
             public class AuthorizeAttribute : System.Attribute { }
             [Authorize] public class AuthController { }
             [AllowAnonymous] public class PublicController { }
@@ -462,7 +467,8 @@ public class SecurityProbeTests
     public void MissingAuthorization_PartialControllerWithAuthorizeOnAnotherDeclaration_NotFound()
     {
         const string code = """
-            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute, Microsoft.AspNetCore.Authorization.IAllowAnonymous { }
+            namespace Microsoft.AspNetCore.Authorization { public interface IAllowAnonymous {} }
             public class AuthorizeAttribute : System.Attribute { }
             [Authorize] public class AuthController { }
             [Authorize] public partial class PublicController { }
@@ -481,7 +487,8 @@ public class SecurityProbeTests
     public void MissingAuthorization_PartialControllerWithAllowAnonymousOnAnotherDeclaration_NotFound()
     {
         const string code = """
-            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute, Microsoft.AspNetCore.Authorization.IAllowAnonymous { }
+            namespace Microsoft.AspNetCore.Authorization { public interface IAllowAnonymous {} }
             public class AuthorizeAttribute : System.Attribute { }
             [Authorize] public class AuthController { }
             [AllowAnonymous] public partial class PublicController { }
@@ -541,7 +548,8 @@ public class SecurityProbeTests
     {
         const string code = """
             public class AuthorizeAttribute : System.Attribute { }
-            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute, Microsoft.AspNetCore.Authorization.IAllowAnonymous { }
+            namespace Microsoft.AspNetCore.Authorization { public interface IAllowAnonymous {} }
             [Authorize] public class AuthController { }
             public class OrdersController {
                 [Authorize] public void GetPrivate() { }
@@ -702,7 +710,8 @@ public class SecurityProbeTests
         // 3+ missingAuthorization findings → warnings > 2 → score 6
         const string code = """
             public class AuthorizeAttribute : System.Attribute { }
-            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute, Microsoft.AspNetCore.Authorization.IAllowAnonymous { }
+            namespace Microsoft.AspNetCore.Authorization { public interface IAllowAnonymous {} }
             [Authorize] public class SecureController { }
             public class AlphaController { }
             public class BetaController { }
@@ -715,18 +724,19 @@ public class SecurityProbeTests
     }
 
     [Fact]
-    public void Scoring_SingleWarning_ScoreIs8()
+    public void Scoring_ExplicitAnonymousIntent_ScoreIs10()
     {
-        // A single [AllowAnonymous] → 1 warning → score 8
+        // An explicit anonymous-access annotation is intent, not a security penalty.
         const string code = """
-            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute, Microsoft.AspNetCore.Authorization.IAllowAnonymous { }
+            namespace Microsoft.AspNetCore.Authorization { public interface IAllowAnonymous {} }
             [AllowAnonymous]
             public class PublicController { }
             """;
 
         var result = Analyze(code);
 
-        result.Score.Should().Be(8);
+        result.Score.Should().Be(10);
     }
 
     [Fact]

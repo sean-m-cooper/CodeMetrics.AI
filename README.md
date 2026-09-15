@@ -29,7 +29,7 @@ Stable dimensions:
 - `codeQuality`
 - `maintainability`
 - `errorHandling`
-- `performanceAsync`
+- `performanceAsync` — displayed as **Async/Blocking Usage**
 - `security`
 - `testing`
 - `documentation`

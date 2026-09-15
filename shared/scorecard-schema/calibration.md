@@ -1,5 +1,9 @@
 # Cross-Ecosystem Calibration
 
+The unpublished `dotnet-2026-09-14-evidence-fidelity` update corrects build/tool package folder interpretation, applies compiler diagnostic suppressors, and reads documentation settings from loaded compiler options. README discovery also includes `.github/` and `docs/`. Numerical ladders are unchanged. [Architecture notes](../../analyzers/dotnet/docs/architecture.md) describe the boundaries; the [released second-wave baseline](calibration-runs/dotnet-public-corpus-wave2-2.3.0.md) remains unchanged. New measurements use a distinct ruleset because corrected evidence can change scores or availability.
+
+The following unpublished `dotnet-2026-09-14-source-package-populations` ruleset recognizes semantic regex constants, counts security source sites and dependency package/versions once, and separates development-only dependency advisories from Security imports. Dependency Management still assesses all enabled projects. The [counting and scope policy](security-dependency-populations.md) records the boundaries; all numerical ladders remain unchanged.
+
 The .NET 2.3.0 release uses `dotnet-2026-09-14-dependency-availability`. Missing dependency compatibility evidence now withholds the dependency score; a failed vulnerability query also withholds Security. See [release notes](../../docs/releases/2.3.0.md).
 Performance and shared blocking observations separate actionable signals from unscored
 review leads under the [classification policy](performance-async-policy.md). Numeric
@@ -86,7 +90,7 @@ The [accepted maintainability design](maintainability-policy.md) uses 40% of the
 
 The .NET 2.3.0 implementation uses `source-function-own-mi-v1` and scoring policy `dotnet/maintainability/source-functions-quintile-40-60-v1`, ruleset `dotnet-2026-09-14-dependency-availability`. Own MI 40/52/58/65/70/75 maps linearly to individual scores 0/2/4/6/8/10. The initial ladder preserves former MI reference points and remains a product choice pending broader labeled calibration. Raw metrics and CSV stay compatible. Earlier `dotnet/maintainability/v1` scores are not comparable baselines.
 
-## Performance & Async source identity
+## Async/Blocking Usage source identity
 
 The .NET correction accepted on 2026-09-13 counts authored finding sites rather than
 project/framework rows. Policy `dotnet/performanceAsync/source-findings-v1` groups by
@@ -135,3 +139,9 @@ See `../calibration/README.md` and `../calibration/baselines/` for the pinned la
 ## Security and error-handling context correction
 
 The .NET 2.3.0 release uses ruleset `dotnet-2026-09-14-dependency-availability`. It distinguishes descriptive identifiers from credential candidates, recognizes bounded CORS rejecting guards, accepts local catch rationale and diagnostic output parameters, and scores the severity-weighted source catch population. See the [policy and limitations](error-handling-policy.md). Earlier absolute-count scores are incompatible baseline gates.
+
+The unpublished `dotnet-2026-09-14-scope-explicit-intent` ruleset adds benchmark scope recognition, terminal Task.Status switch proofs and informational semantic anonymous-access intent. Numerical ladders remain unchanged. See [scope and intent policy](scope-explicit-intent.md) for explicit boundaries.
+
+The unpublished `dotnet-2026-09-14-short-circuit-completion` ruleset recognizes accesses in the right operand of built-in boolean `&&` when the left proves completion of the same Task/ValueTask local or parameter. A negated completion proof on the left of `||` also qualifies. Parentheses and nested boolean guards are supported; wrong receivers, mixed unproven alternatives, eager `&`/`|`, writes/ref/out uses within the guarded expression, user-defined operators and deferred functions do not establish this proof. Write detection is deliberately conservative across the whole expression; general interprocedural mutation is outside scope. Completion proves nonblocking access, not successful completion or safe repeated ValueTask consumption. Both Async/Blocking Usage and Error Handling use the shared classifier. Numerical ladders and raw metrics are unchanged; prior rulesets are incompatible baseline gates.
+
+The unpublished `dotnet-2026-09-15-package-metadata` ruleset separates explicit no-upgrade-candidate observations from unknown compatibility and adds bounded HTTP range inspection for large packages. `PackageZipDirectory` validates classic ZIP metadata; `PackageMetadataRanges` owns version-consistent range reads and bounded manifest decoding. See the [candidate and metadata policy](dependency-metadata-policy.md). Numerical ladders remain unchanged.

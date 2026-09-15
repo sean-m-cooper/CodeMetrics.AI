@@ -14,6 +14,16 @@ internal sealed record SyncBlockingAccess(SyntaxNode Node, SyncBlockingKind Kind
 
 internal static class SyncBlockingDetector
 {
+    internal static bool TryGetTaskReceiver(SyntaxNode access, SemanticModel model, out ExpressionSyntax receiver)
+    {
+        if (access is MemberAccessExpressionSyntax member)
+            return TryClassifyMemberAccess(member, model, out receiver, out _);
+        if (access is InvocationExpressionSyntax invocation)
+            return TryGetWaitReceiver(invocation, model, out receiver);
+        receiver = null!;
+        return false;
+    }
+
     public static IReadOnlyList<SyncBlockingAccess> Find(
         SyntaxNode root,
         SemanticModel semanticModel,

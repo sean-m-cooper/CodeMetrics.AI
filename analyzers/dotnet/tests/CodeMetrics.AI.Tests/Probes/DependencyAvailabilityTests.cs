@@ -66,7 +66,7 @@ public sealed class DependencyAvailabilityTests : IDisposable
     }
 
     [Theory]
-    [InlineData("Not found at the sources")]
+    [InlineData("invalid version")]
     [InlineData("")]
     public async Task UnavailableLatestVersion_IsExplicit(string version)
     {
@@ -165,7 +165,16 @@ public sealed class DependencyAvailabilityTests : IDisposable
             new OutdatedPackageUpgrade("App", "net10.0", "absent." + Guid.NewGuid().ToString("N"), "2.0.0")).ToArray();
         var result = await PackageFrameworkCompatibility.AssessAsync(upgrades, "{\"version\":1,\"projects\":[],\"sources\":[\"https://feed.invalid/index.json\"]}", cancellationToken: TestContext.Current.CancellationToken, budget: TimeSpan.FromMilliseconds(100), client: client);
         result.Results.Should().BeEmpty();
-        result.Failures.SelectMany(f => f.Reasons).Should().Contain(expectedReason);
+        var reasons = result.Failures.SelectMany(f => f.Reasons).ToArray();
+        if (blockIndex)
+            reasons.Should().OnlyContain(reason => reason == expectedReason);
+        else
+        {
+            // Cancellation can release an occupied semaphore slot before a queued wait's
+            // cancellation callback runs. Either observed stage is valid; no partial success is.
+            reasons.Should().OnlyContain(reason => reason == expectedReason || reason == "packageBudgetExceeded");
+            reasons.Should().Contain("packageBudgetExceeded");
+        }
         result.Failures.Sum(f => f.AffectedObservations).Should().Be(20);
     }
 

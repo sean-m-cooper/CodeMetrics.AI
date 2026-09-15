@@ -1,7 +1,13 @@
-# Performance & Async classification
+# Async/Blocking Usage classification
 
-The .NET 2.3.0 release uses ruleset `dotnet-2026-09-14-dependency-availability`
-and policy `dotnet/performanceAsync/context-classification-v3`. This changes which
+Evaluates asynchronous operations and blocking calls for avoidable hazards, accounting
+for documented intent and supported usage patterns. Scores reflect code usage, not
+runtime speed or throughput. I/O latency, external rate limits and deliberate
+throttling do not inherently indicate misuse. The evidence key remains
+`performanceAsync`; this display-name clarification does not change scoring.
+
+The .NET 2.3.1 release uses ruleset `dotnet-2026-09-15-declared-async-boundaries`
+and policy `dotnet/performanceAsync/context-classification-v4`. This changes which
 observations qualify as scored signals. The numeric 0/2/4/6/8/10 ladder, thresholds,
 source-site counting and maximum-severity aggregation are unchanged. Population and
 severity calibration is deliberately deferred pending corpus review.
@@ -83,8 +89,38 @@ Paired synchronous/asynchronous scripting APIs and documented cache invariants r
 review cases; having an async counterpart does not automatically exempt a wait. Existing
 CMAI annotations can express reviewed rationale without the analyzer judging it.
 
-Local rationale recognition is bounded to the operation's statement or enclosing
-branch, before crossing a function boundary. Prose must mention synchronous execution,
+## Declared boundaries update
+
+The unpublished `dotnet-2026-09-15-declared-async-boundaries` ruleset uses
+`dotnet/performanceAsync/context-classification-v4`. The numeric ladder is unchanged.
+The earlier descriptions above remain applicable except for these two bounded additions:
+
+- An explanatory comment on a single initialized Task/ValueTask local declaration can
+  apply to that same local in the immediately following statement in the same block.
+  The access must stay within the function, with no receiver writes/ref escapes or
+  unrelated invocations in that statement. Branch/deferred boundaries, intervening
+  statements, other receivers, task-marker comments and unrelated prose do not qualify.
+  The reason is `documentedTaskLocalChoice`. It records intent, not proven completion.
+- The synchronous script delegate directly returned from the expression-bodied factory
+  assigned to `OrchardCore.Scripting.GlobalMethod.Method` in an object initializer is a
+  cataloged boundary. Recognition resolves the property and its
+  `IServiceProvider -> Delegate` factory signature and requires the returned delegate to
+  be synchronous and non-awaitable. The reason is `synchronousScriptingContract`.
+  `AsyncMethod`, arbitrary delegate properties, similar names in other namespaces,
+  async/task-returning delegates, deeper deferred lambdas and statement-bodied factories
+  do not qualify. Having a paired async member alone grants no exemption.
+
+Both classifications retain the original finding, code, source span and confidence as
+informational review leads excluded from penalties in Async/Blocking Usage and Error
+Handling. Existing CMAI8001/CMAI5005 rationale-bearing annotations remain available for
+explicit reviewed intent outside these shapes; see the catalog shipped with the package.
+Internal helper propagation, cache completion inference, obsolete APIs and hidden base
+members are unchanged. Previous rulesets are incompatible baseline gates. This does not
+establish throughput, latency or safety of a synchronous script's execution.
+
+The base local rationale rule checks the operation's statement or enclosing branch,
+before crossing a function boundary; the adjacent same-task extension is described above.
+Prose must mention synchronous execution,
 sync-over-async, blocking or cancellability. TODO/FIXME/HACK markers, commented-out
 statements, unrelated prose and general method documentation do not qualify. This is
 an intent declaration, not a correctness proof. Existing CMAI directives remain the
@@ -106,3 +142,5 @@ This remains a partial static assessment. A 10 means no scored signals were obse
 it is not a throughput, latency, allocation or scalability measurement. Old/new scores
 across these rulesets are classification comparisons, not compatible baseline gates
 or evidence of improvements to unchanged corpus source.
+
+The unpublished `dotnet-2026-09-14-short-circuit-completion` ruleset recognizes accesses in the right operand of built-in boolean `&&` when the left proves completion of the same Task/ValueTask local or parameter. A negated completion proof on the left of `||` also qualifies. Parentheses and nested boolean guards are supported; wrong receivers, mixed unproven alternatives, eager `&`/`|`, writes/ref/out uses within the guarded expression, user-defined operators and deferred functions do not establish this proof. Write detection is deliberately conservative across the whole expression; general interprocedural mutation is outside scope. Completion proves nonblocking access, not successful completion or safe repeated ValueTask consumption. Both Async/Blocking Usage and Error Handling use the shared classifier. Numerical ladders and raw metrics are unchanged; prior rulesets are incompatible baseline gates.

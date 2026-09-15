@@ -32,7 +32,13 @@ public static class DocumentationProbe
 
     private static (string Path, bool Exists, int NonBlankLines) InspectReadme(string solutionDir)
     {
-        var path = Path.Combine(solutionDir, "README.md");
+        // Prefer the repository README; GitHub also supports one in .github/ or docs/.
+        var path = new[] { solutionDir, Path.Combine(solutionDir, ".github"), Path.Combine(solutionDir, "docs") }
+            .Where(Directory.Exists)
+            .SelectMany(directory => Directory.EnumerateFiles(directory)
+                .Where(file => Path.GetFileName(file).Equals("README.md", StringComparison.OrdinalIgnoreCase))
+                .Order(StringComparer.Ordinal))
+            .FirstOrDefault() ?? Path.Combine(solutionDir, "README.md");
         var exists = File.Exists(path);
         var nonBlankLines = exists
             ? File.ReadLines(path).Count(line => !string.IsNullOrWhiteSpace(line))
@@ -67,7 +73,7 @@ public static class DocumentationProbe
     {
         var libraryProjects = GetLibraryProjects(projects);
         var xmlDocEnabledCount = libraryProjects.Count(project =>
-            HasXmlDocumentationEnabled(project.ProjectFilePath));
+            HasXmlDocumentationEnabled(project.Compilation));
         var xmlDocRatio = libraryProjects.Count > 0
             ? (double)xmlDocEnabledCount / libraryProjects.Count
             : 1.0;
@@ -83,16 +89,11 @@ public static class DocumentationProbe
             publicApiCoverage);
     }
 
-    private static bool HasXmlDocumentationEnabled(string? projectFilePath)
+    private static bool HasXmlDocumentationEnabled(Compilation compilation)
     {
-        if (projectFilePath == null || !File.Exists(projectFilePath))
-            return false;
-
-        var content = File.ReadAllText(projectFilePath);
-        return content.Contains(
-                   "<GenerateDocumentationFile>true</GenerateDocumentationFile>",
-                   StringComparison.OrdinalIgnoreCase) ||
-               content.Contains("<DocumentationFile>", StringComparison.OrdinalIgnoreCase);
+        // MSBuild's evaluated /doc compiler option selects Diagnose, including imported
+        // properties and per-framework/configuration overrides. Parse alone is not /doc.
+        return compilation.SyntaxTrees.Any(tree => tree.Options.DocumentationMode == DocumentationMode.Diagnose);
     }
 
     private static DimensionResult CreateResult(
@@ -184,13 +185,9 @@ public static class DocumentationProbe
 
         foreach (var project in projects)
         {
-            if (project.ProjectFilePath != null && File.Exists(project.ProjectFilePath))
-            {
-                var content = File.ReadAllText(project.ProjectFilePath);
-                // Exe output type means it's a console/executable project
-                if (content.Contains("<OutputType>Exe</OutputType>", StringComparison.OrdinalIgnoreCase))
-                    continue;
-            }
+            if (project.Compilation.Options.OutputKind is OutputKind.ConsoleApplication or
+                OutputKind.WindowsApplication or OutputKind.WindowsRuntimeApplication)
+                continue;
             result.Add(project);
         }
 
@@ -319,6 +316,8 @@ public static class DocumentationProbe
             var mdFiles = Directory.GetFiles(docsDir, "*.md", SearchOption.AllDirectories);
             foreach (var file in mdFiles)
             {
+                if (hasReadme && SolutionScope.PathComparer.Equals(file, readmePath))
+                    continue;
                 var content = File.ReadAllText(file);
                 if (content.IndexOf("TODO", StringComparison.OrdinalIgnoreCase) >= 0 ||
                     content.IndexOf("TBD", StringComparison.OrdinalIgnoreCase) >= 0)

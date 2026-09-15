@@ -1,0 +1,1229 @@
+{
+  "packageSha256": "d2ca3e8d8e25b045b955ea62fbcb4d6e2e56b224c86fdc96373a00ec539ed101",
+  "packagePath": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\fidelity-final-package\\CodeMetrics.AI.2.3.0.nupkg",
+  "releaseStatus": "unpublished local 2.3.0 build",
+  "baseCommit": "edc293f764d8cd2800fcc977995f4ac29f97a49a",
+  "ruleset": "dotnet-2026-09-14-evidence-fidelity",
+  "repositories": [
+    {
+      "name": "Dapper",
+      "root": "E:/repos/Dapper",
+      "repository": "https://github.com/DapperLib/Dapper",
+      "commit": "8becae8d0e2b360165ae03c0d5d1330b0273473d",
+      "branch": "main",
+      "entryPoint": "Dapper.slnx",
+      "configuration": "Release",
+      "buildSummary": "Release solution build passed after fetching omitted historical Git blobs. 21 warnings; no source edits.",
+      "buildExitCode": 0,
+      "restoreExitCode": 0,
+      "resultFile": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\Dapper-fidelity-final-result.json",
+      "runId": "10ffa8c9-bfa7-400b-bef2-2d62850f1b27",
+      "auditId": "484b526c-ef83-4528-bcf8-d493bc15ebb3",
+      "baselineRunId": "9a991b6a-8512-4c4a-bc4a-bd356442f93c",
+      "baselineAuditId": "7c6bfc93-70c6-43dd-9e1f-0fad6656c258",
+      "artifacts": {
+        "evidence": "E:\\repos\\Dapper\\.scorecard\\dotnet\\runs\\10ffa8c9-bfa7-400b-bef2-2d62850f1b27\\evidence.json",
+        "inspection": "E:\\repos\\Dapper\\.scorecard\\dotnet\\runs\\10ffa8c9-bfa7-400b-bef2-2d62850f1b27\\inspection.json",
+        "metrics": "E:\\repos\\Dapper\\.scorecard\\dotnet\\runs\\10ffa8c9-bfa7-400b-bef2-2d62850f1b27\\metrics.csv"
+      },
+      "usable": true,
+      "analysis": {
+        "runId": "10ffa8c9-bfa7-400b-bef2-2d62850f1b27",
+        "auditId": "484b526c-ef83-4528-bcf8-d493bc15ebb3",
+        "status": "complete",
+        "ruleset": "dotnet-2026-09-14-evidence-fidelity",
+        "calibration": "baseline",
+        "configurationFingerprint": "55a2905da4b6f5b4abe0c76ea5cf5c652d34a1a1344d243dab163d59e3fa8d0d",
+        "diagnostics": [
+          {
+            "kind": "workspaceWarning",
+            "message": "Found project reference without a matching metadata reference: E:\\repos\\Dapper\\Dapper.StrongName\\Dapper.StrongName.csproj"
+          },
+          {
+            "kind": "workspaceWarning",
+            "message": "Duplicate source file 'E:\\repos\\Dapper\\Dapper\\PublicAPI.Shipped.txt' in project 'E:\\repos\\Dapper\\Dapper\\Dapper.csproj'"
+          },
+          {
+            "kind": "workspaceWarning",
+            "message": "Duplicate source file 'E:\\repos\\Dapper\\Dapper\\PublicAPI.Unshipped.txt' in project 'E:\\repos\\Dapper\\Dapper\\Dapper.csproj'"
+          },
+          {
+            "kind": "workspaceWarning",
+            "message": "Found project reference without a matching metadata reference: E:\\repos\\Dapper\\Dapper\\Dapper.csproj"
+          },
+          {
+            "kind": "workspaceWarning",
+            "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\benchmarks\\Dapper.Tests.Performance\\Dapper.Tests.Performance.csproj' with message: Package 'System.Security.Cryptography.Xml' 10.0.8 has a known high severity vulnerability, https://github.com/advisories/GHSA-23rf-6693-g89p"
+          },
+          {
+            "kind": "workspaceWarning",
+            "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\benchmarks\\Dapper.Tests.Performance\\Dapper.Tests.Performance.csproj' with message: Package 'System.Security.Cryptography.Xml' 10.0.8 has a known high severity vulnerability, https://github.com/advisories/GHSA-8q5v-6pqq-x66h"
+          },
+          {
+            "kind": "workspaceWarning",
+            "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\benchmarks\\Dapper.Tests.Performance\\Dapper.Tests.Performance.csproj' with message: Package 'System.Security.Cryptography.Xml' 10.0.8 has a known high severity vulnerability, https://github.com/advisories/GHSA-cvvh-rhrc-wg4q"
+          },
+          {
+            "kind": "workspaceWarning",
+            "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\benchmarks\\Dapper.Tests.Performance\\Dapper.Tests.Performance.csproj' with message: Package 'System.Security.Cryptography.Xml' 10.0.8 has a known high severity vulnerability, https://github.com/advisories/GHSA-g8r8-53c2-pm3f"
+          },
+          {
+            "kind": "workspaceWarning",
+            "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\benchmarks\\Dapper.Tests.Performance\\Dapper.Tests.Performance.csproj' with message: Package 'System.Security.Cryptography.Xml' 10.0.8 has a known high severity vulnerability, https://github.com/advisories/GHSA-mmjf-rqrv-855v"
+          },
+          {
+            "kind": "workspaceWarning",
+            "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\tests\\Dapper.Tests\\Dapper.Tests.csproj' with message: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q"
+          }
+        ],
+        "suppressions": []
+      },
+      "filters": {
+        "totalUnits": 25,
+        "analyzedUnits": 20,
+        "skipped": [
+          {
+            "name": "Dapper.Tests.Performance(net472)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Dapper.Tests.Performance(net10.0)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Dapper.Tests(net481)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Dapper.Tests(net8.0)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Dapper.Tests(net10.0)",
+            "reason": "Test project"
+          }
+        ]
+      },
+      "population": {
+        "types": 555,
+        "members": 7222
+      },
+      "analyzerExitCode": 0,
+      "validationExitCode": 0,
+      "scores": {
+        "codeQuality": 5.9,
+        "maintainability": 7.7,
+        "errorHandling": 4,
+        "performanceAsync": 2,
+        "dependencyManagement": 0,
+        "security": 0,
+        "testing": 6,
+        "documentation": 6,
+        "architecture": 5.2
+      },
+      "overallPartial": 4.1,
+      "scoredDimensions": 9,
+      "baselineScores": {
+        "codeQuality": null,
+        "maintainability": null,
+        "errorHandling": null,
+        "performanceAsync": null,
+        "dependencyManagement": null,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "architecture": null
+      },
+      "rawCsvIdentical": true,
+      "unchangedDimensions": [],
+      "baselineConfigurationFingerprint": "df6e6db6fd7474f40c9130e6bb1b2bd56d06b96f7d91c1c7ed5903e60b5eeeb2",
+      "configurationFingerprintChangeReason": "dependency status changed from failed to scored",
+      "assessmentFailures": [],
+      "dimensions": {
+        "codeQuality": {
+          "status": "scored",
+          "score": 5.9,
+          "basis": "Eligible types: 429. Passive data carriers excluded: 30. Method complexity: 5.8, Decomposition: 6. Combined: 5.9.",
+          "scope": {
+            "id": "dotnet/codeQuality/v1",
+            "coverage": "partial",
+            "includes": [
+              "production-type-complexity",
+              "member-complexity"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "maintainability": {
+          "status": "scored",
+          "score": 7.7,
+          "basis": "Distinct executable functions: 949. Weakest 190: 4.29; remaining 759: 9.93. Each function contributes once; distribution statistics are diagnostic only.",
+          "scope": {
+            "id": "dotnet/maintainability/v1",
+            "coverage": "partial",
+            "includes": [
+              "production-executable-function-maintainability-index"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "errorHandling": {
+          "status": "scored",
+          "score": 4,
+          "basis": "Distinct source findings: 15 across 70 project/framework observations (errors: 6, warnings: 9). emptyCatch=4, throwEx=0, broadDefaults=2. Affected catches: 8/19; documented catches: 9.",
+          "scope": {
+            "id": "dotnet/errorHandling/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-exception-patterns"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 15
+        },
+        "performanceAsync": {
+          "status": "scored",
+          "score": 2,
+          "basis": "Distinct source findings: 6 across 33 project/framework observations (errors: 2, warnings: 0, unscored review leads: 4). syncOverAsync=2, threadSleep=0, saveChangesInsideLoop=0, missingCancellationToken=4, materializationBeforeQueryShape=0, awaitedIoInsideLoop=0, unboundedWhenAll=0, sharedStateMutationInFanOut=0.",
+          "scope": {
+            "id": "dotnet/performanceAsync/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-async-and-blocking-patterns"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 6
+        },
+        "dependencyManagement": {
+          "status": "scored",
+          "score": 0,
+          "basis": "vulnerableDirect=2, vulnerableTransitive=3, outdated=119, outdatedAspireExcluded=0, outdatedFrameworkIncompatibleExcluded=4, outdatedFrameworkCompatibilityUnknown=0, deprecated=7, unsupportedTFMs=1, versionDrift=0, cpmEnabled=True, anyCommandFailed=False.",
+          "scope": {
+            "id": "dotnet/dependencyManagement/v1",
+            "coverage": "partial",
+            "includes": [
+              "package-version-and-feed-observations"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 136
+        },
+        "security": {
+          "status": "scored",
+          "score": 0,
+          "basis": "Findings: 8 (errors: 8, warnings: 0). hardcodedSecrets=8, rawSql=0, unsafeDeserialization=0, allowAnyOriginWithCredentials=0, importedVulnerabilities=5.",
+          "scope": {
+            "id": "dotnet/security/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-security-patterns",
+              "dependency-vulnerability-observations"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 8
+        },
+        "testing": {
+          "status": "scored",
+          "score": 6,
+          "basis": "testProjects=1, testMethods=389, skipped=1, placeholders=0, assertions=1228, assertionDensity=3.16, uncoveredProjects=7, coverageFile=False, lineRate=n/a.",
+          "scope": {
+            "id": "dotnet/testing/v1",
+            "coverage": "partial",
+            "includes": [
+              "test-project-signals",
+              "supplied-coverage-report"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 7
+        },
+        "documentation": {
+          "status": "scored",
+          "score": 6,
+          "basis": "hasReadme=True, readmeNonBlankLines=373, hasDocsDir=True, architectureDocs=0, hasAiInstructions=False, libraryXmlDocRatio=0.85, publicApiDocCoverage=0.90, staleMarkers=0, unresolvedCrefs=0.",
+          "scope": {
+            "id": "dotnet/documentation/v1",
+            "coverage": "partial",
+            "includes": [
+              "documentation-presence-and-content-signals"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "architecture": {
+          "status": "scored",
+          "score": 5.2,
+          "basis": "Findings: 43 (errors: 0, warnings: 43). Cycles: 0, hotspots: 43 (showing 10). Excluded passive data carriers: 30, DI extension types: 0, framework coupling archetypes: 0, application composition roots: 0. coupling: 35/525 eligible types, score 5.20; complexity: 0/525 eligible types, score 10.00; size: 8/525 eligible types, score 5.82. Final = min(metric score 5.20, graph/layering cap 10.0), rounded to 1 decimal.",
+          "scope": {
+            "id": "dotnet/architecture/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-coupling-and-project-structure"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 43
+        }
+      },
+      "components": {
+        "methodComplexity": 5.8,
+        "decomposition": 6
+      },
+      "dependencyCompatibility": {
+        "status": "complete",
+        "uniquePackageVersions": 25,
+        "totalObservations": 123,
+        "knownObservations": 123,
+        "elapsedMilliseconds": 4138.0286,
+        "failures": []
+      },
+      "documentationMetrics": {
+        "hasReadme": true,
+        "readmeNonBlankLines": 373,
+        "hasDocsDir": true,
+        "architectureDocCount": 0,
+        "hasAiInstructions": false,
+        "libraryXmlDocRatio": 0.85,
+        "publicApiDocCoverage": 0.8953,
+        "staleMarkerCount": 0,
+        "unresolvedCrefCount": 0
+      }
+    },
+    {
+      "name": "serilog",
+      "root": "E:/repos/serilog",
+      "repository": "https://github.com/serilog/serilog",
+      "commit": "bebc7719004f76187ae72e64ce138ec2540f2070",
+      "branch": "dev",
+      "entryPoint": "Serilog.sln",
+      "configuration": "Release",
+      "buildSummary": "Library Release build passed all seven TFMs; full solution build failed only at AotTestApp native linking (C++ linker unavailable).",
+      "buildExitCode": 1,
+      "restoreExitCode": 0,
+      "resultFile": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\serilog-fidelity-final-result.json",
+      "runId": "400d7095-ff58-4c2b-841f-f9d58f7e2cde",
+      "auditId": "ea2b05c9-3f6a-48b9-8029-e162a669d995",
+      "baselineRunId": "daf9ef96-ef03-4b9a-9275-070116a67668",
+      "baselineAuditId": "992d791b-92ed-42da-869b-4789b75675b4",
+      "artifacts": {
+        "evidence": "E:\\repos\\serilog\\.scorecard\\dotnet\\runs\\400d7095-ff58-4c2b-841f-f9d58f7e2cde\\evidence.json",
+        "inspection": "E:\\repos\\serilog\\.scorecard\\dotnet\\runs\\400d7095-ff58-4c2b-841f-f9d58f7e2cde\\inspection.json",
+        "metrics": "E:\\repos\\serilog\\.scorecard\\dotnet\\runs\\400d7095-ff58-4c2b-841f-f9d58f7e2cde\\metrics.csv"
+      },
+      "usable": true,
+      "analysis": {
+        "runId": "400d7095-ff58-4c2b-841f-f9d58f7e2cde",
+        "auditId": "ea2b05c9-3f6a-48b9-8029-e162a669d995",
+        "status": "complete",
+        "ruleset": "dotnet-2026-09-14-evidence-fidelity",
+        "calibration": "baseline",
+        "configurationFingerprint": "55a2905da4b6f5b4abe0c76ea5cf5c652d34a1a1344d243dab163d59e3fa8d0d",
+        "diagnostics": [],
+        "suppressions": []
+      },
+      "filters": {
+        "totalUnits": 19,
+        "analyzedUnits": 7,
+        "skipped": [
+          {
+            "name": "TestDummies(netstandard2.0)",
+            "reason": "Test support / fixture"
+          },
+          {
+            "name": "TestDummies(net462)",
+            "reason": "Test support / fixture"
+          },
+          {
+            "name": "Serilog.Tests(net48)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Serilog.Tests(net462)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Serilog.Tests(net10.0)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Serilog.Tests(net9.0)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Serilog.Tests(net8.0)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Serilog.PerformanceTests(net10.0)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Serilog.PerformanceTests(net9.0)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Serilog.PerformanceTests(net8.0)",
+            "reason": "Test project"
+          },
+          {
+            "name": "Serilog.ApprovalTests",
+            "reason": "Test project"
+          },
+          {
+            "name": "AotTestApp",
+            "reason": "Test support / fixture"
+          }
+        ]
+      },
+      "population": {
+        "types": 790,
+        "members": 6812
+      },
+      "analyzerExitCode": 0,
+      "validationExitCode": 0,
+      "scores": {
+        "codeQuality": 6,
+        "maintainability": 8,
+        "errorHandling": 9.2,
+        "performanceAsync": 10,
+        "dependencyManagement": 4,
+        "security": 10,
+        "testing": 10,
+        "documentation": 6,
+        "architecture": 6.3
+      },
+      "overallPartial": 7.7,
+      "scoredDimensions": 9,
+      "baselineScores": {
+        "codeQuality": 6,
+        "maintainability": 8,
+        "errorHandling": 9.2,
+        "performanceAsync": 10,
+        "dependencyManagement": 4,
+        "security": 10,
+        "testing": 10,
+        "documentation": 4,
+        "architecture": 6.3
+      },
+      "rawCsvIdentical": true,
+      "unchangedDimensions": [
+        "codeQuality",
+        "maintainability",
+        "errorHandling",
+        "performanceAsync",
+        "security",
+        "testing",
+        "architecture"
+      ],
+      "baselineConfigurationFingerprint": "55a2905da4b6f5b4abe0c76ea5cf5c652d34a1a1344d243dab163d59e3fa8d0d",
+      "configurationFingerprintChangeReason": null,
+      "assessmentFailures": [],
+      "dimensions": {
+        "codeQuality": {
+          "status": "scored",
+          "score": 6,
+          "basis": "Eligible types: 615. Passive data carriers excluded: 21. Method complexity: 7.3, Decomposition: 4.7. Combined: 6.",
+          "scope": {
+            "id": "dotnet/codeQuality/v1",
+            "coverage": "partial",
+            "includes": [
+              "production-type-complexity",
+              "member-complexity"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "maintainability": {
+          "status": "scored",
+          "score": 8,
+          "basis": "Distinct executable functions: 871. Weakest 175: 5.01; remaining 696: 9.97. Each function contributes once; distribution statistics are diagnostic only.",
+          "scope": {
+            "id": "dotnet/maintainability/v1",
+            "coverage": "partial",
+            "includes": [
+              "production-executable-function-maintainability-index"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "errorHandling": {
+          "status": "scored",
+          "score": 9.2,
+          "basis": "Distinct source findings: 5 across 26 project/framework observations (errors: 0, warnings: 4). emptyCatch=0, throwEx=0, broadDefaults=0. Affected catches: 3/19; documented catches: 4.",
+          "scope": {
+            "id": "dotnet/errorHandling/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-exception-patterns"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 5
+        },
+        "performanceAsync": {
+          "status": "scored",
+          "score": 10,
+          "basis": "Distinct source findings: 1 across 7 project/framework observations (errors: 0, warnings: 0, unscored review leads: 1). syncOverAsync=1, threadSleep=0, saveChangesInsideLoop=0, missingCancellationToken=0, materializationBeforeQueryShape=0, awaitedIoInsideLoop=0, unboundedWhenAll=0, sharedStateMutationInFanOut=0.",
+          "scope": {
+            "id": "dotnet/performanceAsync/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-async-and-blocking-patterns"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 1
+        },
+        "dependencyManagement": {
+          "status": "scored",
+          "score": 4,
+          "basis": "vulnerableDirect=0, vulnerableTransitive=0, outdated=65, outdatedAspireExcluded=0, outdatedFrameworkIncompatibleExcluded=1, outdatedFrameworkCompatibilityUnknown=0, deprecated=9, unsupportedTFMs=1, versionDrift=1, cpmEnabled=False, anyCommandFailed=False.",
+          "scope": {
+            "id": "dotnet/dependencyManagement/v1",
+            "coverage": "partial",
+            "includes": [
+              "package-version-and-feed-observations"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 78
+        },
+        "security": {
+          "status": "scored",
+          "score": 10,
+          "basis": "Findings: 0 (errors: 0, warnings: 0). hardcodedSecrets=0, rawSql=0, unsafeDeserialization=0, allowAnyOriginWithCredentials=0, importedVulnerabilities=0.",
+          "scope": {
+            "id": "dotnet/security/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-security-patterns",
+              "dependency-vulnerability-observations"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "testing": {
+          "status": "scored",
+          "score": 10,
+          "basis": "testProjects=3, testMethods=437, skipped=0, placeholders=0, assertions=825, assertionDensity=1.89, uncoveredProjects=0, coverageFile=False, lineRate=n/a.",
+          "scope": {
+            "id": "dotnet/testing/v1",
+            "coverage": "partial",
+            "includes": [
+              "test-project-signals",
+              "supplied-coverage-report"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "documentation": {
+          "status": "scored",
+          "score": 6,
+          "basis": "hasReadme=True, readmeNonBlankLines=84, hasDocsDir=False, architectureDocs=0, hasAiInstructions=False, libraryXmlDocRatio=1.00, publicApiDocCoverage=1.00, staleMarkers=0, unresolvedCrefs=0.",
+          "scope": {
+            "id": "dotnet/documentation/v1",
+            "coverage": "partial",
+            "includes": [
+              "documentation-presence-and-content-signals"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "architecture": {
+          "status": "scored",
+          "score": 6.3,
+          "basis": "Findings: 63 (errors: 0, warnings: 63). Cycles: 0, hotspots: 63 (showing 10). Excluded passive data carriers: 21, DI extension types: 0, framework coupling archetypes: 0, application composition roots: 0. coupling: 56/769 eligible types, score 6.33; complexity: 0/769 eligible types, score 10.00; size: 7/769 eligible types, score 9.78. Final = min(metric score 6.33, graph/layering cap 10.0), rounded to 1 decimal.",
+          "scope": {
+            "id": "dotnet/architecture/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-coupling-and-project-structure"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 63
+        }
+      },
+      "components": {
+        "methodComplexity": 7.3,
+        "decomposition": 4.7
+      },
+      "dependencyCompatibility": {
+        "status": "complete",
+        "uniquePackageVersions": 14,
+        "totalObservations": 66,
+        "knownObservations": 66,
+        "elapsedMilliseconds": 981.6897,
+        "failures": []
+      },
+      "documentationMetrics": {
+        "hasReadme": true,
+        "readmeNonBlankLines": 84,
+        "hasDocsDir": false,
+        "architectureDocCount": 0,
+        "hasAiInstructions": false,
+        "libraryXmlDocRatio": 1,
+        "publicApiDocCoverage": 0.9951,
+        "staleMarkerCount": 0,
+        "unresolvedCrefCount": 0
+      }
+    },
+    {
+      "name": "FluentValidation",
+      "root": "E:/repos/FluentValidation",
+      "repository": "https://github.com/FluentValidation/FluentValidation",
+      "commit": "fa9787a0d4fd0c0b99f9682292d76d5ad97ba6cb",
+      "branch": "main",
+      "entryPoint": "FluentValidation.sln",
+      "configuration": "Release",
+      "buildSummary": "Release solution build passed with zero warnings and errors.",
+      "buildExitCode": 0,
+      "restoreExitCode": 0,
+      "resultFile": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\FluentValidation-fidelity-final-result.json",
+      "runId": "087154fb-24ba-48c4-9b74-efb1f52a6bdf",
+      "auditId": "82d3b781-15ae-4914-8e07-10d59e2fb8b3",
+      "baselineRunId": "c84a5ac7-0c35-4ee7-a6f9-535703c5b941",
+      "baselineAuditId": "a820df20-6d4d-4fbe-b3c0-52cceb0ead6d",
+      "artifacts": {
+        "evidence": "E:\\repos\\FluentValidation\\.scorecard\\dotnet\\runs\\087154fb-24ba-48c4-9b74-efb1f52a6bdf\\evidence.json",
+        "inspection": "E:\\repos\\FluentValidation\\.scorecard\\dotnet\\runs\\087154fb-24ba-48c4-9b74-efb1f52a6bdf\\inspection.json",
+        "metrics": "E:\\repos\\FluentValidation\\.scorecard\\dotnet\\runs\\087154fb-24ba-48c4-9b74-efb1f52a6bdf\\metrics.csv"
+      },
+      "usable": true,
+      "analysis": {
+        "runId": "087154fb-24ba-48c4-9b74-efb1f52a6bdf",
+        "auditId": "82d3b781-15ae-4914-8e07-10d59e2fb8b3",
+        "status": "complete",
+        "ruleset": "dotnet-2026-09-14-evidence-fidelity",
+        "calibration": "baseline",
+        "configurationFingerprint": "55a2905da4b6f5b4abe0c76ea5cf5c652d34a1a1344d243dab163d59e3fa8d0d",
+        "diagnostics": [],
+        "suppressions": []
+      },
+      "filters": {
+        "totalUnits": 6,
+        "analyzedUnits": 2,
+        "skipped": [
+          {
+            "name": "FluentValidation.Tests(net8.0)",
+            "reason": "Test project"
+          },
+          {
+            "name": "FluentValidation.Tests(net9.0)",
+            "reason": "Test project"
+          },
+          {
+            "name": "FluentValidation.Tests(net10.0)",
+            "reason": "Test project"
+          },
+          {
+            "name": "FluentValidation.Tests.Benchmarks",
+            "reason": "Test project"
+          }
+        ]
+      },
+      "population": {
+        "types": 196,
+        "members": 1017
+      },
+      "analyzerExitCode": 0,
+      "validationExitCode": 0,
+      "scores": {
+        "codeQuality": 4.8,
+        "maintainability": 7.5,
+        "errorHandling": 10,
+        "performanceAsync": 10,
+        "dependencyManagement": 4,
+        "security": 10,
+        "testing": 6,
+        "documentation": 8,
+        "architecture": 5.4
+      },
+      "overallPartial": 7.3,
+      "scoredDimensions": 9,
+      "baselineScores": {
+        "codeQuality": 4.8,
+        "maintainability": 7.5,
+        "errorHandling": 10,
+        "performanceAsync": 10,
+        "dependencyManagement": 4,
+        "security": 10,
+        "testing": 6,
+        "documentation": 3,
+        "architecture": 5.4
+      },
+      "rawCsvIdentical": true,
+      "unchangedDimensions": [
+        "codeQuality",
+        "maintainability",
+        "errorHandling",
+        "performanceAsync",
+        "security",
+        "testing",
+        "architecture"
+      ],
+      "baselineConfigurationFingerprint": "55a2905da4b6f5b4abe0c76ea5cf5c652d34a1a1344d243dab163d59e3fa8d0d",
+      "configurationFingerprintChangeReason": null,
+      "assessmentFailures": [],
+      "dimensions": {
+        "codeQuality": {
+          "status": "scored",
+          "score": 4.8,
+          "basis": "Eligible types: 142. Passive data carriers excluded: 2. Method complexity: 5.6, Decomposition: 4. Combined: 4.8.",
+          "scope": {
+            "id": "dotnet/codeQuality/v1",
+            "coverage": "partial",
+            "includes": [
+              "production-type-complexity",
+              "member-complexity"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "maintainability": {
+          "status": "scored",
+          "score": 7.5,
+          "basis": "Distinct executable functions: 852. Weakest 171: 3.79; remaining 681: 9.92. Each function contributes once; distribution statistics are diagnostic only.",
+          "scope": {
+            "id": "dotnet/maintainability/v1",
+            "coverage": "partial",
+            "includes": [
+              "production-executable-function-maintainability-index"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "errorHandling": {
+          "status": "scored",
+          "score": 10,
+          "basis": "Distinct source findings: 0 across 0 project/framework observations (errors: 0, warnings: 0). emptyCatch=0, throwEx=0, broadDefaults=0. Affected catches: 0/4; documented catches: 1.",
+          "scope": {
+            "id": "dotnet/errorHandling/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-exception-patterns"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "performanceAsync": {
+          "status": "scored",
+          "score": 10,
+          "basis": "Distinct source findings: 0 across 0 project/framework observations (errors: 0, warnings: 0, unscored review leads: 0). syncOverAsync=0, threadSleep=0, saveChangesInsideLoop=0, missingCancellationToken=0, materializationBeforeQueryShape=0, awaitedIoInsideLoop=0, unboundedWhenAll=0, sharedStateMutationInFanOut=0.",
+          "scope": {
+            "id": "dotnet/performanceAsync/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-async-and-blocking-patterns"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "dependencyManagement": {
+          "status": "scored",
+          "score": 4,
+          "basis": "vulnerableDirect=0, vulnerableTransitive=0, outdated=25, outdatedAspireExcluded=0, outdatedFrameworkIncompatibleExcluded=0, outdatedFrameworkCompatibilityUnknown=0, deprecated=3, unsupportedTFMs=0, versionDrift=0, cpmEnabled=False, anyCommandFailed=False.",
+          "scope": {
+            "id": "dotnet/dependencyManagement/v1",
+            "coverage": "partial",
+            "includes": [
+              "package-version-and-feed-observations"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 29
+        },
+        "security": {
+          "status": "scored",
+          "score": 10,
+          "basis": "Findings: 0 (errors: 0, warnings: 0). hardcodedSecrets=0, rawSql=0, unsafeDeserialization=0, allowAnyOriginWithCredentials=0, importedVulnerabilities=0.",
+          "scope": {
+            "id": "dotnet/security/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-security-patterns",
+              "dependency-vulnerability-observations"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "testing": {
+          "status": "scored",
+          "score": 6,
+          "basis": "testProjects=1, testMethods=828, skipped=1, placeholders=0, assertions=1319, assertionDensity=1.59, uncoveredProjects=1, coverageFile=False, lineRate=n/a.",
+          "scope": {
+            "id": "dotnet/testing/v1",
+            "coverage": "partial",
+            "includes": [
+              "test-project-signals",
+              "supplied-coverage-report"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 1
+        },
+        "documentation": {
+          "status": "scored",
+          "score": 8,
+          "basis": "hasReadme=True, readmeNonBlankLines=50, hasDocsDir=True, architectureDocs=0, hasAiInstructions=False, libraryXmlDocRatio=1.00, publicApiDocCoverage=0.62, staleMarkers=0, unresolvedCrefs=0.",
+          "scope": {
+            "id": "dotnet/documentation/v1",
+            "coverage": "partial",
+            "includes": [
+              "documentation-presence-and-content-signals"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "architecture": {
+          "status": "scored",
+          "score": 5.4,
+          "basis": "Findings: 9 (errors: 0, warnings: 9). Cycles: 0, hotspots: 9. Excluded passive data carriers: 2, DI extension types: 1, framework coupling archetypes: 0, application composition roots: 0. coupling: 9/193 eligible types, score 5.44; complexity: 0/193 eligible types, score 10.00; size: 0/193 eligible types, score 10.00. Final = min(metric score 5.44, graph/layering cap 10.0), rounded to 1 decimal.",
+          "scope": {
+            "id": "dotnet/architecture/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-coupling-and-project-structure"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 9
+        }
+      },
+      "components": {
+        "methodComplexity": 5.6,
+        "decomposition": 4
+      },
+      "dependencyCompatibility": {
+        "status": "complete",
+        "uniquePackageVersions": 11,
+        "totalObservations": 25,
+        "knownObservations": 25,
+        "elapsedMilliseconds": 1277.9095,
+        "failures": []
+      },
+      "documentationMetrics": {
+        "hasReadme": true,
+        "readmeNonBlankLines": 50,
+        "hasDocsDir": true,
+        "architectureDocCount": 0,
+        "hasAiInstructions": false,
+        "libraryXmlDocRatio": 1,
+        "publicApiDocCoverage": 0.6224,
+        "staleMarkerCount": 0,
+        "unresolvedCrefCount": 0
+      }
+    },
+    {
+      "name": "quartznet",
+      "root": "E:/repos/quartznet",
+      "repository": "https://github.com/quartznet/quartznet",
+      "commit": "97afe142210e9c616b434ec7d617286a2752e9d4",
+      "branch": "main",
+      "entryPoint": "Quartz.slnx",
+      "configuration": "Release",
+      "buildSummary": "Release solution build passed with zero warnings and errors.",
+      "buildExitCode": 0,
+      "restoreExitCode": 0,
+      "resultFile": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\quartznet-fidelity-final-result.json",
+      "runId": "dece046a-3e66-4ea8-a6a9-96d29ae93d42",
+      "auditId": "aee899b0-416f-43e0-8a1e-099a9c9545af",
+      "baselineRunId": "f2791085-aaf6-4917-81bb-622d27e5babb",
+      "baselineAuditId": "a98f087b-ebe3-4ed8-83c4-4bd4c1b371e9",
+      "artifacts": {
+        "evidence": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\dece046a-3e66-4ea8-a6a9-96d29ae93d42\\evidence.json",
+        "inspection": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\dece046a-3e66-4ea8-a6a9-96d29ae93d42\\inspection.json",
+        "metrics": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\dece046a-3e66-4ea8-a6a9-96d29ae93d42\\metrics.csv"
+      },
+      "usable": true,
+      "analysis": {
+        "runId": "dece046a-3e66-4ea8-a6a9-96d29ae93d42",
+        "auditId": "aee899b0-416f-43e0-8a1e-099a9c9545af",
+        "status": "complete",
+        "ruleset": "dotnet-2026-09-14-evidence-fidelity",
+        "calibration": "baseline",
+        "configurationFingerprint": "55a2905da4b6f5b4abe0c76ea5cf5c652d34a1a1344d243dab163d59e3fa8d0d",
+        "diagnostics": [],
+        "suppressions": []
+      },
+      "filters": {
+        "totalUnits": 30,
+        "analyzedUnits": 21,
+        "skipped": [
+          {
+            "name": "_build",
+            "reason": "Excluded by solution build configuration"
+          },
+          {
+            "name": "Quartz.Documentation.Samples",
+            "reason": "Sample / demo code"
+          },
+          {
+            "name": "Quartz.Examples.Aspire.AppHost",
+            "reason": "Aspire orchestration host"
+          },
+          {
+            "name": "Quartz.Examples.FSharp",
+            "reason": "Reference outside selected solution"
+          },
+          {
+            "name": "Quartz.Extensions.Hosting",
+            "reason": "Aspire / generic hosting"
+          },
+          {
+            "name": "Quartz.Tests.AspNetCore",
+            "reason": "Test project"
+          },
+          {
+            "name": "Quartz.Tests.Integration.Seeder",
+            "reason": "Test project"
+          },
+          {
+            "name": "Quartz.Tests.Integration",
+            "reason": "Test project"
+          },
+          {
+            "name": "Quartz.Tests.Unit",
+            "reason": "Test project"
+          }
+        ]
+      },
+      "population": {
+        "types": 988,
+        "members": 9098
+      },
+      "analyzerExitCode": 0,
+      "validationExitCode": 0,
+      "scores": {
+        "codeQuality": 5.6,
+        "maintainability": 7.1,
+        "errorHandling": 4,
+        "performanceAsync": 0,
+        "dependencyManagement": 4,
+        "security": 2,
+        "testing": 6,
+        "documentation": 6,
+        "architecture": 4.5
+      },
+      "overallPartial": 4.4,
+      "scoredDimensions": 9,
+      "baselineScores": {
+        "codeQuality": null,
+        "maintainability": null,
+        "errorHandling": null,
+        "performanceAsync": null,
+        "dependencyManagement": null,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "architecture": null
+      },
+      "rawCsvIdentical": true,
+      "unchangedDimensions": [],
+      "baselineConfigurationFingerprint": "55a2905da4b6f5b4abe0c76ea5cf5c652d34a1a1344d243dab163d59e3fa8d0d",
+      "configurationFingerprintChangeReason": null,
+      "assessmentFailures": [],
+      "dimensions": {
+        "codeQuality": {
+          "status": "scored",
+          "score": 5.6,
+          "basis": "Eligible types: 685. Passive data carriers excluded: 156. Method complexity: 5.8, Decomposition: 5.3. Combined: 5.6.",
+          "scope": {
+            "id": "dotnet/codeQuality/v1",
+            "coverage": "partial",
+            "includes": [
+              "production-type-complexity",
+              "member-complexity"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "maintainability": {
+          "status": "scored",
+          "score": 7.1,
+          "basis": "Distinct executable functions: 6849. Weakest 1370: 3.49; remaining 5479: 9.56. Each function contributes once; distribution statistics are diagnostic only.",
+          "scope": {
+            "id": "dotnet/maintainability/v1",
+            "coverage": "partial",
+            "includes": [
+              "production-executable-function-maintainability-index"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 0
+        },
+        "errorHandling": {
+          "status": "scored",
+          "score": 4,
+          "basis": "Distinct source findings: 356 across 356 project/framework observations (errors: 24, warnings: 123). emptyCatch=10, throwEx=0, broadDefaults=14. Affected catches: 62/352; documented catches: 101.",
+          "scope": {
+            "id": "dotnet/errorHandling/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-exception-patterns"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 356
+        },
+        "performanceAsync": {
+          "status": "scored",
+          "score": 0,
+          "basis": "Distinct source findings: 74 across 74 project/framework observations (errors: 67, warnings: 0, unscored review leads: 7). syncOverAsync=70, threadSleep=0, saveChangesInsideLoop=0, missingCancellationToken=0, materializationBeforeQueryShape=0, awaitedIoInsideLoop=0, unboundedWhenAll=4, sharedStateMutationInFanOut=0.",
+          "scope": {
+            "id": "dotnet/performanceAsync/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-async-and-blocking-patterns"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 74
+        },
+        "dependencyManagement": {
+          "status": "scored",
+          "score": 4,
+          "basis": "vulnerableDirect=0, vulnerableTransitive=0, outdated=79, outdatedAspireExcluded=12, outdatedFrameworkIncompatibleExcluded=0, outdatedFrameworkCompatibilityUnknown=0, deprecated=0, unsupportedTFMs=0, versionDrift=0, cpmEnabled=True, anyCommandFailed=False.",
+          "scope": {
+            "id": "dotnet/dependencyManagement/v1",
+            "coverage": "partial",
+            "includes": [
+              "package-version-and-feed-observations"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 91
+        },
+        "security": {
+          "status": "scored",
+          "score": 2,
+          "basis": "Findings: 7 (errors: 7, warnings: 0). hardcodedSecrets=1, rawSql=6, unsafeDeserialization=0, allowAnyOriginWithCredentials=0, importedVulnerabilities=0.",
+          "scope": {
+            "id": "dotnet/security/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-security-patterns",
+              "dependency-vulnerability-observations"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 7
+        },
+        "testing": {
+          "status": "scored",
+          "score": 6,
+          "basis": "testProjects=3, testMethods=4355, skipped=0, placeholders=0, assertions=10502, assertionDensity=2.41, uncoveredProjects=20, coverageFile=False, lineRate=n/a.",
+          "scope": {
+            "id": "dotnet/testing/v1",
+            "coverage": "partial",
+            "includes": [
+              "test-project-signals",
+              "supplied-coverage-report"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 20
+        },
+        "documentation": {
+          "status": "scored",
+          "score": 6,
+          "basis": "hasReadme=True, readmeNonBlankLines=41, hasDocsDir=True, architectureDocs=0, hasAiInstructions=True, libraryXmlDocRatio=0.77, publicApiDocCoverage=1.00, staleMarkers=0, unresolvedCrefs=2.",
+          "scope": {
+            "id": "dotnet/documentation/v1",
+            "coverage": "partial",
+            "includes": [
+              "documentation-presence-and-content-signals"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 2
+        },
+        "architecture": {
+          "status": "scored",
+          "score": 4.5,
+          "basis": "Findings: 112 (errors: 0, warnings: 112). Cycles: 0, hotspots: 112 (showing 10). Excluded passive data carriers: 156, DI extension types: 4, framework coupling archetypes: 1, application composition roots: 6. coupling: 105/821 eligible types, score 4.47; complexity: 1/828 eligible types, score 9.96; size: 6/828 eligible types, score 5.91. Final = min(metric score 4.47, graph/layering cap 10.0), rounded to 1 decimal.",
+          "scope": {
+            "id": "dotnet/architecture/v1",
+            "coverage": "partial",
+            "includes": [
+              "static-coupling-and-project-structure"
+            ],
+            "excludes": [
+              "runtime-behavior",
+              "comprehensive-human-review"
+            ]
+          },
+          "findingCount": 112
+        }
+      },
+      "components": {
+        "methodComplexity": 5.8,
+        "decomposition": 5.3
+      },
+      "dependencyCompatibility": {
+        "status": "complete",
+        "uniquePackageVersions": 28,
+        "totalObservations": 79,
+        "knownObservations": 79,
+        "elapsedMilliseconds": 6789.1412,
+        "failures": []
+      },
+      "documentationMetrics": {
+        "hasReadme": true,
+        "readmeNonBlankLines": 41,
+        "hasDocsDir": true,
+        "architectureDocCount": 0,
+        "hasAiInstructions": true,
+        "libraryXmlDocRatio": 0.7692,
+        "publicApiDocCoverage": 0.9967,
+        "staleMarkerCount": 0,
+        "unresolvedCrefCount": 2
+      }
+    }
+  ],
+  "sourceFilesSha256": {
+    "analyzers/dotnet/docs/architecture.md": "1b40f7cd7a9adc63ec7bb9a00bdfb0c14597d49e04ce2bbf19812014ce3438ad",
+    "analyzers/dotnet/src/CodeMetrics.AI/CompilationReferenceMetadata.cs": "955293865f933f82e1cd4cd69d5da033b377461aecd0fefd1ddb0e797e2d4c4f",
+    "analyzers/dotnet/src/CodeMetrics.AI/Output/EvidenceModel.cs": "99a388cd4a65677252173116d40ce926f13919ea9640ed18dc4614ae01a8f616",
+    "analyzers/dotnet/src/CodeMetrics.AI/Probes/DocumentationProbe.cs": "fe5ed14f2b80c4e6f713028dae6f62d39da0faaf816b06b261bf4bbb619a885e",
+    "analyzers/dotnet/src/CodeMetrics.AI/Probes/PackageAssetInspector.cs": "31c961dc7e0314f717e203f994d4dc24111e16e89eca17925db13c02c04e5b5a",
+    "analyzers/dotnet/src/CodeMetrics.AI/SolutionAnalysisContext.cs": "51fa1643b270c6c0bb57b79da230f2a9cf3509c0e5fb05d31e1c2bce7cb4922d",
+    "analyzers/dotnet/src/CodeMetrics.AI/SolutionCompilationDiagnostics.cs": "68bc520aec62d5cff9578619f0ce7addfb4c5bae5c8497d36a7b4c45d0a4f531",
+    "analyzers/dotnet/tests/CodeMetrics.AI.Tests/CliIntegrationTests.cs": "7daebc2b30bb438edb5f1b19d74d6c6dac772782bc9223460e5e0497e6020244",
+    "analyzers/dotnet/tests/CodeMetrics.AI.Tests/Probes/DependencyProbeTests.cs": "f55ec75997b787099ada207a91f43f546360f7f8a11c6608b20c97de669929d6",
+    "analyzers/dotnet/tests/CodeMetrics.AI.Tests/Probes/DocumentationProbeTests.cs": "c1ecc59be16803b0800b50a228569ef1ce18bab89e9b419b66a3e2e143b5767b",
+    "analyzers/dotnet/tests/CodeMetrics.AI.Tests/SolutionCompilationLoaderTests.cs": "09856fafd39a8ba72b5e7716f88ebecc59af5c343ec3f6c3c87b59960682bbfd"
+  },
+  "validation": {
+    "dotnetTestsPassed": 998,
+    "newRegressionCases": 27,
+    "calibrationCases": 6,
+    "calibrationScoresAndFindingsUnchanged": true,
+    "formatVerificationPassed": true,
+    "testsLog": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\fidelity-final-tests.log",
+    "calibrationReport": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\fidelity-final-calibration.json",
+    "formatLog": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\fidelity-final-format-verify.log"
+  }
+}

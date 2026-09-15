@@ -59,6 +59,9 @@ internal static class PackageAssetInspector
             "buildTransitive",
             "buildMultiTargeting",
             "tools");
+        // These are tool-host/processor folders, not the consuming project's TFMs.
+        // Keep every other unrecognized folder so unsupported metadata stays unknown.
+        buildFrameworks.ExceptWith(["MSBuildCore", "MSBuildFull", "runtimes", "x86", "x64", "arm", "arm64"]);
         return buildFrameworks.Count > 0
             ? CreateFrameworkSpecificSet(buildFrameworks)
             : new PackageFrameworkSet(true, []);

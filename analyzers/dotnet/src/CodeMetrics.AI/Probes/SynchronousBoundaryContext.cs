@@ -17,7 +17,8 @@ internal static class SynchronousBoundaryContext
         var owner = node.Ancestors().FirstOrDefault(candidate => PerformanceFindingContext.IsFunction(candidate) ||
             candidate is PropertyDeclarationSyntax or IndexerDeclarationSyntax);
         if (owner is AnonymousFunctionExpressionSyntax callback)
-            return SynchronousCallbackContract.IsRecognized(callback, model) ? "synchronousCallbackContract" : null;
+            return ScriptingCallbackContract.IsRecognized(callback, model) ? "synchronousScriptingContract" :
+                SynchronousCallbackContract.IsRecognized(callback, model) ? "synchronousCallbackContract" : null;
         var symbol = owner switch
         {
             MethodDeclarationSyntax method => model.GetDeclaredSymbol(method),

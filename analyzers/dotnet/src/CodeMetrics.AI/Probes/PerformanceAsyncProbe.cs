@@ -40,7 +40,7 @@ public static class PerformanceAsyncProbe
         findings.AddRange(ConcurrentFanOutProbe.Analyze(projects, solutionDir));
         PerformanceFindingContext.CompleteMetadata(findings);
         var observationCount = findings.Count;
-        findings = PerformanceSourceFindings.Collapse(findings, solutionDir);
+        findings = SourceFindings.Collapse(findings, solutionDir);
 
         var errors = findings.Count(f => f.Severity == "error");
         var warnings = findings.Count(f => f.Severity == "warning");
@@ -56,7 +56,7 @@ public static class PerformanceAsyncProbe
         //   6  several   — two or three scored warnings
         //   8  minor     — a single scored warning, no errors
         //  10  clean     — no scored findings; review leads can remain
-        var decision = ScoringDecision.FirstMatch("dotnet/performanceAsync/context-classification-v3", new()
+        var decision = ScoringDecision.FirstMatch("dotnet/performanceAsync/context-classification-v4", new()
         {
             ["countingUnit"] = "distinctSourceFinding",
             ["variantAggregation"] = "maximumSeverityPerSourceSite",
@@ -120,7 +120,7 @@ public static class PerformanceAsyncProbe
                 Severity = contextReason == null ? "error" : "info",
                 File = filePath,
                 Line = GetLine(access.Node),
-                Observations = contextReason == null ? PerformanceSourceFindings.Location(access.Node) :
+                Observations = contextReason == null ? SourceFindings.Location(access.Node) :
                     PerformanceFindingContext.Review(access.Node, contextReason),
                 Project = projectName,
                 Type = GetContainingTypeName(access.Node),
@@ -150,7 +150,7 @@ public static class PerformanceAsyncProbe
                     Severity = contextReason == null ? "warning" : "info",
                     File = filePath,
                     Line = GetLine(inv),
-                    Observations = contextReason == null ? PerformanceSourceFindings.Location(inv) :
+                    Observations = contextReason == null ? SourceFindings.Location(inv) :
                         PerformanceFindingContext.Review(inv, contextReason),
                     Project = projectName,
                     Type = GetContainingTypeName(inv),
@@ -393,7 +393,7 @@ public static class PerformanceAsyncProbe
                 Confidence = "medium",
                 File = filePath,
                 Line = GetLine(inv),
-                Observations = PerformanceSourceFindings.Location(inv),
+                Observations = SourceFindings.Location(inv),
                 Project = projectName,
                 Type = GetContainingTypeName(inv),
                 Message = "Task.WhenAll enumerates a task-producing projection whose input size is not bounded here. Consider explicit concurrency control."

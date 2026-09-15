@@ -9,7 +9,7 @@ internal static class PerformanceFindingContext
 {
     public static Dictionary<string, object?> Review(SyntaxNode node, string reason)
     {
-        var observations = PerformanceSourceFindings.Location(node);
+        var observations = SourceFindings.Location(node);
         observations["classification"] = "reviewLead";
         observations["classificationReason"] = reason;
         observations["scoreDisposition"] = "excludedReviewLead";
@@ -31,7 +31,8 @@ internal static class PerformanceFindingContext
     public static string? SyncReason(SyntaxNode node, SemanticModel model)
     {
         return SynchronousBoundaryContext.Reason(node, model) ??
-            (LocalPerformanceRationale.HasExplanation(node) ? "documentedLocalChoice" : null);
+            (LocalPerformanceRationale.HasExplanation(node) ? "documentedLocalChoice" : null) ??
+            (LocalPerformanceRationale.HasTaskDeclarationExplanation(node, model) ? "documentedTaskLocalChoice" : null);
     }
 
     internal static bool IsFunction(SyntaxNode node) => node is

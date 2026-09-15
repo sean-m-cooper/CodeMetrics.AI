@@ -35,6 +35,13 @@ internal sealed record SolutionProjectSelection(
                 AnalyzedProjectIds.Remove(candidate.Id);
                 SkippedProjects.Add(new SkippedProjectInfo { Name = candidate.Name, Reason = "Test project (semantic attributes)" });
             }
+            else if (compilation != null && AnalyzedProjectIds.Contains(candidate.Id) &&
+                     BenchmarkProjectRecognition.Declaration(candidate.FilePath) != false &&
+                     BenchmarkProjectRecognition.HasBenchmarkMethods(compilation, root))
+            {
+                AnalyzedProjectIds.Remove(candidate.Id);
+                SkippedProjects.Add(new SkippedProjectInfo { Name = candidate.Name, Reason = "Benchmark project (semantic attributes)" });
+            }
         }
     }
 

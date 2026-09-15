@@ -38,7 +38,8 @@ public class ControllerAuthorizationTests
             """, path: secondPath, cancellationToken: TestContext.Current.CancellationToken);
         var (_, _, compilation) = RoslynTestHelper.CompileCode("""
             public class AuthorizeAttribute : System.Attribute { }
-            public class AllowAnonymousAttribute : System.Attribute { }
+            public class AllowAnonymousAttribute : System.Attribute, Microsoft.AspNetCore.Authorization.IAllowAnonymous { }
+            namespace Microsoft.AspNetCore.Authorization { public interface IAllowAnonymous {} }
             public class NonActionAttribute : System.Attribute { }
             [Authorize] public class SecureBase { }
             """);

@@ -16,6 +16,7 @@ internal sealed record SolutionAnalysisContext(
 {
     public List<AnalysisDiagnostic> Diagnostics { get; } = [];
     public IReadOnlyList<string> ScopedProjectPaths { get; init; } = [];
+    public IReadOnlyDictionary<string, string> DependencyProjectScopes { get; init; } = new Dictionary<string, string>();
     public bool HasErrors => Diagnostics.Any(diagnostic => diagnostic.Kind != "workspaceWarning");
 }
 
@@ -43,9 +44,10 @@ internal static class SolutionCompilationLoader
             loaded.Types,
             loaded.Members)
         {
-            ScopedProjectPaths = selection.ActiveProjects.Select(p => p.FilePath).OfType<string>().Distinct(SolutionScope.PathComparer).ToArray()
+            ScopedProjectPaths = selection.ActiveProjects.Select(p => p.FilePath).OfType<string>().Distinct(SolutionScope.PathComparer).ToArray(),
+            DependencyProjectScopes = DependencyProjectScope.Create(selection, solutionDir)
         };
-        SolutionCompilationDiagnostics.Append(context, compiledProjects, selection, cancellationToken);
+        await SolutionCompilationDiagnostics.AppendAsync(context, compiledProjects, selection, cancellationToken);
         return context;
     }
 

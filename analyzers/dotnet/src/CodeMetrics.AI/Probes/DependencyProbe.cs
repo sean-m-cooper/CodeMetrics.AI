@@ -115,6 +115,19 @@ public static class DependencyProbe
             frameworkCompatibility);
         AddOutdatedFindings(outdatedOutput, aspireProjects, frameworkCompatibility, findings);
         var deprecated = CountDeprecatedPackages(deprecatedOutput, findings);
+        if (PackageReport.IsJson(vulnerableOutput))
+        {
+            vulnerableDirect = DependencyFindingPopulation.Count(findings.Where(f => f.Category == "vulnerableDirectDependency"));
+            vulnerableTransitive = DependencyFindingPopulation.Count(findings.Where(f => f.Category == "vulnerableTransitiveDependency"));
+        }
+        if (PackageReport.IsJson(deprecatedOutput))
+            deprecated = DependencyFindingPopulation.Count(findings.Where(f => f.Category == "deprecatedDependency"));
+        if (PackageReport.IsJson(outdatedOutput))
+            outdatedCounts = outdatedCounts with
+            {
+                Included = DependencyFindingPopulation.Count(findings.Where(f => f.Category == "outdatedDependency" &&
+                    f.Observations.GetValueOrDefault("scoreDisposition") as string == "included"))
+            };
         var (unsupportedTFMs, unsupportedTFMList) = FindUnsupportedTargetFrameworks(solutionDir, projectPaths);
         var cpmEnabled = FindCpm(solutionDir);
         var versionDrift = cpmEnabled ? 0 : FindVersionDrift(solutionDir, projectPaths);
@@ -130,6 +143,7 @@ public static class DependencyProbe
             versionDrift,
             cpmEnabled);
         var result = CreateSuccessResult(metrics, findings);
+        DependencyFindingPopulation.Attach(result, solutionDir, null);
         result.Extra["vulnerabilityAssessmentAvailable"] = true;
         if (compatibilityAssessment != null)
             result.Extra["dependencyCompatibility"] = new
@@ -138,6 +152,8 @@ public static class DependencyProbe
                 compatibilityAssessment.UniquePackageVersions,
                 compatibilityAssessment.TotalObservations,
                 knownObservations = compatibilityAssessment.Results.Count,
+                notApplicableObservations = compatibilityAssessment.NoReportedCandidates.Count,
+                compatibilityAssessment.NoReportedCandidates,
                 compatibilityAssessment.ElapsedMilliseconds,
                 compatibilityAssessment.Failures
             };
@@ -334,13 +350,15 @@ public static class DependencyProbe
         }
     }
 
-    private enum OutdatedAssessment { Aspire, NotAssessed, Unknown, Compatible, Incompatible }
+    private enum OutdatedAssessment { NoCandidate, Aspire, NotAssessed, Unknown, Compatible, Incompatible }
 
     private static OutdatedAssessment AssessOutdatedPackage(OutdatedPackageUpgrade upgrade,
         IReadOnlySet<string> aspireProjects, IReadOnlyDictionary<OutdatedPackageUpgrade, bool>? compatibility)
     {
         if (upgrade.Project != null && IsAspireProjectSection(upgrade.Project, aspireProjects))
             return OutdatedAssessment.Aspire;
+        if (PackageFrameworkCompatibility.HasNoReportedCandidate(upgrade.LatestVersion))
+            return OutdatedAssessment.NoCandidate;
         if (compatibility == null)
             return OutdatedAssessment.NotAssessed;
         if (!compatibility.TryGetValue(upgrade, out var compatible))
@@ -352,6 +370,8 @@ public static class DependencyProbe
     {
         var (disposition, compatibility, explanation) = assessment switch
         {
+            OutdatedAssessment.NoCandidate => ("excludedNoReportedCandidate", "notApplicable",
+                "NuGet reported no upgrade candidate under the stable-only query. This does not establish that the package is current, supported or safe; prerelease and unlisted packages may require review."),
             OutdatedAssessment.Aspire => ("excludedAspire", "unknown", "Excluded from outdated scoring by Aspire policy."),
             OutdatedAssessment.Incompatible => ("excludedFrameworkIncompatible", "incompatible",
                 "Latest version is incompatible with this target framework; excluded from scoring."),
@@ -364,6 +384,7 @@ public static class DependencyProbe
         var observations = package.Observations();
         observations["scoreDisposition"] = disposition;
         observations["frameworkCompatibility"] = compatibility;
+        if (assessment == OutdatedAssessment.NoCandidate) observations["candidateSelection"] = "noReportedStableCandidate";
         return new Finding
         {
             Category = "outdatedDependency",
@@ -371,7 +392,9 @@ public static class DependencyProbe
             Confidence = "high",
             Project = package.Project,
             Package = package.Package,
-            Message = $"Package '{package.Package}' {package.ResolvedVersion} ({package.TargetFramework}) has latest version {package.LatestVersion}. " + explanation,
+            Message = assessment == OutdatedAssessment.NoCandidate
+                ? $"Package '{package.Package}' {package.ResolvedVersion} ({package.TargetFramework}): " + explanation
+                : $"Package '{package.Package}' {package.ResolvedVersion} ({package.TargetFramework}) has latest version {package.LatestVersion}. " + explanation,
             Observations = observations
         };
     }
@@ -441,7 +464,8 @@ public static class DependencyProbe
             {
                 ["dependencyMetrics"] = new
                 {
-                    countUnit = "package occurrences per project and target framework; not unique package IDs",
+                    countUnit = DependencyFindingPopulation.CountingUnit,
+                    exclusionCountUnit = "project/target-framework candidate observations",
                     vulnerableDirect = metrics.VulnerableDirect,
                     vulnerableTransitive = metrics.VulnerableTransitive,
                     outdated,
@@ -478,8 +502,9 @@ public static class DependencyProbe
 
     private static ScoringDecision CalculateDecision(DependencyMetrics metrics)
     {
-        return ScoringDecision.FirstMatch("dotnet/dependencyManagement/v1", new()
+        return ScoringDecision.FirstMatch("dotnet/dependencyManagement/package-versions-v2", new()
         {
+            ["countingUnit"] = DependencyFindingPopulation.CountingUnit,
             ["vulnerableDirect"] = metrics.VulnerableDirect,
             ["vulnerableTransitive"] = metrics.VulnerableTransitive,
             ["deprecated"] = metrics.Deprecated,
@@ -617,6 +642,8 @@ public static class DependencyProbe
         {
             switch (AssessOutdatedPackage(upgrade, aspireProjects, frameworkCompatibility))
             {
+                case OutdatedAssessment.NoCandidate:
+                    break;
                 case OutdatedAssessment.Aspire:
                     aspireExcluded++;
                     break;
@@ -739,7 +766,8 @@ public static class DependencyProbe
             }
         }
 
-        return (unsupported.Count, unsupported);
+        var distinct = unsupported.Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(tfm => tfm, StringComparer.Ordinal).ToList();
+        return (distinct.Count, distinct);
     }
 
     private static bool IsUnsupportedFramework(string tfm)

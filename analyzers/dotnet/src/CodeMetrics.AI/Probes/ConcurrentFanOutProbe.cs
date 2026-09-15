@@ -100,7 +100,7 @@ internal static class ConcurrentFanOutProbe
             Confidence = "high",
             File = whenAll.SyntaxTree.FilePath,
             Line = whenAll.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
-            Observations = PerformanceSourceFindings.Location(whenAll),
+            Observations = SourceFindings.Location(whenAll),
             Project = projectName,
             Type = whenAll.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault()?.Identifier.Text,
             Message = $"Concurrent fan-out passes captured state '{mutation.CapturedName}' " +

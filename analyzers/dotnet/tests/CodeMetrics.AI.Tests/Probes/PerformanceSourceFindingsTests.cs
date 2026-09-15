@@ -37,7 +37,7 @@ public class PerformanceSourceFindingsTests
         var finding = result.Findings.Should().ContainSingle().Subject;
         finding.Observations["observationCount"].Should().Be(frameworks);
         finding.Observations["affectedProjects"].Should().BeOfType<string[]>().Subject.Should().HaveCount(frameworks);
-        result.ScoringDecision!.Policy.Should().Be("dotnet/performanceAsync/context-classification-v3");
+        result.ScoringDecision!.Policy.Should().Be("dotnet/performanceAsync/context-classification-v4");
     }
 
     [Theory]
@@ -147,7 +147,7 @@ public class PerformanceSourceFindingsTests
             Message = "Thread sleeps.",
             Observations = new() { ["sourceSpanStart"] = 10, ["sourceSpanLength"] = 5 }
         });
-        PerformanceSourceFindings.Collapse(findings, Root).Should().HaveCount(OperatingSystem.IsWindows() ? 1 : 2);
+        SourceFindings.Collapse(findings, Root).Should().HaveCount(OperatingSystem.IsWindows() ? 1 : 2);
     }
 
     [Theory]
@@ -165,7 +165,7 @@ public class PerformanceSourceFindingsTests
                 ? new() { ["sourceSpanStart"] = 1, ["sourceSpanLength"] = 5 }
                 : new()
         });
-        PerformanceSourceFindings.Collapse(findings, Root).Should().HaveCount(2);
+        SourceFindings.Collapse(findings, Root).Should().HaveCount(2);
     }
 
     [Fact]
@@ -180,7 +180,7 @@ public class PerformanceSourceFindingsTests
                 Message = "Thread sleeps.",
                 Observations = new() { ["sourceSpanStart"] = 10, ["sourceSpanLength"] = 5 }
             });
-        PerformanceSourceFindings.Collapse(findings, Root).Should().ContainSingle()
+        SourceFindings.Collapse(findings, Root).Should().ContainSingle()
             .Subject.Observations["observationCount"].Should().Be(2);
     }
 

@@ -10,6 +10,11 @@ public sealed record OutdatedPackageUpgrade(
 
 public static class PackageFrameworkCompatibility
 {
+    internal const string NoCandidateText = "Not found at the sources";
+
+    internal static bool HasNoReportedCandidate(string? version) =>
+        string.Equals(version?.Trim(), NoCandidateText, StringComparison.OrdinalIgnoreCase);
+
     public static IReadOnlyList<OutdatedPackageUpgrade> ParseOutdatedOutput(string output)
     {
         if (PackageReport.IsJson(output))
@@ -54,7 +59,7 @@ public static class PackageFrameworkCompatibility
                 currentProject,
                 currentFramework,
                 columns[0],
-                columns[^1]));
+                trimmed.EndsWith(NoCandidateText, StringComparison.OrdinalIgnoreCase) ? NoCandidateText : columns[^1]));
         }
 
         return upgrades;
@@ -94,11 +99,12 @@ public static class PackageFrameworkCompatibility
     {
         cancellationToken.ThrowIfCancellationRequested();
         var watch = System.Diagnostics.Stopwatch.StartNew();
-        var groups = upgrades.GroupBy(upgrade => (upgrade.Package, upgrade.LatestVersion),
+        var noCandidates = upgrades.Where(u => HasNoReportedCandidate(u.LatestVersion)).ToArray();
+        var groups = upgrades.Where(u => !HasNoReportedCandidate(u.LatestVersion)).GroupBy(upgrade => (upgrade.Package, upgrade.LatestVersion),
             StringTupleComparer.OrdinalIgnoreCase).ToList();
         var result = new Dictionary<OutdatedPackageUpgrade, bool>();
         var failures = new List<PackageCompatibilityFailure>();
-        if (groups.Count == 0) return new(result, failures, 0, 0, 0);
+        if (groups.Count == 0) return new(result, failures, 0, upgrades.Count, 0) { NoReportedCandidates = noCandidates };
 
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(budget ?? TimeSpan.FromSeconds(20));
@@ -111,7 +117,7 @@ public static class PackageFrameworkCompatibility
         {
             foreach (var group in groups)
                 failures.Add(new(group.Key.Package, group.Key.Item2, group.Count(), ["sourceDiscoveryBudgetExceeded"]));
-            return new(result, failures, groups.Count, upgrades.Count, watch.Elapsed.TotalMilliseconds);
+            return new(result, failures, groups.Count, upgrades.Count, watch.Elapsed.TotalMilliseconds) { NoReportedCandidates = noCandidates };
         }
         using var gate = new SemaphoreSlim(4);
         var tasks = groups.Select(async group =>
@@ -153,7 +159,7 @@ public static class PackageFrameworkCompatibility
                 failures.Add(new(assessment.Group.Key.Package, assessment.Group.Key.Item2,
                     missing, assessment.Reasons.Count > 0 ? assessment.Reasons.Distinct().ToArray() : ["frameworkMetadataUnsupported"]));
         }
-        return new(result, failures, groups.Count, upgrades.Count, watch.Elapsed.TotalMilliseconds);
+        return new(result, failures, groups.Count, upgrades.Count, watch.Elapsed.TotalMilliseconds) { NoReportedCandidates = noCandidates };
     }
 
     private static IEnumerable<string> SplitLines(string text)
@@ -194,4 +200,7 @@ public sealed record PackageCompatibilityAssessment(
     IReadOnlyList<PackageCompatibilityFailure> Failures,
     int UniquePackageVersions,
     int TotalObservations,
-    double ElapsedMilliseconds);
+    double ElapsedMilliseconds)
+{
+    public IReadOnlyList<OutdatedPackageUpgrade> NoReportedCandidates { get; init; } = [];
+}

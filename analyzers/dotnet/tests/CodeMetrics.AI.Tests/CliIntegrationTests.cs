@@ -117,7 +117,12 @@ public class CliIntegrationTests
             var missing = await Run(root, tool, "--solution", "missing.slnx");
             missing.Code.Should().Be(2, missing.Output);
             await File.WriteAllTextAsync(Path.Combine(root, "Sample.slnx"), "<Solution><Project Path='Sample.csproj'/></Solution>", TestContext.Current.CancellationToken);
-            await File.WriteAllTextAsync(Path.Combine(root, "Sample.csproj"), "<Project Sdk='Microsoft.NET.Sdk'><PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup></Project>", TestContext.Current.CancellationToken);
+            await File.WriteAllTextAsync(Path.Combine(root, "Directory.Build.props"),
+                "<Project><PropertyGroup><GenerateDocumentationFile>true</GenerateDocumentationFile></PropertyGroup></Project>", TestContext.Current.CancellationToken);
+            await File.WriteAllTextAsync(Path.Combine(root, "Sample.csproj"),
+                "<Project Sdk='Microsoft.NET.Sdk'><PropertyGroup><TargetFramework>net10.0</TargetFramework><GenerateDocumentationFile Condition=\"'$(Configuration)' == 'Debug'\">false</GenerateDocumentationFile></PropertyGroup></Project>", TestContext.Current.CancellationToken);
+            Directory.CreateDirectory(Path.Combine(root, ".github"));
+            await File.WriteAllLinesAsync(Path.Combine(root, ".github", "README.md"), Enumerable.Repeat("Documentation content", 25), TestContext.Current.CancellationToken);
             await File.WriteAllTextAsync(Path.Combine(root, "Sample.cs"), """
                 public class Sample
                 {
@@ -137,6 +142,11 @@ public class CliIntegrationTests
             }
             using var debug = await Analyze("Debug");
             using var release = await Analyze("Release");
+            var debugDocs = debug.RootElement.GetProperty("dimensions").GetProperty("documentation").GetProperty("documentationMetrics");
+            var releaseDocs = release.RootElement.GetProperty("dimensions").GetProperty("documentation").GetProperty("documentationMetrics");
+            debugDocs.GetProperty("libraryXmlDocRatio").GetDouble().Should().Be(0);
+            releaseDocs.GetProperty("libraryXmlDocRatio").GetDouble().Should().Be(1);
+            releaseDocs.GetProperty("hasReadme").GetBoolean().Should().BeTrue();
             var debugId = debug.RootElement.GetProperty("analysis").GetProperty("runId").GetString();
             Guid.TryParseExact(debugId, "D", out _).Should().BeTrue();
             release.RootElement.GetProperty("analysis").GetProperty("runId").GetString().Should().NotBe(debugId);

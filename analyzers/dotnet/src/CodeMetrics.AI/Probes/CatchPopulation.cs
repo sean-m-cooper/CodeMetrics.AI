@@ -64,7 +64,7 @@ internal sealed class CatchPopulation(string? solutionDir)
         inputs["throwExes"] = findings.Count(f => f.Category == "throwEx");
         inputs["broadDefaults"] = findings.Count(f => f.Category == "broadCatchReturnsDefault");
         inputs["hasSyncBlock"] = syncBlock;
-        inputs["syncBlockingClassification"] = "context-classification-v3";
+        inputs["syncBlockingClassification"] = "context-classification-v4";
         foreach (var finding in findings.Where(f => f.Category is "missingLoggerForMultipleCatches" or "consoleWriteLine"))
             finding.Observations["scoreDisposition"] = "excludedAdvisoryContext";
         return decision;

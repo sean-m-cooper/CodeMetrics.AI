@@ -77,8 +77,7 @@ internal static class ControllerAuthorizationAnalysis
 
     private static bool HasAuthorizationIntent(ISymbol symbol)
     {
-        return symbol.GetAttributes().Any(attribute => attribute.AttributeClass?.Name is
-            "Authorize" or "AuthorizeAttribute" or "AllowAnonymous" or "AllowAnonymousAttribute");
+        return HasAttribute(symbol, "Authorize") || AnonymousAccessIntent.IsDeclared(symbol);
     }
 
     private static bool HasAuthorizationIntentInHierarchy(INamedTypeSymbol type)

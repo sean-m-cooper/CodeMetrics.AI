@@ -40,7 +40,7 @@ The tool scores your codebase across 9 quality dimensions (0-10 scale):
 | Complexity & Decomposition | Separate method-complexity and decomposition components, retaining one combined score |
 | Maintainability | Statistical — distinct executable-function MI, weakest fifth / remaining population |
 | Error Handling | Rule-based — empty catches, throw ex, broad catches, sync blocking |
-| Performance & Async | Rule-based — sync-over-async, sequential I/O, unbounded fan-out, shared-state concurrency |
+| Async/Blocking Usage | Rule-based — avoidable async/blocking hazards; documented boundaries and context-dependent patterns remain review leads |
 | Security | Rule-based — hardcoded secrets, SQL interpolation, unsafe deserialization |
 | Testing | Rule-based — test coverage, assertion density, placeholder detection |
 | Documentation | Deduction-based — README, docs/, XML docs, public API coverage, unresolved `cref` references |
@@ -88,10 +88,15 @@ The tool automatically skips non-production projects:
 - Aspire hosts (AppHost, ServiceDefaults, Hosting)
 - Benchmarks, Samples, Demo, Playground projects
 
-## Performance & Async classification and source counting
+## Async/Blocking Usage classification and source counting
 
-Policy `dotnet/performanceAsync/context-classification-v3`, ruleset
-`dotnet-2026-09-14-dependency-availability`, preserves the existing 0/2/4/6/8/10 ladder and
+Evaluates asynchronous operations and blocking calls for avoidable hazards, accounting
+for documented intent and supported usage patterns. Scores reflect code usage, not
+runtime speed or throughput. I/O latency, rate limits and deliberate throttling do
+not inherently indicate misuse. The evidence key remains `performanceAsync`.
+
+Policy `dotnet/performanceAsync/context-classification-v4`, ruleset
+`dotnet-2026-09-15-declared-async-boundaries`, preserves the existing 0/2/4/6/8/10 ladder and
 counts each physical file/span/rule once at maximum severity across frameworks.
 
 Proven completed-task reads are excluded. Synchronous contracts and local documented
@@ -249,7 +254,7 @@ for these entry points is provided through `HttpContext.RequestAborted`.
 
 Back-pressure is recognized through `ChannelWriter`, `ChannelReader`, and `SemaphoreSlim`, including authored wrapper methods and interface contracts when every analyzed implementation delegates to a recognized back-pressure primitive.
 
-The Performance & Async dimension also reports `sharedStateMutationInFanOut` when a concurrent projection passes captured state to an authored implementation that demonstrably mutates that parameter-reachable object graph.
+The Async/Blocking Usage dimension also reports `sharedStateMutationInFanOut` when a concurrent projection passes captured state to an authored implementation that demonstrably mutates that parameter-reachable object graph.
 
 ### Evidence population and samples
 
@@ -423,4 +428,6 @@ not invalidate a successful vulnerability query. Restore/compiler errors continu
 to make affected source analysis incomplete. Retain original artifacts, address the
 recorded failure, and rerun; never recover a score from CSV or stale evidence.
 
-See [2.3.0 release notes](../../docs/releases/2.3.0.md).
+See [2.3.1 release notes](../../docs/releases/2.3.1.md) for the latest accuracy fixes and
+Async/Blocking Usage naming, and [2.3.0 release notes](../../docs/releases/2.3.0.md)
+for the earlier scoring and availability changes.

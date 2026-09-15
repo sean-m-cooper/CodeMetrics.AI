@@ -197,7 +197,7 @@
       "category": "hardcodedSecret",
       "kind": "finding",
       "title": "Potential hardcoded secret",
-      "description": "Source matches a potential credential literal. Descriptive literals spelling the declaration name (including route, key and purpose identifiers) are excluded by a bounded lexical rule. Naming suffixes alone do not exempt credentials. Review actual use; never reproduce secret values in reports.",
+      "description": "Source matches a potential credential literal. Descriptive literals spelling the declaration name are excluded by a bounded lexical rule. Private or local constants used exclusively as semantic BCL Regex/GeneratedRegex pattern arguments are also excluded. Pattern-like names, public constants, mixed uses and unresolved consumers are not exempt. Repeated physical source sites count once with variant observations retained. Review actual use; never reproduce secret values in reports.",
       "documentation": "Rules/rules.md#cmai4001",
       "annotation": {
         "supported": false,
@@ -265,7 +265,7 @@
       "category": "allowAnonymous",
       "kind": "finding",
       "title": "Anonymous access declaration",
-      "description": "An AllowAnonymous declaration permits anonymous access. Review the endpoint's intended exposure; the declaration alone is not a vulnerability.",
+      "description": "A semantically recognized anonymous-access annotation records explicit developer intent. It is informational and does not reduce Security; other findings on the same endpoint remain eligible.",
       "documentation": "Rules/rules.md#cmai4005",
       "annotation": {
         "supported": false,
@@ -387,7 +387,7 @@
       "category": "syncBlockingCall",
       "kind": "finding",
       "title": "Synchronous task boundary",
-      "description": "A recognized task wait may block the calling thread. Proven completion guards, including ternary branches, and narrowly resolved completed-return helpers are excluded. Synchronous method/property contracts, bounded all-uses private helper chains, recognized synchronous callback APIs and local explanations remain unscored review leads, consistently with CMAI8001. Other waits retain the existing error-handling cap. A successful void Task.Wait establishes completion for subsequent access; timed waits and swallowed wait failures do not. These classifications do not prove runtime safety or absence of preceding synchronous I/O.",
+      "description": "A recognized task wait may block the calling thread. Proven completion guards, including ternary branches, and narrowly resolved completed-return helpers are excluded. Synchronous method/property contracts, bounded all-uses private helper chains, recognized synchronous callback APIs, cataloged OrchardCore GlobalMethod.Method script delegates, local explanations and explanatory comments on the same unchanged task in an adjacent declaration remain unscored review leads, consistently with CMAI8001. Other waits retain the existing error-handling cap. A successful void Task.Wait establishes completion for subsequent access; timed waits and swallowed wait failures do not. These classifications do not prove runtime safety or absence of preceding synchronous I/O.",
       "documentation": "Rules/rules.md#cmai5005",
       "annotation": {
         "supported": true,
@@ -526,7 +526,7 @@
       "category": "outdatedDependency",
       "kind": "finding",
       "title": "Outdated dependency",
-      "description": "The package feed reports a newer version. Compatible framework assets do not establish upgrade safety. Incompatible candidates are excluded. Unresolved compatibility is informational with scoreDisposition unavailable and withholds the dependency score; missing metadata is not a code defect.",
+      "description": "The package feed reports a newer version. Compatible framework assets do not establish upgrade safety. Incompatible candidates are excluded. Unresolved compatibility is informational with scoreDisposition unavailable and withholds the dependency score; missing metadata is not a code defect. The explicit NuGet no-candidate response is retained as informational excludedNoReportedCandidate with compatibility notApplicable; it is not a newer version or proof that the installed package is current or supported.",
       "documentation": "Rules/rules.md#cmai7004",
       "annotation": {
         "supported": false,
@@ -611,7 +611,7 @@
       "category": "syncOverAsync",
       "kind": "finding",
       "title": "Synchronous wait on asynchronous work",
-      "description": "A recognized task wait may block the calling thread. Proven Task/ValueTask guards, completed ternary branches and narrowly resolved completed-return helpers are excluded. Synchronous interface/override methods and properties, bounded all-uses private helper chains, recognized synchronous callback APIs and local explanations remain unscored review leads. Arbitrary callbacks, mixed callers, async contracts and unknown virtual implementations are not exempted. A contract or explanation is not proof of runtime safety, and completed-return helpers may still perform synchronous I/O. Counts once per physical source span and rule at maximum severity across frameworks. A successful void Task.Wait establishes completion for subsequent access; timed waits and swallowed wait failures do not.",
+      "description": "A recognized task wait may block the calling thread. Proven Task/ValueTask guards, completed ternary branches and narrowly resolved completed-return helpers are excluded. Synchronous interface/override methods and properties, bounded all-uses private helper chains, recognized synchronous callback APIs, cataloged OrchardCore GlobalMethod.Method script delegates, local explanations and explanatory comments on the same unchanged task in an adjacent declaration remain unscored review leads. Arbitrary callbacks, mixed callers, async contracts and unknown virtual implementations are not exempted. A contract or explanation is not proof of runtime safety, and completed-return helpers may still perform synchronous I/O. Counts once per physical source span and rule at maximum severity across frameworks. A successful void Task.Wait establishes completion for subsequent access; timed waits and swallowed wait failures do not.",
       "documentation": "Rules/rules.md#cmai8001",
       "annotation": {
         "supported": true,

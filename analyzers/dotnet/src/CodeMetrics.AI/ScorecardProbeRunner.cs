@@ -22,6 +22,7 @@ internal static class ScorecardProbeRunner
             context.ScopedProjectPaths,
             scope);
         dimensions["dependencyManagement"] = dependency;
+        DependencyFindingPopulation.Attach(dependency, solutionDir, context.DependencyProjectScopes);
         AddDependentDimensions(dimensions, context, dependency, solutionDir, coveragePath);
         Output.EvidenceEnricher.Enrich(dimensions, context, solutionDir);
         if (context.HasErrors)
@@ -84,12 +85,19 @@ internal static class ScorecardProbeRunner
         string solutionDir,
         string? coveragePath)
     {
-        var vulnerabilityCount = dependency.Findings.Count(finding =>
-            finding.Category.Contains("vulnerable", StringComparison.OrdinalIgnoreCase));
+        var vulnerabilityCount = DependencyFindingPopulation.Count(dependency.Findings.Where(DependencyFindingPopulation.IsSecurityInput));
         dimensions["security"] = SecurityProbe.Analyze(
             context.AnalyzedProjectCompilations, vulnerabilityCount, solutionDir,
             dependency.Status != "failed" ||
             dependency.Extra.TryGetValue("vulnerabilityAssessmentAvailable", out var available) && available is true);
+        ((DimensionResult)dimensions["security"]).Extra["dependencyVulnerabilityScope"] = new
+        {
+            policy = "production-and-unknown-projects-v1",
+            importedPackageVersions = vulnerabilityCount,
+            excludedDevelopmentObservations = dependency.Findings.Count(f =>
+                DependencyFindingPopulation.IsVulnerability(f) && !DependencyFindingPopulation.IsSecurityInput(f)),
+            detailDimension = "dependencyManagement"
+        };
         dimensions["testing"] = TestingProbe.Analyze(
             context.AllProjectCompilations, context.AnalyzedProjectNames, solutionDir, coveragePath);
         dimensions["documentation"] = DocumentationProbe.Analyze(

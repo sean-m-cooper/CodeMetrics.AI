@@ -2,6 +2,7 @@ using CodeMetrics.AI.Probes;
 using CodeMetrics.AI.Tests.Helpers;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using System.Text.Json;
 
 namespace CodeMetrics.AI.Tests.Probes;
@@ -368,9 +369,13 @@ public class DocumentationProbeTests
 
             var resultNoXmlDocs = DocumentationProbe.Analyze(tempDir, projects);
 
-            // Add GenerateDocumentationFile
+            // A reload with /doc changes the effective parse options.
             var csprojWithDocs = "<Project Sdk=\"Microsoft.NET.Sdk\"><PropertyGroup><TargetFramework>net10.0</TargetFramework><GenerateDocumentationFile>true</GenerateDocumentationFile></PropertyGroup></Project>";
             File.WriteAllText(csprojPath, csprojWithDocs);
+            var tree = compilation.SyntaxTrees.Single();
+            var withDocs = compilation.ReplaceSyntaxTree(tree, tree.WithRootAndOptions(tree.GetRoot(TestContext.Current.CancellationToken),
+                tree.Options.WithDocumentationMode(DocumentationMode.Diagnose)));
+            projects[0] = ("MyLib", withDocs, csprojPath);
 
             var resultWithXmlDocs = DocumentationProbe.Analyze(tempDir, projects);
 
@@ -402,6 +407,7 @@ public class DocumentationProbeTests
             File.WriteAllText(csprojPath, csprojContent);
 
             var (_, _, compilation) = RoslynTestHelper.CompileCode("public class Program { }");
+            compilation = compilation.WithOptions(compilation.Options.WithOutputKind(OutputKind.ConsoleApplication));
             var projects = new List<(string, Compilation, string?)>
             {
                 ("MyApp", compilation, csprojPath)
@@ -669,6 +675,63 @@ public class ClassA
         {
             Directory.Delete(tempDir, recursive: true);
         }
+    }
+
+    [Theory]
+    [InlineData(".github")]
+    [InlineData("docs")]
+    public void ConventionalReadmeLocations_AreRecognizedIncludingStaleMarkers(string directory)
+    {
+        var root = TempDir();
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(root, directory));
+            WriteLines(Path.Combine(root, directory, "readme.md"), 25, "TODO: expand example");
+            var result = DocumentationProbe.Analyze(root, NoProjects());
+            var metrics = (JsonElement)result.Extra["documentationMetrics"]!;
+            metrics.GetProperty("hasReadme").GetBoolean().Should().BeTrue();
+            metrics.GetProperty("readmeNonBlankLines").GetInt32().Should().Be(26);
+            metrics.GetProperty("staleMarkerCount").GetInt32().Should().Be(1);
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
+    [Fact]
+    public void RepositoryReadme_TakesPrecedenceOverGithubCopy()
+    {
+        var root = TempDir();
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(root, ".github"));
+            WriteLines(Path.Combine(root, ".github", "README.md"), 25, "TODO");
+            WriteLines(Path.Combine(root, "README.md"), 5);
+            var metrics = (JsonElement)DocumentationProbe.Analyze(root, NoProjects()).Extra["documentationMetrics"]!;
+            metrics.GetProperty("readmeNonBlankLines").GetInt32().Should().Be(5);
+            metrics.GetProperty("staleMarkerCount").GetInt32().Should().Be(0);
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void EvaluatedCompilerDocumentationSetting_WinsOverUnevaluatedProjectText(bool enabled, bool literalEnabled)
+    {
+        var root = TempDir();
+        try
+        {
+            WriteLines(Path.Combine(root, "README.md"), 25);
+            var path = Path.Combine(root, "Library.csproj");
+            File.WriteAllText(path, $"<Project><PropertyGroup><GenerateDocumentationFile>{literalEnabled.ToString().ToLowerInvariant()}</GenerateDocumentationFile></PropertyGroup></Project>");
+            var args = enabled ? new[] { "/target:library", "/doc:Library.xml" } : new[] { "/target:library" };
+            var parsed = CSharpCommandLineParser.Default.Parse(args, root, null);
+            var tree = CSharpSyntaxTree.ParseText("public class Example { }", parsed.ParseOptions, Path.Combine(root, "Example.cs"), cancellationToken: TestContext.Current.CancellationToken);
+            var compilation = CSharpCompilation.Create("Library", [tree], options: parsed.CompilationOptions);
+            var result = DocumentationProbe.Analyze(root, [("Library", compilation, path)]);
+            var metrics = (JsonElement)result.Extra["documentationMetrics"]!;
+            metrics.GetProperty("libraryXmlDocRatio").GetDouble().Should().Be(enabled ? 1 : 0);
+        }
+        finally { Directory.Delete(root, true); }
     }
 
 
