@@ -2,8 +2,8 @@ using Microsoft.CodeAnalysis;
 
 namespace CodeMetrics.AI.Probes;
 
-/// <summary>Counts authored async finding sites once while retaining framework-specific evidence.</summary>
-internal static class PerformanceSourceFindings
+/// <summary>Counts authored finding sites once while retaining framework-specific evidence.</summary>
+internal static class SourceFindings
 {
     private sealed record Site(string File, int Start, int Length, string Category, int UnknownIdentity);
 
@@ -13,11 +13,14 @@ internal static class PerformanceSourceFindings
         ["sourceSpanLength"] = node.Span.Length
     };
 
-    public static List<Finding> Collapse(IEnumerable<Finding> observations, string? solutionDir)
+    public static List<Finding> Collapse(IEnumerable<Finding> observations, string? solutionDir, bool preserveObservationOrder = false)
     {
         var root = Path.GetFullPath(string.IsNullOrWhiteSpace(solutionDir) ? "." : solutionDir);
-        return observations.Select((finding, index) => (Finding: finding, Index: index))
-            .GroupBy(item => Identity(item.Finding, item.Index, root))
+        var groups = observations.Select((finding, index) => (Finding: finding, Index: index))
+            .GroupBy(item => Identity(item.Finding, item.Index, root));
+        if (preserveObservationOrder)
+            return groups.Select(group => Summarize(group.Select(item => item.Finding))).ToList();
+        return groups
             .OrderBy(group => group.Key.File, StringComparer.Ordinal)
             .ThenBy(group => group.Key.Start).ThenBy(group => group.Key.Length)
             .ThenBy(group => group.Key.Category, StringComparer.Ordinal)

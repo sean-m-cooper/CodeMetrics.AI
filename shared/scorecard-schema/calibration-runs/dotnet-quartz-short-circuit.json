@@ -1,0 +1,470 @@
+{
+  "ruleset": "dotnet-2026-09-14-short-circuit-completion",
+  "packagePath": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\short-circuit-package\\CodeMetrics.AI.2.3.0.nupkg",
+  "packageSha256": "f48f3aec62caea5d75591e390f5df0a84b40ea3e2e10e9d14ed8eb86a9b02d11",
+  "releaseStatus": "unpublished local 2.3.0 build",
+  "baselineReport": "E:\\repos\\CodeMetrics.AI\\shared\\scorecard-schema\\calibration-runs\\dotnet-public-corpus-wave2-scope-intent.json",
+  "sourceCommit": "97afe142210e9c616b434ec7d617286a2752e9d4",
+  "sourceRoot": "E:/repos/quartznet",
+  "entryPoint": "Quartz.slnx",
+  "runId": "b1eb3e16-c3a6-4c18-ab43-3c05a7e787a0",
+  "auditId": "aeb58165-c749-4ed1-adf5-fb69a2afc0e4",
+  "baselineRunId": "d3a6eff7-0283-4184-9d73-6d75cf7d8edf",
+  "baselineAuditId": "28a2091a-9cab-497d-bfe5-4905c0dadfa6",
+  "artifacts": {
+    "evidence": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\b1eb3e16-c3a6-4c18-ab43-3c05a7e787a0\\evidence.json",
+    "inspection": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\b1eb3e16-c3a6-4c18-ab43-3c05a7e787a0\\inspection.json",
+    "metrics": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\b1eb3e16-c3a6-4c18-ab43-3c05a7e787a0\\metrics.csv"
+  },
+  "baselineArtifacts": {
+    "evidence": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\d3a6eff7-0283-4184-9d73-6d75cf7d8edf\\evidence.json",
+    "inspection": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\d3a6eff7-0283-4184-9d73-6d75cf7d8edf\\inspection.json",
+    "metrics": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\d3a6eff7-0283-4184-9d73-6d75cf7d8edf\\metrics.csv"
+  },
+  "analysis": {
+    "runId": "b1eb3e16-c3a6-4c18-ab43-3c05a7e787a0",
+    "auditId": "aeb58165-c749-4ed1-adf5-fb69a2afc0e4",
+    "status": "complete",
+    "ruleset": "dotnet-2026-09-14-short-circuit-completion",
+    "calibration": "baseline",
+    "configurationFingerprint": "55a2905da4b6f5b4abe0c76ea5cf5c652d34a1a1344d243dab163d59e3fa8d0d",
+    "diagnostics": [],
+    "suppressions": []
+  },
+  "filters": {
+    "totalUnits": 30,
+    "analyzedUnits": 20,
+    "skipped": [
+      {
+        "name": "_build",
+        "reason": "Excluded by solution build configuration"
+      },
+      {
+        "name": "Quartz.Benchmark",
+        "reason": "Benchmark project"
+      },
+      {
+        "name": "Quartz.Documentation.Samples",
+        "reason": "Sample / demo code"
+      },
+      {
+        "name": "Quartz.Examples.Aspire.AppHost",
+        "reason": "Aspire orchestration host"
+      },
+      {
+        "name": "Quartz.Examples.FSharp",
+        "reason": "Reference outside selected solution"
+      },
+      {
+        "name": "Quartz.Extensions.Hosting",
+        "reason": "Aspire / generic hosting"
+      },
+      {
+        "name": "Quartz.Tests.AspNetCore",
+        "reason": "Test project"
+      },
+      {
+        "name": "Quartz.Tests.Integration.Seeder",
+        "reason": "Test project"
+      },
+      {
+        "name": "Quartz.Tests.Integration",
+        "reason": "Test project"
+      },
+      {
+        "name": "Quartz.Tests.Unit",
+        "reason": "Test project"
+      }
+    ]
+  },
+  "population": {
+    "types": 903,
+    "members": 8059
+  },
+  "scores": {
+    "codeQuality": 5.6,
+    "maintainability": 7,
+    "errorHandling": 8.9,
+    "performanceAsync": 10,
+    "dependencyManagement": 4,
+    "security": 2,
+    "testing": 6,
+    "documentation": 6,
+    "architecture": 4.5
+  },
+  "baselineScores": {
+    "codeQuality": 5.6,
+    "maintainability": 7,
+    "errorHandling": 4,
+    "performanceAsync": 2,
+    "dependencyManagement": 4,
+    "security": 2,
+    "testing": 6,
+    "documentation": 6,
+    "architecture": 4.5
+  },
+  "overallPartial": 6.0,
+  "baselineOverallPartial": 4.6,
+  "removedFindings": [
+    {
+      "category": "syncOverAsync",
+      "severity": "error",
+      "file": "src/Quartz/Impl/AdoJobStore/StdAdoDelegate.cs",
+      "line": 336,
+      "member": "ReadMapFromReader(DbDataReader rs, int colIndex)",
+      "project": "Quartz",
+      "type": "StdAdoDelegate",
+      "message": "'.Result' synchronously waits for asynchronous work. Review an asynchronous path and blocking risk.",
+      "confidence": "high",
+      "ruleId": "dotnet/performanceAsync/syncOverAsync",
+      "fingerprint": "68d85bbb96f0f2a454c5d56e8927890be12dc31fe26ab41abcb96193cb882569",
+      "observations": {
+        "sourceSpanStart": 15050,
+        "sourceSpanLength": 19,
+        "classification": "actionableSignal",
+        "classificationReason": "observedHazard",
+        "scoreDisposition": "scored",
+        "countingUnit": "distinctSourceFinding",
+        "variantAggregation": "maximumSeverityPerSourceSite",
+        "observationCount": 1,
+        "affectedProjects": [
+          "Quartz"
+        ],
+        "projectFrameworkObservations": [
+          {
+            "project": "Quartz",
+            "severity": "error",
+            "message": "'.Result' synchronously waits for asynchronous work. Review an asynchronous path and blocking risk.",
+            "classification": "actionableSignal",
+            "classificationReason": "observedHazard"
+          }
+        ],
+        "diagnosticCode": "CMAI8001",
+        "confidenceBasis": "Direct syntax, semantic, or metric observation"
+      }
+    },
+    {
+      "category": "syncBlockingCall",
+      "severity": "warning",
+      "file": "src/Quartz/Impl/AdoJobStore/StdAdoDelegate.cs",
+      "line": 336,
+      "member": "ReadMapFromReader(DbDataReader rs, int colIndex)",
+      "project": "Quartz",
+      "type": "StdAdoDelegate",
+      "message": "'.Result' synchronously waits for asynchronous work. Review blocking and deadlock risk.",
+      "confidence": "high",
+      "ruleId": "dotnet/errorHandling/syncBlockingCall",
+      "fingerprint": "65288049ad3ad7b298e21a57f7611bb9d072faef717c6f4dbfa66833ba15f315",
+      "observations": {
+        "sourceSpanStart": 15050,
+        "sourceSpanLength": 19,
+        "countingUnit": "distinctSourceFinding",
+        "observationCount": 1,
+        "affectedProjects": [
+          "Quartz"
+        ],
+        "projectFrameworkObservations": [
+          {
+            "project": "Quartz",
+            "message": "'.Result' synchronously waits for asynchronous work. Review blocking and deadlock risk."
+          }
+        ],
+        "diagnosticCode": "CMAI5005",
+        "confidenceBasis": "Direct syntax, semantic, or metric observation"
+      }
+    }
+  ],
+  "validation": {
+    "testsPassed": 1095,
+    "newRegressionCases": 24,
+    "calibrationCases": 6,
+    "rawCsvIdentical": true,
+    "retainedFindingsIdentical": true,
+    "otherSevenDimensionScoresUnchanged": true,
+    "sourceCommitAndTrackedFilesUnchanged": true,
+    "packageMatchesTestedDllAndCatalog": true,
+    "testsLog": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\short-circuit-tests.log",
+    "calibrationReport": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\short-circuit-calibration.json",
+    "formatLog": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\short-circuit-format.log"
+  },
+  "sourceFilesSha256": {
+    "analyzers/dotnet/src/CodeMetrics.AI/Probes/CompletedTaskAccess.cs": "0261fea8563e1032cf31d9e828656af55d520a23e68920f4729f67d36ca45aa0",
+    "analyzers/dotnet/src/CodeMetrics.AI/Output/EvidenceModel.cs": "c7c6ef6bb8acdc5432374177e4ddc6701737bec204d32612fe104e70c4329ebb",
+    "analyzers/dotnet/tests/CodeMetrics.AI.Tests/Probes/CompletedTaskShortCircuitTests.cs": "6b3db4b975f374583958ef2e7846c26cabd84c9f7b015aeb3b49a7df074558a1"
+  },
+  "dimensions": {
+    "codeQuality": {
+      "status": "scored",
+      "score": 5.6,
+      "basis": "Eligible types: 605. Passive data carriers excluded: 154. Method complexity: 5.8, Decomposition: 5.3. Combined: 5.6.",
+      "scope": {
+        "id": "dotnet/codeQuality/v1",
+        "coverage": "partial",
+        "includes": [
+          "production-type-complexity",
+          "member-complexity"
+        ],
+        "excludes": [
+          "runtime-behavior",
+          "comprehensive-human-review"
+        ]
+      },
+      "displayName": "Complexity & Decomposition",
+      "measurementPolicy": "executable-function-ownership-v1",
+      "complexityMeasurementPolicy": "source-function-own-cc-v1",
+      "findingSummary": {
+        "total": 0,
+        "byCategoryAndSeverity": {}
+      },
+      "scoringDecisionSummary": {
+        "version": 1,
+        "policy": "dotnet/codeQuality/method-population-v3",
+        "operation": "mean",
+        "finalScore": 5.6
+      }
+    },
+    "maintainability": {
+      "status": "scored",
+      "score": 7,
+      "basis": "Distinct executable functions: 6022. Weakest 1205: 3.37; remaining 4817: 9.49. Each function contributes once; distribution statistics are diagnostic only.",
+      "scope": {
+        "id": "dotnet/maintainability/v1",
+        "coverage": "partial",
+        "includes": [
+          "production-executable-function-maintainability-index"
+        ],
+        "excludes": [
+          "runtime-behavior",
+          "comprehensive-human-review"
+        ]
+      },
+      "measurementPolicy": "source-function-own-mi-v1",
+      "findingSummary": {
+        "total": 0,
+        "byCategoryAndSeverity": {}
+      },
+      "scoringDecisionSummary": {
+        "version": 1,
+        "policy": "dotnet/maintainability/source-functions-quintile-40-60-v1",
+        "operation": "deductions",
+        "finalScore": 7
+      }
+    },
+    "errorHandling": {
+      "status": "scored",
+      "score": 8.9,
+      "basis": "Distinct source findings: 277 across 277 project/framework observations (errors: 24, warnings: 55). emptyCatch=10, throwEx=0, broadDefaults=14. Affected catches: 61/349; documented catches: 100.",
+      "scope": {
+        "id": "dotnet/errorHandling/v1",
+        "coverage": "partial",
+        "includes": [
+          "static-exception-patterns"
+        ],
+        "excludes": [
+          "runtime-behavior",
+          "comprehensive-human-review"
+        ]
+      },
+      "findingSummary": {
+        "total": 277,
+        "byCategoryAndSeverity": {
+          "broadCatchReturnsDefault/error": 14,
+          "broadCatchWithoutLoggingOrRethrow/warning": 51,
+          "consoleWriteLine/info": 195,
+          "emptyCatch/error": 10,
+          "missingLoggerForMultipleCatches/warning": 4,
+          "syncBlockingCall/info": 3
+        }
+      },
+      "scoringDecisionSummary": {
+        "version": 1,
+        "policy": "dotnet/errorHandling/catch-population-v2",
+        "operation": "minimum",
+        "finalScore": 8.9
+      }
+    },
+    "performanceAsync": {
+      "status": "scored",
+      "score": 10,
+      "basis": "Distinct source findings: 7 across 7 project/framework observations (errors: 0, warnings: 0, unscored review leads: 7). syncOverAsync=3, threadSleep=0, saveChangesInsideLoop=0, missingCancellationToken=0, materializationBeforeQueryShape=0, awaitedIoInsideLoop=0, unboundedWhenAll=4, sharedStateMutationInFanOut=0.",
+      "scope": {
+        "id": "dotnet/performanceAsync/v1",
+        "coverage": "partial",
+        "includes": [
+          "static-async-and-blocking-patterns"
+        ],
+        "excludes": [
+          "runtime-behavior",
+          "comprehensive-human-review"
+        ]
+      },
+      "findingSummary": {
+        "total": 7,
+        "byCategoryAndSeverity": {
+          "syncOverAsync/info": 3,
+          "unboundedWhenAll/info": 4
+        }
+      },
+      "scoringDecisionSummary": {
+        "version": 1,
+        "policy": "dotnet/performanceAsync/context-classification-v3",
+        "operation": "firstMatch",
+        "finalScore": 10
+      }
+    },
+    "dependencyManagement": {
+      "status": "scored",
+      "score": 4,
+      "basis": "vulnerableDirect=0, vulnerableTransitive=0, outdated=35, outdatedAspireExcluded=12, outdatedFrameworkIncompatibleExcluded=0, outdatedFrameworkCompatibilityUnknown=0, deprecated=0, unsupportedTFMs=0, versionDrift=0, cpmEnabled=True, anyCommandFailed=False.",
+      "scope": {
+        "id": "dotnet/dependencyManagement/v2",
+        "coverage": "partial",
+        "includes": [
+          "package-version-and-feed-observations",
+          "production-and-development-project-dependencies"
+        ],
+        "excludes": [
+          "runtime-behavior",
+          "comprehensive-human-review"
+        ]
+      },
+      "findingSummary": {
+        "total": 91,
+        "byCategoryAndSeverity": {
+          "outdatedDependency/info": 12,
+          "outdatedDependency/warning": 79
+        }
+      },
+      "scoringDecisionSummary": {
+        "version": 1,
+        "policy": "dotnet/dependencyManagement/package-versions-v2",
+        "operation": "firstMatch",
+        "finalScore": 4
+      }
+    },
+    "security": {
+      "status": "scored",
+      "score": 2,
+      "basis": "Findings: 7 distinct source sites from 7 observations (errors: 7, warnings: 0). hardcodedSecrets=1, rawSql=6, unsafeDeserialization=0, allowAnyOriginWithCredentials=0, importedVulnerabilities=0.",
+      "scope": {
+        "id": "dotnet/security/v2",
+        "coverage": "partial",
+        "includes": [
+          "static-security-patterns",
+          "production-and-unknown-project-dependency-vulnerabilities"
+        ],
+        "excludes": [
+          "runtime-behavior",
+          "comprehensive-human-review",
+          "test-and-benchmark-only-dependency-vulnerabilities"
+        ]
+      },
+      "findingSummary": {
+        "total": 7,
+        "byCategoryAndSeverity": {
+          "hardcodedSecret/error": 1,
+          "rawSqlInterpolation/error": 6
+        }
+      },
+      "scoringDecisionSummary": {
+        "version": 1,
+        "policy": "dotnet/security/explicit-anonymous-intent-v4",
+        "operation": "firstMatch",
+        "finalScore": 2
+      }
+    },
+    "testing": {
+      "status": "scored",
+      "score": 6,
+      "basis": "testProjects=3, testMethods=4355, skipped=0, placeholders=0, assertions=10502, assertionDensity=2.41, uncoveredProjects=19, coverageFile=False, lineRate=n/a.",
+      "scope": {
+        "id": "dotnet/testing/v1",
+        "coverage": "partial",
+        "includes": [
+          "test-project-signals",
+          "supplied-coverage-report"
+        ],
+        "excludes": [
+          "runtime-behavior",
+          "comprehensive-human-review"
+        ]
+      },
+      "findingSummary": {
+        "total": 19,
+        "byCategoryAndSeverity": {
+          "uncoveredProject/warning": 19
+        }
+      },
+      "scoringDecisionSummary": {
+        "version": 1,
+        "policy": "dotnet/testing/signals/v1",
+        "operation": "firstMatch",
+        "finalScore": 6
+      }
+    },
+    "documentation": {
+      "status": "scored",
+      "score": 6,
+      "basis": "hasReadme=True, readmeNonBlankLines=41, hasDocsDir=True, architectureDocs=0, hasAiInstructions=True, libraryXmlDocRatio=0.77, publicApiDocCoverage=1.00, staleMarkers=0, unresolvedCrefs=1.",
+      "scope": {
+        "id": "dotnet/documentation/v1",
+        "coverage": "partial",
+        "includes": [
+          "documentation-presence-and-content-signals"
+        ],
+        "excludes": [
+          "runtime-behavior",
+          "comprehensive-human-review"
+        ]
+      },
+      "findingSummary": {
+        "total": 1,
+        "byCategoryAndSeverity": {
+          "unresolvedCref/warning": 1
+        }
+      },
+      "scoringDecisionSummary": {
+        "version": 1,
+        "policy": "dotnet/documentation/v1",
+        "operation": "deductions",
+        "finalScore": 6
+      }
+    },
+    "architecture": {
+      "status": "scored",
+      "score": 4.5,
+      "basis": "Findings: 99 (errors: 0, warnings: 99). Cycles: 0, hotspots: 99 (showing 10). Excluded passive data carriers: 154, DI extension types: 4, framework coupling archetypes: 1, application composition roots: 5. coupling: 92/739 eligible types, score 4.51; complexity: 1/745 eligible types, score 9.96; size: 6/745 eligible types, score 5.90. Final = min(metric score 4.51, graph/layering cap 10.0), rounded to 1 decimal.",
+      "scope": {
+        "id": "dotnet/architecture/v1",
+        "coverage": "partial",
+        "includes": [
+          "static-coupling-and-project-structure"
+        ],
+        "excludes": [
+          "runtime-behavior",
+          "comprehensive-human-review"
+        ]
+      },
+      "findingSummary": {
+        "total": 99,
+        "byCategoryAndSeverity": {
+          "highCoupling/warning": 92,
+          "highCyclomaticComplexity/warning": 1,
+          "largeClass/warning": 6
+        }
+      },
+      "scoringDecisionSummary": {
+        "version": 1,
+        "policy": "dotnet/architecture/population-severity-v1",
+        "operation": "minimum",
+        "finalScore": 4.5
+      }
+    }
+  },
+  "reportDetail": {
+    "kind": "curated-summary",
+    "note": "Full per-finding and per-function evidence remains in each linked run artifact. This report retains measured scores, scope, basis, validation and provenance; it is not a replacement evidence document.",
+    "originalReportSha256": "532df15182ff32f02a78f7e161b7d70709c1864f0408c2678908e5b2122fc468",
+    "localFullReport": "E:/repos/CodeMetrics.AI/TestResults/commit-preparation/full-calibration-reports/dotnet-quartz-short-circuit.json"
+  }
+}

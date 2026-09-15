@@ -1,0 +1,3561 @@
+[
+  {
+    "name": "Dapper",
+    "root": "E:/repos/Dapper",
+    "entryPoint": "Dapper.slnx",
+    "repository": "https://github.com/DapperLib/Dapper",
+    "commit": "8becae8d0e2b360165ae03c0d5d1330b0273473d",
+    "branch": "main",
+    "configuration": "Release",
+    "sdkPolicy": {
+      "sdk": {
+        "version": "10.0.102",
+        "rollForward": "latestMajor"
+      }
+    },
+    "restoreExitCode": 0,
+    "buildSummary": "Release solution build passed after fetching omitted historical Git blobs. 21 warnings; no source edits.",
+    "buildExitCode": 0,
+    "testsExecuted": false,
+    "resultFile": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\Dapper-result.json",
+    "runId": "9a991b6a-8512-4c4a-bc4a-bd356442f93c",
+    "auditId": "7c6bfc93-70c6-43dd-9e1f-0fad6656c258",
+    "usable": false,
+    "resultStatus": "failed",
+    "analyzerExitCode": 2,
+    "validationExitCode": 2,
+    "artifacts": {
+      "evidence": "E:\\repos\\Dapper\\.scorecard\\dotnet\\runs\\9a991b6a-8512-4c4a-bc4a-bd356442f93c\\evidence.json",
+      "inspection": "E:\\repos\\Dapper\\.scorecard\\dotnet\\runs\\9a991b6a-8512-4c4a-bc4a-bd356442f93c\\inspection.json",
+      "metrics": "E:\\repos\\Dapper\\.scorecard\\dotnet\\runs\\9a991b6a-8512-4c4a-bc4a-bd356442f93c\\metrics.csv"
+    },
+    "tool": {
+      "name": "CodeMetrics.AI",
+      "version": "2.3.0",
+      "ecosystem": "dotnet"
+    },
+    "subject": {
+      "root": "E:\\repos\\Dapper",
+      "entryPoint": "E:\\repos\\Dapper\\Dapper.slnx",
+      "name": "Dapper",
+      "variant": "Release"
+    },
+    "analysis": {
+      "runId": "9a991b6a-8512-4c4a-bc4a-bd356442f93c",
+      "auditId": "7c6bfc93-70c6-43dd-9e1f-0fad6656c258",
+      "status": "complete",
+      "ruleset": "dotnet-2026-09-14-dependency-availability",
+      "calibration": "baseline",
+      "configurationFingerprint": "df6e6db6fd7474f40c9130e6bb1b2bd56d06b96f7d91c1c7ed5903e60b5eeeb2",
+      "diagnostics": [
+        {
+          "kind": "workspaceWarning",
+          "message": "Found project reference without a matching metadata reference: E:\\repos\\Dapper\\Dapper.StrongName\\Dapper.StrongName.csproj"
+        },
+        {
+          "kind": "workspaceWarning",
+          "message": "Duplicate source file 'E:\\repos\\Dapper\\Dapper\\PublicAPI.Shipped.txt' in project 'E:\\repos\\Dapper\\Dapper\\Dapper.csproj'"
+        },
+        {
+          "kind": "workspaceWarning",
+          "message": "Duplicate source file 'E:\\repos\\Dapper\\Dapper\\PublicAPI.Unshipped.txt' in project 'E:\\repos\\Dapper\\Dapper\\Dapper.csproj'"
+        },
+        {
+          "kind": "workspaceWarning",
+          "message": "Found project reference without a matching metadata reference: E:\\repos\\Dapper\\Dapper\\Dapper.csproj"
+        },
+        {
+          "kind": "workspaceWarning",
+          "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\benchmarks\\Dapper.Tests.Performance\\Dapper.Tests.Performance.csproj' with message: Package 'System.Security.Cryptography.Xml' 10.0.8 has a known high severity vulnerability, https://github.com/advisories/GHSA-23rf-6693-g89p"
+        },
+        {
+          "kind": "workspaceWarning",
+          "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\benchmarks\\Dapper.Tests.Performance\\Dapper.Tests.Performance.csproj' with message: Package 'System.Security.Cryptography.Xml' 10.0.8 has a known high severity vulnerability, https://github.com/advisories/GHSA-8q5v-6pqq-x66h"
+        },
+        {
+          "kind": "workspaceWarning",
+          "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\benchmarks\\Dapper.Tests.Performance\\Dapper.Tests.Performance.csproj' with message: Package 'System.Security.Cryptography.Xml' 10.0.8 has a known high severity vulnerability, https://github.com/advisories/GHSA-cvvh-rhrc-wg4q"
+        },
+        {
+          "kind": "workspaceWarning",
+          "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\benchmarks\\Dapper.Tests.Performance\\Dapper.Tests.Performance.csproj' with message: Package 'System.Security.Cryptography.Xml' 10.0.8 has a known high severity vulnerability, https://github.com/advisories/GHSA-g8r8-53c2-pm3f"
+        },
+        {
+          "kind": "workspaceWarning",
+          "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\benchmarks\\Dapper.Tests.Performance\\Dapper.Tests.Performance.csproj' with message: Package 'System.Security.Cryptography.Xml' 10.0.8 has a known high severity vulnerability, https://github.com/advisories/GHSA-mmjf-rqrv-855v"
+        },
+        {
+          "kind": "workspaceWarning",
+          "message": "Msbuild failed when processing the file 'E:\\repos\\Dapper\\tests\\Dapper.Tests\\Dapper.Tests.csproj' with message: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.11 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q"
+        }
+      ],
+      "suppressions": []
+    },
+    "filters": {
+      "totalUnits": 25,
+      "analyzedUnits": 20,
+      "skipped": [
+        {
+          "name": "Dapper.Tests.Performance(net472)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Dapper.Tests.Performance(net10.0)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Dapper.Tests(net481)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Dapper.Tests(net8.0)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Dapper.Tests(net10.0)",
+          "reason": "Test project"
+        }
+      ]
+    },
+    "population": {
+      "types": 555,
+      "members": 7222
+    },
+    "scores": {
+      "codeQuality": null,
+      "maintainability": null,
+      "errorHandling": null,
+      "performanceAsync": null,
+      "dependencyManagement": null,
+      "security": null,
+      "testing": null,
+      "documentation": null,
+      "architecture": null
+    },
+    "overallPartial": null,
+    "scoredDimensions": 0,
+    "assessmentFailures": [
+      {
+        "dimension": "dependencyManagement",
+        "basis": "Dependency compatibility assessment unavailable; no dependency score is assigned. vulnerableDirect=2, vulnerableTransitive=3, outdated=92, outdatedAspireExcluded=0, outdatedFrameworkIncompatibleExcluded=4, outdatedFrameworkCompatibilityUnknown=27, deprecated=7, unsupportedTFMs=1, versionDrift=0, cpmEnabled=True, anyCommandFailed=False.",
+        "dependencyCompatibility": {
+          "status": "failed",
+          "uniquePackageVersions": 25,
+          "totalObservations": 123,
+          "knownObservations": 96,
+          "elapsedMilliseconds": 4820.8047,
+          "failures": [
+            {
+              "package": "Nerdbank.GitVersioning",
+              "latestVersion": "3.10.94",
+              "affectedObservations": 25,
+              "reasons": [
+                "frameworkMetadataUnsupported"
+              ]
+            },
+            {
+              "package": "linq2db.SqlServer",
+              "latestVersion": "6.5.0",
+              "affectedObservations": 2,
+              "reasons": [
+                "frameworkMetadataUnsupported"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "dimensions": {
+      "codeQuality": {
+        "status": "scored",
+        "score": null,
+        "scope": {
+          "id": "dotnet/codeQuality/v1",
+          "coverage": "partial",
+          "includes": [
+            "production-type-complexity",
+            "member-complexity"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Diagnostic only: failed audit",
+        "findingCount": 0
+      },
+      "maintainability": {
+        "status": "scored",
+        "score": null,
+        "scope": {
+          "id": "dotnet/maintainability/v1",
+          "coverage": "partial",
+          "includes": [
+            "production-executable-function-maintainability-index"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Diagnostic only: failed audit",
+        "findingCount": 0
+      },
+      "errorHandling": {
+        "status": "scored",
+        "score": null,
+        "scope": {
+          "id": "dotnet/errorHandling/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-exception-patterns"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Diagnostic only: failed audit",
+        "findingCount": 15
+      },
+      "performanceAsync": {
+        "status": "scored",
+        "score": null,
+        "scope": {
+          "id": "dotnet/performanceAsync/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-async-and-blocking-patterns"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Diagnostic only: failed audit",
+        "findingCount": 6
+      },
+      "dependencyManagement": {
+        "status": "failed",
+        "score": null,
+        "scope": {
+          "id": "dotnet/dependencyManagement/v1",
+          "coverage": "partial",
+          "includes": [
+            "package-version-and-feed-observations"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Dependency compatibility assessment unavailable; no dependency score is assigned. vulnerableDirect=2, vulnerableTransitive=3, outdated=92, outdatedAspireExcluded=0, outdatedFrameworkIncompatibleExcluded=4, outdatedFrameworkCompatibilityUnknown=27, deprecated=7, unsupportedTFMs=1, versionDrift=0, cpmEnabled=True, anyCommandFailed=False.",
+        "findingCount": 136
+      },
+      "security": {
+        "status": "scored",
+        "score": null,
+        "scope": {
+          "id": "dotnet/security/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-security-patterns",
+            "dependency-vulnerability-observations"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Diagnostic only: failed audit",
+        "findingCount": 8
+      },
+      "testing": {
+        "status": "scored",
+        "score": null,
+        "scope": {
+          "id": "dotnet/testing/v1",
+          "coverage": "partial",
+          "includes": [
+            "test-project-signals",
+            "supplied-coverage-report"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Diagnostic only: failed audit",
+        "findingCount": 7
+      },
+      "documentation": {
+        "status": "scored",
+        "score": null,
+        "scope": {
+          "id": "dotnet/documentation/v1",
+          "coverage": "partial",
+          "includes": [
+            "documentation-presence-and-content-signals"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Diagnostic only: failed audit",
+        "findingCount": 0
+      },
+      "architecture": {
+        "status": "scored",
+        "score": null,
+        "scope": {
+          "id": "dotnet/architecture/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-coupling-and-project-structure"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Diagnostic only: failed audit",
+        "findingCount": 43
+      }
+    },
+    "dependencyCompatibility": {
+      "status": "failed",
+      "uniquePackageVersions": 25,
+      "totalObservations": 123,
+      "knownObservations": 96,
+      "elapsedMilliseconds": 4820.8047,
+      "failures": [
+        {
+          "package": "Nerdbank.GitVersioning",
+          "latestVersion": "3.10.94",
+          "affectedObservations": 25,
+          "reasons": [
+            "frameworkMetadataUnsupported"
+          ]
+        },
+        {
+          "package": "linq2db.SqlServer",
+          "latestVersion": "6.5.0",
+          "affectedObservations": 2,
+          "reasons": [
+            "frameworkMetadataUnsupported"
+          ]
+        }
+      ]
+    },
+    "vulnerabilityAssessmentAvailable": true,
+    "dependencyGroups": [
+      {
+        "category": "outdatedDependency",
+        "package": "ReferenceTrimmer",
+        "resolvedVersion": "3.5.7",
+        "latestVersion": "3.5.9",
+        "scoreDisposition": "included",
+        "projects": [
+          "Dapper.EntityFramework.StrongName/Dapper.EntityFramework.StrongName.csproj",
+          "Dapper.EntityFramework/Dapper.EntityFramework.csproj",
+          "Dapper.ProviderTools/Dapper.ProviderTools.csproj",
+          "Dapper.Rainbow/Dapper.Rainbow.csproj",
+          "Dapper.SqlBuilder/Dapper.SqlBuilder.csproj",
+          "Dapper.StrongName/Dapper.StrongName.csproj",
+          "Dapper/Dapper.csproj",
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj",
+          "docs/docs.csproj",
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net461",
+          "net472",
+          "net481",
+          "net5.0",
+          "net8.0",
+          "netstandard2.0"
+        ],
+        "occurrences": 25,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.CodeAnalysis.PublicApiAnalyzers",
+        "resolvedVersion": "3.3.4",
+        "latestVersion": "5.6.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "Dapper.EntityFramework/Dapper.EntityFramework.csproj",
+          "Dapper.ProviderTools/Dapper.ProviderTools.csproj",
+          "Dapper.SqlBuilder/Dapper.SqlBuilder.csproj",
+          "Dapper/Dapper.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net461",
+          "net8.0",
+          "netstandard2.0"
+        ],
+        "occurrences": 11,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Nerdbank.GitVersioning",
+        "resolvedVersion": "3.9.50",
+        "latestVersion": "3.10.94",
+        "scoreDisposition": "unavailable",
+        "projects": [
+          "Dapper.EntityFramework.StrongName/Dapper.EntityFramework.StrongName.csproj",
+          "Dapper.EntityFramework/Dapper.EntityFramework.csproj",
+          "Dapper.ProviderTools/Dapper.ProviderTools.csproj",
+          "Dapper.Rainbow/Dapper.Rainbow.csproj",
+          "Dapper.SqlBuilder/Dapper.SqlBuilder.csproj",
+          "Dapper.StrongName/Dapper.StrongName.csproj",
+          "Dapper/Dapper.csproj",
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj",
+          "docs/docs.csproj",
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net461",
+          "net472",
+          "net481",
+          "net5.0",
+          "net8.0",
+          "netstandard2.0"
+        ],
+        "occurrences": 25,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "DevExpress.Xpo",
+        "resolvedVersion": "25.2.7",
+        "latestVersion": "26.1.4",
+        "scoreDisposition": "included",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "deprecatedDependency",
+        "package": "xunit",
+        "resolvedVersion": "2.9.3",
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net481",
+          "net8.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": [
+          "Legacy"
+        ],
+        "alternativePackage": {
+          "id": "xunit.v3",
+          "versionRange": ">= 0.0.0"
+        },
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "GitHubActionsTestLogger",
+        "resolvedVersion": "3.0.4",
+        "latestVersion": "3.0.5",
+        "scoreDisposition": "included",
+        "projects": [
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net481",
+          "net8.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "System.Data.SQLite",
+        "resolvedVersion": "2.0.3",
+        "latestVersion": "2.0.4",
+        "scoreDisposition": "included",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "DuckDB.NET.Data.Full",
+        "resolvedVersion": "1.5.2",
+        "latestVersion": "1.5.5",
+        "scoreDisposition": "included",
+        "projects": [
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "linq2db.SqlServer",
+        "resolvedVersion": "5.4.1.9",
+        "latestVersion": "6.5.0",
+        "scoreDisposition": "unavailable",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Data.SqlClient",
+        "resolvedVersion": "7.0.1",
+        "latestVersion": "7.0.3",
+        "scoreDisposition": "included",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj",
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472",
+          "net481",
+          "net8.0"
+        ],
+        "occurrences": 5,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.NET.Test.Sdk",
+        "resolvedVersion": "18.5.1",
+        "latestVersion": "18.10.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net481",
+          "net8.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Data.Sqlite",
+        "resolvedVersion": "10.0.8",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net481",
+          "net8.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "vulnerableTransitiveDependency",
+        "package": "SQLitePCLRaw.lib.e_sqlite3",
+        "resolvedVersion": "2.1.11",
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net481",
+          "net8.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": [
+          {
+            "severity": "High",
+            "advisoryurl": "https://github.com/advisories/GHSA-2m69-gcr7-jv3q"
+          }
+        ]
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "MySqlConnector",
+        "resolvedVersion": "2.5.0",
+        "latestVersion": "2.6.2",
+        "scoreDisposition": "included",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj",
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472",
+          "net481",
+          "net8.0"
+        ],
+        "occurrences": 5,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Snowflake.Data",
+        "resolvedVersion": "5.5.0",
+        "latestVersion": "6.1.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "System.Reflection.Metadata",
+        "resolvedVersion": "10.0.8",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "log4net",
+        "resolvedVersion": "3.3.1",
+        "latestVersion": "3.4.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net481",
+          "net8.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "ServiceStack.OrmLite.SqlServer",
+        "resolvedVersion": "10.0.6",
+        "latestVersion": "10.2.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "deprecatedDependency",
+        "package": "PetaPoco",
+        "resolvedVersion": "5.1.306",
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": [
+          "Legacy"
+        ],
+        "alternativePackage": {
+          "id": "PetaPoco.Compiled",
+          "versionRange": ">= 0.0.0"
+        },
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.SqlServer.Types",
+        "resolvedVersion": "14.0.1016.290",
+        "latestVersion": "170.1000.7",
+        "scoreDisposition": "included",
+        "projects": [
+          "Dapper.EntityFramework.StrongName/Dapper.EntityFramework.StrongName.csproj",
+          "Dapper.EntityFramework/Dapper.EntityFramework.csproj",
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net461",
+          "net472"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "deprecatedDependency",
+        "package": "EntityFramework",
+        "resolvedVersion": "6.1.3",
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [
+          "Dapper.EntityFramework.StrongName/Dapper.EntityFramework.StrongName.csproj",
+          "Dapper.EntityFramework/Dapper.EntityFramework.csproj"
+        ],
+        "frameworks": [
+          "net461"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": [
+          "Legacy"
+        ],
+        "alternativePackage": {
+          "id": "EntityFramework",
+          "versionRange": ">= 6.5.1"
+        },
+        "vulnerabilities": null
+      },
+      {
+        "category": "unsupportedTargetFramework",
+        "package": null,
+        "resolvedVersion": null,
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [],
+        "frameworks": [],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.EntityFrameworkCore.SqlServer",
+        "resolvedVersion": "3.1.32",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedFrameworkIncompatible",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net472"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "RepoDb.SqlServer",
+        "resolvedVersion": "1.13.1",
+        "latestVersion": "1.16.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "DuckDB.NET.Data.Full",
+        "resolvedVersion": "1.4.4",
+        "latestVersion": "1.5.5",
+        "scoreDisposition": "excludedFrameworkIncompatible",
+        "projects": [
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net481"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Bcl.AsyncInterfaces",
+        "resolvedVersion": "10.0.8",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "Dapper.StrongName/Dapper.StrongName.csproj",
+          "Dapper/Dapper.csproj"
+        ],
+        "frameworks": [
+          "net461",
+          "netstandard2.0"
+        ],
+        "occurrences": 4,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "NHibernate",
+        "resolvedVersion": "5.6.0",
+        "latestVersion": "5.7.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Npgsql",
+        "resolvedVersion": "8.0.9",
+        "latestVersion": "10.0.3",
+        "scoreDisposition": "excludedFrameworkIncompatible",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj",
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net472",
+          "net481"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "vulnerableDirectDependency",
+        "package": "System.Security.Cryptography.Xml",
+        "resolvedVersion": "10.0.8",
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": [
+          {
+            "severity": "High",
+            "advisoryurl": "https://github.com/advisories/GHSA-cvvh-rhrc-wg4q"
+          },
+          {
+            "severity": "High",
+            "advisoryurl": "https://github.com/advisories/GHSA-g8r8-53c2-pm3f"
+          },
+          {
+            "severity": "High",
+            "advisoryurl": "https://github.com/advisories/GHSA-23rf-6693-g89p"
+          },
+          {
+            "severity": "High",
+            "advisoryurl": "https://github.com/advisories/GHSA-8q5v-6pqq-x66h"
+          },
+          {
+            "severity": "High",
+            "advisoryurl": "https://github.com/advisories/GHSA-mmjf-rqrv-855v"
+          }
+        ]
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Npgsql",
+        "resolvedVersion": "10.0.2",
+        "latestVersion": "10.0.3",
+        "scoreDisposition": "included",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj",
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "xunit.runner.visualstudio",
+        "resolvedVersion": "3.1.5",
+        "latestVersion": "4.0.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "tests/Dapper.Tests/Dapper.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net481",
+          "net8.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "EntityFramework",
+        "resolvedVersion": "6.1.3",
+        "latestVersion": "6.5.2",
+        "scoreDisposition": "included",
+        "projects": [
+          "Dapper.EntityFramework.StrongName/Dapper.EntityFramework.StrongName.csproj",
+          "Dapper.EntityFramework/Dapper.EntityFramework.csproj"
+        ],
+        "frameworks": [
+          "net461"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.EntityFrameworkCore.SqlServer",
+        "resolvedVersion": "10.0.8",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "System.Security.Cryptography.Xml",
+        "resolvedVersion": "10.0.8",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "benchmarks/Dapper.Tests.Performance/Dapper.Tests.Performance.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net472"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      }
+    ]
+  },
+  {
+    "name": "serilog",
+    "root": "E:/repos/serilog",
+    "entryPoint": "Serilog.sln",
+    "repository": "https://github.com/serilog/serilog",
+    "commit": "bebc7719004f76187ae72e64ce138ec2540f2070",
+    "branch": "dev",
+    "configuration": "Release",
+    "sdkPolicy": {
+      "sdk": {
+        "version": "10.0.100",
+        "allowPrerelease": true,
+        "rollForward": "latestFeature"
+      }
+    },
+    "restoreExitCode": 0,
+    "buildSummary": "Library Release build passed all seven TFMs; full solution build failed only at AotTestApp native linking (C++ linker unavailable).",
+    "buildExitCode": 1,
+    "testsExecuted": false,
+    "resultFile": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\serilog-result.json",
+    "runId": "daf9ef96-ef03-4b9a-9275-070116a67668",
+    "auditId": "992d791b-92ed-42da-869b-4789b75675b4",
+    "usable": true,
+    "resultStatus": "complete",
+    "analyzerExitCode": 0,
+    "validationExitCode": 0,
+    "artifacts": {
+      "evidence": "E:\\repos\\serilog\\.scorecard\\dotnet\\runs\\daf9ef96-ef03-4b9a-9275-070116a67668\\evidence.json",
+      "inspection": "E:\\repos\\serilog\\.scorecard\\dotnet\\runs\\daf9ef96-ef03-4b9a-9275-070116a67668\\inspection.json",
+      "metrics": "E:\\repos\\serilog\\.scorecard\\dotnet\\runs\\daf9ef96-ef03-4b9a-9275-070116a67668\\metrics.csv"
+    },
+    "tool": {
+      "name": "CodeMetrics.AI",
+      "version": "2.3.0",
+      "ecosystem": "dotnet"
+    },
+    "subject": {
+      "root": "E:\\repos\\serilog",
+      "entryPoint": "E:\\repos\\serilog\\Serilog.sln",
+      "name": "Serilog",
+      "variant": "Release"
+    },
+    "analysis": {
+      "runId": "daf9ef96-ef03-4b9a-9275-070116a67668",
+      "auditId": "992d791b-92ed-42da-869b-4789b75675b4",
+      "status": "complete",
+      "ruleset": "dotnet-2026-09-14-dependency-availability",
+      "calibration": "baseline",
+      "configurationFingerprint": "55a2905da4b6f5b4abe0c76ea5cf5c652d34a1a1344d243dab163d59e3fa8d0d",
+      "diagnostics": [],
+      "suppressions": []
+    },
+    "filters": {
+      "totalUnits": 19,
+      "analyzedUnits": 7,
+      "skipped": [
+        {
+          "name": "TestDummies(netstandard2.0)",
+          "reason": "Test support / fixture"
+        },
+        {
+          "name": "TestDummies(net462)",
+          "reason": "Test support / fixture"
+        },
+        {
+          "name": "Serilog.Tests(net48)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Serilog.Tests(net462)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Serilog.Tests(net10.0)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Serilog.Tests(net9.0)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Serilog.Tests(net8.0)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Serilog.PerformanceTests(net10.0)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Serilog.PerformanceTests(net9.0)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Serilog.PerformanceTests(net8.0)",
+          "reason": "Test project"
+        },
+        {
+          "name": "Serilog.ApprovalTests",
+          "reason": "Test project"
+        },
+        {
+          "name": "AotTestApp",
+          "reason": "Test support / fixture"
+        }
+      ]
+    },
+    "population": {
+      "types": 790,
+      "members": 6812
+    },
+    "scores": {
+      "codeQuality": 6,
+      "maintainability": 8,
+      "errorHandling": 9.2,
+      "performanceAsync": 10,
+      "dependencyManagement": 4,
+      "security": 10,
+      "testing": 10,
+      "documentation": 4,
+      "architecture": 6.3
+    },
+    "overallPartial": 7.5,
+    "scoredDimensions": 9,
+    "assessmentFailures": [],
+    "dimensions": {
+      "codeQuality": {
+        "status": "scored",
+        "score": 6,
+        "scope": {
+          "id": "dotnet/codeQuality/v1",
+          "coverage": "partial",
+          "includes": [
+            "production-type-complexity",
+            "member-complexity"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Eligible types: 615. Passive data carriers excluded: 21. Method complexity: 7.3, Decomposition: 4.7. Combined: 6.",
+        "findingCount": 0
+      },
+      "maintainability": {
+        "status": "scored",
+        "score": 8,
+        "scope": {
+          "id": "dotnet/maintainability/v1",
+          "coverage": "partial",
+          "includes": [
+            "production-executable-function-maintainability-index"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Distinct executable functions: 871. Weakest 175: 5.01; remaining 696: 9.97. Each function contributes once; distribution statistics are diagnostic only.",
+        "findingCount": 0
+      },
+      "errorHandling": {
+        "status": "scored",
+        "score": 9.2,
+        "scope": {
+          "id": "dotnet/errorHandling/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-exception-patterns"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Distinct source findings: 5 across 26 project/framework observations (errors: 0, warnings: 4). emptyCatch=0, throwEx=0, broadDefaults=0. Affected catches: 3/19; documented catches: 4.",
+        "findingCount": 5
+      },
+      "performanceAsync": {
+        "status": "scored",
+        "score": 10,
+        "scope": {
+          "id": "dotnet/performanceAsync/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-async-and-blocking-patterns"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Distinct source findings: 1 across 7 project/framework observations (errors: 0, warnings: 0, unscored review leads: 1). syncOverAsync=1, threadSleep=0, saveChangesInsideLoop=0, missingCancellationToken=0, materializationBeforeQueryShape=0, awaitedIoInsideLoop=0, unboundedWhenAll=0, sharedStateMutationInFanOut=0.",
+        "findingCount": 1
+      },
+      "dependencyManagement": {
+        "status": "scored",
+        "score": 4,
+        "scope": {
+          "id": "dotnet/dependencyManagement/v1",
+          "coverage": "partial",
+          "includes": [
+            "package-version-and-feed-observations"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "vulnerableDirect=0, vulnerableTransitive=0, outdated=65, outdatedAspireExcluded=0, outdatedFrameworkIncompatibleExcluded=1, outdatedFrameworkCompatibilityUnknown=0, deprecated=9, unsupportedTFMs=1, versionDrift=1, cpmEnabled=False, anyCommandFailed=False.",
+        "findingCount": 78
+      },
+      "security": {
+        "status": "scored",
+        "score": 10,
+        "scope": {
+          "id": "dotnet/security/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-security-patterns",
+            "dependency-vulnerability-observations"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Findings: 0 (errors: 0, warnings: 0). hardcodedSecrets=0, rawSql=0, unsafeDeserialization=0, allowAnyOriginWithCredentials=0, importedVulnerabilities=0.",
+        "findingCount": 0
+      },
+      "testing": {
+        "status": "scored",
+        "score": 10,
+        "scope": {
+          "id": "dotnet/testing/v1",
+          "coverage": "partial",
+          "includes": [
+            "test-project-signals",
+            "supplied-coverage-report"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "testProjects=3, testMethods=437, skipped=0, placeholders=0, assertions=825, assertionDensity=1.89, uncoveredProjects=0, coverageFile=False, lineRate=n/a.",
+        "findingCount": 0
+      },
+      "documentation": {
+        "status": "scored",
+        "score": 4,
+        "scope": {
+          "id": "dotnet/documentation/v1",
+          "coverage": "partial",
+          "includes": [
+            "documentation-presence-and-content-signals"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "hasReadme=True, readmeNonBlankLines=84, hasDocsDir=False, architectureDocs=0, hasAiInstructions=False, libraryXmlDocRatio=0.00, publicApiDocCoverage=1.00, staleMarkers=0, unresolvedCrefs=0.",
+        "findingCount": 0
+      },
+      "architecture": {
+        "status": "scored",
+        "score": 6.3,
+        "scope": {
+          "id": "dotnet/architecture/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-coupling-and-project-structure"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Findings: 63 (errors: 0, warnings: 63). Cycles: 0, hotspots: 63 (showing 10). Excluded passive data carriers: 21, DI extension types: 0, framework coupling archetypes: 0, application composition roots: 0. coupling: 56/769 eligible types, score 6.33; complexity: 0/769 eligible types, score 10.00; size: 7/769 eligible types, score 9.78. Final = min(metric score 6.33, graph/layering cap 10.0), rounded to 1 decimal.",
+        "findingCount": 63
+      }
+    },
+    "dependencyCompatibility": {
+      "status": "complete",
+      "uniquePackageVersions": 14,
+      "totalObservations": 66,
+      "knownObservations": 66,
+      "elapsedMilliseconds": 2105.4048,
+      "failures": []
+    },
+    "vulnerabilityAssessmentAvailable": true,
+    "components": {
+      "methodComplexity": 7.3,
+      "decomposition": 4.7
+    },
+    "worstFunction": {
+      "project": "Serilog(net10.0)",
+      "namespace": "Serilog.Formatting.Json",
+      "type": "JsonValueFormatter",
+      "name": "Serilog.Formatting.Json.JsonValueFormatter.FormatLiteralValue(object?, System.IO.TextWriter)",
+      "kind": "method",
+      "file": "E:\\repos\\serilog\\src\\Serilog\\Formatting\\Json\\JsonValueFormatter.cs",
+      "line": 173,
+      "sourceSpanStart": 6198,
+      "sourceSpanLength": 3571,
+      "ownCc": 22,
+      "individualScore": 3.6,
+      "classification": "severe",
+      "observationCount": 7,
+      "affectedProjects": [
+        "Serilog(net10.0)",
+        "Serilog(net462)",
+        "Serilog(net471)",
+        "Serilog(net6.0)",
+        "Serilog(net8.0)",
+        "Serilog(net9.0)",
+        "Serilog(netstandard2.0)"
+      ],
+      "projectFrameworkObservations": [
+        {
+          "project": "Serilog(net10.0)",
+          "name": "Serilog.Formatting.Json.JsonValueFormatter.FormatLiteralValue(object?, System.IO.TextWriter)",
+          "ownCc": 22
+        },
+        {
+          "project": "Serilog(net6.0)",
+          "name": "Serilog.Formatting.Json.JsonValueFormatter.FormatLiteralValue(object?, System.IO.TextWriter)",
+          "ownCc": 22
+        },
+        {
+          "project": "Serilog(net8.0)",
+          "name": "Serilog.Formatting.Json.JsonValueFormatter.FormatLiteralValue(object?, System.IO.TextWriter)",
+          "ownCc": 22
+        },
+        {
+          "project": "Serilog(net9.0)",
+          "name": "Serilog.Formatting.Json.JsonValueFormatter.FormatLiteralValue(object?, System.IO.TextWriter)",
+          "ownCc": 22
+        },
+        {
+          "project": "Serilog(net462)",
+          "name": "Serilog.Formatting.Json.JsonValueFormatter.FormatLiteralValue(object?, System.IO.TextWriter)",
+          "ownCc": 20
+        },
+        {
+          "project": "Serilog(net471)",
+          "name": "Serilog.Formatting.Json.JsonValueFormatter.FormatLiteralValue(object?, System.IO.TextWriter)",
+          "ownCc": 20
+        },
+        {
+          "project": "Serilog(netstandard2.0)",
+          "name": "Serilog.Formatting.Json.JsonValueFormatter.FormatLiteralValue(object?, System.IO.TextWriter)",
+          "ownCc": 20
+        }
+      ]
+    },
+    "dependencyGroups": [
+      {
+        "category": "outdatedDependency",
+        "package": "PolySharp",
+        "resolvedVersion": "1.14.1",
+        "latestVersion": "1.16.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "test/Serilog.PerformanceTests/Serilog.PerformanceTests.csproj",
+          "test/TestDummies/TestDummies.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net462",
+          "net8.0",
+          "net9.0",
+          "netstandard2.0"
+        ],
+        "occurrences": 5,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "System.ServiceModel.Http",
+        "resolvedVersion": "8.1.0",
+        "latestVersion": "10.0.652802",
+        "scoreDisposition": "included",
+        "projects": [
+          "test/Serilog.Tests/Serilog.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "System.ServiceModel.Primitives",
+        "resolvedVersion": "8.1.0",
+        "latestVersion": "10.0.652802",
+        "scoreDisposition": "included",
+        "projects": [
+          "test/Serilog.Tests/Serilog.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "System.Threading.Channels",
+        "resolvedVersion": "8.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Serilog/Serilog.csproj"
+        ],
+        "frameworks": [
+          "net462",
+          "net471",
+          "netstandard2.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "PolySharp",
+        "resolvedVersion": "1.15.0",
+        "latestVersion": "1.16.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Serilog/Serilog.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net462",
+          "net471",
+          "net6.0",
+          "net8.0",
+          "net9.0",
+          "netstandard2.0"
+        ],
+        "occurrences": 7,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.NET.Test.Sdk",
+        "resolvedVersion": "17.11.1",
+        "latestVersion": "18.10.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "test/Serilog.ApprovalTests/Serilog.ApprovalTests.csproj",
+          "test/Serilog.PerformanceTests/Serilog.PerformanceTests.csproj",
+          "test/Serilog.Tests/Serilog.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net462",
+          "net48",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 9,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "xunit",
+        "resolvedVersion": "2.9.2",
+        "latestVersion": "2.9.3",
+        "scoreDisposition": "included",
+        "projects": [
+          "test/Serilog.ApprovalTests/Serilog.ApprovalTests.csproj",
+          "test/Serilog.PerformanceTests/Serilog.PerformanceTests.csproj",
+          "test/Serilog.Tests/Serilog.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net462",
+          "net48",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 9,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "xunit.runner.visualstudio",
+        "resolvedVersion": "2.8.2",
+        "latestVersion": "4.0.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "test/Serilog.ApprovalTests/Serilog.ApprovalTests.csproj",
+          "test/Serilog.PerformanceTests/Serilog.PerformanceTests.csproj",
+          "test/Serilog.Tests/Serilog.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net48",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 8,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "versionDrift",
+        "package": null,
+        "resolvedVersion": null,
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [],
+        "frameworks": [],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "deprecatedDependency",
+        "package": "xunit",
+        "resolvedVersion": "2.9.2",
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [
+          "test/Serilog.ApprovalTests/Serilog.ApprovalTests.csproj",
+          "test/Serilog.PerformanceTests/Serilog.PerformanceTests.csproj",
+          "test/Serilog.Tests/Serilog.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net462",
+          "net48",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 9,
+        "deprecationReasons": [
+          "Legacy"
+        ],
+        "alternativePackage": {
+          "id": "xunit.v3",
+          "versionRange": ">= 0.0.0"
+        },
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Newtonsoft.Json",
+        "resolvedVersion": "13.0.3",
+        "latestVersion": "13.0.4",
+        "scoreDisposition": "included",
+        "projects": [
+          "test/Serilog.Tests/Serilog.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net462",
+          "net48",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 5,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "System.Diagnostics.DiagnosticSource",
+        "resolvedVersion": "8.0.1",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Serilog/Serilog.csproj"
+        ],
+        "frameworks": [
+          "net462",
+          "net471",
+          "netstandard2.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "unsupportedTargetFramework",
+        "package": null,
+        "resolvedVersion": null,
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [],
+        "frameworks": [],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "BenchmarkDotNet",
+        "resolvedVersion": "0.15.2",
+        "latestVersion": "0.15.8",
+        "scoreDisposition": "included",
+        "projects": [
+          "test/Serilog.PerformanceTests/Serilog.PerformanceTests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "System.ValueTuple",
+        "resolvedVersion": "4.5.0",
+        "latestVersion": "4.6.2",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Serilog/Serilog.csproj",
+          "test/Serilog.Tests/Serilog.Tests.csproj"
+        ],
+        "frameworks": [
+          "net462"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "System.Security.Cryptography.Xml",
+        "resolvedVersion": "8.0.4",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "test/Serilog.Tests/Serilog.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "xunit.runner.visualstudio",
+        "resolvedVersion": "2.8.2",
+        "latestVersion": "4.0.0",
+        "scoreDisposition": "excludedFrameworkIncompatible",
+        "projects": [
+          "test/Serilog.Tests/Serilog.Tests.csproj"
+        ],
+        "frameworks": [
+          "net462"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "noCentralPackageManagement",
+        "package": null,
+        "resolvedVersion": null,
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [],
+        "frameworks": [],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "PublicApiGenerator",
+        "resolvedVersion": "11.1.0",
+        "latestVersion": "11.5.4",
+        "scoreDisposition": "included",
+        "projects": [
+          "test/Serilog.ApprovalTests/Serilog.ApprovalTests.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Shouldly",
+        "resolvedVersion": "4.2.1",
+        "latestVersion": "4.3.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "test/Serilog.ApprovalTests/Serilog.ApprovalTests.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      }
+    ]
+  },
+  {
+    "name": "FluentValidation",
+    "root": "E:/repos/FluentValidation",
+    "entryPoint": "FluentValidation.sln",
+    "repository": "https://github.com/FluentValidation/FluentValidation",
+    "commit": "fa9787a0d4fd0c0b99f9682292d76d5ad97ba6cb",
+    "branch": "main",
+    "configuration": "Release",
+    "sdkPolicy": {
+      "sdk": {
+        "version": "10.0.0",
+        "rollForward": "latestFeature",
+        "allowPrerelease": true
+      }
+    },
+    "restoreExitCode": 0,
+    "buildSummary": "Release solution build passed with zero warnings and errors.",
+    "buildExitCode": 0,
+    "testsExecuted": false,
+    "resultFile": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\FluentValidation-result.json",
+    "runId": "c84a5ac7-0c35-4ee7-a6f9-535703c5b941",
+    "auditId": "a820df20-6d4d-4fbe-b3c0-52cceb0ead6d",
+    "usable": true,
+    "resultStatus": "complete",
+    "analyzerExitCode": 0,
+    "validationExitCode": 0,
+    "artifacts": {
+      "evidence": "E:\\repos\\FluentValidation\\.scorecard\\dotnet\\runs\\c84a5ac7-0c35-4ee7-a6f9-535703c5b941\\evidence.json",
+      "inspection": "E:\\repos\\FluentValidation\\.scorecard\\dotnet\\runs\\c84a5ac7-0c35-4ee7-a6f9-535703c5b941\\inspection.json",
+      "metrics": "E:\\repos\\FluentValidation\\.scorecard\\dotnet\\runs\\c84a5ac7-0c35-4ee7-a6f9-535703c5b941\\metrics.csv"
+    },
+    "tool": {
+      "name": "CodeMetrics.AI",
+      "version": "2.3.0",
+      "ecosystem": "dotnet"
+    },
+    "subject": {
+      "root": "E:\\repos\\FluentValidation",
+      "entryPoint": "E:\\repos\\FluentValidation\\FluentValidation.sln",
+      "name": "FluentValidation",
+      "variant": "Release"
+    },
+    "analysis": {
+      "runId": "c84a5ac7-0c35-4ee7-a6f9-535703c5b941",
+      "auditId": "a820df20-6d4d-4fbe-b3c0-52cceb0ead6d",
+      "status": "complete",
+      "ruleset": "dotnet-2026-09-14-dependency-availability",
+      "calibration": "baseline",
+      "configurationFingerprint": "55a2905da4b6f5b4abe0c76ea5cf5c652d34a1a1344d243dab163d59e3fa8d0d",
+      "diagnostics": [],
+      "suppressions": []
+    },
+    "filters": {
+      "totalUnits": 6,
+      "analyzedUnits": 2,
+      "skipped": [
+        {
+          "name": "FluentValidation.Tests(net8.0)",
+          "reason": "Test project"
+        },
+        {
+          "name": "FluentValidation.Tests(net9.0)",
+          "reason": "Test project"
+        },
+        {
+          "name": "FluentValidation.Tests(net10.0)",
+          "reason": "Test project"
+        },
+        {
+          "name": "FluentValidation.Tests.Benchmarks",
+          "reason": "Test project"
+        }
+      ]
+    },
+    "population": {
+      "types": 196,
+      "members": 1017
+    },
+    "scores": {
+      "codeQuality": 4.8,
+      "maintainability": 7.5,
+      "errorHandling": 10,
+      "performanceAsync": 10,
+      "dependencyManagement": 4,
+      "security": 10,
+      "testing": 6,
+      "documentation": 3,
+      "architecture": 5.4
+    },
+    "overallPartial": 6.7,
+    "scoredDimensions": 9,
+    "assessmentFailures": [],
+    "dimensions": {
+      "codeQuality": {
+        "status": "scored",
+        "score": 4.8,
+        "scope": {
+          "id": "dotnet/codeQuality/v1",
+          "coverage": "partial",
+          "includes": [
+            "production-type-complexity",
+            "member-complexity"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Eligible types: 142. Passive data carriers excluded: 2. Method complexity: 5.6, Decomposition: 4. Combined: 4.8.",
+        "findingCount": 0
+      },
+      "maintainability": {
+        "status": "scored",
+        "score": 7.5,
+        "scope": {
+          "id": "dotnet/maintainability/v1",
+          "coverage": "partial",
+          "includes": [
+            "production-executable-function-maintainability-index"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Distinct executable functions: 852. Weakest 171: 3.79; remaining 681: 9.92. Each function contributes once; distribution statistics are diagnostic only.",
+        "findingCount": 0
+      },
+      "errorHandling": {
+        "status": "scored",
+        "score": 10,
+        "scope": {
+          "id": "dotnet/errorHandling/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-exception-patterns"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Distinct source findings: 0 across 0 project/framework observations (errors: 0, warnings: 0). emptyCatch=0, throwEx=0, broadDefaults=0. Affected catches: 0/4; documented catches: 1.",
+        "findingCount": 0
+      },
+      "performanceAsync": {
+        "status": "scored",
+        "score": 10,
+        "scope": {
+          "id": "dotnet/performanceAsync/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-async-and-blocking-patterns"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Distinct source findings: 0 across 0 project/framework observations (errors: 0, warnings: 0, unscored review leads: 0). syncOverAsync=0, threadSleep=0, saveChangesInsideLoop=0, missingCancellationToken=0, materializationBeforeQueryShape=0, awaitedIoInsideLoop=0, unboundedWhenAll=0, sharedStateMutationInFanOut=0.",
+        "findingCount": 0
+      },
+      "dependencyManagement": {
+        "status": "scored",
+        "score": 4,
+        "scope": {
+          "id": "dotnet/dependencyManagement/v1",
+          "coverage": "partial",
+          "includes": [
+            "package-version-and-feed-observations"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "vulnerableDirect=0, vulnerableTransitive=0, outdated=25, outdatedAspireExcluded=0, outdatedFrameworkIncompatibleExcluded=0, outdatedFrameworkCompatibilityUnknown=0, deprecated=3, unsupportedTFMs=0, versionDrift=0, cpmEnabled=False, anyCommandFailed=False.",
+        "findingCount": 29
+      },
+      "security": {
+        "status": "scored",
+        "score": 10,
+        "scope": {
+          "id": "dotnet/security/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-security-patterns",
+            "dependency-vulnerability-observations"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Findings: 0 (errors: 0, warnings: 0). hardcodedSecrets=0, rawSql=0, unsafeDeserialization=0, allowAnyOriginWithCredentials=0, importedVulnerabilities=0.",
+        "findingCount": 0
+      },
+      "testing": {
+        "status": "scored",
+        "score": 6,
+        "scope": {
+          "id": "dotnet/testing/v1",
+          "coverage": "partial",
+          "includes": [
+            "test-project-signals",
+            "supplied-coverage-report"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "testProjects=1, testMethods=828, skipped=1, placeholders=0, assertions=1319, assertionDensity=1.59, uncoveredProjects=1, coverageFile=False, lineRate=n/a.",
+        "findingCount": 1
+      },
+      "documentation": {
+        "status": "scored",
+        "score": 3,
+        "scope": {
+          "id": "dotnet/documentation/v1",
+          "coverage": "partial",
+          "includes": [
+            "documentation-presence-and-content-signals"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "hasReadme=False, readmeNonBlankLines=0, hasDocsDir=True, architectureDocs=0, hasAiInstructions=False, libraryXmlDocRatio=0.00, publicApiDocCoverage=0.62, staleMarkers=0, unresolvedCrefs=0.",
+        "findingCount": 0
+      },
+      "architecture": {
+        "status": "scored",
+        "score": 5.4,
+        "scope": {
+          "id": "dotnet/architecture/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-coupling-and-project-structure"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Findings: 9 (errors: 0, warnings: 9). Cycles: 0, hotspots: 9. Excluded passive data carriers: 2, DI extension types: 1, framework coupling archetypes: 0, application composition roots: 0. coupling: 9/193 eligible types, score 5.44; complexity: 0/193 eligible types, score 10.00; size: 0/193 eligible types, score 10.00. Final = min(metric score 5.44, graph/layering cap 10.0), rounded to 1 decimal.",
+        "findingCount": 9
+      }
+    },
+    "dependencyCompatibility": {
+      "status": "complete",
+      "uniquePackageVersions": 11,
+      "totalObservations": 25,
+      "knownObservations": 25,
+      "elapsedMilliseconds": 5025.1318,
+      "failures": []
+    },
+    "vulnerabilityAssessmentAvailable": true,
+    "components": {
+      "methodComplexity": 5.6,
+      "decomposition": 4
+    },
+    "worstFunction": {
+      "project": "FluentValidation",
+      "namespace": "FluentValidation.Resources",
+      "type": "LanguageManager",
+      "name": "FluentValidation.Resources.LanguageManager.GetTranslation(string, string)",
+      "kind": "method",
+      "file": "E:\\repos\\FluentValidation\\src\\FluentValidation\\Resources\\LanguageManager.cs",
+      "line": 39,
+      "sourceSpanStart": 1402,
+      "sourceSpanLength": 4419,
+      "ownCc": 62,
+      "individualScore": 0,
+      "classification": "severe",
+      "observationCount": 1,
+      "affectedProjects": [
+        "FluentValidation"
+      ],
+      "projectFrameworkObservations": [
+        {
+          "project": "FluentValidation",
+          "name": "FluentValidation.Resources.LanguageManager.GetTranslation(string, string)",
+          "ownCc": 62
+        }
+      ]
+    },
+    "dependencyGroups": [
+      {
+        "category": "outdatedDependency",
+        "package": "xunit.runner.visualstudio",
+        "resolvedVersion": "2.2.0",
+        "latestVersion": "4.0.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/FluentValidation.Tests/FluentValidation.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "deprecatedDependency",
+        "package": "xunit",
+        "resolvedVersion": "2.2.0",
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [
+          "src/FluentValidation.Tests/FluentValidation.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": [
+          "Legacy"
+        ],
+        "alternativePackage": {
+          "id": "xunit.v3",
+          "versionRange": ">= 0.0.0"
+        },
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Newtonsoft.Json",
+        "resolvedVersion": "13.0.3",
+        "latestVersion": "13.0.4",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/FluentValidation.Tests/FluentValidation.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.DependencyInjection.Abstractions",
+        "resolvedVersion": "2.1.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/FluentValidation.DependencyInjectionExtensions/FluentValidation.DependencyInjectionExtensions.csproj"
+        ],
+        "frameworks": [
+          "net8.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "xunit",
+        "resolvedVersion": "2.2.0",
+        "latestVersion": "2.9.3",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/FluentValidation.Tests/FluentValidation.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "System.ComponentModel.Annotations",
+        "resolvedVersion": "4.4.1",
+        "latestVersion": "5.0.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/FluentValidation.Tests/FluentValidation.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.TestPlatform.TestHost",
+        "resolvedVersion": "16.0.1",
+        "latestVersion": "18.10.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/FluentValidation.Tests/FluentValidation.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.NET.Test.Sdk",
+        "resolvedVersion": "16.0.1",
+        "latestVersion": "18.10.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/FluentValidation.Tests/FluentValidation.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.DependencyInjection",
+        "resolvedVersion": "8.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/FluentValidation.Tests/FluentValidation.Tests.csproj"
+        ],
+        "frameworks": [
+          "net10.0",
+          "net8.0",
+          "net9.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Bogus",
+        "resolvedVersion": "30.0.2",
+        "latestVersion": "35.6.5",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/FluentValidation.Tests.Benchmarks/FluentValidation.Tests.Benchmarks.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Zomp.SyncMethodGenerator",
+        "resolvedVersion": "1.6.17",
+        "latestVersion": "2.0.56",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/FluentValidation/FluentValidation.csproj"
+        ],
+        "frameworks": [
+          "net8.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "BenchmarkDotNet",
+        "resolvedVersion": "0.12.1",
+        "latestVersion": "0.15.8",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/FluentValidation.Tests.Benchmarks/FluentValidation.Tests.Benchmarks.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "noCentralPackageManagement",
+        "package": null,
+        "resolvedVersion": null,
+        "latestVersion": null,
+        "scoreDisposition": null,
+        "projects": [],
+        "frameworks": [],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      }
+    ]
+  },
+  {
+    "name": "quartznet",
+    "root": "E:/repos/quartznet",
+    "entryPoint": "Quartz.slnx",
+    "repository": "https://github.com/quartznet/quartznet",
+    "commit": "97afe142210e9c616b434ec7d617286a2752e9d4",
+    "branch": "main",
+    "configuration": "Release",
+    "sdkPolicy": {
+      "sdk": {
+        "version": "10.0.100",
+        "rollForward": "latestMinor"
+      }
+    },
+    "restoreExitCode": 0,
+    "buildSummary": "Release solution build passed with zero warnings and errors.",
+    "buildExitCode": 0,
+    "testsExecuted": false,
+    "resultFile": "E:\\repos\\CodeMetrics.AI\\TestResults\\public-corpus-wave2\\quartznet-result.json",
+    "runId": "f2791085-aaf6-4917-81bb-622d27e5babb",
+    "auditId": "a98f087b-ebe3-4ed8-83c4-4bd4c1b371e9",
+    "usable": false,
+    "resultStatus": "failed",
+    "analyzerExitCode": 2,
+    "validationExitCode": 2,
+    "artifacts": {
+      "evidence": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\f2791085-aaf6-4917-81bb-622d27e5babb\\evidence.json",
+      "inspection": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\f2791085-aaf6-4917-81bb-622d27e5babb\\inspection.json",
+      "metrics": "E:\\repos\\quartznet\\.scorecard\\dotnet\\runs\\f2791085-aaf6-4917-81bb-622d27e5babb\\metrics.csv"
+    },
+    "tool": {
+      "name": "CodeMetrics.AI",
+      "version": "2.3.0",
+      "ecosystem": "dotnet"
+    },
+    "subject": {
+      "root": "E:\\repos\\quartznet",
+      "entryPoint": "E:\\repos\\quartznet\\Quartz.slnx",
+      "name": "Quartz",
+      "variant": "Release"
+    },
+    "analysis": {
+      "runId": "f2791085-aaf6-4917-81bb-622d27e5babb",
+      "auditId": "a98f087b-ebe3-4ed8-83c4-4bd4c1b371e9",
+      "status": "incomplete",
+      "ruleset": "dotnet-2026-09-14-dependency-availability",
+      "calibration": "baseline",
+      "configurationFingerprint": "55a2905da4b6f5b4abe0c76ea5cf5c652d34a1a1344d243dab163d59e3fa8d0d",
+      "diagnostics": [
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.AspNetCore\\HttpApi\\TraceContextOverHttpTest.cs(37,44): error CS8618: Non-nullable field 'factory' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.",
+          "project": "Quartz.Tests.AspNetCore"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.AspNetCore\\HttpApi\\TraceContextOverHttpTest.cs(38,29): error CS8618: Non-nullable field 'provider' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.",
+          "project": "Quartz.Tests.AspNetCore"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.AspNetCore\\HttpApi\\TraceContextOverHttpTest.cs(39,24): error CS8618: Non-nullable field 'scheduler' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.",
+          "project": "Quartz.Tests.AspNetCore"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.AspNetCore\\HttpApi\\TraceContextOverHttpTest.cs(40,30): error CS8618: Non-nullable field 'listener' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.",
+          "project": "Quartz.Tests.AspNetCore"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.AspNetCore\\HttpApi\\TraceContextOverHttpTest.cs(41,20): error CS8618: Non-nullable field 'schedulerName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.",
+          "project": "Quartz.Tests.AspNetCore"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.AspNetCore\\HttpApi\\TraceContextOverHttpTest.cs(42,20): error CS8618: Non-nullable field 'jobKey' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.",
+          "project": "Quartz.Tests.AspNetCore"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.Unit\\Jobs\\SendMailJobTest.cs(51,9): error CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+          "project": "Quartz.Tests.Unit"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.Unit\\Jobs\\SendMailJobTest.cs(80,9): error CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+          "project": "Quartz.Tests.Unit"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.Unit\\Jobs\\SendMailJobTest.cs(110,9): error CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+          "project": "Quartz.Tests.Unit"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.Unit\\Jobs\\SendMailJobTest.cs(143,9): error CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+          "project": "Quartz.Tests.Unit"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.Unit\\Jobs\\SendMailJobTest.cs(172,9): error CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+          "project": "Quartz.Tests.Unit"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.Unit\\Jobs\\SendMailJobTest.cs(217,9): error CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+          "project": "Quartz.Tests.Unit"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.Unit\\Jobs\\SendMailJobTest.cs(241,9): error CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+          "project": "Quartz.Tests.Unit"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.Unit\\Jobs\\SendMailJobTest.cs(253,9): error CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+          "project": "Quartz.Tests.Unit"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.Unit\\Jobs\\SendMailJobTest.cs(261,9): error CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+          "project": "Quartz.Tests.Unit"
+        },
+        {
+          "kind": "compilationError",
+          "message": "E:\\repos\\quartznet\\src\\Quartz.Tests.Unit\\Jobs\\NativeJobStreamLoggingTest.cs(94,13): error CS4014: Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+          "project": "Quartz.Tests.Unit"
+        }
+      ],
+      "suppressions": []
+    },
+    "filters": {
+      "totalUnits": 30,
+      "analyzedUnits": 21,
+      "skipped": [
+        {
+          "name": "_build",
+          "reason": "Excluded by solution build configuration"
+        },
+        {
+          "name": "Quartz.Documentation.Samples",
+          "reason": "Sample / demo code"
+        },
+        {
+          "name": "Quartz.Examples.Aspire.AppHost",
+          "reason": "Aspire orchestration host"
+        },
+        {
+          "name": "Quartz.Examples.FSharp",
+          "reason": "Reference outside selected solution"
+        },
+        {
+          "name": "Quartz.Extensions.Hosting",
+          "reason": "Aspire / generic hosting"
+        },
+        {
+          "name": "Quartz.Tests.AspNetCore",
+          "reason": "Test project"
+        },
+        {
+          "name": "Quartz.Tests.Integration.Seeder",
+          "reason": "Test project"
+        },
+        {
+          "name": "Quartz.Tests.Integration",
+          "reason": "Test project"
+        },
+        {
+          "name": "Quartz.Tests.Unit",
+          "reason": "Test project"
+        }
+      ]
+    },
+    "population": {
+      "types": 988,
+      "members": 9098
+    },
+    "scores": {
+      "codeQuality": null,
+      "maintainability": null,
+      "errorHandling": null,
+      "performanceAsync": null,
+      "dependencyManagement": null,
+      "security": null,
+      "testing": null,
+      "documentation": null,
+      "architecture": null
+    },
+    "overallPartial": null,
+    "scoredDimensions": 0,
+    "assessmentFailures": [
+      {
+        "dimension": "codeQuality",
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned."
+      },
+      {
+        "dimension": "maintainability",
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned."
+      },
+      {
+        "dimension": "errorHandling",
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned."
+      },
+      {
+        "dimension": "performanceAsync",
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned."
+      },
+      {
+        "dimension": "security",
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned."
+      },
+      {
+        "dimension": "testing",
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned."
+      },
+      {
+        "dimension": "documentation",
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned."
+      },
+      {
+        "dimension": "architecture",
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned."
+      }
+    ],
+    "dimensions": {
+      "codeQuality": {
+        "status": "failed",
+        "score": null,
+        "scope": {
+          "id": "dotnet/codeQuality/v1",
+          "coverage": "partial",
+          "includes": [
+            "production-type-complexity",
+            "member-complexity"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned.",
+        "findingCount": 0
+      },
+      "maintainability": {
+        "status": "failed",
+        "score": null,
+        "scope": {
+          "id": "dotnet/maintainability/v1",
+          "coverage": "partial",
+          "includes": [
+            "production-executable-function-maintainability-index"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned.",
+        "findingCount": 0
+      },
+      "errorHandling": {
+        "status": "failed",
+        "score": null,
+        "scope": {
+          "id": "dotnet/errorHandling/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-exception-patterns"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned.",
+        "findingCount": 356
+      },
+      "performanceAsync": {
+        "status": "failed",
+        "score": null,
+        "scope": {
+          "id": "dotnet/performanceAsync/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-async-and-blocking-patterns"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned.",
+        "findingCount": 74
+      },
+      "dependencyManagement": {
+        "status": "scored",
+        "score": null,
+        "scope": {
+          "id": "dotnet/dependencyManagement/v1",
+          "coverage": "partial",
+          "includes": [
+            "package-version-and-feed-observations"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Diagnostic only: failed audit",
+        "findingCount": 91
+      },
+      "security": {
+        "status": "failed",
+        "score": null,
+        "scope": {
+          "id": "dotnet/security/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-security-patterns",
+            "dependency-vulnerability-observations"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned.",
+        "findingCount": 7
+      },
+      "testing": {
+        "status": "failed",
+        "score": null,
+        "scope": {
+          "id": "dotnet/testing/v1",
+          "coverage": "partial",
+          "includes": [
+            "test-project-signals",
+            "supplied-coverage-report"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned.",
+        "findingCount": 20
+      },
+      "documentation": {
+        "status": "failed",
+        "score": null,
+        "scope": {
+          "id": "dotnet/documentation/v1",
+          "coverage": "partial",
+          "includes": [
+            "documentation-presence-and-content-signals"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned.",
+        "findingCount": 2
+      },
+      "architecture": {
+        "status": "failed",
+        "score": null,
+        "scope": {
+          "id": "dotnet/architecture/v1",
+          "coverage": "partial",
+          "includes": [
+            "static-coupling-and-project-structure"
+          ],
+          "excludes": [
+            "runtime-behavior",
+            "comprehensive-human-review"
+          ]
+        },
+        "basis": "Incomplete source analysis; findings are partial and no score is assigned.",
+        "findingCount": 112
+      }
+    },
+    "dependencyCompatibility": {
+      "status": "complete",
+      "uniquePackageVersions": 28,
+      "totalObservations": 79,
+      "knownObservations": 79,
+      "elapsedMilliseconds": 3653.461,
+      "failures": []
+    },
+    "vulnerabilityAssessmentAvailable": true,
+    "dependencyGroups": [
+      {
+        "category": "outdatedDependency",
+        "package": "Meziantou.Analyzer",
+        "resolvedVersion": "3.0.254",
+        "latestVersion": "3.0.257",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.AspNetCore/Quartz.AspNetCore.csproj",
+          "src/Quartz.Aspire/Quartz.Aspire.csproj",
+          "src/Quartz.Dashboard/Quartz.Dashboard.csproj",
+          "src/Quartz.Examples.AspNetCore/Quartz.Examples.AspNetCore.csproj",
+          "src/Quartz.Examples.Aspire.Worker/Quartz.Examples.Aspire.Worker.csproj",
+          "src/Quartz.Examples.HttpClient/Quartz.Examples.HttpClient.csproj",
+          "src/Quartz.Examples.Wolverine/Quartz.Examples.Wolverine.csproj",
+          "src/Quartz.Examples.Worker/Quartz.Examples.Worker.csproj",
+          "src/Quartz.Examples/Quartz.Examples.csproj",
+          "src/Quartz.Extensions.DependencyInjection/Quartz.Extensions.DependencyInjection.csproj",
+          "src/Quartz.Extensions.Hosting/Quartz.Extensions.Hosting.csproj",
+          "src/Quartz.Extensions.Redis/Quartz.Extensions.Redis.csproj",
+          "src/Quartz.HttpClient/Quartz.HttpClient.csproj",
+          "src/Quartz.Jobs/Quartz.Jobs.csproj",
+          "src/Quartz.Plugins.TimeZoneConverter/Quartz.Plugins.TimeZoneConverter.csproj",
+          "src/Quartz.Plugins/Quartz.Plugins.csproj",
+          "src/Quartz.Serialization.Json/Quartz.Serialization.Json.csproj",
+          "src/Quartz.Serialization.Newtonsoft/Quartz.Serialization.Newtonsoft.csproj",
+          "src/Quartz.Serialization.SystemTextJson/Quartz.Serialization.SystemTextJson.csproj",
+          "src/Quartz.Trimming.Canary/Quartz.Trimming.Canary.csproj",
+          "src/Quartz/Quartz.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 21,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Quartz.Serialization.SystemTextJson",
+        "resolvedVersion": "3.20.0",
+        "latestVersion": "4.1.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.Integration.Seeder/Quartz.Tests.Integration.Seeder.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "OpenTelemetry.Extensions.Hosting",
+        "resolvedVersion": "1.15.3",
+        "latestVersion": "1.18.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Aspire/Quartz.Aspire.csproj",
+          "src/Quartz.Documentation.Samples/Quartz.Documentation.Samples.csproj",
+          "src/Quartz.Examples.AspNetCore/Quartz.Examples.AspNetCore.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Logging",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj",
+          "src/Quartz.Tests.Unit/Quartz.Tests.Unit.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Logging.Abstractions",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Benchmark/Quartz.Benchmark.csproj",
+          "src/Quartz.Examples.Wolverine/Quartz.Examples.Wolverine.csproj",
+          "src/Quartz.Examples/Quartz.Examples.csproj",
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj",
+          "src/Quartz.Tests.Integration.Seeder/Quartz.Tests.Integration.Seeder.csproj",
+          "src/Quartz.Tests.Integration/Quartz.Tests.Integration.csproj",
+          "src/Quartz.Tests.Unit/Quartz.Tests.Unit.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 7,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "bunit",
+        "resolvedVersion": "2.10.3",
+        "latestVersion": "2.11.3",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Logging.Abstractions",
+        "resolvedVersion": "10.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz/Quartz.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Options.ConfigurationExtensions",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Quartz",
+        "resolvedVersion": "3.20.0",
+        "latestVersion": "4.1.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.Integration.Seeder/Quartz.Tests.Integration.Seeder.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "WolverineFx",
+        "resolvedVersion": "6.36.0",
+        "latestVersion": "6.37.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Examples.Wolverine/Quartz.Examples.Wolverine.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Diagnostics.Testing",
+        "resolvedVersion": "10.9.0",
+        "latestVersion": "10.10.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.Unit/Quartz.Tests.Unit.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Hosting.Abstractions",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.DependencyInjection",
+        "resolvedVersion": "10.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz/Quartz.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.TimeProvider.Testing",
+        "resolvedVersion": "10.9.0",
+        "latestVersion": "10.10.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj",
+          "src/Quartz.Tests.Integration/Quartz.Tests.Integration.csproj",
+          "src/Quartz.Tests.Unit/Quartz.Tests.Unit.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "WolverineFx.Postgresql",
+        "resolvedVersion": "6.36.0",
+        "latestVersion": "6.37.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Examples.Wolverine/Quartz.Examples.Wolverine.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Logging.Abstractions",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Http",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Hosting",
+        "resolvedVersion": "10.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Examples.HttpClient/Quartz.Examples.HttpClient.csproj",
+          "src/Quartz.Examples.Wolverine/Quartz.Examples.Wolverine.csproj",
+          "src/Quartz.Examples.Worker/Quartz.Examples.Worker.csproj",
+          "src/Quartz.Tests.Integration/Quartz.Tests.Integration.csproj",
+          "src/Quartz.Tests.Unit/Quartz.Tests.Unit.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 5,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Configuration.Binder",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj",
+          "src/Quartz.Tests.Unit/Quartz.Tests.Unit.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.NET.Test.Sdk",
+        "resolvedVersion": "18.9.0",
+        "latestVersion": "18.10.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj",
+          "src/Quartz.Tests.Integration/Quartz.Tests.Integration.csproj",
+          "src/Quartz.Tests.Unit/Quartz.Tests.Unit.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 3,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Hosting",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Logging",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Hosting.Abstractions",
+        "resolvedVersion": "10.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Aspire/Quartz.Aspire.csproj",
+          "src/Quartz/Quartz.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Options.ConfigurationExtensions",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj",
+          "src/Quartz.Tests.Unit/Quartz.Tests.Unit.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.AspNetCore.Mvc.Testing",
+        "resolvedVersion": "10.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "TimeZoneConverter",
+        "resolvedVersion": "7.0.0",
+        "latestVersion": "7.2.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Plugins.TimeZoneConverter/Quartz.Plugins.TimeZoneConverter.csproj",
+          "src/Quartz.Tests.Integration/Quartz.Tests.Integration.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Configuration.Binder",
+        "resolvedVersion": "10.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Aspire/Quartz.Aspire.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Verify.NUnit",
+        "resolvedVersion": "32.0.0",
+        "latestVersion": "33.0.2",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj",
+          "src/Quartz.Tests.Unit/Quartz.Tests.Unit.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Hosting.Abstractions",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Http",
+        "resolvedVersion": "10.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.HttpClient/Quartz.HttpClient.csproj",
+          "src/Quartz.Tests.Unit/Quartz.Tests.Unit.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Configuration.EnvironmentVariables",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Meziantou.Analyzer",
+        "resolvedVersion": "3.0.254",
+        "latestVersion": "3.0.257",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "WolverineFx.RuntimeCompilation",
+        "resolvedVersion": "6.36.0",
+        "latestVersion": "6.37.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Examples.Wolverine/Quartz.Examples.Wolverine.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "StackExchange.Redis",
+        "resolvedVersion": "3.0.0",
+        "latestVersion": "3.2.1",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Extensions.Redis/Quartz.Extensions.Redis.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Quartz.Serialization.Json",
+        "resolvedVersion": "3.20.0",
+        "latestVersion": "4.1.0",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.Integration.Seeder/Quartz.Tests.Integration.Seeder.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Diagnostics.HealthChecks",
+        "resolvedVersion": "10.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz/Quartz.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Logging.Console",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Diagnostics.HealthChecks",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Configuration.Binder",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Configuration.EnvironmentVariables",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.DependencyInjection",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj",
+          "src/Quartz.Tests.Unit/Quartz.Tests.Unit.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 2,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.DependencyInjection",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Hosting",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Tests.AspNetCore/Quartz.Tests.AspNetCore.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Logging.Console",
+        "resolvedVersion": "10.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Examples/Quartz.Examples.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Newtonsoft.Json",
+        "resolvedVersion": "13.0.2",
+        "latestVersion": "13.0.4",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz.Serialization.Newtonsoft/Quartz.Serialization.Newtonsoft.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Options.ConfigurationExtensions",
+        "resolvedVersion": "10.0.0",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "included",
+        "projects": [
+          "src/Quartz/Quartz.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      },
+      {
+        "category": "outdatedDependency",
+        "package": "Microsoft.Extensions.Logging.Console",
+        "resolvedVersion": "10.0.11",
+        "latestVersion": "10.0.12",
+        "scoreDisposition": "excludedAspire",
+        "projects": [
+          "src/Quartz.Examples.Aspire.AppHost/Quartz.Examples.Aspire.AppHost.csproj"
+        ],
+        "frameworks": [
+          "net10.0"
+        ],
+        "occurrences": 1,
+        "deprecationReasons": null,
+        "alternativePackage": null,
+        "vulnerabilities": null
+      }
+    ]
+  }
+]

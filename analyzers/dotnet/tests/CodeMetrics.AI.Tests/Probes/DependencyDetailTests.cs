@@ -79,7 +79,7 @@ public sealed class DependencyDetailTests : IDisposable
     }
 
     [Fact]
-    public void SamePackageAcrossFrameworks_RemainsTwoOccurrences()
+    public void SamePackageAcrossFrameworks_RetainsOccurrencesButCountsOnePackageVersion()
     {
         var report = Report("""{"id":"Old","resolvedVersion":"1.0.0","deprecationReasons":["Legacy"]}""");
         using var document = JsonDocument.Parse(report);
@@ -88,7 +88,7 @@ public sealed class DependencyDetailTests : IDisposable
         var result = DependencyProbe.AnalyzeOutput(Empty, Empty, combined, directory, false);
         result.Findings.Should().HaveCount(2);
         result.Findings.Select(f => f.Observations["targetFramework"]).Should().BeEquivalentTo(["net9.0", "net10.0"]);
-        result.Basis.Should().Contain("deprecated=2");
+        result.Basis.Should().Contain("deprecated=1");
     }
 
     [Theory]

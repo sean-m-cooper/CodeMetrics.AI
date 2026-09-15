@@ -33,17 +33,19 @@ public static class SecurityProbe
                 var root = tree.GetRoot();
                 var filePath = tree.FilePath;
 
-                AnalyzeHardcodedSecrets(root, filePath, projectName, findings);
+                AnalyzeHardcodedSecrets(root, compilation.GetSemanticModel(tree), filePath, projectName, findings);
                 AnalyzeRawSqlInterpolation(root, filePath, projectName, findings);
                 AnalyzeUnsafeDeserialization(root, filePath, projectName, findings);
                 AnalyzeAllowAnyOriginWithCredentials(root, compilation.GetSemanticModel(tree), filePath, projectName, findings);
-                AnalyzeAllowAnonymous(root, filePath, projectName, findings);
+                AnalyzeAllowAnonymous(root, compilation.GetSemanticModel(tree), filePath, projectName, findings);
             }
 
             // missingAuthorization needs full project view (all trees)
             AnalyzeMissingAuthorization(compilation, projectName, findings, solutionDir);
         }
 
+        var observationCount = findings.Count;
+        findings = SourceFindings.Collapse(findings, solutionDir, preserveObservationOrder: true);
         var hardcodedSecrets = findings.Count(f => f.Category == "hardcodedSecret");
         var allowAnyOriginWithCreds = findings.Count(f => f.Category == "allowAnyOriginWithCredentials");
         var rawSqlCount = findings.Count(f => f.Category == "rawSqlInterpolation");
@@ -51,8 +53,11 @@ public static class SecurityProbe
         var errors = findings.Count(f => f.Severity == "error");
         var warnings = findings.Count(f => f.Severity == "warning");
 
-        var decision = ScoringDecision.FirstMatch("dotnet/security/identifier-cors-flow-v2", new()
+        var decision = ScoringDecision.FirstMatch("dotnet/security/explicit-anonymous-intent-v4", new()
         {
+            ["countingUnit"] = "distinctSourceFinding",
+            ["observationCount"] = observationCount,
+            ["explicitAnonymousIntent"] = findings.Count(f => f.Category == "allowAnonymous"),
             ["hardcodedSecrets"] = hardcodedSecrets,
             ["allowAnyOriginWithCreds"] = allowAnyOriginWithCreds,
             ["rawSqlCount"] = rawSqlCount,
@@ -70,7 +75,7 @@ public static class SecurityProbe
         ScoringStep.Rule("warnings", "warnings > 0", warnings > 0, 8, findings.Where(f => f.Severity == "warning").Select(f => f.Category).Distinct().ToArray()),
         ScoringStep.Rule("clean", "otherwise", true, 10, []));
 
-        var basis = $"Findings: {findings.Count} (errors: {errors}, warnings: {warnings}). " +
+        var basis = $"Findings: {findings.Count} distinct source sites from {observationCount} observations (errors: {errors}, warnings: {warnings}). " +
                     $"hardcodedSecrets={hardcodedSecrets}, rawSql={rawSqlCount}, " +
                     $"unsafeDeserialization={unsafeDeser}, allowAnyOriginWithCredentials={allowAnyOriginWithCreds}, " +
                     $"importedVulnerabilities={importedVulnerabilities}.";
@@ -96,14 +101,14 @@ public static class SecurityProbe
     // ── Finding 1: Hardcoded Secrets ─────────────────────────────────────────
 
     private static void AnalyzeHardcodedSecrets(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel model, string filePath, string projectName, List<Finding> findings)
     {
         // Preserve declaration-before-assignment finding order, even when source
         // locations interleave. Both forms use the same literal/placeholder policy.
         foreach (var variable in root.DescendantNodes().OfType<VariableDeclaratorSyntax>())
         {
             var name = variable.Identifier.Text;
-            if (IsSecretLiteral(name, variable.Initializer?.Value))
+            if (IsSecretLiteral(name, variable.Initializer?.Value) && !RegexPatternRecognition.IsPattern(variable, model))
                 findings.Add(CreateSecretFinding(variable, filePath, projectName,
                     $"Variable '{name}' appears to contain a hardcoded secret."));
         }
@@ -136,6 +141,7 @@ public static class SecurityProbe
         Line = GetLine(node),
         Project = projectName,
         Type = GetContainingTypeName(node),
+        Observations = SourceFindings.Location(node),
         Message = message
     };
 
@@ -180,6 +186,7 @@ public static class SecurityProbe
                         Line = GetLine(inv),
                         Project = projectName,
                         Type = GetContainingTypeName(inv),
+                        Observations = SourceFindings.Location(inv),
                         Message = $"Method '{methodName}' called with interpolated/concatenated SQL string — potential SQL injection."
                     });
                     break; // one finding per invocation
@@ -230,6 +237,7 @@ public static class SecurityProbe
                     Line = GetLine(creation),
                     Project = projectName,
                     Type = GetContainingTypeName(creation),
+                    Observations = SourceFindings.Location(creation),
                     Message = $"Use of '{shortName}' is unsafe and vulnerable to deserialization attacks."
                 });
             }
@@ -251,6 +259,7 @@ public static class SecurityProbe
                 Line = GetLine(node),
                 Project = projectName,
                 Type = GetContainingTypeName(node),
+                Observations = SourceFindings.Location(node),
                 Message = "The same CORS builder enables AllowAnyOrigin() and AllowCredentials() without a recognized rejecting guard."
             });
         }
@@ -258,7 +267,7 @@ public static class SecurityProbe
     // ── Finding 5: AllowAnonymous ─────────────────────────────────────────────
 
     private static void AnalyzeAllowAnonymous(
-        SyntaxNode root, string filePath, string projectName, List<Finding> findings)
+        SyntaxNode root, SemanticModel model, string filePath, string projectName, List<Finding> findings)
     {
         // Check member declarations and type declarations for [AllowAnonymous]
         var membersWithAttribs = root.DescendantNodes()
@@ -267,7 +276,8 @@ public static class SecurityProbe
 
         foreach (var member in membersWithAttribs)
         {
-            if (HasAttribute(member, "AllowAnonymous"))
+            if (member.AttributeLists.SelectMany(list => list.Attributes).Any(attribute =>
+                    model.GetSymbolInfo(attribute).Symbol is IMethodSymbol constructor && AnonymousAccessIntent.IsRecognized(constructor.ContainingType)))
             {
                 var typeName = member is TypeDeclarationSyntax td
                     ? td.Identifier.Text
@@ -276,12 +286,19 @@ public static class SecurityProbe
                 findings.Add(new Finding
                 {
                     Category = "allowAnonymous",
-                    Severity = "warning",
+                    Severity = "info",
+                    Confidence = "high",
                     File = filePath,
                     Line = GetLine(member),
                     Project = projectName,
                     Type = typeName,
-                    Message = $"[AllowAnonymous] found — verify this endpoint intentionally bypasses authentication."
+                    Observations = new Dictionary<string, object?>(SourceFindings.Location(member))
+                    {
+                        ["classification"] = "explicitAnonymousIntent",
+                        ["classificationReason"] = "recognizedAnonymousAccessAnnotation",
+                        ["scoreDisposition"] = "excludedExplicitIntent"
+                    },
+                    Message = "Explicit anonymous-access intent is declared. Retained for visibility without a security penalty."
                 });
             }
         }
@@ -309,6 +326,7 @@ public static class SecurityProbe
             Line = GetLine(controller.Declaration),
             Project = projectName,
             Type = controller.Symbol.Name,
+            Observations = SourceFindings.Location(controller.Declaration),
             Message = $"Controller '{controller.Symbol.ToDisplayString()}' has no explicit class-level " +
                       $"[Authorize]/[AllowAnonymous] intent and {issue.UnannotatedActionCount} public action(s) " +
                       "also lack an explicit authorization attribute. Global filters or a fallback policy " +
@@ -317,21 +335,6 @@ public static class SecurityProbe
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
-
-    private static bool HasAttribute(MemberDeclarationSyntax member, string attributeName)
-    {
-        return member.AttributeLists
-            .SelectMany(al => al.Attributes)
-            .Any(a =>
-            {
-                var name = a.Name.ToString();
-                // Match "AllowAnonymous" or "AllowAnonymousAttribute"
-                return name == attributeName ||
-                       name == attributeName + "Attribute" ||
-                       name.EndsWith("." + attributeName, StringComparison.Ordinal) ||
-                       name.EndsWith("." + attributeName + "Attribute", StringComparison.Ordinal);
-            });
-    }
 
     private static string? GetContainingTypeName(SyntaxNode node)
     {

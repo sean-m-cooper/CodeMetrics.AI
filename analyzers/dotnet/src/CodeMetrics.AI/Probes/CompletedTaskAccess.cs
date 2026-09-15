@@ -14,8 +14,61 @@ internal static class CompletedTaskAccess
         var symbol = semanticModel.GetSymbolInfo(receiver).Symbol;
         return symbol is ILocalSymbol or IParameterSymbol &&
             (HasCompletionGuard(access, symbol, semanticModel) || HasConditionalGuard(access, symbol, semanticModel) ||
+             HasSwitchGuard(access, symbol, semanticModel) || HasShortCircuitGuard(access, symbol, semanticModel) ||
              HasPrecedingCompletion(access, symbol, semanticModel));
     }
+
+    private static bool HasShortCircuitGuard(SyntaxNode access, ISymbol receiver, SemanticModel model)
+    {
+        foreach (var binary in access.Ancestors().TakeWhile(node => !PerformanceFindingContext.IsFunction(node))
+                     .OfType<BinaryExpressionSyntax>())
+        {
+            if (!binary.Right.Span.Contains(access.Span) ||
+                model.GetOperation(binary) is not Microsoft.CodeAnalysis.Operations.IBinaryOperation
+                { OperatorMethod: null, Type.SpecialType: SpecialType.System_Boolean } ||
+                binary.DescendantNodes().Any(node => WritesReceiver(node, receiver, model))) continue;
+
+            var left = Unwrap(binary.Left);
+            if (binary.IsKind(SyntaxKind.LogicalAndExpression) && ProvesCompletion(left, receiver, model)) return true;
+            if (binary.IsKind(SyntaxKind.LogicalOrExpression) &&
+                left is PrefixUnaryExpressionSyntax negative && negative.IsKind(SyntaxKind.LogicalNotExpression) &&
+                ProvesCompletion(negative.Operand, receiver, model)) return true;
+        }
+        return false;
+    }
+
+    private static bool HasSwitchGuard(SyntaxNode access, ISymbol receiver, SemanticModel model)
+    {
+        foreach (var ancestor in access.Ancestors().TakeWhile(node => !PerformanceFindingContext.IsFunction(node)))
+        {
+            if (ancestor is SwitchSectionSyntax section && section.Parent is SwitchStatementSyntax statement &&
+                !statement.DescendantNodes().OfType<GotoStatementSyntax>().Any() &&
+                !statement.DescendantNodes().Any(node => WritesReceiver(node, receiver, model)) &&
+                section.Labels.All(label => LabelProvesCompletion(label, statement.Expression, receiver, model))) return true;
+            if (ancestor is SwitchExpressionArmSyntax arm && arm.Parent is SwitchExpressionSyntax expression &&
+                !expression.DescendantNodes().Any(node => WritesReceiver(node, receiver, model)) &&
+                PatternProvesCompletion(arm.Pattern, expression.GoverningExpression, receiver, model)) return true;
+        }
+        return false;
+    }
+
+    private static bool LabelProvesCompletion(SwitchLabelSyntax label, ExpressionSyntax value, ISymbol receiver, SemanticModel model) =>
+        label switch
+        {
+            CaseSwitchLabelSyntax constant => IsCompletedStatus(Unwrap(value), constant.Value, receiver, model),
+            CasePatternSwitchLabelSyntax pattern => PatternProvesCompletion(pattern.Pattern, value, receiver, model),
+            _ => false
+        };
+
+    private static bool PatternProvesCompletion(PatternSyntax pattern, ExpressionSyntax value, ISymbol receiver, SemanticModel model) =>
+        pattern switch
+        {
+            ConstantPatternSyntax constant => IsCompletedStatus(Unwrap(value), constant.Expression, receiver, model),
+            ParenthesizedPatternSyntax parentheses => PatternProvesCompletion(parentheses.Pattern, value, receiver, model),
+            BinaryPatternSyntax binary when binary.IsKind(SyntaxKind.OrPattern) =>
+                PatternProvesCompletion(binary.Left, value, receiver, model) && PatternProvesCompletion(binary.Right, value, receiver, model),
+            _ => false
+        };
 
     private static bool HasConditionalGuard(SyntaxNode access, ISymbol receiver, SemanticModel model)
     {
@@ -228,7 +281,8 @@ internal static class CompletedTaskAccess
             ArgumentSyntax argument when !argument.RefKindKeyword.IsKind(SyntaxKind.None) => argument.Expression,
             _ => null
         };
-        return target != null && SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(target).Symbol, receiver);
+        return target != null && target.DescendantNodesAndSelf().Any(candidate =>
+            SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(candidate).Symbol, receiver));
     }
 
     private static bool AwaitsWhenAll(

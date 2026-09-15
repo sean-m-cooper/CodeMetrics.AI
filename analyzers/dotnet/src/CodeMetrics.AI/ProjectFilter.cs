@@ -16,7 +16,7 @@ public static class ProjectFilter
         (n => n.EndsWith(".AppHost", StringComparison.OrdinalIgnoreCase), "Aspire orchestration host"),
         (n => n.EndsWith(".ServiceDefaults", StringComparison.OrdinalIgnoreCase), "Aspire service defaults"),
         (n => n.EndsWith(".Hosting", StringComparison.OrdinalIgnoreCase), "Aspire / generic hosting"),
-        (n => n.EndsWith(".Benchmarks", StringComparison.OrdinalIgnoreCase), "Benchmark project"),
+        (BenchmarkProjectRecognition.IsName, "Benchmark project"),
         (n => n.EndsWith(".Samples", StringComparison.OrdinalIgnoreCase), "Sample / demo code"),
         (n => n.EndsWith(".Demo", StringComparison.OrdinalIgnoreCase), "Demo code"),
         (n => n.EndsWith(".Playground", StringComparison.OrdinalIgnoreCase), "Playground / spike project"),
@@ -42,7 +42,8 @@ public static class ProjectFilter
 
     public static bool ShouldSkip(string projectName, string? projectPath, string root, out string reason)
     {
-        if (ShouldSkip(projectName, out reason)) return true;
+        if (ShouldSkip(projectName, out reason) &&
+            (reason != "Benchmark project" || BenchmarkProjectRecognition.Declaration(projectPath) != false)) return true;
         if (projectPath == null) return false;
         if (File.Exists(projectPath))
         {
@@ -52,14 +53,17 @@ public static class ProjectFilter
                      (e.Name.LocalName == "ProjectType" && e.Value.Trim().Equals("Test", StringComparison.OrdinalIgnoreCase)))))
             { reason = "Test project"; return true; }
         }
+        var benchmarkDeclaration = BenchmarkProjectRecognition.Declaration(projectPath);
+        if (benchmarkDeclaration == true) { reason = "Benchmark project (explicit marker)"; return true; }
         var segments = Path.GetRelativePath(root, projectPath).Replace('\\', '/').Split('/');
         if (segments.Contains("..")) return false;
         if (segments.Any(s => s.Equals("test", StringComparison.OrdinalIgnoreCase) || s.Equals("tests", StringComparison.OrdinalIgnoreCase)))
         { reason = "Test support / fixture"; return true; }
-        if (segments.Any(s => s.Equals("bench", StringComparison.OrdinalIgnoreCase) || s.Equals("benchmarks", StringComparison.OrdinalIgnoreCase)))
+        if (benchmarkDeclaration != false && segments.SkipLast(1).Any(BenchmarkProjectRecognition.IsDirectory))
         { reason = "Benchmark project"; return true; }
         if (segments.Any(s => s.Equals("samples", StringComparison.OrdinalIgnoreCase) || s.Equals("snippets", StringComparison.OrdinalIgnoreCase)))
         { reason = "Sample / demo code"; return true; }
+        reason = "";
         return false;
     }
 

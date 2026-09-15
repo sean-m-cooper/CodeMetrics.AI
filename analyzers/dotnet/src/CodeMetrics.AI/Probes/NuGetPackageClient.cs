@@ -32,7 +32,7 @@ internal static class NuGetPackageClient
                 throw;
             }
             catch (Exception ex) when (
-                ex is HttpRequestException or IOException or InvalidDataException or TaskCanceledException)
+                ex is HttpRequestException or IOException or InvalidDataException or TaskCanceledException or System.Xml.XmlException)
             {
                 reportFailure?.Invoke("packageDownload:" + ex.GetType().Name);
                 // Try the next configured source. If all fail, compatibility remains unknown.
@@ -60,8 +60,15 @@ internal static class NuGetPackageClient
         }
         if (response.Content.Headers.ContentLength is > MaximumPackageBytes)
         {
-            reportFailure?.Invoke("packageSizeLimit");
-            return null;
+            var length = response.Content.Headers.ContentLength.Value;
+            var etag = PackageMetadataRanges.ReadStrongTag(response);
+            response.Dispose();
+            if (etag == null)
+            {
+                reportFailure?.Invoke("packageMetadataRangeMissingValidator");
+                return null;
+            }
+            return await new PackageMetadataRanges(client, packageUri, length, etag).InspectAsync(cancellationToken);
         }
 
         await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);

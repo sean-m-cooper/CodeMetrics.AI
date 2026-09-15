@@ -1,0 +1,204 @@
+{
+  "commit": "4c101f5c6a6e6aca073a800797a223a958b28c0b",
+  "current": {
+    "ecosystem": "dotnet",
+    "entryPoint": "E:\\repos\\OrchardCore\\OrchardCore.slnx",
+    "version": "2.3.0",
+    "source": "compatibility-manifest",
+    "runId": "fd82da6f-ce91-4a01-bc1f-d38af68c4b34",
+    "auditId": "bd769c8e-2687-4a0a-bdd0-c12b94c26c31",
+    "status": "complete",
+    "fresh": true,
+    "artifacts": {
+      "evidence": "E:\\repos\\OrchardCore\\.scorecard\\dotnet\\runs\\fd82da6f-ce91-4a01-bc1f-d38af68c4b34\\evidence.json",
+      "inspection": "E:\\repos\\OrchardCore\\.scorecard\\dotnet\\runs\\fd82da6f-ce91-4a01-bc1f-d38af68c4b34\\inspection.json",
+      "metrics": "E:\\repos\\OrchardCore\\.scorecard\\dotnet\\runs\\fd82da6f-ce91-4a01-bc1f-d38af68c4b34\\metrics.csv"
+    },
+    "analyzerExitCode": 0,
+    "validationExitCode": 0,
+    "evidenceRunId": "fd82da6f-ce91-4a01-bc1f-d38af68c4b34",
+    "evidenceAuditId": "bd769c8e-2687-4a0a-bdd0-c12b94c26c31",
+    "assessmentFailures": []
+  },
+  "previous": {
+    "ecosystem": "dotnet",
+    "entryPoint": "E:\\repos\\OrchardCore\\OrchardCore.slnx",
+    "version": "2.3.0",
+    "source": "compatibility-manifest",
+    "runId": "1f13186d-7eaf-42cd-9a33-5b338841b99e",
+    "auditId": "a65aad6a-ddb9-4176-9cd5-088567d90d43",
+    "status": "complete",
+    "fresh": true,
+    "artifacts": {
+      "evidence": "E:\\repos\\OrchardCore\\.scorecard\\dotnet\\runs\\1f13186d-7eaf-42cd-9a33-5b338841b99e\\evidence.json",
+      "inspection": "E:\\repos\\OrchardCore\\.scorecard\\dotnet\\runs\\1f13186d-7eaf-42cd-9a33-5b338841b99e\\inspection.json",
+      "metrics": "E:\\repos\\OrchardCore\\.scorecard\\dotnet\\runs\\1f13186d-7eaf-42cd-9a33-5b338841b99e\\metrics.csv"
+    },
+    "analyzerExitCode": 0,
+    "validationExitCode": 0,
+    "evidenceRunId": "1f13186d-7eaf-42cd-9a33-5b338841b99e",
+    "evidenceAuditId": "a65aad6a-ddb9-4176-9cd5-088567d90d43",
+    "assessmentFailures": []
+  },
+  "ruleset": "dotnet-2026-09-15-declared-async-boundaries",
+  "packageSha256": "2dd5fc2e948801cfdd1b37acfea49afd5fed0d466fcbdad4c5d40d4857d20779",
+  "testsPassed": 1151,
+  "calibrationCases": 6,
+  "changedFindings": {
+    "errorHandling": [
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Contents/Scripting/ContentMethodsProvider.cs",
+        "line": 23,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "24d63934a70c19ac5703838818b9bfc6e58b3f2eb6af26ad023ea05425313f02"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Contents/Scripting/ContentMethodsProvider.cs",
+        "line": 32,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "963897c322b2e5ed41feafc39a21500ed88a4a723c240e5404edb773d4bb0178"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Contents/Scripting/ContentMethodsProvider.cs",
+        "line": 41,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "6db02cbe110c52e8e5f54d0101e7618a790ff5447fc0ed841b9987caab62cac2"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Contents/Scripting/ContentMethodsProvider.cs",
+        "line": 50,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "0c3ea45678f7a2cbbd95fee1af93128aa0c8e216ae1bd0fb61e9de979cd391c7"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Queries/QueryGlobalMethodProvider.cs",
+        "line": 20,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "e50df2734cc2b4b78ba2f034c8548f4eb04fc217ea36bf70edd781af64004dd0"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Workflows/Http/Scripting/HttpMethodsProvider.cs",
+        "line": 71,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "e25697e2c47f70d452ad61c2f75abcf87330492bf1a29e7c898ff4521f523573"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Workflows/Http/Scripting/HttpMethodsProvider.cs",
+        "line": 89,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "26200a37556f8188cfd033a7cbe7e170cc96624f1141dade10ade2a09896d6ac"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Workflows/Http/Scripting/HttpMethodsProvider.cs",
+        "line": 142,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "d119a580baeab6204b8d043254042e59daf087fd3a45d98f18d9156f3d19510c"
+      },
+      {
+        "file": "src/OrchardCore/OrchardCore.Infrastructure.Abstractions/Settings/SiteServiceExtensions.cs",
+        "line": 52,
+        "reason": "documentedTaskLocalChoice",
+        "fingerprint": "adb4553382d9aabd2ce179adc174195ad1f2326e3a97b1b7984c668c4d81ea2e"
+      },
+      {
+        "file": "src/OrchardCore/OrchardCore.Recipes.Core/VariablesMethodProvider.cs",
+        "line": 21,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "5bbdde156cb4c3b642e9d4e46f88a53d41794585e09f6360641a6fc66348e0db"
+      }
+    ],
+    "performanceAsync": [
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Contents/Scripting/ContentMethodsProvider.cs",
+        "line": 23,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "5aa3e484a8b8a0df635336ebd1c4846fcb93920b17da9d852c09d56819213869"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Contents/Scripting/ContentMethodsProvider.cs",
+        "line": 32,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "b3c7b573ae42bbcbb86dff4ab82b5ffc6e4fb8a64d9f43b2b0ba7692eb44279a"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Contents/Scripting/ContentMethodsProvider.cs",
+        "line": 41,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "83048d8805fb010c4f9ef27bafba0391145de78d4ceeb3a0e82483cbb25cc534"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Contents/Scripting/ContentMethodsProvider.cs",
+        "line": 50,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "7ab95a883b3c381b31cd353e805e4489b2c139c513d066a413e17f8549b06edc"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Queries/QueryGlobalMethodProvider.cs",
+        "line": 20,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "7efa1a60e5215495c2f0fcfdafcfdc66117a2e334023a1e8bf0cdb3d8788cc61"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Workflows/Http/Scripting/HttpMethodsProvider.cs",
+        "line": 71,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "ec2da8f7bd3c4b9b9519cae2e65a9dfad26e69c14b73907571d96d0e143f7675"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Workflows/Http/Scripting/HttpMethodsProvider.cs",
+        "line": 89,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "b6101411ccc5b2a3a1df9292ca16b8925111dfe7d362de697e18361dcef46f97"
+      },
+      {
+        "file": "src/OrchardCore.Modules/OrchardCore.Workflows/Http/Scripting/HttpMethodsProvider.cs",
+        "line": 142,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "6ef3f03bd9d24d9b3aa2b96d286fea7da8eeafc05cf2b95613dc272c3508b49f"
+      },
+      {
+        "file": "src/OrchardCore/OrchardCore.Infrastructure.Abstractions/Settings/SiteServiceExtensions.cs",
+        "line": 52,
+        "reason": "documentedTaskLocalChoice",
+        "fingerprint": "b735a1e15d74bc545960c86b2f1f963a2ee8613c7ddf0bb4413c0ed6bf8d60d8"
+      },
+      {
+        "file": "src/OrchardCore/OrchardCore.Recipes.Core/VariablesMethodProvider.cs",
+        "line": 21,
+        "reason": "synchronousScriptingContract",
+        "fingerprint": "bf8aa3c7008dbc42c30bc4fdd9b7243492c8ca9cf87131c2ba7832e28bd8c1fc"
+      }
+    ]
+  },
+  "externalFeedChanges": [
+    {
+      "fingerprint": "84d7ca64ef189bc645192570b07a5965a7f090a79e4b2a6e717f2a9ec6b5332d",
+      "package": "Aspire.Hosting.AppHost",
+      "previousLatest": "13.5.3",
+      "currentLatest": "13.5.4",
+      "scoreDisposition": "excludedAspire"
+    }
+  ],
+  "overallPartial": "4.3",
+  "scores": {
+    "codeQuality": 5.3,
+    "maintainability": 7.3,
+    "errorHandling": 4,
+    "performanceAsync": 0,
+    "dependencyManagement": 2,
+    "security": 6,
+    "testing": 6,
+    "documentation": 4,
+    "architecture": 4
+  },
+  "assertions": [
+    "fresh complete usable identities",
+    "same source commit and tracked files",
+    "same configuration, population, filters and raw CSV",
+    "same finding fingerprints",
+    "exactly ten reclassifications in each wait dimension",
+    "one excluded Aspire latest-version feed change; all other findings unchanged",
+    "all scores unchanged",
+    "tested DLL and catalogs match installed package"
+  ]
+}

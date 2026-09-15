@@ -756,6 +756,39 @@ public class DependencyProbeTests
             .Should().BeTrue();
     }
 
+    [Theory]
+    [InlineData("build/MSBuildCore/Task.dll")]
+    [InlineData("build/MSBuildFull/Task.dll")]
+    [InlineData("build/runtimes/win-x64/native/git.dll")]
+    [InlineData("tools/arm64/Spatial.dll")]
+    [InlineData("tools/x64/Spatial.dll")]
+    [InlineData("tools/x86/Spatial.dll")]
+    [InlineData("tools\\ARM64\\Spatial.dll")]
+    public void PackageAssets_ToolHostFoldersAreNotConsumerFrameworks(string path)
+    {
+        PackageFrameworkCompatibility.IsPackageCompatible("net9.0", [path]).Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("lib/MSBuildCore/Library.dll")]
+    [InlineData("ref/arm64/Library.dll")]
+    [InlineData("build/unsupported/Library.targets")]
+    [InlineData("tools/unsupported/Tool.dll")]
+    public void PackageAssets_UnknownFrameworkRequirementsRemainUnknown(string path)
+    {
+        PackageFrameworkCompatibility.IsPackageCompatible("net9.0", [path]).Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData("build/net10.0/Library.targets")]
+    [InlineData("buildTransitive/net10.0/Library.props")]
+    [InlineData("lib/net10.0/Library.dll")]
+    public void PackageAssets_ToolFoldersDoNotEraseConsumerRequirements(string path)
+    {
+        PackageFrameworkCompatibility.IsPackageCompatible("net9.0", ["build/MSBuildCore/Task.dll", "tools/x64/Native.dll", path])
+            .Should().BeFalse();
+    }
+
     [Fact]
     public void FrameworkIncompatibleUpgrade_IsExcludedFromOutdatedPenalty()
     {
