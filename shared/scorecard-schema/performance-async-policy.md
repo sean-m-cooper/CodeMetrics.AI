@@ -6,8 +6,8 @@ runtime speed or throughput. I/O latency, external rate limits and deliberate
 throttling do not inherently indicate misuse. The evidence key remains
 `performanceAsync`; this display-name clarification does not change scoring.
 
-The .NET 2.3.0 release uses ruleset `dotnet-2026-09-14-dependency-availability`
-and policy `dotnet/performanceAsync/context-classification-v3`. This changes which
+The .NET 2.3.1 release uses ruleset `dotnet-2026-09-15-declared-async-boundaries`
+and policy `dotnet/performanceAsync/context-classification-v4`. This changes which
 observations qualify as scored signals. The numeric 0/2/4/6/8/10 ladder, thresholds,
 source-site counting and maximum-severity aggregation are unchanged. Population and
 severity calibration is deliberately deferred pending corpus review.

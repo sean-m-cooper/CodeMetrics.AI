@@ -95,8 +95,8 @@ for documented intent and supported usage patterns. Scores reflect code usage, n
 runtime speed or throughput. I/O latency, rate limits and deliberate throttling do
 not inherently indicate misuse. The evidence key remains `performanceAsync`.
 
-Policy `dotnet/performanceAsync/context-classification-v3`, ruleset
-`dotnet-2026-09-14-dependency-availability`, preserves the existing 0/2/4/6/8/10 ladder and
+Policy `dotnet/performanceAsync/context-classification-v4`, ruleset
+`dotnet-2026-09-15-declared-async-boundaries`, preserves the existing 0/2/4/6/8/10 ladder and
 counts each physical file/span/rule once at maximum severity across frameworks.
 
 Proven completed-task reads are excluded. Synchronous contracts and local documented
@@ -428,4 +428,6 @@ not invalidate a successful vulnerability query. Restore/compiler errors continu
 to make affected source analysis incomplete. Retain original artifacts, address the
 recorded failure, and rerun; never recover a score from CSV or stale evidence.
 
-See [2.3.0 release notes](../../docs/releases/2.3.0.md).
+See [2.3.1 release notes](../../docs/releases/2.3.1.md) for the latest accuracy fixes and
+Async/Blocking Usage naming, and [2.3.0 release notes](../../docs/releases/2.3.0.md)
+for the earlier scoring and availability changes.
