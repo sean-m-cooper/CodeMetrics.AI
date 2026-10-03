@@ -1,9 +1,10 @@
 import ts from "typescript";
 import { discover } from "./discovery.js";
 import { analyzeFile, type Metric } from "./metrics.js";
-import { hash, invocationIds, scored, skippedDimensions, type Evidence } from "./evidence.js";
+import { hash, invocationIds, skippedDimensions, type Evidence } from "./evidence.js";
 import { metricsCsvHeader } from "./scorecard-contract.js";
-import { firstMatch, thresholdDecision } from "./scoring-decision.js";
+import { scoreFunctions } from "./function-scoring.js";
+import { scoreAsyncUsage } from "./async-scoring.js";
 
 export function analyze(options: { project?: string; tsconfig?: string; runId?: string; auditId?: string }, version: string): { evidence: Evidence; metrics: Metric[]; csv: string; inputs: string[] } {
   const identity = invocationIds(options.runId, options.auditId);
@@ -11,9 +12,11 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
   const dimensions = skippedDimensions();
   const diagnostics: Evidence["analysis"]["diagnostics"] = [];
   const metrics: Metric[] = [];
+  const functions: ReturnType<typeof analyzeFile>["functions"] = [];
   const collected: ReturnType<typeof analyzeFile>["findings"] = [];
   let analyzedFiles = 0;
   let reactSupported = false;
+  let asyncSupported = false;
   for (const pkg of discovery.packages) {
     const program = ts.createProgram(pkg.files, { ...pkg.options, noEmit: true });
     const checker = program.getTypeChecker();
@@ -28,45 +31,26 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
       analyzedFiles++;
       const result = analyzeFile(source, checker, pkg.name, discovery.repositoryRoot);
       reactSupported ||= result.reactSupported;
+      asyncSupported ||= result.asyncSupported;
       metrics.push(...result.metrics); collected.push(...result.findings);
+      functions.push(...result.functions);
     }
   }
   metrics.sort((a,b) => a.file < b.file ? -1 : a.file > b.file ? 1 : a.line - b.line);
   if (analyzedFiles === 0) diagnostics.push({ kind: "emptyPopulation", message: "No production source files were analyzed." });
-  if (metrics.length) {
-    const maximum = Math.max(...metrics.map(metric => metric.complexity));
-    const quality = thresholdDecision("javascript-typescript/codeQuality/v1", maximum, [5, 10, 20, 40], false,
-      [...new Set(collected.filter(item => item.dimension === "codeQuality").map(item => item.finding.category))]);
-    dimensions.codeQuality = scored(quality, `Maximum member cyclomatic complexity=${maximum}; uncalibrated JS/TS policy.`,
-      collected.filter(item => item.dimension === "codeQuality").map(item => item.finding), { maxMemberComplexity: maximum, thresholds: [5, 10, 20, 40] });
-    const values = metrics.map(metric => metric.maintainabilityIndex).sort((a,b) => a-b);
-    const median = (values[Math.floor((values.length-1)/2)] + values[Math.ceil((values.length-1)/2)]) / 2;
-    dimensions.maintainability = scored(thresholdDecision("javascript-typescript/maintainability/v1", median, [85, 65, 40, 20], true),
-      `Median member maintainability index=${median}; uncalibrated JS/TS policy.`, [], { median, thresholds: [85,65,40,20] });
-    const performance = collected.filter(item => item.dimension === "performanceAsync").map(item => item.finding);
-    const actionable = performance.filter(finding => finding.confidence !== "low");
-    if (reactSupported) dimensions.performanceAsync = scored(firstMatch("javascript-typescript/performanceAsync/react-hooks/v1",
-      { actionableFindings: actionable.length, advisoryFindings: performance.length - actionable.length }, [
-        { id: "actionableHooks", condition: "actionableFindings > 0", matched: actionable.length > 0, score: 6, categories: [...new Set(actionable.map(f => f.category))] },
-        { id: "noActionableHooks", condition: "otherwise", matched: true, score: 10 }
-      ]),
-      "Limited scope: React hook placement and effect callbacks. General async and concurrency analysis is not implemented.", performance,
-      { actionableFindings: actionable.length, advisoryFindings: performance.length-actionable.length, scope: "react-hooks" }, finding => finding.confidence !== "low");
-  }
+  dimensions.codeQuality = scoreFunctions(functions, "codeQuality", collected.filter(item => item.dimension === "codeQuality").map(item => item.finding));
+  dimensions.maintainability = scoreFunctions(functions, "maintainability");
+  dimensions.performanceAsync = scoreAsyncUsage(collected.filter(item => item.dimension === "performanceAsync").map(item => item.finding),
+    reactSupported && metrics.length > 0, asyncSupported);
   if (diagnostics.length) for (const key of ["codeQuality", "maintainability", "performanceAsync"] as const)
-    dimensions[key] = { status: "failed", basis: "Incomplete source analysis; partial findings are unscored.", findings: dimensions[key].findings };
-  for (const [key, includes, excludes] of [
-    ["codeQuality", ["maximum-member-cyclomatic-complexity"], ["design-quality", "runtime-behavior"]],
-    ["maintainability", ["median-member-maintainability-index"], ["change-cost", "comprehensive-human-review"]],
-    ["performanceAsync", ["react-hook-placement", "react-effect-callbacks"], ["general-async", "concurrency", "runtime-performance"]]
-  ] as const) dimensions[key].scope = { id: `javascript-typescript/${key}/v1`, coverage: "partial", includes: [...includes], excludes: [...excludes] };
+    dimensions[key] = { status: "failed", basis: "Incomplete source analysis; partial findings are unscored.", findings: dimensions[key].findings, scope: dimensions[key].scope };
   const evidence: Evidence = {
     schemaVersion: 3, generatedAtUtc: new Date().toISOString(), tool: { name: "codemetrics-ai", version, ecosystem: "javascript-typescript" },
     subject: { root: discovery.repositoryRoot, entryPoint: discovery.entryPoint, name: discovery.name, variant: "source" },
     filters: { totalUnits: discovery.packages.reduce((sum,pkg) => sum + pkg.files.length, 0) + discovery.skipped.length,
       analyzedUnits: analyzedFiles, skipped: discovery.skipped },
     population: { types: new Set(metrics.map(metric => `${metric.project}|${metric.file}|${metric.type}`)).size, members: metrics.length },
-    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-09-05",
+    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-10-02-type-erasure",
       calibration: "uncalibrated", configurationFingerprint: hash(JSON.stringify(canonicalConfiguration(discovery.packages.map(pkg => ({ name: pkg.name,
         options: pkg.options, selection: pkg.selection })), discovery.repositoryRoot))), diagnostics, suppressions: [] }
   };

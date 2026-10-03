@@ -2,6 +2,7 @@
 
 exports[`metrics and React finding boundaries > preserves metrics, finding identity and callback ownership for mixed React imports 1`] = `
 {
+  "asyncSupported": true,
   "findings": [
     {
       "dimension": "performanceAsync",
@@ -14,7 +15,9 @@ exports[`metrics and React finding boundaries > preserves metrics, finding ident
         "member": "App",
         "message": "useState is called within a conditional or loop.",
         "observations": {
+          "classification": "actionableSignal",
           "hook": "useState",
+          "scoreDisposition": "scored",
         },
         "project": "sample",
         "ruleId": "javascript-typescript/performanceAsync/conditionalHook",
@@ -32,7 +35,9 @@ exports[`metrics and React finding boundaries > preserves metrics, finding ident
         "member": "App",
         "message": "useState is called within a conditional or loop.",
         "observations": {
+          "classification": "actionableSignal",
           "hook": "useState",
+          "scoreDisposition": "scored",
         },
         "project": "sample",
         "ruleId": "javascript-typescript/performanceAsync/conditionalHook",
@@ -50,7 +55,9 @@ exports[`metrics and React finding boundaries > preserves metrics, finding ident
         "member": "App",
         "message": "An effect callback is async and returns a Promise instead of cleanup or undefined.",
         "observations": {
+          "classification": "actionableSignal",
           "hook": "useEffect",
+          "scoreDisposition": "scored",
         },
         "project": "sample",
         "ruleId": "javascript-typescript/performanceAsync/asyncEffectCallback",
@@ -68,11 +75,13 @@ exports[`metrics and React finding boundaries > preserves metrics, finding ident
         "member": "App",
         "message": "Effect runs after every render; verify that this is intentional.",
         "observations": {
+          "classification": "reviewLead",
           "hook": "useLayoutEffect",
+          "scoreDisposition": "excludedReviewLead",
         },
         "project": "sample",
         "ruleId": "javascript-typescript/performanceAsync/effectWithoutDependencies",
-        "severity": "warning",
+        "severity": "info",
       },
     },
     {
@@ -86,7 +95,9 @@ exports[`metrics and React finding boundaries > preserves metrics, finding ident
         "member": "App/nested",
         "message": "useEffect is called within a conditional or loop.",
         "observations": {
+          "classification": "actionableSignal",
           "hook": "useEffect",
+          "scoreDisposition": "scored",
         },
         "project": "sample",
         "ruleId": "javascript-typescript/performanceAsync/conditionalHook",

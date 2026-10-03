@@ -1,0 +1,1470 @@
+{
+  "scope": "Explicit source-only package selections; no dependency install, build, semantic validation or runtime tests. Not whole-repository scorecards or cross-ecosystem calibration.",
+  "generatedAtUtc": "2026-10-03T01:19:00.204Z",
+  "nodeVersion": "v24.18.0",
+  "beforeAnalyzerBundleSha256": "79ee31195bd447f04e4aaf0a323a47c765cbcd4edd65cb1c0efebd6dc5f4a467",
+  "afterAnalyzerBundleSha256": "d0473214235d18ec51f4c572f9c72de7f3e6d20dd70237bfe5edf531086efdfd",
+  "samples": [
+    {
+      "id": "express",
+      "repository": "express",
+      "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "package": ".",
+      "include": [
+        "index.js",
+        "lib/**/*.js"
+      ],
+      "commit": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "remote": "https://github.com/expressjs/express.git",
+      "trackedChanges": "",
+      "packageVersion": "5.2.1",
+      "configurationSha256": "0756ff795edb28b3cc6dac8b759283e05733a1fb90e825538e16c394fd3833c7",
+      "csvSha256": "3007f51f5bb3e10faffbe13b04d87b62fa3d872fbf47318456c5334792237014",
+      "population": {
+        "types": 72,
+        "members": 109
+      },
+      "filters": {
+        "analyzedUnits": 7,
+        "totalUnits": 7,
+        "skippedCount": 0
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 4,
+          "maintainability": 8,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-async-usage",
+        "runId": "14c0b55c-24e9-4614-8498-d5139183d48e"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-function-policy",
+        "runId": "a09d2903-0b19-44ac-9d33-7be70472b291"
+      },
+      "details": {
+        "codeQuality": {
+          "decision": {
+            "version": 1,
+            "policy": "javascript-typescript/codeQuality/owned-functions-v2",
+            "operation": "deductions",
+            "finalScore": 7,
+            "inputs": {
+              "baseline": 10,
+              "eligibleFunctions": 109,
+              "weakCount": 1,
+              "restCount": 108,
+              "anchors": [
+                [
+                  3,
+                  10
+                ],
+                [
+                  5,
+                  8
+                ],
+                [
+                  10,
+                  6
+                ],
+                [
+                  20,
+                  4
+                ],
+                [
+                  40,
+                  0
+                ]
+              ],
+              "aggregation": "worst-40-remainder-60",
+              "rounding": "decimal-rational-half-up-one-decimal",
+              "unroundedScore": 6.988888888888889
+            },
+            "steps": [
+              {
+                "id": "weakest",
+                "kind": "component",
+                "score": 2.64,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 2.64,
+                  "functionCount": 1
+                },
+                "findingCategories": [
+                  "highFunctionComplexity"
+                ]
+              },
+              {
+                "id": "remainder",
+                "kind": "component",
+                "score": 0.3711111111111111,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 0.3711111111111111,
+                  "functionCount": 108
+                },
+                "findingCategories": [
+                  "highFunctionComplexity"
+                ]
+              }
+            ]
+          },
+          "topOffenders": [
+            {
+              "id": "3495ebd3fcd27608878bdf47a48945914b174cce9e40042483c1ec8a291f40d5",
+              "file": "lib/response.js",
+              "project": "express",
+              "member": "send",
+              "sourceSpanStart": 3432,
+              "line": 126,
+              "ownComplexity": 23,
+              "ownSourceLines": 57,
+              "ownHalsteadVolume": 2584.9597565557906,
+              "ownMaintainabilityIndex": 34.70979551084187,
+              "group": "weakest",
+              "individualScore": 3.4,
+              "weightNumerator": 2,
+              "weightDenominator": 5,
+              "weightedScoreLoss": 2.64
+            },
+            {
+              "id": "5e2858fefd3b640a044176a7ccfbabbd88a6245e47a737edac5984f25023bd90",
+              "file": "lib/response.js",
+              "project": "express",
+              "member": "download",
+              "sourceSpanStart": 11845,
+              "line": 437,
+              "ownComplexity": 13,
+              "ownSourceLines": 28,
+              "ownHalsteadVolume": 1185.5068254456744,
+              "ownMaintainabilityIndex": 45.159692098204125,
+              "group": "remainder",
+              "individualScore": 5.4,
+              "weightNumerator": 1,
+              "weightDenominator": 180,
+              "weightedScoreLoss": 0.025555555555555557
+            },
+            {
+              "id": "cdb26b2ab14efed0815945ddbd8eb43e857127327cfa91205f05bba96da3e0f0",
+              "file": "lib/application.js",
+              "project": "express",
+              "member": "render",
+              "sourceSpanStart": 11930,
+              "line": 522,
+              "ownComplexity": 10,
+              "ownSourceLines": 30,
+              "ownHalsteadVolume": 1680.1397441850936,
+              "ownMaintainabilityIndex": 43.84918989302365,
+              "group": "remainder",
+              "individualScore": 6,
+              "weightNumerator": 1,
+              "weightDenominator": 180,
+              "weightedScoreLoss": 0.022222222222222223
+            },
+            {
+              "id": "871864b71453ff78fe5569454ad802396d0b4741b04b79ee854b858d4c7c18d3",
+              "file": "lib/response.js",
+              "project": "express",
+              "member": "anonymous",
+              "sourceSpanStart": 19491,
+              "line": 747,
+              "ownComplexity": 8,
+              "ownSourceLines": 19,
+              "ownHalsteadVolume": 1035.3451766876842,
+              "ownMaintainabilityIndex": 49.91762557657744,
+              "group": "remainder",
+              "individualScore": 6.8,
+              "weightNumerator": 1,
+              "weightDenominator": 180,
+              "weightedScoreLoss": 0.017777777777777778
+            },
+            {
+              "id": "ad907a30bab37eff33e28add5a7d5bbb61ebc76e377b3975169468e221a24e03",
+              "file": "lib/view.js",
+              "project": "express",
+              "member": "View",
+              "sourceSpanStart": 915,
+              "line": 52,
+              "ownComplexity": 8,
+              "ownSourceLines": 22,
+              "ownHalsteadVolume": 1123.140217710356,
+              "ownMaintainabilityIndex": 48.28123769579444,
+              "group": "remainder",
+              "individualScore": 6.8,
+              "weightNumerator": 1,
+              "weightDenominator": 180,
+              "weightedScoreLoss": 0.017777777777777778
+            }
+          ]
+        },
+        "maintainability": {
+          "decision": {
+            "version": 1,
+            "policy": "javascript-typescript/maintainability/owned-functions-v2",
+            "operation": "deductions",
+            "finalScore": 5.9,
+            "inputs": {
+              "baseline": 10,
+              "eligibleFunctions": 109,
+              "weakCount": 22,
+              "restCount": 87,
+              "anchors": [
+                [
+                  40,
+                  0
+                ],
+                [
+                  52,
+                  2
+                ],
+                [
+                  58,
+                  4
+                ],
+                [
+                  65,
+                  6
+                ],
+                [
+                  70,
+                  8
+                ],
+                [
+                  75,
+                  10
+                ]
+              ],
+              "aggregation": "weakest-quintile-40-remainder-60",
+              "rounding": "decimal-rational-half-up-one-decimal",
+              "unroundedScore": 5.92648205220541
+            },
+            "steps": [
+              {
+                "id": "weakest",
+                "kind": "component",
+                "score": 3.0726746982608817,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 3.0726746982608817,
+                  "functionCount": 22
+                },
+                "findingCategories": []
+              },
+              {
+                "id": "remainder",
+                "kind": "component",
+                "score": 1.0008432495337087,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 1.0008432495337087,
+                  "functionCount": 87
+                },
+                "findingCategories": []
+              }
+            ]
+          },
+          "topOffenders": [
+            {
+              "id": "3495ebd3fcd27608878bdf47a48945914b174cce9e40042483c1ec8a291f40d5",
+              "file": "lib/response.js",
+              "project": "express",
+              "member": "send",
+              "sourceSpanStart": 3432,
+              "line": 126,
+              "ownComplexity": 23,
+              "ownSourceLines": 57,
+              "ownHalsteadVolume": 2584.9597565557906,
+              "ownMaintainabilityIndex": 34.70979551084187,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 55,
+              "weightedScoreLoss": 0.18181818181818182
+            },
+            {
+              "id": "cdb26b2ab14efed0815945ddbd8eb43e857127327cfa91205f05bba96da3e0f0",
+              "file": "lib/application.js",
+              "project": "express",
+              "member": "render",
+              "sourceSpanStart": 11930,
+              "line": 522,
+              "ownComplexity": 10,
+              "ownSourceLines": 30,
+              "ownHalsteadVolume": 1680.1397441850936,
+              "ownMaintainabilityIndex": 43.84918989302365,
+              "group": "weakest",
+              "individualScore": 0.641531648837275,
+              "weightNumerator": 1,
+              "weightDenominator": 55,
+              "weightedScoreLoss": 0.17015397002114047
+            },
+            {
+              "id": "5e2858fefd3b640a044176a7ccfbabbd88a6245e47a737edac5984f25023bd90",
+              "file": "lib/response.js",
+              "project": "express",
+              "member": "download",
+              "sourceSpanStart": 11845,
+              "line": 437,
+              "ownComplexity": 13,
+              "ownSourceLines": 28,
+              "ownHalsteadVolume": 1185.5068254456744,
+              "ownMaintainabilityIndex": 45.159692098204125,
+              "group": "weakest",
+              "individualScore": 0.8599486830340208,
+              "weightNumerator": 1,
+              "weightDenominator": 55,
+              "weightedScoreLoss": 0.16618275121756326
+            },
+            {
+              "id": "7c0c471048263a69f2febc65eb865b9ec7a7db809534ae0008e4cbffa5132797",
+              "file": "lib/response.js",
+              "project": "express",
+              "member": "jsonp",
+              "sourceSpanStart": 6696,
+              "line": 264,
+              "ownComplexity": 7,
+              "ownSourceLines": 23,
+              "ownHalsteadVolume": 1311.329712225091,
+              "ownMaintainabilityIndex": 47.52353775892205,
+              "group": "weakest",
+              "individualScore": 1.2539229598203416,
+              "weightNumerator": 1,
+              "weightDenominator": 55,
+              "weightedScoreLoss": 0.15901958254872106
+            },
+            {
+              "id": "c3ff1057ad74a414cd21aed304a5856a6df989af408f738ac9702619280b507a",
+              "file": "lib/response.js",
+              "project": "express",
+              "member": "redirect",
+              "sourceSpanStart": 20949,
+              "line": 814,
+              "ownComplexity": 6,
+              "ownSourceLines": 26,
+              "ownHalsteadVolume": 880.441565604857,
+              "ownMaintainabilityIndex": 47.70797284696481,
+              "group": "weakest",
+              "individualScore": 1.2846621411608017,
+              "weightNumerator": 1,
+              "weightDenominator": 55,
+              "weightedScoreLoss": 0.15846068834253088
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "zod-v4",
+      "repository": "zod",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "package": "packages/zod",
+      "include": [
+        "src/v4/**/*.ts"
+      ],
+      "config": "tsconfig.json",
+      "commit": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "remote": "https://github.com/colinhacks/zod.git",
+      "trackedChanges": "",
+      "packageVersion": "4.6.5",
+      "configurationSha256": "500628532e30ebf69760655d30170970b1374cd55e70f37fa945f9b005683c9a",
+      "csvSha256": "7f714913b9d4c86a67acda3e320d6cdfda9700a7838b3957a2964ce738757d7d",
+      "population": {
+        "types": 981,
+        "members": 1948
+      },
+      "filters": {
+        "analyzedUnits": 107,
+        "totalUnits": 244,
+        "skippedCount": 137
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 2,
+          "maintainability": 8,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-async-usage",
+        "runId": "11bab739-c8cf-4ec3-9853-5d95634ed3fd"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-function-policy",
+        "runId": "488648b3-77e6-4e42-a701-e7848fd852bc"
+      },
+      "details": {
+        "codeQuality": {
+          "decision": {
+            "version": 1,
+            "policy": "javascript-typescript/codeQuality/owned-functions-v2",
+            "operation": "deductions",
+            "finalScore": 5.7,
+            "inputs": {
+              "baseline": 10,
+              "eligibleFunctions": 1948,
+              "weakCount": 1,
+              "restCount": 1947,
+              "anchors": [
+                [
+                  3,
+                  10
+                ],
+                [
+                  5,
+                  8
+                ],
+                [
+                  10,
+                  6
+                ],
+                [
+                  20,
+                  4
+                ],
+                [
+                  40,
+                  0
+                ]
+              ],
+              "aggregation": "worst-40-remainder-60",
+              "rounding": "decimal-rational-half-up-one-decimal",
+              "unroundedScore": 5.678397534668721
+            },
+            "steps": [
+              {
+                "id": "weakest",
+                "kind": "component",
+                "score": 4,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 4,
+                  "functionCount": 1
+                },
+                "findingCategories": [
+                  "highFunctionComplexity"
+                ]
+              },
+              {
+                "id": "remainder",
+                "kind": "component",
+                "score": 0.3216024653312789,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 0.3216024653312789,
+                  "functionCount": 1947
+                },
+                "findingCategories": [
+                  "highFunctionComplexity"
+                ]
+              }
+            ]
+          },
+          "topOffenders": [
+            {
+              "id": "683255cb164f3ed97c20b06521f852fdb842cf2b5137145a0a5d4c4fb2c538f9",
+              "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+              "project": "zod",
+              "member": "convertBaseSchema",
+              "sourceSpanStart": 12882,
+              "line": 390,
+              "ownComplexity": 122,
+              "ownSourceLines": 255,
+              "ownHalsteadVolume": 20136.94857166229,
+              "ownMaintainabilityIndex": 0.9578421168887952,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 2,
+              "weightDenominator": 5,
+              "weightedScoreLoss": 4
+            },
+            {
+              "id": "40aa5b5cac023082d5abdaa13f0796a1272019d0c271682d0ad4be6dc3c28281",
+              "file": "packages/zod/src/v4/core/visit.ts",
+              "project": "zod",
+              "member": "visit/mapInner",
+              "sourceSpanStart": 2482,
+              "line": 59,
+              "ownComplexity": 65,
+              "ownSourceLines": 107,
+              "ownHalsteadVolume": 5801.788100311156,
+              "ownMaintainabilityIndex": 20.635895545255053,
+              "group": "remainder",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 3245,
+              "weightedScoreLoss": 0.0030816640986132513
+            },
+            {
+              "id": "88c771b0147769013aee9cfa563c24ab48a116023dfc5e481afddb080cff6e4b",
+              "file": "packages/zod/src/v4/locales/he.ts",
+              "project": "zod",
+              "member": "error/anonymous",
+              "sourceSpanStart": 4537,
+              "line": 108,
+              "ownComplexity": 65,
+              "ownSourceLines": 83,
+              "ownHalsteadVolume": 7185.332534940955,
+              "ownMaintainabilityIndex": 22.39171774355872,
+              "group": "remainder",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 3245,
+              "weightedScoreLoss": 0.0030816640986132513
+            },
+            {
+              "id": "0128152cecafa0ef3801b4ccf860463ea7550be81299e9bbc5f0c9c0ab1ad871",
+              "file": "packages/zod/src/v4/core/memoizer.ts",
+              "project": "zod",
+              "member": "isRecursive",
+              "sourceSpanStart": 1819,
+              "line": 50,
+              "ownComplexity": 58,
+              "ownSourceLines": 93,
+              "ownHalsteadVolume": 3610.914152870264,
+              "ownMaintainabilityIndex": 24.347932003166445,
+              "group": "remainder",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 3245,
+              "weightedScoreLoss": 0.0030816640986132513
+            },
+            {
+              "id": "3401841f5d4461f4195544334e4bb7ac52fd44e5e4abfb34ec01fb555b842c94",
+              "file": "packages/zod/src/v4/core/compile.ts",
+              "project": "zod",
+              "member": "fastPathAcceptsAbsence",
+              "sourceSpanStart": 58450,
+              "line": 1402,
+              "ownComplexity": 46,
+              "ownSourceLines": 53,
+              "ownHalsteadVolume": 1737.8404146483506,
+              "ownMaintainabilityIndex": 33.51298181441139,
+              "group": "remainder",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 3245,
+              "weightedScoreLoss": 0.0030816640986132513
+            }
+          ]
+        },
+        "maintainability": {
+          "decision": {
+            "version": 1,
+            "policy": "javascript-typescript/maintainability/owned-functions-v2",
+            "operation": "deductions",
+            "finalScore": 6.6,
+            "inputs": {
+              "baseline": 10,
+              "eligibleFunctions": 1948,
+              "weakCount": 390,
+              "restCount": 1558,
+              "anchors": [
+                [
+                  40,
+                  0
+                ],
+                [
+                  52,
+                  2
+                ],
+                [
+                  58,
+                  4
+                ],
+                [
+                  65,
+                  6
+                ],
+                [
+                  70,
+                  8
+                ],
+                [
+                  75,
+                  10
+                ]
+              ],
+              "aggregation": "weakest-quintile-40-remainder-60",
+              "rounding": "decimal-rational-half-up-one-decimal",
+              "unroundedScore": 6.620562323259091
+            },
+            "steps": [
+              {
+                "id": "weakest",
+                "kind": "component",
+                "score": 3.0650348504046874,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 3.0650348504046874,
+                  "functionCount": 390
+                },
+                "findingCategories": []
+              },
+              {
+                "id": "remainder",
+                "kind": "component",
+                "score": 0.3144028263362212,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 0.3144028263362212,
+                  "functionCount": 1558
+                },
+                "findingCategories": []
+              }
+            ]
+          },
+          "topOffenders": [
+            {
+              "id": "683255cb164f3ed97c20b06521f852fdb842cf2b5137145a0a5d4c4fb2c538f9",
+              "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+              "project": "zod",
+              "member": "convertBaseSchema",
+              "sourceSpanStart": 12882,
+              "line": 390,
+              "ownComplexity": 122,
+              "ownSourceLines": 255,
+              "ownHalsteadVolume": 20136.94857166229,
+              "ownMaintainabilityIndex": 0.9578421168887952,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 975,
+              "weightedScoreLoss": 0.010256410256410256
+            },
+            {
+              "id": "40aa5b5cac023082d5abdaa13f0796a1272019d0c271682d0ad4be6dc3c28281",
+              "file": "packages/zod/src/v4/core/visit.ts",
+              "project": "zod",
+              "member": "visit/mapInner",
+              "sourceSpanStart": 2482,
+              "line": 59,
+              "ownComplexity": 65,
+              "ownSourceLines": 107,
+              "ownHalsteadVolume": 5801.788100311156,
+              "ownMaintainabilityIndex": 20.635895545255053,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 975,
+              "weightedScoreLoss": 0.010256410256410256
+            },
+            {
+              "id": "88c771b0147769013aee9cfa563c24ab48a116023dfc5e481afddb080cff6e4b",
+              "file": "packages/zod/src/v4/locales/he.ts",
+              "project": "zod",
+              "member": "error/anonymous",
+              "sourceSpanStart": 4537,
+              "line": 108,
+              "ownComplexity": 65,
+              "ownSourceLines": 83,
+              "ownHalsteadVolume": 7185.332534940955,
+              "ownMaintainabilityIndex": 22.39171774355872,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 975,
+              "weightedScoreLoss": 0.010256410256410256
+            },
+            {
+              "id": "daf2087d3655f70305a8f59b4741c7474a0364b837dd438c9350a1e0e5fb8b7c",
+              "file": "packages/zod/src/v4/core/schemas.ts",
+              "project": "zod",
+              "member": "core.$constructor:callback1/anonymous",
+              "sourceSpanStart": 110216,
+              "line": 3242,
+              "ownComplexity": 43,
+              "ownSourceLines": 115,
+              "ownHalsteadVolume": 6232.0859478556795,
+              "ownMaintainabilityIndex": 22.69431248572588,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 975,
+              "weightedScoreLoss": 0.010256410256410256
+            },
+            {
+              "id": "8d21fb6277b8d3808a748d6eda3e79731cb9993f7074261f36c9bf8739dcf509",
+              "file": "packages/zod/src/v4/core/compile.ts",
+              "project": "zod",
+              "member": "generateCheck",
+              "sourceSpanStart": 40539,
+              "line": 958,
+              "ownComplexity": 41,
+              "ownSourceLines": 124,
+              "ownHalsteadVolume": 5054.150559886966,
+              "ownMaintainabilityIndex": 22.886561539715203,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 975,
+              "weightedScoreLoss": 0.010256410256410256
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tanstack-query-core",
+      "repository": "tanstack-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "package": "packages/query-core",
+      "include": [
+        "src/**/*.ts"
+      ],
+      "config": "tsconfig.json",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "remote": "https://github.com/TanStack/query.git",
+      "trackedChanges": "",
+      "packageVersion": "5.104.1",
+      "configurationSha256": "afbcf8e32b2b28049e640fa5f046dde5e4ee203bc2b99708044acd8c1139ccaa",
+      "csvSha256": "9f345cee4f6646f9480e3b2f5d6c5df70baefb54f29142301edb7a7552bf3f4d",
+      "population": {
+        "types": 178,
+        "members": 427
+      },
+      "filters": {
+        "analyzedUnits": 23,
+        "totalUnits": 26,
+        "skippedCount": 3
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 4,
+          "maintainability": 8,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-async-usage",
+        "runId": "6646a4cd-4754-49fd-83a5-b6c8472e26c3"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-function-policy",
+        "runId": "98a893e6-a77d-45fd-a689-21a794ad7ebe"
+      },
+      "details": {
+        "codeQuality": {
+          "decision": {
+            "version": 1,
+            "policy": "javascript-typescript/codeQuality/owned-functions-v2",
+            "operation": "deductions",
+            "finalScore": 6.7,
+            "inputs": {
+              "baseline": 10,
+              "eligibleFunctions": 427,
+              "weakCount": 1,
+              "restCount": 426,
+              "anchors": [
+                [
+                  3,
+                  10
+                ],
+                [
+                  5,
+                  8
+                ],
+                [
+                  10,
+                  6
+                ],
+                [
+                  20,
+                  4
+                ],
+                [
+                  40,
+                  0
+                ]
+              ],
+              "aggregation": "worst-40-remainder-60",
+              "rounding": "decimal-rational-half-up-one-decimal",
+              "unroundedScore": 6.693521126760563
+            },
+            "steps": [
+              {
+                "id": "weakest",
+                "kind": "component",
+                "score": 3.12,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 3.12,
+                  "functionCount": 1
+                },
+                "findingCategories": [
+                  "highFunctionComplexity"
+                ]
+              },
+              {
+                "id": "remainder",
+                "kind": "component",
+                "score": 0.18647887323943663,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 0.18647887323943663,
+                  "functionCount": 426
+                },
+                "findingCategories": [
+                  "highFunctionComplexity"
+                ]
+              }
+            ]
+          },
+          "topOffenders": [
+            {
+              "id": "7ac2fa46c8302f9bab3c1c501b9564055b08be764e1e7890125ac185a8059912",
+              "file": "packages/query-core/src/queryObserver.ts",
+              "project": "@tanstack/query-core",
+              "member": "createResult",
+              "sourceSpanStart": 16646,
+              "line": 558,
+              "ownComplexity": 29,
+              "ownSourceLines": 116,
+              "ownHalsteadVolume": 4139.260729650305,
+              "ownMaintainabilityIndex": 25.739661983427407,
+              "group": "weakest",
+              "individualScore": 2.2,
+              "weightNumerator": 2,
+              "weightDenominator": 5,
+              "weightedScoreLoss": 3.12
+            },
+            {
+              "id": "1a27a0d841550d3131caf154afd4513d254349a90c262e2e266767876ae35ddb",
+              "file": "packages/query-core/src/utils.ts",
+              "project": "@tanstack/query-core",
+              "member": "replaceEqualDeep",
+              "sourceSpanStart": 8567,
+              "line": 341,
+              "ownComplexity": 22,
+              "ownSourceLines": 31,
+              "ownHalsteadVolume": 1476.2112107721482,
+              "ownMaintainabilityIndex": 42.31800585423943,
+              "group": "remainder",
+              "individualScore": 3.6,
+              "weightNumerator": 1,
+              "weightDenominator": 710,
+              "weightedScoreLoss": 0.009014084507042254
+            },
+            {
+              "id": "43ce5b9fa2f8e5456f7e0780ee813bab0e454e60c06b8ec4cef427c1326df13b",
+              "file": "packages/query-core/src/query.ts",
+              "project": "@tanstack/query-core",
+              "member": "fetch",
+              "sourceSpanStart": 16084,
+              "line": 590,
+              "ownComplexity": 22,
+              "ownSourceLines": 97,
+              "ownHalsteadVolume": 3801.275056828207,
+              "ownMaintainabilityIndex": 28.63485650794508,
+              "group": "remainder",
+              "individualScore": 3.6,
+              "weightNumerator": 1,
+              "weightDenominator": 710,
+              "weightedScoreLoss": 0.009014084507042254
+            },
+            {
+              "id": "8926c1664f5eddb686dc01093b3a95aabe3e392f9feff76c897d8b90cc95f933",
+              "file": "packages/query-core/src/hydration.ts",
+              "project": "@tanstack/query-core",
+              "member": "hydrate/dehydratedState.queries?.forEach:callback0",
+              "sourceSpanStart": 10211,
+              "line": 289,
+              "ownComplexity": 21,
+              "ownSourceLines": 66,
+              "ownHalsteadVolume": 1903.9841475979129,
+              "ownMaintainabilityIndex": 34.51972687362618,
+              "group": "remainder",
+              "individualScore": 3.8,
+              "weightNumerator": 1,
+              "weightDenominator": 710,
+              "weightedScoreLoss": 0.008732394366197183
+            },
+            {
+              "id": "85e7b72f15681d95ab33697491ff74f52a758ca52c028a16ce36e5eb5ea34bc5",
+              "file": "packages/query-core/src/queryObserver.ts",
+              "project": "@tanstack/query-core",
+              "member": "setOptions",
+              "sourceSpanStart": 5275,
+              "line": 182,
+              "ownComplexity": 17,
+              "ownSourceLines": 54,
+              "ownHalsteadVolume": 1732.933674314892,
+              "ownMaintainabilityIndex": 37.245081379107354,
+              "group": "remainder",
+              "individualScore": 4.6,
+              "weightNumerator": 1,
+              "weightDenominator": 710,
+              "weightedScoreLoss": 0.007605633802816901
+            }
+          ]
+        },
+        "maintainability": {
+          "decision": {
+            "version": 1,
+            "policy": "javascript-typescript/maintainability/owned-functions-v2",
+            "operation": "deductions",
+            "finalScore": 7.2,
+            "inputs": {
+              "baseline": 10,
+              "eligibleFunctions": 427,
+              "weakCount": 86,
+              "restCount": 341,
+              "anchors": [
+                [
+                  40,
+                  0
+                ],
+                [
+                  52,
+                  2
+                ],
+                [
+                  58,
+                  4
+                ],
+                [
+                  65,
+                  6
+                ],
+                [
+                  70,
+                  8
+                ],
+                [
+                  75,
+                  10
+                ]
+              ],
+              "aggregation": "weakest-quintile-40-remainder-60",
+              "rounding": "decimal-rational-half-up-one-decimal",
+              "unroundedScore": 7.226347718793688
+            },
+            "steps": [
+              {
+                "id": "weakest",
+                "kind": "component",
+                "score": 2.5188329893294106,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 2.5188329893294106,
+                  "functionCount": 86
+                },
+                "findingCategories": []
+              },
+              {
+                "id": "remainder",
+                "kind": "component",
+                "score": 0.254819291876901,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 0.254819291876901,
+                  "functionCount": 341
+                },
+                "findingCategories": []
+              }
+            ]
+          },
+          "topOffenders": [
+            {
+              "id": "7ac2fa46c8302f9bab3c1c501b9564055b08be764e1e7890125ac185a8059912",
+              "file": "packages/query-core/src/queryObserver.ts",
+              "project": "@tanstack/query-core",
+              "member": "createResult",
+              "sourceSpanStart": 16646,
+              "line": 558,
+              "ownComplexity": 29,
+              "ownSourceLines": 116,
+              "ownHalsteadVolume": 4139.260729650305,
+              "ownMaintainabilityIndex": 25.739661983427407,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 215,
+              "weightedScoreLoss": 0.046511627906976744
+            },
+            {
+              "id": "a9d28fd79a8b6e1c5b598edb71f7e44a5df66685a186976603086f887f2cdb71",
+              "file": "packages/query-core/src/mutation.ts",
+              "project": "@tanstack/query-core",
+              "member": "execute",
+              "sourceSpanStart": 8471,
+              "line": 284,
+              "ownComplexity": 11,
+              "ownSourceLines": 121,
+              "ownHalsteadVolume": 3371.1056593197313,
+              "ownMaintainabilityIndex": 28.385154185895814,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 215,
+              "weightedScoreLoss": 0.046511627906976744
+            },
+            {
+              "id": "43ce5b9fa2f8e5456f7e0780ee813bab0e454e60c06b8ec4cef427c1326df13b",
+              "file": "packages/query-core/src/query.ts",
+              "project": "@tanstack/query-core",
+              "member": "fetch",
+              "sourceSpanStart": 16084,
+              "line": 590,
+              "ownComplexity": 22,
+              "ownSourceLines": 97,
+              "ownHalsteadVolume": 3801.275056828207,
+              "ownMaintainabilityIndex": 28.63485650794508,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 215,
+              "weightedScoreLoss": 0.046511627906976744
+            },
+            {
+              "id": "8926c1664f5eddb686dc01093b3a95aabe3e392f9feff76c897d8b90cc95f933",
+              "file": "packages/query-core/src/hydration.ts",
+              "project": "@tanstack/query-core",
+              "member": "hydrate/dehydratedState.queries?.forEach:callback0",
+              "sourceSpanStart": 10211,
+              "line": 289,
+              "ownComplexity": 21,
+              "ownSourceLines": 66,
+              "ownHalsteadVolume": 1903.9841475979129,
+              "ownMaintainabilityIndex": 34.51972687362618,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 215,
+              "weightedScoreLoss": 0.046511627906976744
+            },
+            {
+              "id": "85e7b72f15681d95ab33697491ff74f52a758ca52c028a16ce36e5eb5ea34bc5",
+              "file": "packages/query-core/src/queryObserver.ts",
+              "project": "@tanstack/query-core",
+              "member": "setOptions",
+              "sourceSpanStart": 5275,
+              "line": 182,
+              "ownComplexity": 17,
+              "ownSourceLines": 54,
+              "ownHalsteadVolume": 1732.933674314892,
+              "ownMaintainabilityIndex": 37.245081379107354,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 215,
+              "weightedScoreLoss": 0.046511627906976744
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tanstack-react-query",
+      "repository": "tanstack-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "package": "packages/react-query",
+      "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "config": "tsconfig.json",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "remote": "https://github.com/TanStack/query.git",
+      "trackedChanges": "",
+      "packageVersion": "5.104.1",
+      "configurationSha256": "de7addcb26f9aa4b8b1a0afadf13d9075df920c287ba7ff8738459f20e77dacb",
+      "csvSha256": "e2dc06bd0145c8c14d56ec768ffdd27fb3b1e6b6c03bd18d90ad94de3be34483",
+      "population": {
+        "types": 34,
+        "members": 76
+      },
+      "filters": {
+        "analyzedUnits": 23,
+        "totalUnits": 59,
+        "skippedCount": 36
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 6,
+          "maintainability": 8,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-async-usage",
+        "runId": "25f7f755-b2f4-4ce7-9852-ba232861e869"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-function-policy",
+        "runId": "5b923465-920b-4428-82d1-11b77c810b49"
+      },
+      "details": {
+        "codeQuality": {
+          "decision": {
+            "version": 1,
+            "policy": "javascript-typescript/codeQuality/owned-functions-v2",
+            "operation": "deductions",
+            "finalScore": 8.1,
+            "inputs": {
+              "baseline": 10,
+              "eligibleFunctions": 76,
+              "weakCount": 1,
+              "restCount": 75,
+              "anchors": [
+                [
+                  3,
+                  10
+                ],
+                [
+                  5,
+                  8
+                ],
+                [
+                  10,
+                  6
+                ],
+                [
+                  20,
+                  4
+                ],
+                [
+                  40,
+                  0
+                ]
+              ],
+              "aggregation": "worst-40-remainder-60",
+              "rounding": "decimal-rational-half-up-one-decimal",
+              "unroundedScore": 8.0592
+            },
+            "steps": [
+              {
+                "id": "weakest",
+                "kind": "component",
+                "score": 1.84,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 1.84,
+                  "functionCount": 1
+                },
+                "findingCategories": [
+                  "highFunctionComplexity"
+                ]
+              },
+              {
+                "id": "remainder",
+                "kind": "component",
+                "score": 0.1008,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 0.1008,
+                  "functionCount": 75
+                },
+                "findingCategories": [
+                  "highFunctionComplexity"
+                ]
+              }
+            ]
+          },
+          "topOffenders": [
+            {
+              "id": "5324c386464d6185f8bd204b978acde64879e8f9ab0b417c82bf15e2f1643f53",
+              "file": "packages/react-query/src/HydrationBoundary.tsx",
+              "project": "@tanstack/react-query",
+              "member": "HydrationBoundary/React.useMemo:callback0",
+              "sourceSpanStart": 3817,
+              "line": 115,
+              "ownComplexity": 13,
+              "ownSourceLines": 27,
+              "ownHalsteadVolume": 1005.0330620966223,
+              "ownMaintainabilityIndex": 46.006438034745344,
+              "group": "weakest",
+              "individualScore": 5.4,
+              "weightNumerator": 2,
+              "weightDenominator": 5,
+              "weightedScoreLoss": 1.84
+            },
+            {
+              "id": "fafd991313315e4e0e382a81884461dc6266568070d322a115ddb22b299b9fc1",
+              "file": "packages/react-query/src/useBaseQuery.ts",
+              "project": "@tanstack/react-query",
+              "member": "useBaseQuery",
+              "sourceSpanStart": 656,
+              "line": 26,
+              "ownComplexity": 12,
+              "ownSourceLines": 58,
+              "ownHalsteadVolume": 1743.1717762507603,
+              "ownMaintainabilityIndex": 37.22270347774993,
+              "group": "remainder",
+              "individualScore": 5.6,
+              "weightNumerator": 1,
+              "weightDenominator": 125,
+              "weightedScoreLoss": 0.0352
+            },
+            {
+              "id": "9ac001c75733496e616e5c9f61b0aee577acfa8e8c93ab3c39602be76d471cd7",
+              "file": "packages/react-query/src/errorBoundaryUtils.ts",
+              "project": "@tanstack/react-query",
+              "member": "getHasError",
+              "sourceSpanStart": 1329,
+              "line": 51,
+              "ownComplexity": 7,
+              "ownSourceLines": 8,
+              "ownHalsteadVolume": 218.26124091941205,
+              "ownMaintainabilityIndex": 62.98096198494563,
+              "group": "remainder",
+              "individualScore": 7.2,
+              "weightNumerator": 1,
+              "weightDenominator": 125,
+              "weightedScoreLoss": 0.0224
+            },
+            {
+              "id": "33a1ff2d47f6a146eb6b10b5cdf9d9abbc519726844cae1b97bff5abf7dbe3e6",
+              "file": "packages/react-query/src/errorBoundaryUtils.ts",
+              "project": "@tanstack/react-query",
+              "member": "ensurePreventErrorBoundaryRetry",
+              "sourceSpanStart": 363,
+              "line": 13,
+              "ownComplexity": 6,
+              "ownSourceLines": 7,
+              "ownHalsteadVolume": 317.06856386476,
+              "ownMaintainabilityIndex": 63.24493671100938,
+              "group": "remainder",
+              "individualScore": 7.6,
+              "weightNumerator": 1,
+              "weightDenominator": 125,
+              "weightedScoreLoss": 0.0192
+            },
+            {
+              "id": "701eb60f349a4e8c620a325008c9aed42f1619ee97d7aee6b176a5a5faab91ea",
+              "file": "packages/react-query/src/useQueries.ts",
+              "project": "@tanstack/react-query",
+              "member": "useQueries",
+              "sourceSpanStart": 14506,
+              "line": 359,
+              "ownComplexity": 5,
+              "ownSourceLines": 45,
+              "ownHalsteadVolume": 1148.1642750450042,
+              "ownMaintainabilityIndex": 41.83817860595926,
+              "group": "remainder",
+              "individualScore": 8,
+              "weightNumerator": 1,
+              "weightDenominator": 125,
+              "weightedScoreLoss": 0.016
+            }
+          ]
+        },
+        "maintainability": {
+          "decision": {
+            "version": 1,
+            "policy": "javascript-typescript/maintainability/owned-functions-v2",
+            "operation": "deductions",
+            "finalScore": 7.2,
+            "inputs": {
+              "baseline": 10,
+              "eligibleFunctions": 76,
+              "weakCount": 16,
+              "restCount": 60,
+              "anchors": [
+                [
+                  40,
+                  0
+                ],
+                [
+                  52,
+                  2
+                ],
+                [
+                  58,
+                  4
+                ],
+                [
+                  65,
+                  6
+                ],
+                [
+                  70,
+                  8
+                ],
+                [
+                  75,
+                  10
+                ]
+              ],
+              "aggregation": "weakest-quintile-40-remainder-60",
+              "rounding": "decimal-rational-half-up-one-decimal",
+              "unroundedScore": 7.218616941085573
+            },
+            "steps": [
+              {
+                "id": "weakest",
+                "kind": "component",
+                "score": 2.5161067050400385,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 2.5161067050400385,
+                  "functionCount": 16
+                },
+                "findingCategories": []
+              },
+              {
+                "id": "remainder",
+                "kind": "component",
+                "score": 0.2652763538743888,
+                "disposition": "applied",
+                "inputs": {
+                  "weightedScoreLoss": 0.2652763538743888,
+                  "functionCount": 60
+                },
+                "findingCategories": []
+              }
+            ]
+          },
+          "topOffenders": [
+            {
+              "id": "fafd991313315e4e0e382a81884461dc6266568070d322a115ddb22b299b9fc1",
+              "file": "packages/react-query/src/useBaseQuery.ts",
+              "project": "@tanstack/react-query",
+              "member": "useBaseQuery",
+              "sourceSpanStart": 656,
+              "line": 26,
+              "ownComplexity": 12,
+              "ownSourceLines": 58,
+              "ownHalsteadVolume": 1743.1717762507603,
+              "ownMaintainabilityIndex": 37.22270347774993,
+              "group": "weakest",
+              "individualScore": 0,
+              "weightNumerator": 1,
+              "weightDenominator": 40,
+              "weightedScoreLoss": 0.25
+            },
+            {
+              "id": "701eb60f349a4e8c620a325008c9aed42f1619ee97d7aee6b176a5a5faab91ea",
+              "file": "packages/react-query/src/useQueries.ts",
+              "project": "@tanstack/react-query",
+              "member": "useQueries",
+              "sourceSpanStart": 14506,
+              "line": 359,
+              "ownComplexity": 5,
+              "ownSourceLines": 45,
+              "ownHalsteadVolume": 1148.1642750450042,
+              "ownMaintainabilityIndex": 41.83817860595926,
+              "group": "weakest",
+              "individualScore": 0.30636310099321,
+              "weightNumerator": 1,
+              "weightDenominator": 40,
+              "weightedScoreLoss": 0.24234092247516975
+            },
+            {
+              "id": "5324c386464d6185f8bd204b978acde64879e8f9ab0b417c82bf15e2f1643f53",
+              "file": "packages/react-query/src/HydrationBoundary.tsx",
+              "project": "@tanstack/react-query",
+              "member": "HydrationBoundary/React.useMemo:callback0",
+              "sourceSpanStart": 3817,
+              "line": 115,
+              "ownComplexity": 13,
+              "ownSourceLines": 27,
+              "ownHalsteadVolume": 1005.0330620966223,
+              "ownMaintainabilityIndex": 46.006438034745344,
+              "group": "weakest",
+              "individualScore": 1.0010730057908908,
+              "weightNumerator": 1,
+              "weightDenominator": 40,
+              "weightedScoreLoss": 0.22497317485522772
+            },
+            {
+              "id": "20f0a3a989897cc77fbb08d4e7ba8743dcbd45d9476981b2b641873c0519cef5",
+              "file": "packages/react-query/src/useMutation.ts",
+              "project": "@tanstack/react-query",
+              "member": "useMutation",
+              "sourceSpanStart": 5933,
+              "line": 191,
+              "ownComplexity": 3,
+              "ownSourceLines": 25,
+              "ownHalsteadVolume": 544.3585240137863,
+              "ownMaintainabilityIndex": 49.94517521316757,
+              "group": "weakest",
+              "individualScore": 1.657529202194595,
+              "weightNumerator": 1,
+              "weightDenominator": 40,
+              "weightedScoreLoss": 0.20856176994513512
+            },
+            {
+              "id": "c7cdf1efaf8457d3d75e802ea8b4437352b0f29703414191f24a4320dba5e77f",
+              "file": "packages/react-query/src/useMutationState.ts",
+              "project": "@tanstack/react-query",
+              "member": "useMutationState",
+              "sourceSpanStart": 4777,
+              "line": 157,
+              "ownComplexity": 2,
+              "ownSourceLines": 15,
+              "ownHalsteadVolume": 386.42731221017624,
+              "ownMaintainabilityIndex": 55.96109886979575,
+              "group": "weakest",
+              "individualScore": 3.3203662899319166,
+              "weightNumerator": 1,
+              "weightDenominator": 40,
+              "weightedScoreLoss": 0.1669908427517021
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

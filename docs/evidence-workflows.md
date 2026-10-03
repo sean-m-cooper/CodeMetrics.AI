@@ -31,6 +31,27 @@ Do not average ecosystem scores. JS/TS scores are uncalibrated across ecosystems
 
 The `code-scorecard` skill in `ai_tools` is a version-aware consumer. Keep thresholds and schemas here; downstream consumers pin tested package versions and use the packaged validator. Generate a fresh run by default, validate both process exit and evidence provenance, and expose scope alongside every score. Never promote partial CSV into a replacement score after a failed analysis.
 
+### JS/TS complexity explanations
+
+Development JS/TS evidence exposes `complexityBreakdown` version 1 on
+`dimensions.codeQuality.scoring.observations.functionContributions`, sampled
+`topOffenders` (including `componentDetails.methodComplexity.topOffenders`), and
+complexity finding `observations`. Inspection preserves these optional fields.
+They contain baseline 1, eight named decision counts, their `decisionIncrements`
+sum and the total owned CC. Present a concise selection when explaining a hotspot:
+“CC23: baseline 1 + 14 if statements + 4 case labels + 4 logical operators.”
+
+Use these counts as explanatory context only. They do not add deductions, alter
+the recorded score, measure nesting or establish defects. Case labels can share
+a body; logical operators include both conditions and value expressions. Preserve
+documented protocol and ordering responsibilities when discussing possible changes.
+If the field is absent or its version is unknown, omit the breakdown and retain
+the supported score/observations. Do not infer counts from prose, restore scores
+from CSV, or present the top-five sample as the entire population. This additive
+detail does not itself require a new scoring ruleset or baseline migration.
+
+### Packaged inspection
+
 ```sh
 npx --package codemetrics-ai@0.3.0 codemetrics-evidence --input evidence.json \
   --inspect-output inspection.json --expected-ecosystem dotnet \

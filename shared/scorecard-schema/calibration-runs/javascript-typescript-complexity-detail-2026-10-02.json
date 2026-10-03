@@ -1,0 +1,383 @@
+{
+  "scope": "Explicit source-only package selections; no dependency install, build, semantic validation or runtime tests. Not whole-repository scorecards or cross-ecosystem calibration.",
+  "generatedAtUtc": "2026-10-03T04:45:15.379Z",
+  "nodeVersion": "v24.18.0",
+  "beforeAnalyzerBundleSha256": "05535376376e3d276373af60bb290a266e95af94946c0988cb7690787eb93a17",
+  "afterAnalyzerBundleSha256": "5f2d0aaa91cc0b82c2e056755c7d79f11bb76759e1d6eabb1c20c4cc99a0c280",
+  "verification": {
+    "functionExplanations": 2560,
+    "complexityFindings": 124,
+    "testsPassed": 114,
+    "calibrationFixturesPassed": 6,
+    "dimensionEvidenceUnchangedExceptBreakdown": true,
+    "baselineGatesPassed": true
+  },
+  "samples": [
+    {
+      "id": "express",
+      "repository": "express",
+      "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "package": ".",
+      "include": [
+        "index.js",
+        "lib/**/*.js"
+      ],
+      "commit": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "remote": "https://github.com/expressjs/express.git",
+      "trackedChanges": "",
+      "packageVersion": "5.2.1",
+      "configurationSha256": "0756ff795edb28b3cc6dac8b759283e05733a1fb90e825538e16c394fd3833c7",
+      "csvSha256": "3007f51f5bb3e10faffbe13b04d87b62fa3d872fbf47318456c5334792237014",
+      "population": {
+        "types": 72,
+        "members": 109
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "015db0cf-fa59-4d57-afe5-7988a83f53d2"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "6840e144-32e6-4fe7-8320-b8ef17017cb6"
+      }
+    },
+    {
+      "id": "zod-v4",
+      "repository": "zod",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "package": "packages/zod",
+      "include": [
+        "src/v4/**/*.ts"
+      ],
+      "config": "tsconfig.json",
+      "commit": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "remote": "https://github.com/colinhacks/zod.git",
+      "trackedChanges": "",
+      "packageVersion": "4.6.5",
+      "configurationSha256": "500628532e30ebf69760655d30170970b1374cd55e70f37fa945f9b005683c9a",
+      "csvSha256": "7f714913b9d4c86a67acda3e320d6cdfda9700a7838b3957a2964ce738757d7d",
+      "population": {
+        "types": 981,
+        "members": 1948
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "4e46952d-00b0-4e30-9e4f-355418fba396"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "43b96e47-33be-4ff3-b9a5-fde0d1976aa4"
+      }
+    },
+    {
+      "id": "tanstack-query-core",
+      "repository": "tanstack-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "package": "packages/query-core",
+      "include": [
+        "src/**/*.ts"
+      ],
+      "config": "tsconfig.json",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "remote": "https://github.com/TanStack/query.git",
+      "trackedChanges": "",
+      "packageVersion": "5.104.1",
+      "configurationSha256": "afbcf8e32b2b28049e640fa5f046dde5e4ee203bc2b99708044acd8c1139ccaa",
+      "csvSha256": "9f345cee4f6646f9480e3b2f5d6c5df70baefb54f29142301edb7a7552bf3f4d",
+      "population": {
+        "types": 178,
+        "members": 427
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "3b0f59fb-17d2-463c-8572-19bdb5599b5c"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "d3b9cd2f-f445-4649-bcf0-963b27c28a13"
+      }
+    },
+    {
+      "id": "tanstack-react-query",
+      "repository": "tanstack-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "package": "packages/react-query",
+      "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "config": "tsconfig.json",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "remote": "https://github.com/TanStack/query.git",
+      "trackedChanges": "",
+      "packageVersion": "5.104.1",
+      "configurationSha256": "de7addcb26f9aa4b8b1a0afadf13d9075df920c287ba7ff8738459f20e77dacb",
+      "csvSha256": "e2dc06bd0145c8c14d56ec768ffdd27fb3b1e6b6c03bd18d90ad94de3be34483",
+      "population": {
+        "types": 34,
+        "members": 76
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "2ebddf54-1ded-4fb8-9e02-36db23da049c"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "72aca2f5-7ff7-4e96-8062-0ff339c0711a"
+      }
+    }
+  ],
+  "auditedHotspots": [
+    {
+      "id": "express",
+      "commit": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "file": "lib/response.js",
+      "member": "send",
+      "line": 126,
+      "endLine": 222,
+      "ownComplexity": 23,
+      "ownSourceLines": 57,
+      "beforeOwnMi": 34.70979551084187,
+      "afterOwnMi": 34.70979551084187,
+      "baseline": 1,
+      "decisionCounts": {
+        "&&": 3,
+        "case": 4,
+        "if": 14,
+        "||": 1
+      },
+      "recordedComplexityBreakdown": {
+        "version": 1,
+        "baseline": 1,
+        "counts": {
+          "ifStatements": 14,
+          "switchCases": 4,
+          "loops": 0,
+          "catchClauses": 0,
+          "ternaryExpressions": 0,
+          "logicalAnd": 3,
+          "logicalOr": 1,
+          "nullishCoalescing": 0
+        },
+        "decisionIncrements": 22,
+        "total": 23
+      },
+      "directlyNestedFunctionsExcluded": 0,
+      "directlyNestedDecisionIncrementsExcluded": 0,
+      "changedMiFunctionCount": 0,
+      "beforeUnroundedMiScore": 5.92648205220541,
+      "afterUnroundedMiScore": 5.92648205220541
+    },
+    {
+      "id": "zod-v4",
+      "commit": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+      "member": "convertBaseSchema",
+      "line": 390,
+      "endLine": 806,
+      "ownComplexity": 122,
+      "ownSourceLines": 255,
+      "beforeOwnMi": 0.9938207694987709,
+      "afterOwnMi": 0.9938207694987709,
+      "baseline": 1,
+      "decisionCounts": {
+        "&&": 11,
+        "case": 7,
+        "if": 76,
+        "loop": 3,
+        "ternary": 14,
+        "||": 10
+      },
+      "recordedComplexityBreakdown": {
+        "version": 1,
+        "baseline": 1,
+        "counts": {
+          "ifStatements": 76,
+          "switchCases": 7,
+          "loops": 3,
+          "catchClauses": 0,
+          "ternaryExpressions": 14,
+          "logicalAnd": 11,
+          "logicalOr": 10,
+          "nullishCoalescing": 0
+        },
+        "decisionIncrements": 121,
+        "total": 122
+      },
+      "directlyNestedFunctionsExcluded": 8,
+      "directlyNestedDecisionIncrementsExcluded": 6,
+      "changedMiFunctionCount": 0,
+      "beforeUnroundedMiScore": 6.6326808689189,
+      "afterUnroundedMiScore": 6.6326808689189
+    },
+    {
+      "id": "tanstack-query-core",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "file": "packages/query-core/src/queryObserver.ts",
+      "member": "createResult",
+      "line": 558,
+      "endLine": 726,
+      "ownComplexity": 29,
+      "ownSourceLines": 116,
+      "beforeOwnMi": 25.81085469403287,
+      "afterOwnMi": 25.81085469403287,
+      "baseline": 1,
+      "decisionCounts": {
+        "&&": 13,
+        "catch": 1,
+        "if": 10,
+        "ternary": 2,
+        "||": 2
+      },
+      "recordedComplexityBreakdown": {
+        "version": 1,
+        "baseline": 1,
+        "counts": {
+          "ifStatements": 10,
+          "switchCases": 0,
+          "loops": 0,
+          "catchClauses": 1,
+          "ternaryExpressions": 2,
+          "logicalAnd": 13,
+          "logicalOr": 2,
+          "nullishCoalescing": 0
+        },
+        "decisionIncrements": 28,
+        "total": 29
+      },
+      "directlyNestedFunctionsExcluded": 0,
+      "directlyNestedDecisionIncrementsExcluded": 0,
+      "changedMiFunctionCount": 0,
+      "beforeUnroundedMiScore": 7.243145042562228,
+      "afterUnroundedMiScore": 7.243145042562228
+    },
+    {
+      "id": "tanstack-react-query",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "file": "packages/react-query/src/HydrationBoundary.tsx",
+      "member": "HydrationBoundary/React.useMemo:callback0",
+      "line": 115,
+      "endLine": 162,
+      "ownComplexity": 13,
+      "ownSourceLines": 27,
+      "beforeOwnMi": 46.040606210761716,
+      "afterOwnMi": 46.040606210761716,
+      "baseline": 1,
+      "decisionCounts": {
+        "&&": 3,
+        "if": 6,
+        "loop": 1,
+        "||": 2
+      },
+      "recordedComplexityBreakdown": {
+        "version": 1,
+        "baseline": 1,
+        "counts": {
+          "ifStatements": 6,
+          "switchCases": 0,
+          "loops": 1,
+          "catchClauses": 0,
+          "ternaryExpressions": 0,
+          "logicalAnd": 3,
+          "logicalOr": 2,
+          "nullishCoalescing": 0
+        },
+        "decisionIncrements": 12,
+        "total": 13
+      },
+      "directlyNestedFunctionsExcluded": 0,
+      "directlyNestedDecisionIncrementsExcluded": 0,
+      "changedMiFunctionCount": 0,
+      "beforeUnroundedMiScore": 7.232476514191217,
+      "afterUnroundedMiScore": 7.232476514191217
+    }
+  ]
+}

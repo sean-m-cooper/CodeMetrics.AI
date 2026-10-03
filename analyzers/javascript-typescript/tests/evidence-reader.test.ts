@@ -45,7 +45,7 @@ it("validates native scope, explicit provenance, unsupported schemas and incompl
     expect(() => analyze({ project: path.join(root, "package.json"), runId: "invalid" }, "0.2.0")).toThrow("UUID");
     fs.symlinkSync(root, alias, process.platform === "win32" ? "junction" : "dir");
     expect(inspectEvidence(file, { root: alias, entryPoint: path.join(alias, "package.json") }).usable).toBe(true);
-    expect(evidence.dimensions.performanceAsync.scope?.excludes).toContain("general-async");
+    expect(evidence.dimensions.performanceAsync.scope?.excludes).toContain("general-promise-flow");
     for (const expected of [{ version: "9" }, { entryPoint: path.join(root, "wrong.json") }, { variant: "Release" }, { root: path.dirname(root) }])
       expect(() => inspectEvidence(file, expected)).toThrow("Provenance mismatch");
     const changed = structuredClone(evidence);

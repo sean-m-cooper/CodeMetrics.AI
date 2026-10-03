@@ -6,7 +6,7 @@
     "version": "0.3.0",
     "ecosystem": "javascript-typescript"
   },
-  "ruleset": "javascript-typescript-2026-09-05",
+  "ruleset": "javascript-typescript-2026-10-02-type-erasure",
   "scope": "Only listed rules have accuracy labels. Fixture distributions do not establish cross-ecosystem comparability.",
   "accuracy": {
     "codeQuality/highFunctionComplexity": {
@@ -33,13 +33,13 @@
       "count": 6,
       "median": 10.0,
       "p25": 10.0,
-      "p10": 8.0
+      "p10": 7.7
     },
     "maintainability": {
       "count": 6,
       "median": 10.0,
       "p25": 10.0,
-      "p10": 9.0
+      "p10": 10.0
     },
     "errorHandling": null,
     "performanceAsync": {
@@ -81,8 +81,8 @@
         "members": 1
       },
       "scores": {
-        "codeQuality": 6,
-        "maintainability": 8,
+        "codeQuality": 5.4,
+        "maintainability": 10,
         "errorHandling": null,
         "performanceAsync": null,
         "security": null,

@@ -5,9 +5,10 @@ import { isFunction } from "./function-nodes.js";
 type ReactObservation = Pick<Finding, "category" | "message" | "observations" | "confidence">;
 
 function isReactImport(declaration: ts.Declaration): boolean {
+  if (ts.isImportSpecifier(declaration) && declaration.isTypeOnly) return false;
   let cursor: ts.Node | undefined = declaration;
   while (cursor && !ts.isImportDeclaration(cursor)) cursor = cursor.parent;
-  return !!cursor && ts.isStringLiteral(cursor.moduleSpecifier) && cursor.moduleSpecifier.text === "react";
+  return !!cursor && !cursor.importClause?.isTypeOnly && ts.isStringLiteral(cursor.moduleSpecifier) && cursor.moduleSpecifier.text === "react";
 }
 
 function importedHookName(call: ts.CallExpression, checker: ts.TypeChecker): string | undefined {
@@ -21,10 +22,14 @@ function importedHookName(call: ts.CallExpression, checker: ts.TypeChecker): str
   return (reactHook || reactNamespace) && /^use[A-Z]/.test(calledName) ? calledName : undefined;
 }
 
-function isConditionalOrLoop(node: ts.Node): boolean {
-  return ts.isIfStatement(node) || ts.isConditionalExpression(node) || ts.isForStatement(node) ||
-    ts.isForOfStatement(node) || ts.isForInStatement(node) || ts.isWhileStatement(node) || ts.isDoStatement(node) ||
-    ts.isBinaryExpression(node) && [ts.SyntaxKind.AmpersandAmpersandToken, ts.SyntaxKind.BarBarToken, ts.SyntaxKind.QuestionQuestionToken].includes(node.operatorToken.kind);
+function isConditionalOrLoop(node: ts.Node, child: ts.Node): boolean {
+  if (ts.isIfStatement(node)) return child !== node.expression;
+  if (ts.isConditionalExpression(node)) return child !== node.condition;
+  if (ts.isBinaryExpression(node)) return child === node.right &&
+    [ts.SyntaxKind.AmpersandAmpersandToken, ts.SyntaxKind.BarBarToken, ts.SyntaxKind.QuestionQuestionToken].includes(node.operatorToken.kind);
+  if (ts.isForStatement(node)) return child !== node.initializer;
+  if (ts.isForOfStatement(node) || ts.isForInStatement(node)) return child !== node.expression;
+  return ts.isWhileStatement(node) || ts.isDoStatement(node);
 }
 
 // The metric visitor supplies only calls owned by the current function. Keeping
@@ -35,11 +40,13 @@ export function inspectReactCall(call: ts.CallExpression, body: ts.ConciseBody, 
 
   const findings: ReactObservation[] = [];
   let ancestor = call.parent;
+  let child: ts.Node = call;
   while (ancestor && ancestor !== body) {
-    if (isConditionalOrLoop(ancestor)) {
+    if (isConditionalOrLoop(ancestor, child)) {
       findings.push({ category: "conditionalHook", message: `${hook} is called within a conditional or loop.`, observations: { hook }, confidence: "high" });
       break;
     }
+    child = ancestor;
     ancestor = ancestor.parent;
   }
 

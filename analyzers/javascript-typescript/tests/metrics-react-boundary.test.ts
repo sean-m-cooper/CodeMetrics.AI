@@ -27,9 +27,11 @@ export function Shadow(React: any, effect: any) {
   effect(async () => {});
 }`);
 
-    // Captured before separating React rules from metric collection. The full
-    // result protects source locations, fingerprints, order and every raw metric.
-    expect(result).toMatchSnapshot();
+    // Keep the historical result snapshot unchanged when adding separate scored
+    // measurements: locations, fingerprints, order and every raw metric are protected.
+    const { functions, ...legacyResult } = result;
+    expect(functions).toHaveLength(result.metrics.length);
+    expect(legacyResult).toMatchSnapshot();
     expect(result.findings.map(item => [item.finding.category, item.finding.member])).toEqual([
       ["conditionalHook", "App"],
       ["conditionalHook", "App"],

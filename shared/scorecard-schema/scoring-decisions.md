@@ -27,6 +27,25 @@ Unpublished .NET 2.3.0 adds `dotnet/maintainability/source-functions-quintile-40
 
 Decision inputs and `metrics` record MI anchors, interpolation, group counts/means/weights, source observation counts, minimum-MI variant aggregation, unrounded score and half-up rounding. `functionContributions` records every function's score, group and rational weight (`weightNumerator / weightDenominator`). `topOffenders` is only a five-function sample with owned MI measurements and variant details. Distribution statistics (`populationPercentBelow60`, `populationPercentBelow40`, `p10Mi`) are diagnostic only and add no deductions or caps. There is no entry-point MI bonus. The earlier percentile/three-component policy applies only to legacy evidence or explicitly labeled legacy input; raw CSV MI cannot replace owned function MI. See [maintainability-policy.md](maintainability-policy.md) for measurement and compatibility limits.
 
+## JS/TS function population decisions
+
+Development ruleset `javascript-typescript-2026-10-02-function-policy` uses the same
+`deductions` representation for owned-function complexity and MI. Complexity
+weights one worst function 40% and the remaining mean 60%; MI weights the weakest
+`ceil(N/5)` mean 40% and the remaining mean 60%. Singletons use their own score;
+empty populations remain unmeasured. Inputs record anchors and exact decimal/rational
+interpolation followed by one half-up rounding. Contribution rows and rational
+weights are in `scoring.observations.functionContributions`. The `weakest` and
+`remainder` step scores are weighted losses from 10. JS/TS decomposition remains
+unsupported. See the [JS/TS function policy](javascript-typescript-function-policy.md)
+for source ownership, raw CSV compatibility and explicit coverage limits.
+
+The follow-up `javascript-typescript-2026-10-02-type-erasure` ruleset retains those
+weights and anchors. Measurement `owned-function-body-v2-type-erasure` removes
+erased TypeScript assertion/annotation/generic syntax while retaining executable
+operands, nested functions and decisions. Even where rounded scores remain equal,
+the corrected measurement requires a fresh compatible baseline.
+
 ## Finding attribution
 
 Root `findingEffects` identifies each emitted finding exactly once by fingerprint and category, with links to relevant step IDs:
