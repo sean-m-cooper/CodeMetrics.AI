@@ -5,6 +5,7 @@ import { hash, invocationIds, skippedDimensions, type Evidence } from "./evidenc
 import { metricsCsvHeader } from "./scorecard-contract.js";
 import { scoreFunctions } from "./function-scoring.js";
 import { scoreAsyncUsage } from "./async-scoring.js";
+import { ModuleGraphCollector } from "./module-graph.js";
 
 export function analyze(options: { project?: string; tsconfig?: string; runId?: string; auditId?: string }, version: string): { evidence: Evidence; metrics: Metric[]; csv: string; inputs: string[] } {
   const identity = invocationIds(options.runId, options.auditId);
@@ -14,12 +15,14 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
   const metrics: Metric[] = [];
   const functions: ReturnType<typeof analyzeFile>["functions"] = [];
   const collected: ReturnType<typeof analyzeFile>["findings"] = [];
+  const moduleGraph = new ModuleGraphCollector(discovery.repositoryRoot, discovery.packages);
   let analyzedFiles = 0;
   let reactSupported = false;
   let asyncSupported = false;
   for (const pkg of discovery.packages) {
     const program = ts.createProgram(pkg.files, { ...pkg.options, noEmit: true });
     const checker = program.getTypeChecker();
+    const collectModules = moduleGraph.forPackage(pkg, program);
     for (const filename of pkg.files) {
       const source = program.getSourceFile(filename);
       if (!source) { diagnostics.push({ kind: "sourceUnavailable", message: filename, project: pkg.name }); continue; }
@@ -29,6 +32,7 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
         continue;
       }
       analyzedFiles++;
+      collectModules(source);
       const result = analyzeFile(source, checker, pkg.name, discovery.repositoryRoot);
       reactSupported ||= result.reactSupported;
       asyncSupported ||= result.asyncSupported;
@@ -44,13 +48,14 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
     reactSupported && metrics.length > 0, asyncSupported);
   if (diagnostics.length) for (const key of ["codeQuality", "maintainability", "performanceAsync"] as const)
     dimensions[key] = { status: "failed", basis: "Incomplete source analysis; partial findings are unscored.", findings: dimensions[key].findings, scope: dimensions[key].scope };
+  dimensions.architecture = moduleGraph.finish(diagnostics.length > 0);
   const evidence: Evidence = {
     schemaVersion: 3, generatedAtUtc: new Date().toISOString(), tool: { name: "codemetrics-ai", version, ecosystem: "javascript-typescript" },
     subject: { root: discovery.repositoryRoot, entryPoint: discovery.entryPoint, name: discovery.name, variant: "source" },
     filters: { totalUnits: discovery.packages.reduce((sum,pkg) => sum + pkg.files.length, 0) + discovery.skipped.length,
       analyzedUnits: analyzedFiles, skipped: discovery.skipped },
     population: { types: new Set(metrics.map(metric => `${metric.project}|${metric.file}|${metric.type}`)).size, members: metrics.length },
-    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-10-02-type-erasure",
+    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-10-02-module-graph",
       calibration: "uncalibrated", configurationFingerprint: hash(JSON.stringify(canonicalConfiguration(discovery.packages.map(pkg => ({ name: pkg.name,
         options: pkg.options, selection: pkg.selection })), discovery.repositoryRoot))), diagnostics, suppressions: [] }
   };

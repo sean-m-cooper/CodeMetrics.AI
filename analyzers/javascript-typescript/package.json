@@ -15,8 +15,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && node scripts/copy-schema.mjs",
     "prepack": "npm run build",
-    "test": "npm run build && vitest run",
-    "test:package": "node scripts/package-smoke.mjs"
+    "test": "npm run build && vitest run --maxWorkers=2",
+    "test:package": "node scripts/package-smoke.mjs",
+    "test:architecture": "npm run build && node scripts/architecture-corpus.mjs"
   },
   "engines": {
     "node": ">=20"

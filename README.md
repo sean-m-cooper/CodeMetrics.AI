@@ -63,7 +63,7 @@ for exact placement, supported spellings, and scoring effects.
 npx codemetrics-ai
 ```
 
-The JS/TS analyzer implements source metrics, function-based complexity and maintainability, React hook/effect checks and bounded standard-Promise/Array callback checks. Decomposition and other dimensions are explicitly unmeasured. See its [README](analyzers/javascript-typescript/README.md) for development status, scope and scoring policy.
+The JS/TS analyzer implements source metrics, function-based complexity and maintainability, React hook/effect checks and bounded standard-Promise/Array callback checks. Its module dependency graph reports resolution coverage, type-only references, cycles and fan-in/out as unscored architecture evidence. Decomposition and other dimensions are explicitly unmeasured. See its [README](analyzers/javascript-typescript/README.md) for development status, scope and scoring policy.
 
 ## Evidence and release verification
 

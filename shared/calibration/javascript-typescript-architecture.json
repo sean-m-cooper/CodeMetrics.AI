@@ -1,0 +1,260 @@
+{
+  "version": 1,
+  "scope": "Authored source-graph counterexamples, not a scored architecture ladder or representative defect prevalence estimate.",
+  "cases": [
+    {
+      "id": "barrel",
+      "label": "Intentional public export surface",
+      "files": {
+        "index.mjs": "export * from './a.mjs'; export * from './b.mjs'; export * from './c.mjs';",
+        "a.mjs": "export const a=1;",
+        "b.mjs": "export const b=2;",
+        "c.mjs": "export const c=3;"
+      },
+      "expected": {
+        "cycles": 0,
+        "typeOnly": 0,
+        "fanOut": 3,
+        "barrels": 1
+      },
+      "runtime": {
+        "expression": "Object.keys(await import('./index.mjs')).length",
+        "value": 3
+      },
+      "expectedViews": {
+        "implementation": 0,
+        "reExports": 3,
+        "shared": 0
+      }
+    },
+    {
+      "id": "service-dependencies",
+      "label": "Ordinary acyclic service composition",
+      "files": {
+        "service.mjs": "import {read} from './store.mjs'; import {format} from './format.mjs'; export const get=()=>format(read());",
+        "store.mjs": "export const read=()=>4;",
+        "format.mjs": "export const format=n=>`value:${n}`;"
+      },
+      "expected": {
+        "cycles": 0,
+        "typeOnly": 0,
+        "fanOut": 2,
+        "barrels": 0
+      },
+      "runtime": {
+        "expression": "(await import('./service.mjs')).get()",
+        "value": "value:4"
+      },
+      "expectedViews": {
+        "implementation": 2,
+        "reExports": 0,
+        "shared": 0
+      }
+    },
+    {
+      "id": "type-only-cycle",
+      "label": "Mutually referring types, no value edge",
+      "files": {
+        "a.ts": "import type {B} from './b'; export interface A { b?:B }",
+        "b.ts": "import type {A} from './a'; export interface B { a?:A }"
+      },
+      "expected": {
+        "cycles": 0,
+        "typeOnly": 2,
+        "fanOut": 0,
+        "barrels": 0
+      },
+      "expectedViews": {
+        "implementation": 0,
+        "reExports": 0,
+        "shared": 0
+      }
+    },
+    {
+      "id": "esm-deferred-cycle",
+      "label": "Cycle with bindings read after initialization",
+      "files": {
+        "a.mjs": "import {readB} from './b.mjs'; export const value=1; export const read=()=>readB();",
+        "b.mjs": "import {value} from './a.mjs'; export const readB=()=>value;"
+      },
+      "expected": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "expression": "(await import('./a.mjs')).read()",
+        "value": 1
+      },
+      "expectedViews": {
+        "implementation": 2,
+        "reExports": 0,
+        "shared": 0
+      }
+    },
+    {
+      "id": "esm-eager-cycle",
+      "label": "Demonstrated uninitialized binding access",
+      "files": {
+        "a.mjs": "import {b} from './b.mjs'; export const a=b+1;",
+        "b.mjs": "import {a} from './a.mjs'; export const b=a+1;"
+      },
+      "expected": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "expression": "await import('./a.mjs')",
+        "errorName": "ReferenceError",
+        "messageIncludes": "before initialization"
+      },
+      "expectedViews": {
+        "implementation": 2,
+        "reExports": 0,
+        "shared": 0
+      }
+    },
+    {
+      "id": "esm-iife-cycle",
+      "label": "Function nesting does not prove deferred execution",
+      "files": {
+        "a.mjs": "import {b} from './b.mjs'; export const a=(()=>b+1)();",
+        "b.mjs": "import {a} from './a.mjs'; export const b=(()=>a+1)();"
+      },
+      "expected": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "expression": "await import('./a.mjs')",
+        "errorName": "ReferenceError",
+        "messageIncludes": "before initialization"
+      },
+      "expectedViews": {
+        "implementation": 2,
+        "reExports": 0,
+        "shared": 0
+      }
+    },
+    {
+      "id": "commonjs-deferred-cycle",
+      "label": "CommonJS reads populated exports after loading",
+      "files": {
+        "a.cjs": "const b=require('./b.cjs'); exports.value=1; exports.read=()=>b.read();",
+        "b.cjs": "const a=require('./a.cjs'); exports.read=()=>a.value;"
+      },
+      "expected": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "expression": "(await import('./a.cjs')).default.read()",
+        "value": 1
+      },
+      "expectedViews": {
+        "implementation": 2,
+        "reExports": 0,
+        "shared": 0
+      }
+    },
+    {
+      "id": "commonjs-partial-exports",
+      "label": "Early export read captures undefined without throwing",
+      "files": {
+        "a.cjs": "const b=require('./b.cjs'); exports.value=1; exports.snapshot=b.snapshot;",
+        "b.cjs": "const a=require('./a.cjs'); exports.snapshot=a.value;"
+      },
+      "expected": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "expression": "typeof (await import('./a.cjs')).default.snapshot",
+        "value": "undefined"
+      },
+      "expectedViews": {
+        "implementation": 0,
+        "reExports": 2,
+        "shared": 0
+      }
+    },
+    {
+      "id": "dynamic-deferred-cycle",
+      "label": "Literal dynamic imports form a source cycle without a loading failure",
+      "files": {
+        "a.mjs": "export const value=1; export const read=async()=>(await import('./b.mjs')).read();",
+        "b.mjs": "export const read=async()=>(await import('./a.mjs')).value;"
+      },
+      "expected": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "expression": "await (await import('./a.mjs')).read()",
+        "value": 1
+      },
+      "expectedViews": {
+        "implementation": 2,
+        "reExports": 0,
+        "shared": 0
+      }
+    },
+    {
+      "id": "esm-forwarding-and-use",
+      "label": "Explicit forwarding retains simultaneous implementation use",
+      "files": {
+        "a.mjs": "import {value} from './b.mjs'; export {value}; export const read=()=>value;",
+        "b.mjs": "export const value=1;"
+      },
+      "expected": {
+        "cycles": 0,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "expression": "(await import('./a.mjs')).read()+(await import('./a.mjs')).value",
+        "value": 2
+      },
+      "expectedViews": {
+        "implementation": 1,
+        "reExports": 1,
+        "shared": 1
+      }
+    },
+    {
+      "id": "commonjs-forwarding",
+      "label": "Direct CommonJS public export forwarding",
+      "files": {
+        "a.cjs": "module.exports=require('./b.cjs');",
+        "b.cjs": "exports.value=7;"
+      },
+      "expected": {
+        "cycles": 0,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "expression": "(await import('./a.cjs')).default.value",
+        "value": 7
+      },
+      "expectedViews": {
+        "implementation": 0,
+        "reExports": 1,
+        "shared": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,1610 @@
+{
+  "scope": "Explicit source-only package selections; no dependency install, build, semantic validation or runtime tests. Not whole-repository scorecards or cross-ecosystem calibration.",
+  "generatedAtUtc": "2026-10-03T05:31:51.721Z",
+  "nodeVersion": "v24.18.0",
+  "beforeAnalyzerBundleSha256": "05535376376e3d276373af60bb290a266e95af94946c0988cb7690787eb93a17",
+  "afterAnalyzerBundleSha256": "31b3dd46c36ac2e37049a84887f2fd09772fec08b69b6c28c34d8b8f7515bb6a",
+  "samples": [
+    {
+      "id": "express",
+      "repository": "express",
+      "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "package": ".",
+      "include": [
+        "index.js",
+        "lib/**/*.js"
+      ],
+      "commit": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "remote": "https://github.com/expressjs/express.git",
+      "trackedChanges": "",
+      "packageVersion": "5.2.1",
+      "configurationSha256": "0756ff795edb28b3cc6dac8b759283e05733a1fb90e825538e16c394fd3833c7",
+      "csvSha256": "3007f51f5bb3e10faffbe13b04d87b62fa3d872fbf47318456c5334792237014",
+      "population": {
+        "types": 72,
+        "members": 109
+      },
+      "filters": {
+        "totalUnits": 7,
+        "analyzedUnits": 7,
+        "skipped": []
+      },
+      "moduleGraph": {
+        "coverage": {
+          "status": "gaps",
+          "selectedModules": 7,
+          "analyzedModules": 7,
+          "dependencyOccurrences": 59,
+          "literalOccurrences": 58,
+          "resolvedLiteralOccurrences": 26,
+          "literalResolutionPercent": 44.827586206896555,
+          "occurrencesByResolution": {
+            "internal": 12,
+            "external": 0,
+            "builtin": 14,
+            "outOfScope": 0,
+            "unavailableSource": 0,
+            "unresolved": 32,
+            "dynamic": 1
+          },
+          "explicitTypeOnlyOccurrences": 0
+        },
+        "cycleCount": 0,
+        "cycles": [],
+        "reExportOnlyModules": 0,
+        "highestFanOut": [
+          {
+            "id": "lib/express.js",
+            "internalValueFanOut": 3,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "lib/application.js",
+            "internalValueFanOut": 2,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "index.js",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 0
+          },
+          {
+            "id": "lib/response.js",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 1
+          }
+        ],
+        "highestFanIn": [
+          {
+            "id": "lib/utils.js",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 2
+          },
+          {
+            "id": "lib/application.js",
+            "internalValueFanOut": 2,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "lib/express.js",
+            "internalValueFanOut": 3,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "lib/request.js",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "lib/response.js",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "lib/view.js",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 1
+          }
+        ]
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "3a5d025d-3f3e-404f-9716-7247958ab86a"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-module-graph",
+        "runId": "3bb2421e-3dca-4ade-896d-9784ece924a2"
+      },
+      "evidenceSha256": "61e42dd8b3d2700259f2dec32a553d50cc4eec6a7e7533445eaf339bda45bf2a",
+      "existingDimensionEvidenceUnchangedApartFromComplexityExplanation": true,
+      "architectureStatus": "skipped",
+      "resolutionEnvironment": {
+        "typescriptVersion": "5.8.3",
+        "nodeVersion": "24.18.0"
+      },
+      "cycleEdges": [],
+      "unresolvedSpecifiers": {
+        "accepts": 1,
+        "body-parser": 1,
+        "content-disposition": 1,
+        "content-type": 1,
+        "cookie": 1,
+        "cookie-signature": 1,
+        "debug": 2,
+        "depd": 1,
+        "encodeurl": 1,
+        "escape-html": 1,
+        "etag": 1,
+        "finalhandler": 1,
+        "fresh": 1,
+        "http-errors": 1,
+        "merge-descriptors": 1,
+        "mime-types": 2,
+        "on-finished": 1,
+        "once": 1,
+        "parseurl": 1,
+        "proxy-addr": 2,
+        "qs": 1,
+        "range-parser": 1,
+        "router": 2,
+        "send": 1,
+        "serve-static": 1,
+        "statuses": 1,
+        "type-is": 1,
+        "vary": 1
+      },
+      "dynamicReferences": [
+        {
+          "from": "lib/view.js",
+          "project": "express",
+          "line": 81,
+          "sourceSpanStart": 1640,
+          "form": "require",
+          "usage": "value",
+          "specifier": null,
+          "resolution": "dynamic",
+          "via": "nonLiteralSpecifier"
+        }
+      ],
+      "topFanOutContext": [
+        {
+          "id": "lib/express.js",
+          "internalValueFanOut": 3,
+          "internalValueFanIn": 1,
+          "reExportOnly": false
+        },
+        {
+          "id": "lib/application.js",
+          "internalValueFanOut": 2,
+          "internalValueFanIn": 1,
+          "reExportOnly": false
+        },
+        {
+          "id": "index.js",
+          "internalValueFanOut": 1,
+          "internalValueFanIn": 0,
+          "reExportOnly": false
+        }
+      ]
+    },
+    {
+      "id": "zod-v4",
+      "repository": "zod",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "package": "packages/zod",
+      "include": [
+        "src/v4/**/*.ts"
+      ],
+      "config": "tsconfig.json",
+      "commit": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "remote": "https://github.com/colinhacks/zod.git",
+      "trackedChanges": "",
+      "packageVersion": "4.6.5",
+      "configurationSha256": "500628532e30ebf69760655d30170970b1374cd55e70f37fa945f9b005683c9a",
+      "csvSha256": "7f714913b9d4c86a67acda3e320d6cdfda9700a7838b3957a2964ce738757d7d",
+      "population": {
+        "types": 981,
+        "members": 1948
+      },
+      "filters": {
+        "totalUnits": 244,
+        "analyzedUnits": 107,
+        "skipped": [
+          {
+            "name": "src/v4/classic/tests/anyunknown.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/apply.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/array.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/assignability.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/async-parsing.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/async-refinements.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/base.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/bigint.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/brand.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/catch.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/coalesce.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/codec-examples.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/codec.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/coerce.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/continuability.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/credit-card.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/custom.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/cyclic-data.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/date.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/datetime.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/deep-partial.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/default-locale.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/default.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/describe-meta-checks.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/description.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/detached-methods.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/discriminated-unions.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/enum.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/error-utils.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/error.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/file.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/firstparty.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/fix-json-issue.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/from-json-schema.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/function.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/generics.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/global-config.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/hash.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/iban.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/in-out.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/index.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/instance-footprint.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/instanceof.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/intersection.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/issue-schema.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/jitless-allows-eval.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/json.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/lazy.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/literal.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/locales_ka.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/locales_ro.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/map.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/nan.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/nested-refine.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/nonoptional.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/nullable.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/number.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/object.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/optin-ladder.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/optional.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/partial.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/pickomit.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/pipe.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/prefault.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/preprocess-types.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/preprocess.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/primitive.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/promise.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/properties.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/prototypes.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/readonly.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/record.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/recursive-types.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/redos.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/refine.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/registries.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/set.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/standard-schema.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/string-formats.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/string.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/stringbool.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/template-literal.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/to-json-schema-methods.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/to-json-schema.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/transform.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/tuple.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/union.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/url.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/validate.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/validations.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/classic/tests/void.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/cached.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/compile-differential.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/compile-generative.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/compile-global.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/compile-off-by-default.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/compile-stats.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/compile.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/email-regex.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/extend.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/index.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/be.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/el.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/en.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/es.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/fr.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/he.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/hr.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/nl.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/parity.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/ru.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/tg.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/tk.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/tr.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/locales/uz.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/polyfill-collision.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/record-constructor.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/recursive-tuples.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/treeshake.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/core/tests/url-no-canparse.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/apply.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/assignability.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/brand.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/checks.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/codec.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/computed.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/cyclic-data.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/deep-partial.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/error.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/functions.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/index.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/number.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/object.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/prototypes.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/recursive-types.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/standard-schema.test.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/v4/mini/tests/string.test.ts",
+            "reason": "Test or fixture source"
+          }
+        ]
+      },
+      "moduleGraph": {
+        "coverage": {
+          "status": "observedDependenciesResolved",
+          "selectedModules": 107,
+          "analyzedModules": 107,
+          "dependencyOccurrences": 447,
+          "literalOccurrences": 447,
+          "resolvedLiteralOccurrences": 447,
+          "literalResolutionPercent": 100,
+          "occurrencesByResolution": {
+            "internal": 447,
+            "external": 0,
+            "builtin": 0,
+            "outOfScope": 0,
+            "unavailableSource": 0,
+            "unresolved": 0,
+            "dynamic": 0
+          },
+          "explicitTypeOnlyOccurrences": 182
+        },
+        "cycleCount": 1,
+        "cycles": [
+          {
+            "id": "f8a3343408aa1f899b0c728b54404a4d180993d11bfe948fa6655f26f5a8a87b",
+            "modules": [
+              "packages/zod/src/v4/core/core.ts",
+              "packages/zod/src/v4/core/util.ts"
+            ]
+          }
+        ],
+        "reExportOnlyModules": 7,
+        "highestFanOut": [
+          {
+            "id": "packages/zod/src/v4/locales/index.ts",
+            "internalValueFanOut": 63,
+            "internalValueFanIn": 3
+          },
+          {
+            "id": "packages/zod/src/v4/core/index.ts",
+            "internalValueFanOut": 18,
+            "internalValueFanIn": 14
+          },
+          {
+            "id": "packages/zod/src/v4/classic/external.ts",
+            "internalValueFanOut": 13,
+            "internalValueFanIn": 2
+          },
+          {
+            "id": "packages/zod/src/v4/mini/external.ts",
+            "internalValueFanOut": 10,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/zod/src/v4/classic/schemas.ts",
+            "internalValueFanOut": 7,
+            "internalValueFanIn": 6
+          },
+          {
+            "id": "packages/zod/src/v4/core/schemas.ts",
+            "internalValueFanOut": 7,
+            "internalValueFanIn": 5
+          },
+          {
+            "id": "packages/zod/src/v4/core/compile.ts",
+            "internalValueFanOut": 6,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/zod/src/v4/classic/from-json-schema.ts",
+            "internalValueFanOut": 5,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/zod/src/v4/core/api.ts",
+            "internalValueFanOut": 4,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/zod/src/v4/core/json-schema-processors.ts",
+            "internalValueFanOut": 4,
+            "internalValueFanIn": 5
+          }
+        ],
+        "highestFanIn": [
+          {
+            "id": "packages/zod/src/v4/core/util.ts",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 79
+          },
+          {
+            "id": "packages/zod/src/v4/core/index.ts",
+            "internalValueFanOut": 18,
+            "internalValueFanIn": 14
+          },
+          {
+            "id": "packages/zod/src/v4/core/core.ts",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 7
+          },
+          {
+            "id": "packages/zod/src/v4/core/regexes.ts",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 7
+          },
+          {
+            "id": "packages/zod/src/v4/classic/schemas.ts",
+            "internalValueFanOut": 7,
+            "internalValueFanIn": 6
+          },
+          {
+            "id": "packages/zod/src/v4/core/json-schema-processors.ts",
+            "internalValueFanOut": 4,
+            "internalValueFanIn": 5
+          },
+          {
+            "id": "packages/zod/src/v4/core/schemas.ts",
+            "internalValueFanOut": 7,
+            "internalValueFanIn": 5
+          },
+          {
+            "id": "packages/zod/src/v4/mini/schemas.ts",
+            "internalValueFanOut": 4,
+            "internalValueFanIn": 5
+          },
+          {
+            "id": "packages/zod/src/v4/core/registries.ts",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 4
+          },
+          {
+            "id": "packages/zod/src/v4/core/to-json-schema.ts",
+            "internalValueFanOut": 2,
+            "internalValueFanIn": 4
+          }
+        ]
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "681aee24-22cd-404c-9965-dc7a3ca7e2b0"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-module-graph",
+        "runId": "8743d7e7-c9f1-464a-8e9d-58aee227e374"
+      },
+      "evidenceSha256": "ff131668770f59857e44ecc88753501201cf2b0889cef277ea1400e038023dbd",
+      "existingDimensionEvidenceUnchangedApartFromComplexityExplanation": true,
+      "architectureStatus": "skipped",
+      "resolutionEnvironment": {
+        "typescriptVersion": "5.8.3",
+        "nodeVersion": "24.18.0"
+      },
+      "cycleEdges": [
+        {
+          "from": "packages/zod/src/v4/core/core.ts",
+          "project": "zod",
+          "line": 4,
+          "sourceSpanStart": 142,
+          "form": "import",
+          "usage": "value",
+          "specifier": "./util.js",
+          "resolution": "internal",
+          "via": "typescript",
+          "declarationTarget": false,
+          "targetFile": "packages/zod/src/v4/core/util.ts",
+          "target": "packages/zod/src/v4/core/util.ts"
+        },
+        {
+          "from": "packages/zod/src/v4/core/util.ts",
+          "project": "zod",
+          "line": 2,
+          "sourceSpanStart": 45,
+          "form": "import",
+          "usage": "value",
+          "specifier": "./core.js",
+          "resolution": "internal",
+          "via": "typescript",
+          "declarationTarget": false,
+          "targetFile": "packages/zod/src/v4/core/core.ts",
+          "target": "packages/zod/src/v4/core/core.ts"
+        }
+      ],
+      "unresolvedSpecifiers": {},
+      "dynamicReferences": [],
+      "topFanOutContext": [
+        {
+          "id": "packages/zod/src/v4/locales/index.ts",
+          "internalValueFanOut": 63,
+          "internalValueFanIn": 3,
+          "reExportOnly": true
+        },
+        {
+          "id": "packages/zod/src/v4/core/index.ts",
+          "internalValueFanOut": 18,
+          "internalValueFanIn": 14,
+          "reExportOnly": true
+        },
+        {
+          "id": "packages/zod/src/v4/classic/external.ts",
+          "internalValueFanOut": 13,
+          "internalValueFanIn": 2,
+          "reExportOnly": true
+        }
+      ]
+    },
+    {
+      "id": "tanstack-query-core",
+      "repository": "tanstack-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "package": "packages/query-core",
+      "include": [
+        "src/**/*.ts"
+      ],
+      "config": "tsconfig.json",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "remote": "https://github.com/TanStack/query.git",
+      "trackedChanges": "",
+      "packageVersion": "5.104.1",
+      "configurationSha256": "afbcf8e32b2b28049e640fa5f046dde5e4ee203bc2b99708044acd8c1139ccaa",
+      "csvSha256": "9f345cee4f6646f9480e3b2f5d6c5df70baefb54f29142301edb7a7552bf3f4d",
+      "population": {
+        "types": 178,
+        "members": 427
+      },
+      "filters": {
+        "totalUnits": 26,
+        "analyzedUnits": 23,
+        "skipped": [
+          {
+            "name": "src/__tests__/OmitKeyof.test-d.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/environmentManager.test-d.ts",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/utils.ts",
+            "reason": "Test or fixture source"
+          }
+        ]
+      },
+      "moduleGraph": {
+        "coverage": {
+          "status": "observedDependenciesResolved",
+          "selectedModules": 23,
+          "analyzedModules": 23,
+          "dependencyOccurrences": 140,
+          "literalOccurrences": 140,
+          "resolvedLiteralOccurrences": 140,
+          "literalResolutionPercent": 100,
+          "occurrencesByResolution": {
+            "internal": 140,
+            "external": 0,
+            "builtin": 0,
+            "outOfScope": 0,
+            "unavailableSource": 0,
+            "unresolved": 0,
+            "dynamic": 0
+          },
+          "explicitTypeOnlyOccurrences": 67
+        },
+        "cycleCount": 0,
+        "cycles": [],
+        "reExportOnlyModules": 1,
+        "highestFanOut": [
+          {
+            "id": "packages/query-core/src/index.ts",
+            "internalValueFanOut": 19,
+            "internalValueFanIn": 0
+          },
+          {
+            "id": "packages/query-core/src/queryObserver.ts",
+            "internalValueFanOut": 7,
+            "internalValueFanIn": 3
+          },
+          {
+            "id": "packages/query-core/src/queryClient.ts",
+            "internalValueFanOut": 6,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/query-core/src/query.ts",
+            "internalValueFanOut": 5,
+            "internalValueFanIn": 3
+          },
+          {
+            "id": "packages/query-core/src/mutationCache.ts",
+            "internalValueFanOut": 4,
+            "internalValueFanIn": 2
+          },
+          {
+            "id": "packages/query-core/src/mutationObserver.ts",
+            "internalValueFanOut": 4,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/query-core/src/queriesObserver.ts",
+            "internalValueFanOut": 4,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/query-core/src/queryCache.ts",
+            "internalValueFanOut": 4,
+            "internalValueFanIn": 2
+          },
+          {
+            "id": "packages/query-core/src/retryer.ts",
+            "internalValueFanOut": 4,
+            "internalValueFanIn": 3
+          },
+          {
+            "id": "packages/query-core/src/mutation.ts",
+            "internalValueFanOut": 3,
+            "internalValueFanIn": 3
+          }
+        ],
+        "highestFanIn": [
+          {
+            "id": "packages/query-core/src/utils.ts",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 14
+          },
+          {
+            "id": "packages/query-core/src/notifyManager.ts",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 9
+          },
+          {
+            "id": "packages/query-core/src/subscribable.ts",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 7
+          },
+          {
+            "id": "packages/query-core/src/timeoutManager.ts",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 5
+          },
+          {
+            "id": "packages/query-core/src/environmentManager.ts",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 4
+          },
+          {
+            "id": "packages/query-core/src/focusManager.ts",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 4
+          },
+          {
+            "id": "packages/query-core/src/mutation.ts",
+            "internalValueFanOut": 3,
+            "internalValueFanIn": 3
+          },
+          {
+            "id": "packages/query-core/src/onlineManager.ts",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 3
+          },
+          {
+            "id": "packages/query-core/src/query.ts",
+            "internalValueFanOut": 5,
+            "internalValueFanIn": 3
+          },
+          {
+            "id": "packages/query-core/src/queryObserver.ts",
+            "internalValueFanOut": 7,
+            "internalValueFanIn": 3
+          }
+        ]
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "9d746635-2478-4dcf-9ce2-5da4020fc11d"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-module-graph",
+        "runId": "55c8b0a9-9410-4f95-99b1-2fa8ca347c4d"
+      },
+      "evidenceSha256": "a46defb51f10d748d36b31c2c7738997b66bd4b47d11e7ec7282edea69ee9dee",
+      "existingDimensionEvidenceUnchangedApartFromComplexityExplanation": true,
+      "architectureStatus": "skipped",
+      "resolutionEnvironment": {
+        "typescriptVersion": "5.8.3",
+        "nodeVersion": "24.18.0"
+      },
+      "cycleEdges": [],
+      "unresolvedSpecifiers": {},
+      "dynamicReferences": [],
+      "topFanOutContext": [
+        {
+          "id": "packages/query-core/src/index.ts",
+          "internalValueFanOut": 19,
+          "internalValueFanIn": 0,
+          "reExportOnly": true
+        },
+        {
+          "id": "packages/query-core/src/queryObserver.ts",
+          "internalValueFanOut": 7,
+          "internalValueFanIn": 3,
+          "reExportOnly": false
+        },
+        {
+          "id": "packages/query-core/src/queryClient.ts",
+          "internalValueFanOut": 6,
+          "internalValueFanIn": 1,
+          "reExportOnly": false
+        }
+      ]
+    },
+    {
+      "id": "tanstack-react-query",
+      "repository": "tanstack-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "package": "packages/react-query",
+      "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "config": "tsconfig.json",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "remote": "https://github.com/TanStack/query.git",
+      "trackedChanges": "",
+      "packageVersion": "5.104.1",
+      "configurationSha256": "de7addcb26f9aa4b8b1a0afadf13d9075df920c287ba7ff8738459f20e77dacb",
+      "csvSha256": "e2dc06bd0145c8c14d56ec768ffdd27fb3b1e6b6c03bd18d90ad94de3be34483",
+      "population": {
+        "types": 34,
+        "members": 76
+      },
+      "filters": {
+        "totalUnits": 59,
+        "analyzedUnits": 23,
+        "skipped": [
+          {
+            "name": "src/__tests__/HydrationBoundary.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/QueryClientProvider.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/QueryResetErrorBoundary.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/fine-grained-persister.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/infiniteQueryOptions.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/infiniteQueryOptions.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/mutationOptions.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/mutationOptions.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/queryOptions.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/queryOptions.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/ssr-hydration.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/ssr.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/suspense.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/transition.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useInfiniteQuery.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useInfiniteQuery.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useIsFetching.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useMutation.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useMutation.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useMutationState.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useMutationState.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/usePrefetchInfiniteQuery.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/usePrefetchInfiniteQuery.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/usePrefetchQuery.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/usePrefetchQuery.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useQueries.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useQueries.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useQuery.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useQuery.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useSuspenseInfiniteQuery.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useSuspenseInfiniteQuery.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useSuspenseQueries.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useSuspenseQueries.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useSuspenseQuery.test-d.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/useSuspenseQuery.test.tsx",
+            "reason": "Test or fixture source"
+          },
+          {
+            "name": "src/__tests__/utils.tsx",
+            "reason": "Test or fixture source"
+          }
+        ]
+      },
+      "moduleGraph": {
+        "coverage": {
+          "status": "gaps",
+          "selectedModules": 23,
+          "analyzedModules": 23,
+          "dependencyOccurrences": 113,
+          "literalOccurrences": 113,
+          "resolvedLiteralOccurrences": 68,
+          "literalResolutionPercent": 60.176991150442475,
+          "occurrencesByResolution": {
+            "internal": 68,
+            "external": 0,
+            "builtin": 0,
+            "outOfScope": 0,
+            "unavailableSource": 0,
+            "unresolved": 45,
+            "dynamic": 0
+          },
+          "explicitTypeOnlyOccurrences": 46
+        },
+        "cycleCount": 0,
+        "cycles": [],
+        "reExportOnlyModules": 1,
+        "highestFanOut": [
+          {
+            "id": "packages/react-query/src/index.ts",
+            "internalValueFanOut": 18,
+            "internalValueFanIn": 0
+          },
+          {
+            "id": "packages/react-query/src/useBaseQuery.ts",
+            "internalValueFanOut": 5,
+            "internalValueFanIn": 4
+          },
+          {
+            "id": "packages/react-query/src/useQueries.ts",
+            "internalValueFanOut": 5,
+            "internalValueFanIn": 2
+          },
+          {
+            "id": "packages/react-query/src/useSuspenseInfiniteQuery.ts",
+            "internalValueFanOut": 2,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/react-query/src/useSuspenseQueries.ts",
+            "internalValueFanOut": 2,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/react-query/src/useSuspenseQuery.ts",
+            "internalValueFanOut": 2,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/react-query/src/HydrationBoundary.tsx",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/react-query/src/useInfiniteQuery.ts",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/react-query/src/useIsFetching.ts",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/react-query/src/useMutation.ts",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 1
+          }
+        ],
+        "highestFanIn": [
+          {
+            "id": "packages/react-query/src/QueryClientProvider.tsx",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 9
+          },
+          {
+            "id": "packages/react-query/src/suspense.ts",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 5
+          },
+          {
+            "id": "packages/react-query/src/useBaseQuery.ts",
+            "internalValueFanOut": 5,
+            "internalValueFanIn": 4
+          },
+          {
+            "id": "packages/react-query/src/IsRestoringProvider.ts",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 3
+          },
+          {
+            "id": "packages/react-query/src/QueryErrorResetBoundary.tsx",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 3
+          },
+          {
+            "id": "packages/react-query/src/errorBoundaryUtils.ts",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 2
+          },
+          {
+            "id": "packages/react-query/src/useQueries.ts",
+            "internalValueFanOut": 5,
+            "internalValueFanIn": 2
+          },
+          {
+            "id": "packages/react-query/src/HydrationBoundary.tsx",
+            "internalValueFanOut": 1,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/react-query/src/infiniteQueryOptions.ts",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 1
+          },
+          {
+            "id": "packages/react-query/src/mutationOptions.ts",
+            "internalValueFanOut": 0,
+            "internalValueFanIn": 1
+          }
+        ]
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "11541fbb-e5ca-4f59-a405-cc01d1925b37"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-module-graph",
+        "runId": "5601c8ea-9615-4236-a650-abf984a9a3d8"
+      },
+      "evidenceSha256": "a13ca848940395d0d19b350fdc2f416d784b9b16b27a7b87657f822fcf9cca91",
+      "existingDimensionEvidenceUnchangedApartFromComplexityExplanation": true,
+      "architectureStatus": "skipped",
+      "resolutionEnvironment": {
+        "typescriptVersion": "5.8.3",
+        "nodeVersion": "24.18.0"
+      },
+      "cycleEdges": [],
+      "unresolvedSpecifiers": {
+        "@tanstack/query-core": 35,
+        "react": 10
+      },
+      "dynamicReferences": [],
+      "topFanOutContext": [
+        {
+          "id": "packages/react-query/src/index.ts",
+          "internalValueFanOut": 18,
+          "internalValueFanIn": 0,
+          "reExportOnly": true
+        },
+        {
+          "id": "packages/react-query/src/useBaseQuery.ts",
+          "internalValueFanOut": 5,
+          "internalValueFanIn": 4,
+          "reExportOnly": false
+        },
+        {
+          "id": "packages/react-query/src/useQueries.ts",
+          "internalValueFanOut": 5,
+          "internalValueFanIn": 2,
+          "reExportOnly": false
+        }
+      ]
+    }
+  ],
+  "baselineNote": "Saved type-erasure development bundle predates additive complexityBreakdown metadata. All eight existing dimensions match after removing only that diagnostic field. This is not an exact build of checkpoint commit 677028c.",
+  "verification": {
+    "unitAndIntegrationTests": 129,
+    "moduleGraphTests": 15,
+    "sharedFixtureBaselineChange": "ruleset only",
+    "installedPackageSmoke": "passed",
+    "corpusSourceExecuted": false,
+    "dependenciesInstalledInCorpus": false,
+    "architectureScored": false
+  }
+}

@@ -70,6 +70,15 @@ for (const sample of samples) {
     packageVersion: JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).version,
     configurationSha256: sha256(fs.readFileSync(configPath)), csvSha256: sha256(fs.readFileSync(path.join(out, 'after.csv'))),
     population: evidence.after.population, filters: evidence.after.filters,
+    ...(evidence.after.dimensions.architecture.dependencyGraph ? { moduleGraph: {
+      coverage: evidence.after.dimensions.architecture.dependencyGraph.coverage,
+      cycleCount: evidence.after.dimensions.architecture.dependencyGraph.cycles.length,
+      cycles: evidence.after.dimensions.architecture.dependencyGraph.cycles,
+      reExportOnlyModules: evidence.after.dimensions.architecture.dependencyGraph.nodes.filter(node => node.reExportOnly).length,
+      highestFanOut: evidence.after.dimensions.architecture.dependencyGraph.highestFanOut,
+      highestFanIn: evidence.after.dimensions.architecture.dependencyGraph.highestFanIn,
+      dependencyViews: evidence.after.dimensions.architecture.dependencyGraph.dependencyViews,
+    } } : {}),
     before: { scores: scores(evidence.before), ruleset: evidence.before.analysis.ruleset, runId: evidence.before.analysis.runId },
     after: { scores: scores(evidence.after), ruleset: evidence.after.analysis.ruleset, runId: evidence.after.analysis.runId }, details };
   summaries.push(summary);

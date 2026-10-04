@@ -52,6 +52,23 @@ detail does not itself require a new scoring ruleset or baseline migration.
 
 ### Packaged inspection
 
+The development JS/TS module-graph scope adds
+`dimensions.architecture.dependencyGraph` version 1. Present Architecture as
+unmeasured: its skipped status means scoring is not calibrated, while graph
+observations may still be available. Report resolution/scope gaps and interpret
+cycles and fan-in/out as review leads. Explicit type-only dependencies do not
+participate in the value graph; ordinary imports are value-capable syntax, not
+verified emitted runtime imports. See the [module graph contract](../shared/scorecard-schema/javascript-typescript-module-graph.md).
+
+When `dependencyGraph.dependencyViews` is present, report implementation-reference
+rankings separately from public re-export rankings. Version 1 separates direct
+export-from declarations; version 2 additionally recognizes bounded ESM/CommonJS
+forwarding and preserves local uses in both views. Interpret the recorded version
+and classification; a changed view count between versions is not code improvement.
+This is not a runtime-use or responsibility analysis. Preserve overall cycle
+findings, resolution gaps and the reported overlap between views; do not add
+view counts or infer a score. Missing view detail means unavailable, not zero.
+
 ```sh
 npx --package codemetrics-ai@0.3.0 codemetrics-evidence --input evidence.json \
   --inspect-output inspection.json --expected-ecosystem dotnet \

@@ -4,7 +4,7 @@ Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0
 
 Each scored dimension includes `scoringDecision`: policy inputs, executed steps, rounding and finding attribution. These are aggregate policy decisions, not independent finding deductions. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md).
 
-The unpublished development ruleset `javascript-typescript-2026-10-02-type-erasure` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements. Generate new baselines for this ruleset; package version alone does not identify development scoring behavior.
+The unpublished development ruleset `javascript-typescript-2026-10-02-module-graph` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements and adds unscored module dependency evidence. Generate new baselines for this ruleset; package version alone does not identify development scoring behavior.
 
 ```sh
 npx codemetrics-ai --project package.json
@@ -21,6 +21,7 @@ Default output paths are `.scorecard/javascript-typescript/metrics.csv` and `.sc
 | codeQuality (Method Complexity) | 40% one worst function score + 60% mean remaining; owned CC findings above 10. Decomposition is unmeasured. |
 | maintainability | 40% mean weakest ceil(N/5) function scores + 60% mean remaining |
 | performanceAsync (Async/Blocking Usage) | React hook/effect checks, standard Promise async executors, and informational async Array.forEach callbacks |
+| architecture | Module dependencies, explicit type-only separation, internal cycle groups and fan-in/out rankings; score remains unmeasured |
 | Other dimensions | Explicitly skipped |
 
 React checks run only when a source file imports React. Aliased named imports and namespace imports are recognized; local functions shadowing imports are excluded. Missing dependency arrays are advisory because running after every render can be intentional. The implementation does not claim exhaustive Rules of Hooks, dependency-array correctness, or general concurrency analysis. Source syntax errors make the run incomplete and source dimensions unscored. Semantic type errors are outside this AST-focused version's completeness check.
@@ -37,6 +38,18 @@ The metric checks avoidable usage hazards, not execution speed or throughput. I/
 An applicable async/React scope retains the provisional 6/10 policy: any scored signal selects 6; otherwise 10. A synchronous-only or type-only scope is skipped rather than awarded 10. Module-level promise operations and top-level await are inspected even without function metrics. Findings, scope and scoring dispositions distinguish observed usage from demonstrated runtime defects.
 
 This is bounded source analysis, not promise-flow verification. Referenced executor/callback functions, constructor aliases, runtime monkey-patching, arbitrary libraries, floating promises and exhaustive hook control flow are outside scope. See the [policy and supporting references](../../shared/scorecard-schema/javascript-typescript-async-policy.md).
+
+## Module architecture evidence
+
+`dimensions.architecture.dependencyGraph` version 1 records selected modules and dependency occurrences. It handles ESM imports/re-exports, TypeScript import-equals and import types, unshadowed CommonJS `require`/`module.require`, and dynamic `import()`. Explicit `import type`/`export type` and type-only named bindings are separated; mixed bindings retain a value dependency. Ordinary imports are value-capable source syntax: their presence does not prove they survive TypeScript emission or execute at runtime.
+
+Resolution uses the package's TypeScript configuration, including paths, module mode and export conditions. Default source scans use Node10 resolution. If normal resolution fails, a read-only virtual node_modules view lets TypeScript resolve uniquely named selected workspace packages through their existing manifests. It never installs packages, changes source, or guesses a missing `dist` entry from `src`. Duplicate workspace names are not guessed. An explicit package selection does not automatically add sibling packages to graph scope.
+
+Coverage distinguishes `internal`, `external`, `builtin`, `outOfScope`, `unavailableSource`, `unresolved` and `dynamic` occurrences. Literal resolution percentage is separate from topology coverage: a resolved but excluded target or a computed import still leaves a gap. A zero-literal population reports null, not 100%. Declaration targets are marked because TypeScript resolution is not runtime-loader verification. The graph includes no transitive source outside the selected files.
+
+Cycles are strongly connected groups of resolved internal value/mixed dependencies; repeated imports count once toward fan-in/out. Cycles are informational review leads and carry no score penalty. Dynamic-literal imports and CommonJS calls can be conditional or deferred; a cycle does not establish an initialization failure. Top-ten fan-in/out lists are observations, with no invented defect cutoff. Re-export-only modules are marked for barrel-file context.
+
+Architecture retains `status: skipped` and no score until calibration. Other measured dimensions remain usable when this diagnostic graph has resolution gaps. Source parse failures retain partial graph evidence with `status: failed` and the existing incomplete-analysis exit. Schema v3 is unchanged; the new scope/ruleset requires fresh baselines. See the [graph contract](../../shared/scorecard-schema/javascript-typescript-module-graph.md).
 
 ## Discovery
 
@@ -92,14 +105,27 @@ Exit codes: 0 success, 1 requested quality gate failed, 2 invalid input or incom
 
 ## Development
 
+Architecture evidence includes separate import/load and direct public re-export
+rankings under `dependencyGraph.dependencyViews`. Version 2 recognizes explicit
+ESM and CommonJS forwarding; bindings also used locally appear in both views.
+Reassigned bindings and unsupported alias/value flow remain in implementation
+evidence. Overall dependencies and cycle findings remain intact, including mixed
+files and cycles crossing the views. Architecture is still unscored. See the
+[dependency view contract](../../shared/scorecard-schema/javascript-typescript-module-graph.md#implementation-reference-and-public-re-export-views).
+
 `metrics.ts` owns source traversal, raw member metrics and finding identities. `function-measurements.ts` collects the separate owned-body measurements; `function-scoring.ts` applies the two population policies with exact interpolation/rounding from `score-arithmetic.ts`. `react-probe.ts` checks calls owned by each function for React hook/effect observations. `async-probe.ts` checks each visited node once for bounded standard-library promise patterns, including module-level operations. Neither probe traverses nested bodies or calculates metrics. `async-scoring.ts` owns applicability, scope and the provisional async score. Regression fixtures preserve raw metrics, source locations and existing finding fingerprints; advisory severity/disposition changes are intentional.
 
 ```sh
 npm ci
 npm test
 npm run test:package
+npm run test:architecture
 ```
 
 Tests include parser/React/workspace fixtures, formula assertions, schema validation, comparison compatibility, gate behavior, and compiled CLI execution. The package smoke test packs and installs the package with production dependencies in an isolated directory and exercises analysis, comparison and SARIF. The shared corpus adds pinned accuracy and score-distribution checks.
+
+The test command limits Vitest to two workers to avoid contention between concurrent TypeScript compiler instances; integration assertions and timeouts are unchanged.
+
+`test:architecture` verifies eleven labeled graph examples against their observed loading behavior and tests a real, offline npm installation alongside a competing workspace version. It executes only repository-authored fixture code. Safe deferred cycles, eager initialization failures, an immediately invoked function and partial CommonJS exports demonstrate why cycle counts alone are not defect labels. Results are written to `TestResults/js-ts-architecture-context/` at the repository root. CI and npm release verification both run this check; Architecture remains unscored.
 
 The packaged `codemetrics-evidence --inspect-output <path>` command reads v2/v3 and validates optional expected provenance; historical v2 cannot be compared, gated or exported as SARIF. Structured dimension scope identifies implemented coverage. See [consumer integration](../../docs/evidence-workflows.md#skill-and-other-evidence-consumers).
