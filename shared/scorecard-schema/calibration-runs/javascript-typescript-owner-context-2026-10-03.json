@@ -1,0 +1,1647 @@
+{
+  "scope": "Explicit source-only package selections; no dependency install, build, semantic validation or runtime tests. Not whole-repository scorecards or cross-ecosystem calibration.",
+  "generatedAtUtc": "2026-10-04T03:48:52.750Z",
+  "nodeVersion": "v24.18.0",
+  "beforeAnalyzerBundleSha256": "bb30fecec950a8f7ee3d7be85498baead5709a2789d0dd7e13321f54559fb36f",
+  "afterAnalyzerBundleSha256": "ead7fe6fab205b49bdef8d512437fdce1bb92f59f9431a2d68e344c8389afa9c",
+  "verification": {
+    "unitIntegrationTests": 175,
+    "sharedCalibrationFixtures": 6,
+    "architectureContextCases": 11,
+    "installedPackageSmoke": "passed",
+    "baselineMigration": "incompatible; exploratory gates rejected",
+    "invariants": [
+      "identical raw CSV",
+      "unchanged population, filters and configuration fingerprint",
+      "unchanged complexity scores, inputs and findings",
+      "unchanged complete MI and architecture dimensions",
+      "unchanged async finding fingerprints",
+      "fresh run identities",
+      "decomposition and error handling remain unscored"
+    ]
+  },
+  "samples": [
+    {
+      "id": "express",
+      "repository": "express",
+      "commit": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "remote": "https://github.com/expressjs/express.git",
+      "package": ".",
+      "include": [
+        "index.js",
+        "lib/**/*.js"
+      ],
+      "configurationSha256": "0756ff795edb28b3cc6dac8b759283e05733a1fb90e825538e16c394fd3833c7",
+      "csvSha256": "3007f51f5bb3e10faffbe13b04d87b62fa3d872fbf47318456c5334792237014",
+      "population": {
+        "types": 72,
+        "members": 109
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-module-graph",
+        "runId": "0340e674-d741-40e3-9c45-3a5b5637d401"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-03-owner-population",
+        "runId": "a039474e-1528-4d30-b645-46d8a6b9d66e"
+      },
+      "asyncPopulation": {
+        "eligibleOwners": 0,
+        "affectedOwners": 0,
+        "affectedPercent": null,
+        "status": "skipped"
+      },
+      "decomposition": {
+        "version": 1,
+        "measurement": "owned-function-size-and-module-distribution-v1",
+        "status": "unscored",
+        "score": null,
+        "population": {
+          "modules": 7,
+          "functions": 109,
+          "sumOwnedFunctionLines": 768,
+          "medianFunctionLines": 5,
+          "p90FunctionLines": 19
+        },
+        "largestFunctions": [
+          {
+            "id": "3495ebd3fcd27608878bdf47a48945914b174cce9e40042483c1ec8a291f40d5",
+            "member": "send",
+            "line": 126,
+            "ownedSourceLines": 57,
+            "ownedStatements": 50,
+            "dataLiteralEntries": 0,
+            "file": "lib/response.js",
+            "project": "express"
+          },
+          {
+            "id": "cdb26b2ab14efed0815945ddbd8eb43e857127327cfa91205f05bba96da3e0f0",
+            "member": "render",
+            "line": 522,
+            "ownedSourceLines": 30,
+            "ownedStatements": 24,
+            "dataLiteralEntries": 6,
+            "file": "lib/application.js",
+            "project": "express"
+          },
+          {
+            "id": "5e2858fefd3b640a044176a7ccfbabbd88a6245e47a737edac5984f25023bd90",
+            "member": "download",
+            "line": 437,
+            "ownedSourceLines": 28,
+            "ownedStatements": 24,
+            "dataLiteralEntries": 1,
+            "file": "lib/response.js",
+            "project": "express"
+          },
+          {
+            "id": "c3ff1057ad74a414cd21aed304a5856a6df989af408f738ac9702619280b507a",
+            "member": "redirect",
+            "line": 814,
+            "ownedSourceLines": 26,
+            "ownedStatements": 19,
+            "dataLiteralEntries": 3,
+            "file": "lib/response.js",
+            "project": "express"
+          },
+          {
+            "id": "7c0c471048263a69f2febc65eb865b9ec7a7db809534ae0008e4cbffa5132797",
+            "member": "jsonp",
+            "line": 264,
+            "ownedSourceLines": 23,
+            "ownedStatements": 21,
+            "dataLiteralEntries": 0,
+            "file": "lib/response.js",
+            "project": "express"
+          },
+          {
+            "id": "06a09e464cdb98908e15dea4937d1e43086ea6669e1ed27a4a4ffd286f7ff3fb",
+            "member": "defaultConfiguration",
+            "line": 90,
+            "ownedSourceLines": 22,
+            "ownedStatements": 18,
+            "dataLiteralEntries": 2,
+            "file": "lib/application.js",
+            "project": "express"
+          },
+          {
+            "id": "ad907a30bab37eff33e28add5a7d5bbb61ebc76e377b3975169468e221a24e03",
+            "member": "View",
+            "line": 52,
+            "ownedSourceLines": 22,
+            "ownedStatements": 20,
+            "dataLiteralEntries": 0,
+            "file": "lib/view.js",
+            "project": "express"
+          },
+          {
+            "id": "37801129d32dcf0579d9d35f5e05b8bf4c4ef701ff7a0141b2997fd2dfc22068",
+            "member": "acceptParams",
+            "line": 89,
+            "ownedSourceLines": 20,
+            "ownedStatements": 20,
+            "dataLiteralEntries": 3,
+            "file": "lib/utils.js",
+            "project": "express"
+          },
+          {
+            "id": "52502daaec8f315ff3ff6066ff716ff24857f8d6209aff520e59b677e736d42a",
+            "member": "sendFile",
+            "line": 375,
+            "ownedSourceLines": 19,
+            "ownedStatements": 18,
+            "dataLiteralEntries": 0,
+            "file": "lib/response.js",
+            "project": "express"
+          },
+          {
+            "id": "871864b71453ff78fe5569454ad802396d0b4741b04b79ee854b858d4c7c18d3",
+            "member": "anonymous",
+            "line": 747,
+            "ownedSourceLines": 19,
+            "ownedStatements": 17,
+            "dataLiteralEntries": 1,
+            "file": "lib/response.js",
+            "project": "express"
+          }
+        ],
+        "largestFunctionContainers": [
+          {
+            "file": "lib/response.js",
+            "project": "express",
+            "implementedFunctions": 41,
+            "sumOwnedFunctionLines": 340,
+            "sumOwnedFunctionStatements": 303,
+            "initializer": {
+              "ownedStatements": 45,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 0,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.4427083333333333
+          },
+          {
+            "file": "lib/application.js",
+            "project": "express",
+            "implementedFunctions": 25,
+            "sumOwnedFunctionLines": 181,
+            "sumOwnedFunctionStatements": 147,
+            "initializer": {
+              "ownedStatements": 33,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 0,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.23567708333333334
+          },
+          {
+            "file": "lib/request.js",
+            "project": "express",
+            "implementedFunctions": 20,
+            "sumOwnedFunctionLines": 93,
+            "sumOwnedFunctionStatements": 76,
+            "initializer": {
+              "ownedStatements": 30,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 0,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.12109375
+          },
+          {
+            "file": "lib/utils.js",
+            "project": "express",
+            "implementedFunctions": 14,
+            "sumOwnedFunctionLines": 82,
+            "sumOwnedFunctionStatements": 65,
+            "initializer": {
+              "ownedStatements": 18,
+              "dataLiteralEntries": 2
+            },
+            "directReExports": 0,
+            "typeDeclarations": 0,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.10677083333333333
+          },
+          {
+            "file": "lib/view.js",
+            "project": "express",
+            "implementedFunctions": 7,
+            "sumOwnedFunctionLines": 60,
+            "sumOwnedFunctionStatements": 55,
+            "initializer": {
+              "ownedStatements": 13,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 0,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.078125
+          },
+          {
+            "file": "lib/express.js",
+            "project": "express",
+            "implementedFunctions": 2,
+            "sumOwnedFunctionLines": 12,
+            "sumOwnedFunctionStatements": 8,
+            "initializer": {
+              "ownedStatements": 19,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 0,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.015625
+          }
+        ]
+      },
+      "errorHandling": {
+        "version": 1,
+        "countingUnit": "handlerOccurrence",
+        "totalHandlers": 2,
+        "unexplainedEmptyHandlers": 1,
+        "documentedEmptyHandlers": 0,
+        "handlersContainingCode": 1,
+        "unexplainedEmptyPercent": 50,
+        "uninspectedRejectionCallbacks": 0,
+        "handlers": [
+          {
+            "id": "e8aeaaec21599010f835a16bef558212ce84312a3feeef2c5d4e826d14a51a39",
+            "file": "lib/application.js",
+            "project": "express",
+            "line": 628,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "d56b25c0a2af0867cb55d77671b032594db689c76c96eb2b06a8a2764e922b3b",
+            "file": "lib/view.js",
+            "project": "express",
+            "line": 202,
+            "kind": "catchClause",
+            "classification": "unexplainedEmpty",
+            "comments": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "zod-v4",
+      "repository": "zod",
+      "commit": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "remote": "https://github.com/colinhacks/zod.git",
+      "package": "packages/zod",
+      "include": [
+        "src/v4/**/*.ts"
+      ],
+      "configurationSha256": "500628532e30ebf69760655d30170970b1374cd55e70f37fa945f9b005683c9a",
+      "csvSha256": "7f714913b9d4c86a67acda3e320d6cdfda9700a7838b3957a2964ce738757d7d",
+      "population": {
+        "types": 981,
+        "members": 1948
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-module-graph",
+        "runId": "a9b227b4-38d6-4b67-be88-413c70935394"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-03-owner-population",
+        "runId": "1e4ed40f-4f63-42e1-bef0-be095b0ff275"
+      },
+      "asyncPopulation": {
+        "eligibleOwners": 46,
+        "affectedOwners": 0,
+        "affectedPercent": 0,
+        "actionableFindings": 0,
+        "advisoryFindings": 0,
+        "countingUnit": "distinct-function-or-module-owner"
+      },
+      "decomposition": {
+        "version": 1,
+        "measurement": "owned-function-size-and-module-distribution-v1",
+        "status": "unscored",
+        "score": null,
+        "population": {
+          "modules": 107,
+          "functions": 1948,
+          "sumOwnedFunctionLines": 14367,
+          "medianFunctionLines": 2,
+          "p90FunctionLines": 18
+        },
+        "largestFunctions": [
+          {
+            "id": "683255cb164f3ed97c20b06521f852fdb842cf2b5137145a0a5d4c4fb2c538f9",
+            "member": "convertBaseSchema",
+            "line": 390,
+            "ownedSourceLines": 255,
+            "ownedStatements": 222,
+            "dataLiteralEntries": 13,
+            "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+            "project": "zod"
+          },
+          {
+            "id": "8d21fb6277b8d3808a748d6eda3e79731cb9993f7074261f36c9bf8739dcf509",
+            "member": "generateCheck",
+            "line": 958,
+            "ownedSourceLines": 124,
+            "ownedStatements": 87,
+            "dataLiteralEntries": 0,
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "project": "zod"
+          },
+          {
+            "id": "f7f3a0380df51635d8abfb1b2cc17d0455aefdd40b96934ebfbb8866a6abd34a",
+            "member": "error",
+            "line": 22,
+            "ownedSourceLines": 118,
+            "ownedStatements": 4,
+            "dataLiteralEntries": 91,
+            "file": "packages/zod/src/v4/locales/lt.ts",
+            "project": "zod"
+          },
+          {
+            "id": "daf2087d3655f70305a8f59b4741c7474a0364b837dd438c9350a1e0e5fb8b7c",
+            "member": "core.$constructor:callback1/anonymous",
+            "line": 3242,
+            "ownedSourceLines": 115,
+            "ownedStatements": 79,
+            "dataLiteralEntries": 38,
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod"
+          },
+          {
+            "id": "40aa5b5cac023082d5abdaa13f0796a1272019d0c271682d0ad4be6dc3c28281",
+            "member": "visit/mapInner",
+            "line": 59,
+            "ownedSourceLines": 107,
+            "ownedStatements": 65,
+            "dataLiteralEntries": 28,
+            "file": "packages/zod/src/v4/core/visit.ts",
+            "project": "zod"
+          },
+          {
+            "id": "f4979992d6c0f6c06fdbc5ab1b0d62d6c78024c1d4a1161e5d02b951583a6fdc",
+            "member": "generateStringFormatCheck",
+            "line": 783,
+            "ownedSourceLines": 94,
+            "ownedStatements": 81,
+            "dataLiteralEntries": 0,
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "project": "zod"
+          },
+          {
+            "id": "0128152cecafa0ef3801b4ccf860463ea7550be81299e9bbc5f0c9c0ab1ad871",
+            "member": "isRecursive",
+            "line": 50,
+            "ownedSourceLines": 93,
+            "ownedStatements": 61,
+            "dataLiteralEntries": 0,
+            "file": "packages/zod/src/v4/core/memoizer.ts",
+            "project": "zod"
+          },
+          {
+            "id": "88c771b0147769013aee9cfa563c24ab48a116023dfc5e481afddb080cff6e4b",
+            "member": "error/anonymous",
+            "line": 108,
+            "ownedSourceLines": 83,
+            "ownedStatements": 72,
+            "dataLiteralEntries": 0,
+            "file": "packages/zod/src/v4/locales/he.ts",
+            "project": "zod"
+          },
+          {
+            "id": "aecc585ee2ad4dc3cfdddfc9017cc57a06c0e71874147ea067a329a0c9099ed9",
+            "member": "generateObjectCheck",
+            "line": 1190,
+            "ownedSourceLines": 83,
+            "ownedStatements": 72,
+            "dataLiteralEntries": 2,
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "project": "zod"
+          },
+          {
+            "id": "24c0e1a3a6f88d1fe5e6050d7f49010a2def436a8c2e171f6047b03fd16cb251",
+            "member": "error",
+            "line": 33,
+            "ownedSourceLines": 81,
+            "ownedStatements": 4,
+            "dataLiteralEntries": 65,
+            "file": "packages/zod/src/v4/locales/ru.ts",
+            "project": "zod"
+          }
+        ],
+        "largestFunctionContainers": [
+          {
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "implementedFunctions": 306,
+            "sumOwnedFunctionLines": 1901,
+            "sumOwnedFunctionStatements": 1374,
+            "initializer": {
+              "ownedStatements": 85,
+              "dataLiteralEntries": 2
+            },
+            "directReExports": 1,
+            "typeDeclarations": 285,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.13231711561216677
+          },
+          {
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "project": "zod",
+            "implementedFunctions": 123,
+            "sumOwnedFunctionLines": 1295,
+            "sumOwnedFunctionStatements": 1073,
+            "initializer": {
+              "ownedStatements": 4,
+              "dataLiteralEntries": 30
+            },
+            "directReExports": 0,
+            "typeDeclarations": 10,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.09013711978840398
+          },
+          {
+            "file": "packages/zod/src/v4/classic/schemas.ts",
+            "project": "zod",
+            "implementedFunctions": 405,
+            "sumOwnedFunctionLines": 846,
+            "sumOwnedFunctionStatements": 566,
+            "initializer": {
+              "ownedStatements": 80,
+              "dataLiteralEntries": 149
+            },
+            "directReExports": 0,
+            "typeDeclarations": 96,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.05888494466485696
+          },
+          {
+            "file": "packages/zod/src/v4/core/api.ts",
+            "project": "zod",
+            "implementedFunctions": 136,
+            "sumOwnedFunctionLines": 690,
+            "sumOwnedFunctionStatements": 190,
+            "initializer": {
+              "ownedStatements": 1,
+              "dataLiteralEntries": 5
+            },
+            "directReExports": 0,
+            "typeDeclarations": 134,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.04802672791814575
+          },
+          {
+            "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+            "project": "zod",
+            "implementedFunctions": 30,
+            "sumOwnedFunctionLines": 501,
+            "sumOwnedFunctionStatements": 415,
+            "initializer": {
+              "ownedStatements": 5,
+              "dataLiteralEntries": 82
+            },
+            "directReExports": 0,
+            "typeDeclarations": 3,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.03487158070578409
+          },
+          {
+            "file": "packages/zod/src/v4/core/json-schema-processors.ts",
+            "project": "zod",
+            "implementedFunctions": 85,
+            "sumOwnedFunctionLines": 498,
+            "sumOwnedFunctionStatements": 453,
+            "initializer": {
+              "ownedStatements": 56,
+              "dataLiteralEntries": 63
+            },
+            "directReExports": 0,
+            "typeDeclarations": 3,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.03466276884527041
+          },
+          {
+            "file": "packages/zod/src/v4/core/util.ts",
+            "project": "zod",
+            "implementedFunctions": 123,
+            "sumOwnedFunctionLines": 490,
+            "sumOwnedFunctionStatements": 407,
+            "initializer": {
+              "ownedStatements": 14,
+              "dataLiteralEntries": 17
+            },
+            "directReExports": 0,
+            "typeDeclarations": 76,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.03410593721723394
+          },
+          {
+            "file": "packages/zod/src/v4/mini/schemas.ts",
+            "project": "zod",
+            "implementedFunctions": 196,
+            "sumOwnedFunctionLines": 474,
+            "sumOwnedFunctionStatements": 291,
+            "initializer": {
+              "ownedStatements": 73,
+              "dataLiteralEntries": 11
+            },
+            "directReExports": 0,
+            "typeDeclarations": 87,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.032992273961160994
+          },
+          {
+            "file": "packages/zod/src/v4/core/to-json-schema.ts",
+            "project": "zod",
+            "implementedFunctions": 30,
+            "sumOwnedFunctionLines": 385,
+            "sumOwnedFunctionStatements": 368,
+            "initializer": {
+              "ownedStatements": 4,
+              "dataLiteralEntries": 6
+            },
+            "directReExports": 0,
+            "typeDeclarations": 11,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.026797522099255237
+          },
+          {
+            "file": "packages/zod/src/v4/core/checks.ts",
+            "project": "zod",
+            "implementedFunctions": 52,
+            "sumOwnedFunctionLines": 370,
+            "sumOwnedFunctionStatements": 189,
+            "initializer": {
+              "ownedStatements": 26,
+              "dataLiteralEntries": 3
+            },
+            "directReExports": 0,
+            "typeDeclarations": 75,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.025753462796686853
+          }
+        ]
+      },
+      "errorHandling": {
+        "version": 1,
+        "countingUnit": "handlerOccurrence",
+        "totalHandlers": 22,
+        "unexplainedEmptyHandlers": 7,
+        "documentedEmptyHandlers": 0,
+        "handlersContainingCode": 15,
+        "unexplainedEmptyPercent": 31.818181818181817,
+        "uninspectedRejectionCallbacks": 0,
+        "handlers": [
+          {
+            "id": "31cb0f91e402cdd9259ba1c516fc0850bdae6bbc1c9f4017a87fb3ce75ecc425",
+            "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+            "project": "zod",
+            "line": 927,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "dcaaad3bfe9fd8331a5971c0e36e4357e09f4976ab70b63c4af7387fd568daa7",
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "project": "zod",
+            "line": 105,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "8a0b35cb5410c42f6bf92390ed5e4926cf9ca5df76fd5e65322cf185fe2e5c2f",
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "project": "zod",
+            "line": 133,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "f31996ed479a45e8d2a5d1a8333799906c0e7c4398ecb9b1e793e19ed2fba660",
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "project": "zod",
+            "line": 242,
+            "kind": "catchClause",
+            "classification": "unexplainedEmpty",
+            "comments": []
+          },
+          {
+            "id": "37517531395e4f112e57c3aad675988732df38ead1b7ac277c8d40f45425bf2c",
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "project": "zod",
+            "line": 276,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "b2d7a59d0df2ea85e8bfd511930e2bb3dd22bec05dd87993e773870262367d3f",
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "project": "zod",
+            "line": 345,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "046e486a02d98072193bea426865d4b3653fba45246fc923c776332e4143bb3d",
+            "file": "packages/zod/src/v4/core/core.ts",
+            "project": "zod",
+            "line": 37,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "1a886932a3baef2da2b9735fce7cd8aa9180d8e4d2095313450ed8da2cd54bd4",
+            "file": "packages/zod/src/v4/core/json-schema-processors.ts",
+            "project": "zod",
+            "line": 787,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "6003fc44c531224ff3af56347457648970c1c3c3e0d3992bde851b90e23ad684",
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "line": 353,
+            "kind": "catchClause",
+            "classification": "unexplainedEmpty",
+            "comments": []
+          },
+          {
+            "id": "c0d57651175e94ae949a0a14b21ac9152871e90fa50445380677670fd13a30a6",
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "line": 407,
+            "kind": "catchClause",
+            "classification": "unexplainedEmpty",
+            "comments": []
+          },
+          {
+            "id": "3a0acad2b722ac843daa60e47de425df717273500e70c323d866b267482c4f87",
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "line": 533,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "e715e1bfe6374f9fc43eb1e3b9b1bf6ead0dbd031153048b85279fbd9567e3d0",
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "line": 565,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "c7a6446e0e225d15ba99bd2415cd0dcf7273a94fb93d052a8207f00ca9670113",
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "line": 651,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "7f301b57fe24f5c51b6677ce0529e7e23c4dcc1fe587514cad4117bcb543a0a7",
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "line": 1032,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "5ca43586c5ef767fa2e3cafe77ead0af50df1e1bd549f741f5a6aaa797090577",
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "line": 1230,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "a1233798d46393ad6dcf1db567a19adc15c64169a716bc05ff6e7570ba66bf00",
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "line": 1337,
+            "kind": "catchClause",
+            "classification": "unexplainedEmpty",
+            "comments": []
+          },
+          {
+            "id": "ec645a271823d6f0c0ba44d5ed5ddf2a980f77d50f6a69b0525f26a675dde531",
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "line": 1424,
+            "kind": "catchClause",
+            "classification": "unexplainedEmpty",
+            "comments": []
+          },
+          {
+            "id": "4bb7f48958909096263ca88f1832ff3a87c8a3c73c21aa38d26cc8a7bf99e895",
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "line": 1477,
+            "kind": "catchClause",
+            "classification": "unexplainedEmpty",
+            "comments": []
+          },
+          {
+            "id": "cc9dedde9908b183d130e83c42347a82e60802f98fcce73dcb3574ee63476766",
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "project": "zod",
+            "line": 1804,
+            "kind": "catchClause",
+            "classification": "unexplainedEmpty",
+            "comments": []
+          },
+          {
+            "id": "b878a911ec1f8a78d4e8bc566bd3f5a4c06401ca2b5c67cefc9412346c798724",
+            "file": "packages/zod/src/v4/core/to-json-schema.ts",
+            "project": "zod",
+            "line": 755,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "a6021d3a394fe9251f49be60cd28685e2fadf88923973a4831cf844df86482bd",
+            "file": "packages/zod/src/v4/core/util.ts",
+            "project": "zod",
+            "line": 532,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "a099aef95fc3618e467b1ac5b3697bc34abf11f21eecb4d88b393bce9188cba2",
+            "file": "packages/zod/src/v4/core/util.ts",
+            "project": "zod",
+            "line": 1234,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "tanstack-query-core",
+      "repository": "tanstack-query",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "remote": "https://github.com/TanStack/query.git",
+      "package": "packages/query-core",
+      "include": [
+        "src/**/*.ts"
+      ],
+      "configurationSha256": "afbcf8e32b2b28049e640fa5f046dde5e4ee203bc2b99708044acd8c1139ccaa",
+      "csvSha256": "9f345cee4f6646f9480e3b2f5d6c5df70baefb54f29142301edb7a7552bf3f4d",
+      "population": {
+        "types": 178,
+        "members": 427
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-module-graph",
+        "runId": "a4dc6bce-193f-46d5-beca-b4a5779269d5"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-03-owner-population",
+        "runId": "0da39f90-e512-4f9a-a052-752b94ed35a7"
+      },
+      "asyncPopulation": {
+        "eligibleOwners": 38,
+        "affectedOwners": 0,
+        "affectedPercent": 0,
+        "actionableFindings": 0,
+        "advisoryFindings": 0,
+        "countingUnit": "distinct-function-or-module-owner"
+      },
+      "decomposition": {
+        "version": 1,
+        "measurement": "owned-function-size-and-module-distribution-v1",
+        "status": "unscored",
+        "score": null,
+        "population": {
+          "modules": 23,
+          "functions": 427,
+          "sumOwnedFunctionLines": 2444,
+          "medianFunctionLines": 3,
+          "p90FunctionLines": 11
+        },
+        "largestFunctions": [
+          {
+            "id": "a9d28fd79a8b6e1c5b598edb71f7e44a5df66685a186976603086f887f2cdb71",
+            "member": "execute",
+            "line": 284,
+            "ownedSourceLines": 120,
+            "ownedStatements": 38,
+            "dataLiteralEntries": 22,
+            "file": "packages/query-core/src/mutation.ts",
+            "project": "@tanstack/query-core"
+          },
+          {
+            "id": "7ac2fa46c8302f9bab3c1c501b9564055b08be764e1e7890125ac185a8059912",
+            "member": "createResult",
+            "line": 558,
+            "ownedSourceLines": 116,
+            "ownedStatements": 58,
+            "dataLiteralEntries": 28,
+            "file": "packages/query-core/src/queryObserver.ts",
+            "project": "@tanstack/query-core"
+          },
+          {
+            "id": "43ce5b9fa2f8e5456f7e0780ee813bab0e454e60c06b8ec4cef427c1326df13b",
+            "member": "fetch",
+            "line": 590,
+            "ownedSourceLines": 97,
+            "ownedStatements": 50,
+            "dataLiteralEntries": 15,
+            "file": "packages/query-core/src/query.ts",
+            "project": "@tanstack/query-core"
+          },
+          {
+            "id": "8926c1664f5eddb686dc01093b3a95aabe3e392f9feff76c897d8b90cc95f933",
+            "member": "hydrate/dehydratedState.queries?.forEach:callback0",
+            "line": 289,
+            "ownedSourceLines": 66,
+            "ownedStatements": 14,
+            "dataLiteralEntries": 20,
+            "file": "packages/query-core/src/hydration.ts",
+            "project": "@tanstack/query-core"
+          },
+          {
+            "id": "85e7b72f15681d95ab33697491ff74f52a758ca52c028a16ce36e5eb5ea34bc5",
+            "member": "setOptions",
+            "line": 182,
+            "ownedSourceLines": 54,
+            "ownedStatements": 18,
+            "dataLiteralEntries": 3,
+            "file": "packages/query-core/src/queryObserver.ts",
+            "project": "@tanstack/query-core"
+          },
+          {
+            "id": "6a9ec293f87de0a38853da9e13dcccfeb7e4566141db95fbcfabcf7875860c56",
+            "member": "#dispatch/reducer",
+            "line": 822,
+            "ownedSourceLines": 51,
+            "ownedStatements": 12,
+            "dataLiteralEntries": 30,
+            "file": "packages/query-core/src/query.ts",
+            "project": "@tanstack/query-core"
+          },
+          {
+            "id": "d8e28b2d7f381b139089d4d4b67bc4543e3889b55ee2401e1a61d103cfdb13ac",
+            "member": "#notify/notifyManager.batch:callback0",
+            "line": 241,
+            "ownedSourceLines": 49,
+            "ownedStatements": 19,
+            "dataLiteralEntries": 3,
+            "file": "packages/query-core/src/mutationObserver.ts",
+            "project": "@tanstack/query-core"
+          },
+          {
+            "id": "750416670ab9ca6dc8fe62cfd43227ccbbd673e18e5affe046d2bd761459d4b7",
+            "member": "#dispatch/reducer",
+            "line": 448,
+            "ownedSourceLines": 44,
+            "ownedStatements": 7,
+            "dataLiteralEntries": 31,
+            "file": "packages/query-core/src/mutation.ts",
+            "project": "@tanstack/query-core"
+          },
+          {
+            "id": "1a06201a0a92326878ac7ce701177fe3ecccc9e4125da4cb1e5d0a6c8fbda4fe",
+            "member": "createNotifyManager",
+            "line": 21,
+            "ownedSourceLines": 38,
+            "ownedStatements": 8,
+            "dataLiteralEntries": 6,
+            "file": "packages/query-core/src/notifyManager.ts",
+            "project": "@tanstack/query-core"
+          },
+          {
+            "id": "61323ea17a77a2b180e5000fc566be819cd268d6144b5f29daf1ac516da6a71b",
+            "member": "streamedQuery/anonymous",
+            "line": 82,
+            "ownedSourceLines": 37,
+            "ownedStatements": 19,
+            "dataLiteralEntries": 9,
+            "file": "packages/query-core/src/streamedQuery.ts",
+            "project": "@tanstack/query-core"
+          }
+        ],
+        "largestFunctionContainers": [
+          {
+            "file": "packages/query-core/src/queryObserver.ts",
+            "project": "@tanstack/query-core",
+            "implementedFunctions": 46,
+            "sumOwnedFunctionLines": 395,
+            "sumOwnedFunctionStatements": 209,
+            "initializer": {
+              "ownedStatements": 0,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 2,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.161620294599018
+          },
+          {
+            "file": "packages/query-core/src/query.ts",
+            "project": "@tanstack/query-core",
+            "implementedFunctions": 48,
+            "sumOwnedFunctionLines": 342,
+            "sumOwnedFunctionStatements": 175,
+            "initializer": {
+              "ownedStatements": 0,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 16,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.13993453355155483
+          },
+          {
+            "file": "packages/query-core/src/mutation.ts",
+            "project": "@tanstack/query-core",
+            "implementedFunctions": 19,
+            "sumOwnedFunctionLines": 231,
+            "sumOwnedFunctionStatements": 81,
+            "initializer": {
+              "ownedStatements": 0,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 9,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.09451718494271685
+          },
+          {
+            "file": "packages/query-core/src/queryClient.ts",
+            "project": "@tanstack/query-core",
+            "implementedFunctions": 54,
+            "sumOwnedFunctionLines": 228,
+            "sumOwnedFunctionStatements": 139,
+            "initializer": {
+              "ownedStatements": 0,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 2,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.09328968903436989
+          },
+          {
+            "file": "packages/query-core/src/utils.ts",
+            "project": "@tanstack/query-core",
+            "implementedFunctions": 29,
+            "sumOwnedFunctionLines": 189,
+            "sumOwnedFunctionStatements": 155,
+            "initializer": {
+              "ownedStatements": 3,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 7,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.07733224222585924
+          },
+          {
+            "file": "packages/query-core/src/queriesObserver.ts",
+            "project": "@tanstack/query-core",
+            "implementedFunctions": 44,
+            "sumOwnedFunctionLines": 181,
+            "sumOwnedFunctionStatements": 110,
+            "initializer": {
+              "ownedStatements": 0,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 4,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.07405891980360066
+          },
+          {
+            "file": "packages/query-core/src/hydration.ts",
+            "project": "@tanstack/query-core",
+            "implementedFunctions": 14,
+            "sumOwnedFunctionLines": 158,
+            "sumOwnedFunctionStatements": 47,
+            "initializer": {
+              "ownedStatements": 0,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 6,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.06464811783960721
+          },
+          {
+            "file": "packages/query-core/src/retryer.ts",
+            "project": "@tanstack/query-core",
+            "implementedFunctions": 25,
+            "sumOwnedFunctionLines": 117,
+            "sumOwnedFunctionStatements": 79,
+            "initializer": {
+              "ownedStatements": 0,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 7,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.047872340425531915
+          },
+          {
+            "file": "packages/query-core/src/mutationObserver.ts",
+            "project": "@tanstack/query-core",
+            "implementedFunctions": 13,
+            "sumOwnedFunctionLines": 105,
+            "sumOwnedFunctionStatements": 55,
+            "initializer": {
+              "ownedStatements": 0,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 1,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.042962356792144024
+          },
+          {
+            "file": "packages/query-core/src/infiniteQueryBehavior.ts",
+            "project": "@tanstack/query-core",
+            "implementedFunctions": 13,
+            "sumOwnedFunctionLines": 92,
+            "sumOwnedFunctionStatements": 53,
+            "initializer": {
+              "ownedStatements": 0,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 0,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.03764320785597381
+          }
+        ]
+      },
+      "errorHandling": {
+        "version": 1,
+        "countingUnit": "handlerOccurrence",
+        "totalHandlers": 15,
+        "unexplainedEmptyHandlers": 0,
+        "documentedEmptyHandlers": 0,
+        "handlersContainingCode": 15,
+        "unexplainedEmptyPercent": 0,
+        "uninspectedRejectionCallbacks": 12,
+        "handlers": [
+          {
+            "id": "84e50fc5780303c8147e4290864ed5a8147cf694ee46794f1eed7bacde55d0f4",
+            "file": "packages/query-core/src/hydration.ts",
+            "project": "@tanstack/query-core",
+            "line": 116,
+            "kind": "promiseCatch",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "5c78c3ab42edb437afb323b6697d9e9bfc94b7ea8f12038959c62084ac629931",
+            "file": "packages/query-core/src/mutation.ts",
+            "project": "@tanstack/query-core",
+            "line": 384,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "2770ee3ebef8830307c053984fed87b8cd703d9d697c887f5822893bb52ccc54",
+            "file": "packages/query-core/src/mutation.ts",
+            "project": "@tanstack/query-core",
+            "line": 394,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "499e132ac14bfebe119b8f3112626e831d59fb8231c6f2b6e11ee2453a0ce0c8",
+            "file": "packages/query-core/src/mutation.ts",
+            "project": "@tanstack/query-core",
+            "line": 405,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "c851f525d8dc813553a4f7b1b3c0ac5e74e0f0304ef1225f3b16dc7abe0138f0",
+            "file": "packages/query-core/src/mutation.ts",
+            "project": "@tanstack/query-core",
+            "line": 419,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "1ca8e2d8572b961ecc686623a9984c530946291160d7fa1a1e1a914d3dab7558",
+            "file": "packages/query-core/src/mutation.ts",
+            "project": "@tanstack/query-core",
+            "line": 431,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "d943f5733a63e7e55be1f3e8ce416d38b51d95e585474235a1bd52f67f078d9e",
+            "file": "packages/query-core/src/mutationObserver.ts",
+            "project": "@tanstack/query-core",
+            "line": 261,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "e0be7595e73cacc0320e2e24078f0c25b7498a4af1b22891a4e1969a3a740110",
+            "file": "packages/query-core/src/mutationObserver.ts",
+            "project": "@tanstack/query-core",
+            "line": 272,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "a10792dff5c1293e07086a92246b776ac8d939a9e4b927f0a94ba0c45a712c23",
+            "file": "packages/query-core/src/mutationObserver.ts",
+            "project": "@tanstack/query-core",
+            "line": 283,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "71b39ed2b30268bf9ac324532bfa35460ccf467ac0ad85abd124002795a99713",
+            "file": "packages/query-core/src/mutationObserver.ts",
+            "project": "@tanstack/query-core",
+            "line": 294,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "9782b1d2e913b2201d77bf5478cec4180383b9259b5a2c85f219ed23ed6a294d",
+            "file": "packages/query-core/src/query.ts",
+            "project": "@tanstack/query-core",
+            "line": 777,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "e24847bfdd9ee9d730e4d6ec6fd031d3b995683b39c9cc5924a91bf0eb27ca1c",
+            "file": "packages/query-core/src/queryObserver.ts",
+            "project": "@tanstack/query-core",
+            "line": 668,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "891e71a5d029e83eb4285228c8a00812f2e9e1f76da39057b47eae4f947c2601",
+            "file": "packages/query-core/src/retryer.ts",
+            "project": "@tanstack/query-core",
+            "line": 187,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "860c703a12b298dc235a69ccfc5f703f5d3cb35f303700084da22222c68c65bd",
+            "file": "packages/query-core/src/retryer.ts",
+            "project": "@tanstack/query-core",
+            "line": 193,
+            "kind": "promiseCatch",
+            "classification": "containsCode",
+            "comments": []
+          },
+          {
+            "id": "2bcf4221cbc16bce54b837b23074ad87f1d5286af60f032e5db599c519b20866",
+            "file": "packages/query-core/src/utils.ts",
+            "project": "@tanstack/query-core",
+            "line": 470,
+            "kind": "catchClause",
+            "classification": "containsCode",
+            "comments": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "tanstack-react-query",
+      "repository": "tanstack-query",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "remote": "https://github.com/TanStack/query.git",
+      "package": "packages/react-query",
+      "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "configurationSha256": "de7addcb26f9aa4b8b1a0afadf13d9075df920c287ba7ff8738459f20e77dacb",
+      "csvSha256": "e2dc06bd0145c8c14d56ec768ffdd27fb3b1e6b6c03bd18d90ad94de3be34483",
+      "population": {
+        "types": 34,
+        "members": 76
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-module-graph",
+        "runId": "a75eec03-5d56-4519-a875-d1336d8596a6"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-03-owner-population",
+        "runId": "7cd81d62-a2e4-42b9-8936-8de09ad4306f"
+      },
+      "asyncPopulation": {
+        "eligibleOwners": 12,
+        "affectedOwners": 0,
+        "affectedPercent": 0,
+        "actionableFindings": 0,
+        "advisoryFindings": 2,
+        "countingUnit": "distinct-function-or-module-owner"
+      },
+      "decomposition": {
+        "version": 1,
+        "measurement": "owned-function-size-and-module-distribution-v1",
+        "status": "unscored",
+        "score": null,
+        "population": {
+          "modules": 23,
+          "functions": 76,
+          "sumOwnedFunctionLines": 429,
+          "medianFunctionLines": 2,
+          "p90FunctionLines": 13
+        },
+        "largestFunctions": [
+          {
+            "id": "fafd991313315e4e0e382a81884461dc6266568070d322a115ddb22b299b9fc1",
+            "member": "useBaseQuery",
+            "line": 26,
+            "ownedSourceLines": 58,
+            "ownedStatements": 26,
+            "dataLiteralEntries": 9,
+            "file": "packages/react-query/src/useBaseQuery.ts",
+            "project": "@tanstack/react-query"
+          },
+          {
+            "id": "701eb60f349a4e8c620a325008c9aed42f1619ee97d7aee6b176a5a5faab91ea",
+            "member": "useQueries",
+            "line": 359,
+            "ownedSourceLines": 45,
+            "ownedStatements": 20,
+            "dataLiteralEntries": 9,
+            "file": "packages/react-query/src/useQueries.ts",
+            "project": "@tanstack/react-query"
+          },
+          {
+            "id": "5324c386464d6185f8bd204b978acde64879e8f9ab0b417c82bf15e2f1643f53",
+            "member": "HydrationBoundary/React.useMemo:callback0",
+            "line": 115,
+            "ownedSourceLines": 27,
+            "ownedStatements": 19,
+            "dataLiteralEntries": 1,
+            "file": "packages/react-query/src/HydrationBoundary.tsx",
+            "project": "@tanstack/react-query"
+          },
+          {
+            "id": "20f0a3a989897cc77fbb08d4e7ba8743dcbd45d9476981b2b641873c0519cef5",
+            "member": "useMutation",
+            "line": 191,
+            "ownedSourceLines": 25,
+            "ownedStatements": 8,
+            "dataLiteralEntries": 8,
+            "file": "packages/react-query/src/useMutation.ts",
+            "project": "@tanstack/react-query"
+          },
+          {
+            "id": "373ebf4bc6099697c9c04e6c186608ef90c4d335b02483d666c8bd3aee42670d",
+            "member": "createValue",
+            "line": 18,
+            "ownedSourceLines": 17,
+            "ownedStatements": 2,
+            "dataLiteralEntries": 3,
+            "file": "packages/react-query/src/QueryErrorResetBoundary.tsx",
+            "project": "@tanstack/react-query"
+          },
+          {
+            "id": "c7cdf1efaf8457d3d75e802ea8b4437352b0f29703414191f24a4320dba5e77f",
+            "member": "useMutationState",
+            "line": 157,
+            "ownedSourceLines": 15,
+            "ownedStatements": 7,
+            "dataLiteralEntries": 1,
+            "file": "packages/react-query/src/useMutationState.ts",
+            "project": "@tanstack/react-query"
+          },
+          {
+            "id": "4bedbf81c9be197ff60ec510b4edf2f356c5baf558caca86f18fb42987d57666",
+            "member": "ensureSuspenseTimers",
+            "line": 21,
+            "ownedSourceLines": 13,
+            "ownedStatements": 7,
+            "dataLiteralEntries": 0,
+            "file": "packages/react-query/src/suspense.ts",
+            "project": "@tanstack/react-query"
+          },
+          {
+            "id": "aabf41c15078f169af73388319826e8736ec40f36a079d0d5edcbca6df1e9714",
+            "member": "useSuspenseQuery",
+            "line": 75,
+            "ownedSourceLines": 13,
+            "ownedStatements": 4,
+            "dataLiteralEntries": 5,
+            "file": "packages/react-query/src/useSuspenseQuery.ts",
+            "project": "@tanstack/react-query"
+          },
+          {
+            "id": "d6a12f48f46f987cb0381c225fda7a731ff29b80e6f64798c0fbf482f6af431c",
+            "member": "useSuspenseInfiniteQuery",
+            "line": 104,
+            "ownedSourceLines": 13,
+            "ownedStatements": 4,
+            "dataLiteralEntries": 5,
+            "file": "packages/react-query/src/useSuspenseInfiniteQuery.ts",
+            "project": "@tanstack/react-query"
+          },
+          {
+            "id": "2fcdb324349f56820a77253b3e08750dbc8b2b9bbb646bd5b5d4277534b9f08d",
+            "member": "useQueries/optimisticResult.find:callback0",
+            "line": 478,
+            "ownedSourceLines": 11,
+            "ownedStatements": 2,
+            "dataLiteralEntries": 5,
+            "file": "packages/react-query/src/useQueries.ts",
+            "project": "@tanstack/react-query"
+          }
+        ],
+        "largestFunctionContainers": [
+          {
+            "file": "packages/react-query/src/useQueries.ts",
+            "project": "@tanstack/react-query",
+            "implementedFunctions": 12,
+            "sumOwnedFunctionLines": 90,
+            "sumOwnedFunctionStatements": 34,
+            "initializer": {
+              "ownedStatements": 1,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 8,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.2097902097902098
+          },
+          {
+            "file": "packages/react-query/src/useBaseQuery.ts",
+            "project": "@tanstack/react-query",
+            "implementedFunctions": 6,
+            "sumOwnedFunctionLines": 70,
+            "sumOwnedFunctionStatements": 30,
+            "initializer": {
+              "ownedStatements": 1,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 0,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.16317016317016317
+          },
+          {
+            "file": "packages/react-query/src/HydrationBoundary.tsx",
+            "project": "@tanstack/react-query",
+            "implementedFunctions": 4,
+            "sumOwnedFunctionLines": 40,
+            "sumOwnedFunctionStatements": 28,
+            "initializer": {
+              "ownedStatements": 2,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 1,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.09324009324009325
+          },
+          {
+            "file": "packages/react-query/src/useMutationState.ts",
+            "project": "@tanstack/react-query",
+            "implementedFunctions": 9,
+            "sumOwnedFunctionLines": 40,
+            "sumOwnedFunctionStatements": 15,
+            "initializer": {
+              "ownedStatements": 1,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 2,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.09324009324009325
+          },
+          {
+            "file": "packages/react-query/src/useMutation.ts",
+            "project": "@tanstack/react-query",
+            "implementedFunctions": 7,
+            "sumOwnedFunctionLines": 34,
+            "sumOwnedFunctionStatements": 10,
+            "initializer": {
+              "ownedStatements": 1,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 0,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.07925407925407925
+          },
+          {
+            "file": "packages/react-query/src/QueryErrorResetBoundary.tsx",
+            "project": "@tanstack/react-query",
+            "implementedFunctions": 7,
+            "sumOwnedFunctionLines": 28,
+            "sumOwnedFunctionStatements": 7,
+            "initializer": {
+              "ownedStatements": 4,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 6,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.06526806526806526
+          },
+          {
+            "file": "packages/react-query/src/suspense.ts",
+            "project": "@tanstack/react-query",
+            "implementedFunctions": 7,
+            "sumOwnedFunctionLines": 22,
+            "sumOwnedFunctionStatements": 8,
+            "initializer": {
+              "ownedStatements": 4,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 0,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.05128205128205128
+          },
+          {
+            "file": "packages/react-query/src/errorBoundaryUtils.ts",
+            "project": "@tanstack/react-query",
+            "implementedFunctions": 4,
+            "sumOwnedFunctionLines": 18,
+            "sumOwnedFunctionStatements": 7,
+            "initializer": {
+              "ownedStatements": 4,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 0,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.04195804195804196
+          },
+          {
+            "file": "packages/react-query/src/QueryClientProvider.tsx",
+            "project": "@tanstack/react-query",
+            "implementedFunctions": 4,
+            "sumOwnedFunctionLines": 16,
+            "sumOwnedFunctionStatements": 11,
+            "initializer": {
+              "ownedStatements": 4,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 1,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.037296037296037296
+          },
+          {
+            "file": "packages/react-query/src/useSuspenseQueries.ts",
+            "project": "@tanstack/react-query",
+            "implementedFunctions": 2,
+            "sumOwnedFunctionLines": 16,
+            "sumOwnedFunctionStatements": 5,
+            "initializer": {
+              "ownedStatements": 1,
+              "dataLiteralEntries": 0
+            },
+            "directReExports": 0,
+            "typeDeclarations": 6,
+            "enums": 0,
+            "shareOfOwnedFunctionLines": 0.037296037296037296
+          }
+        ]
+      },
+      "errorHandling": {
+        "version": 1,
+        "countingUnit": "handlerOccurrence",
+        "totalHandlers": 0,
+        "unexplainedEmptyHandlers": 0,
+        "documentedEmptyHandlers": 0,
+        "handlersContainingCode": 0,
+        "unexplainedEmptyPercent": null,
+        "uninspectedRejectionCallbacks": 0,
+        "handlers": []
+      }
+    }
+  ]
+}

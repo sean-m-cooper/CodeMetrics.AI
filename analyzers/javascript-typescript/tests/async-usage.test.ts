@@ -20,7 +20,7 @@ describe("bounded promise usage", () => {
     const result = inspect("export const work = new Promise(async resolve => { resolve(1); });", extension);
     const dimension = result.evidence.dimensions.performanceAsync;
     expect(dimension.status).toBe("scored");
-    expect(dimension.score).toBe(6);
+    expect(dimension.score).toBe(0);
     expect(dimension.findings).toHaveLength(1);
     expect(dimension.findings[0]).toMatchObject({ category: "asyncPromiseExecutor", member: "<module>", severity: "warning", confidence: "high" });
     expect(dimension.scoringDecision!.findingEffects[0].effect).toBe("policyInput");

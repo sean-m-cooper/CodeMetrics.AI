@@ -28,6 +28,13 @@ export function isPromiseConstruction(node: ts.Node, checker: ts.TypeChecker): n
     ts.isIdentifier(declaration.name) && declaration.name.text === "Promise" && standardLibraryDeclaration(declaration));
 }
 
+export function isStandardPromiseCall(node: ts.Node, checker: ts.TypeChecker): boolean {
+  if (!ts.isCallExpression(node)) return false;
+  const declaration = checker.getResolvedSignature(node)?.declaration;
+  return !!declaration && ts.isMethodSignature(declaration) && ts.isInterfaceDeclaration(declaration.parent) &&
+    ["Promise", "PromiseLike", "PromiseConstructor"].includes(declaration.parent.name.text) && standardLibraryDeclaration(declaration);
+}
+
 // Limit recognition to the standard Array contract, not arbitrary APIs named forEach.
 function isArrayForEach(call: ts.CallExpression, checker: ts.TypeChecker): boolean {
   const declaration = checker.getResolvedSignature(call)?.declaration;

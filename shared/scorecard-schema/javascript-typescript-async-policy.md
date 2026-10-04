@@ -1,7 +1,7 @@
 # JavaScript/TypeScript Async/Blocking Usage
 
-Development ruleset `javascript-typescript-2026-10-02-async-usage` uses
-`javascript-typescript/performanceAsync/usage-v2`. The JSON dimension remains
+Development ruleset `javascript-typescript-2026-10-03-owner-population` uses
+`javascript-typescript/performanceAsync/owner-population-v3`. The JSON dimension remains
 `performanceAsync`; its display name is **Async/Blocking Usage**. It describes
 avoidable usage hazards, not latency, throughput or a workload's appropriate
 concurrency. Cross-ecosystem calibration remains unestablished.
@@ -38,17 +38,46 @@ and loops and is not classified as an ordinary hook by this probe.
 
 ## Scoring and applicability
 
-The existing provisional 6/10 band structure is retained: one or more scored
-signals select 6; otherwise an applicable scope scores 10. This extension does not
-claim the numerical bands have been calibrated on representative JS/TS projects.
-No percentage-of-functions scoring is introduced. Complexity, MI and raw CSV
-formulas are unchanged.
+The `owner-rate-v3` policy replaces the provisional 6/10 cliff. Let N be the
+number of distinct eligible owners, B the number of those owners with at least
+one scored finding, and rate = 100 * B / N. Each owner contributes once to each
+population, regardless of finding count. Comparisons use integer cross-products,
+not a rounded display percentage.
 
-React imports with executable functions, async functions, awaits or resolved
-standard Promise constructions establish an applicable scope. No applicable
-surface means skipped/unmeasured. Top-level operations are inspected independently
-of function metric populations. Parse failures withhold all implemented source
-dimension scores while retaining partial findings for diagnosis.
+| Affected owner rate | Score |
+|---|---:|
+| B = 0 or below 1% | 10 |
+| Below 2% | 9 |
+| Below 5% | 8 |
+| At most 10% | 6 |
+| At most 15% | 4 |
+| At most 20% | 2 |
+| Above 20% | 0 |
+
+These bands implement product policy, not empirical cross-ecosystem calibration.
+A 10 can contain findings below 1%; small populations can score 0 for one affected
+owner. Report B and N with the score. Never interpret the score as runtime speed.
+
+An eligible owner is an implemented function containing its own async modifier,
+await/for-await, resolved standard Promise construction/method call, imported React
+hook call, or recognized usage finding. Synchronous functions without these signals,
+bodyless signatures, and a React import alone are excluded. Nested functions own
+their own operations; a synchronous wrapper is not eligible merely because it
+contains an async callback. Standard calls require TypeScript standard-library
+signatures. Custom APIs and unresolved Promise names do not establish eligibility.
+
+One synthetic module owner per file covers qualifying operations outside functions,
+including module/class initialization. An async callback is an eligible function;
+a misuse at its containing API call belongs to the enclosing call-site owner.
+Thus a module-level async Promise executor can produce two eligible owners with
+one affected. Mixed React and Promise populations share this product policy; they
+are not calibrated against equivalent runtime workloads. The observations include
+every owner, its eligibility reasons, and whether it is affected.
+
+No eligible owners means skipped, not 10. A scored finding without an eligible
+owner fails analysis instead of disappearing from the numerator. Parse failures
+withhold all implemented source dimension scores while retaining partial findings.
+Complexity, MI, and raw CSV formulas are unchanged.
 
 Informational findings carry `classification: reviewLead` and
 `scoreDisposition: excludedReviewLead`, have an `excluded` scoring effect, and do
@@ -59,8 +88,8 @@ and exhaustive Rules of Hooks analysis remain outside this scope.
 
 ## Compatibility
 
-The new ruleset and `javascript-typescript/performanceAsync/v2` scope distinguish
-this coverage from the earlier React-only policy. Consumers must honor recorded
+The new ruleset and `javascript-typescript/performanceAsync/owner-population-v3`
+scope distinguish this policy from the earlier React-only and 6/10 usage policies. Consumers must honor recorded
 scope instead of assuming every JS/TS score is React-only. Older evidence and its
 scores remain valid historical records, but are incompatible baseline gates.
 Existing finding identities remain stable; changing a review lead from warning

@@ -31,7 +31,11 @@ export function Shadow(React: any, effect: any) {
     // measurements: locations, fingerprints, order and every raw metric are protected.
     const { functions, ...legacyResult } = result;
     expect(functions).toHaveLength(result.metrics.length);
-    expect(legacyResult).toMatchSnapshot();
+    expect(result.findings.map(item => item.finding.observations?.sourceSpanStart)).toEqual([140,171,186,237,310]);
+    // The new diagnostic offset supplies async ownership; it is not a raw metric.
+    const snapshot = structuredClone(legacyResult);
+    for (const item of snapshot.findings) delete item.finding.observations?.sourceSpanStart;
+    expect(snapshot).toMatchSnapshot();
     expect(result.findings.map(item => [item.finding.category, item.finding.member])).toEqual([
       ["conditionalHook", "App"],
       ["conditionalHook", "App"],

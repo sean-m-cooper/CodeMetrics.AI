@@ -7,11 +7,13 @@ import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 
-const [beforeDirectory, repositories, outputDirectory] = process.argv.slice(2).map(p => path.resolve(p));
+const [beforeDirectory, repositories, outputDirectory] = process.argv.slice(2, 5).map(p => path.resolve(p));
+const ownerPopulationTransition = process.argv[5] === '--owner-population-transition';
+assert(process.argv.length === 5 || (process.argv.length === 6 && ownerPopulationTransition), 'Unknown corpus mode');
 if (!beforeDirectory || !repositories || !outputDirectory)
   throw new Error('Usage: node scripts/function-policy-corpus.mjs <before-package-directory> <repositories-directory> <output-directory>');
 const packageRoot = path.resolve(import.meta.dirname, '..');
-const { validateEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/evidence-tools.js')).href);
+const { validateEvidence, compare, gate } = await import(pathToFileURL(path.join(packageRoot, 'dist/evidence-tools.js')).href);
 const samples = [
   { id: 'express', repository: 'express', revision: '7ef98448f8b38099ab1ded55e458538ad47a51e7', package: '.', include: ['index.js', 'lib/**/*.js'] },
   { id: 'zod-v4', repository: 'zod', revision: '0b216ef674e297ebe41d8bf902262e56f8755822', package: 'packages/zod', include: ['src/v4/**/*.ts'], config: 'tsconfig.json' },
@@ -59,7 +61,22 @@ for (const sample of samples) {
   assert.equal(evidence.before.analysis.configurationFingerprint, evidence.after.analysis.configurationFingerprint);
   assert.notEqual(evidence.before.analysis.runId, evidence.after.analysis.runId);
   assert.equal(fs.readFileSync(path.join(out, 'before.csv'), 'utf8'), fs.readFileSync(path.join(out, 'after.csv'), 'utf8'));
-  assert.deepEqual(evidence.before.dimensions.performanceAsync, evidence.after.dimensions.performanceAsync);
+  if (ownerPopulationTransition) {
+    assert.equal(evidence.before.analysis.ruleset, 'javascript-typescript-2026-10-02-module-graph');
+    assert.equal(evidence.after.analysis.ruleset, 'javascript-typescript-2026-10-03-owner-population');
+    for (const key of ['codeQuality', 'maintainability']) assert.equal(evidence.before.dimensions[key].score, evidence.after.dimensions[key].score);
+    assert.deepEqual(evidence.before.dimensions.architecture, evidence.after.dimensions.architecture);
+    assert.deepEqual(evidence.before.dimensions.maintainability, evidence.after.dimensions.maintainability);
+    assert.deepEqual(evidence.before.dimensions.codeQuality.scoring, evidence.after.dimensions.codeQuality.scoring);
+    assert.deepEqual(evidence.before.dimensions.codeQuality.findings, evidence.after.dimensions.codeQuality.findings);
+    assert.deepEqual(evidence.before.dimensions.performanceAsync.findings.map(f => f.fingerprint).sort(),
+      evidence.after.dimensions.performanceAsync.findings.map(f => f.fingerprint).sort());
+    assert.equal(evidence.after.dimensions.errorHandling.score, undefined);
+    assert.equal(evidence.after.dimensions.codeQuality.componentDetails.decomposition.score, null);
+    assert.throws(() => compare(evidence.after, evidence.before), /Incompatible baseline/);
+    const exploratory = compare(evidence.after, evidence.before, true);
+    assert.throws(() => gate(exploratory, 'warning'), /incompatible/);
+  } else assert.deepEqual(evidence.before.dimensions.performanceAsync, evidence.after.dimensions.performanceAsync);
   const details = Object.fromEntries(['codeQuality', 'maintainability'].map(key => [key, {
     decision: evidence.after.dimensions[key].scoringDecision,
     topOffenders: evidence.after.dimensions[key].scoring.observations.topOffenders,
@@ -79,6 +96,9 @@ for (const sample of samples) {
       highestFanIn: evidence.after.dimensions.architecture.dependencyGraph.highestFanIn,
       dependencyViews: evidence.after.dimensions.architecture.dependencyGraph.dependencyViews,
     } } : {}),
+    ...(ownerPopulationTransition ? { asyncPopulation: evidence.after.dimensions.performanceAsync.scoring?.observations,
+      decomposition: evidence.after.dimensions.codeQuality.componentDetails.decomposition,
+      errorHandling: evidence.after.dimensions.errorHandling.handlerEvidence } : {}),
     before: { scores: scores(evidence.before), ruleset: evidence.before.analysis.ruleset, runId: evidence.before.analysis.runId },
     after: { scores: scores(evidence.after), ruleset: evidence.after.analysis.ruleset, runId: evidence.after.analysis.runId }, details };
   summaries.push(summary);

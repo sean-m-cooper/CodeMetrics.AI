@@ -1,4 +1,5 @@
 import ts from "typescript";
+import path from "node:path";
 import { discover } from "./discovery.js";
 import { analyzeFile, type Metric } from "./metrics.js";
 import { hash, invocationIds, skippedDimensions, type Evidence } from "./evidence.js";
@@ -6,6 +7,9 @@ import { metricsCsvHeader } from "./scorecard-contract.js";
 import { scoreFunctions } from "./function-scoring.js";
 import { scoreAsyncUsage } from "./async-scoring.js";
 import { ModuleGraphCollector } from "./module-graph.js";
+import { asyncPopulation, type AsyncOwner } from "./async-population.js";
+import { decompositionModule, decompositionEvidence } from "./decomposition-evidence.js";
+import { inspectErrorHandling, errorHandlingEvidence } from "./error-handling.js";
 
 export function analyze(options: { project?: string; tsconfig?: string; runId?: string; auditId?: string }, version: string): { evidence: Evidence; metrics: Metric[]; csv: string; inputs: string[] } {
   const identity = invocationIds(options.runId, options.auditId);
@@ -17,8 +21,9 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
   const collected: ReturnType<typeof analyzeFile>["findings"] = [];
   const moduleGraph = new ModuleGraphCollector(discovery.repositoryRoot, discovery.packages);
   let analyzedFiles = 0;
-  let reactSupported = false;
-  let asyncSupported = false;
+  const asyncOwners: AsyncOwner[] = [];
+  const decompositionModules: ReturnType<typeof decompositionModule>[] = [];
+  const errorHandling: ReturnType<typeof inspectErrorHandling>[] = [];
   for (const pkg of discovery.packages) {
     const program = ts.createProgram(pkg.files, { ...pkg.options, noEmit: true });
     const checker = program.getTypeChecker();
@@ -34,8 +39,11 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
       analyzedFiles++;
       collectModules(source);
       const result = analyzeFile(source, checker, pkg.name, discovery.repositoryRoot);
-      reactSupported ||= result.reactSupported;
-      asyncSupported ||= result.asyncSupported;
+      const file = path.relative(discovery.repositoryRoot, filename).replaceAll("\\", "/");
+      asyncOwners.push(...asyncPopulation(source, checker, file, pkg.name, result.functions,
+        result.findings.filter(item => item.dimension === "performanceAsync").map(item => item.finding)));
+      decompositionModules.push(decompositionModule(source, file, pkg.name, result.functions));
+      errorHandling.push(inspectErrorHandling(source, checker, file, pkg.name));
       metrics.push(...result.metrics); collected.push(...result.findings);
       functions.push(...result.functions);
     }
@@ -45,17 +53,21 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
   dimensions.codeQuality = scoreFunctions(functions, "codeQuality", collected.filter(item => item.dimension === "codeQuality").map(item => item.finding));
   dimensions.maintainability = scoreFunctions(functions, "maintainability");
   dimensions.performanceAsync = scoreAsyncUsage(collected.filter(item => item.dimension === "performanceAsync").map(item => item.finding),
-    reactSupported && metrics.length > 0, asyncSupported);
+    asyncOwners);
+  if (dimensions.performanceAsync.status === "failed") diagnostics.push({ kind: "asyncOwnership", message: dimensions.performanceAsync.basis });
   if (diagnostics.length) for (const key of ["codeQuality", "maintainability", "performanceAsync"] as const)
     dimensions[key] = { status: "failed", basis: "Incomplete source analysis; partial findings are unscored.", findings: dimensions[key].findings, scope: dimensions[key].scope };
   dimensions.architecture = moduleGraph.finish(diagnostics.length > 0);
+  dimensions.errorHandling = errorHandlingEvidence(errorHandling, diagnostics.length > 0);
+  dimensions.codeQuality.componentDetails = { ...(dimensions.codeQuality.componentDetails as object ?? {}),
+    decomposition: decompositionEvidence(decompositionModules, diagnostics.length > 0) };
   const evidence: Evidence = {
     schemaVersion: 3, generatedAtUtc: new Date().toISOString(), tool: { name: "codemetrics-ai", version, ecosystem: "javascript-typescript" },
     subject: { root: discovery.repositoryRoot, entryPoint: discovery.entryPoint, name: discovery.name, variant: "source" },
     filters: { totalUnits: discovery.packages.reduce((sum,pkg) => sum + pkg.files.length, 0) + discovery.skipped.length,
       analyzedUnits: analyzedFiles, skipped: discovery.skipped },
     population: { types: new Set(metrics.map(metric => `${metric.project}|${metric.file}|${metric.type}`)).size, members: metrics.length },
-    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-10-02-module-graph",
+    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-10-03-owner-population",
       calibration: "uncalibrated", configurationFingerprint: hash(JSON.stringify(canonicalConfiguration(discovery.packages.map(pkg => ({ name: pkg.name,
         options: pkg.options, selection: pkg.selection })), discovery.repositoryRoot))), diagnostics, suppressions: [] }
   };

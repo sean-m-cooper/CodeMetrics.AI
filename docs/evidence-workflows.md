@@ -52,6 +52,22 @@ detail does not itself require a new scoring ruleset or baseline migration.
 
 ### Packaged inspection
 
+The development `javascript-typescript-2026-10-03-owner-population` ruleset scores
+Async/Blocking Usage using distinct affected/eligible function or module owners.
+Show both counts with the score; only owners with observed async/React usage enter
+the denominator. Review leads do not enter the numerator. A small population can
+score 0 from one affected owner, and a rate below 1% can score 10 with findings.
+This is a usage policy, not a runtime-performance claim. A changed ruleset/scope
+requires a fresh baseline; do not bypass compatibility checks to claim improvement.
+
+`codeQuality.componentDetails.decomposition` version 1 contains unscored size and
+module-distribution evidence. Code Quality still measures method complexity only.
+`errorHandling.handlerEvidence` version 1 reports inspected handler counts and
+body-comment context, with no error-handling score. Recognize documented swallowing;
+do not turn empty-body review leads or code presence into correctness judgments.
+Disclose uninspected callbacks and absent populations. Missing optional evidence
+means unavailable, not zero. See the [context contract](../shared/scorecard-schema/javascript-typescript-context-evidence.md).
+
 The development JS/TS module-graph scope adds
 `dimensions.architecture.dependencyGraph` version 1. Present Architecture as
 unmeasured: its skipped status means scoring is not calibrated, while graph
@@ -80,7 +96,7 @@ Inspection contains the unchanged `evidence`, `compatibility` metadata and a `us
 
 The .NET `--solution` option also accepts an explicit `.csproj`. Project mode scores only that project; Roslyn loads references for semantic resolution. Solution mode scores the selected solution's production projects. Both retain the source boundary at the entry point's directory. Automatic CLI discovery remains limited to exactly one solution; orchestration tools should resolve project ambiguity explicitly.
 
-Dimension `scope` has a stable `id`, `coverage` (`partial` or `unsupported`), `includes` and `excludes`. Status separately says whether a probe ran successfully. All current static probes cover only part of the broader quality dimension. JS/TS performance scope explicitly covers React hooks/effects and excludes general async, concurrency and runtime performance. Missing scope in historical v3 means unknown, not comprehensive. Changed scope rejects baseline comparisons.
+Dimension `scope` has a stable `id`, `coverage` (`partial` or `unsupported`), `includes` and `excludes`. Status separately says whether a probe ran successfully. All current static probes cover only part of the broader quality dimension. JS/TS async coverage depends on the recorded ruleset: development evidence includes bounded standard Promise usage as well as React hooks/effects, while general promise flow, concurrency safety, and runtime performance remain outside scope. Missing scope in historical v3 means unknown, not comprehensive. Changed scope rejects baseline comparisons.
 
 For .NET 2.3.0+, `dependencyCompatibility` records lookup coverage and grouped reasons. Missing compatibility makes Dependency Management failed with no score. Unknown candidate observations are informational and `scoreDisposition: unavailable`. Successful vulnerability/deprecation checks retain verified findings; unavailable vulnerability evidence also withholds Security. These assessment failures preserve the existing exit-2/unusable contract and cannot support an overall score.
 

@@ -62,7 +62,7 @@ export function analyzeFile(source: ts.SourceFile, checker: ts.TypeChecker, proj
         if (ts.isCallExpression(child)) {
           for (const finding of inspectReactCall(child, node.body!, checker))
             emit(finding.category, "performanceAsync", child, member, finding.message,
-              { ...finding.observations, classification: finding.confidence === "low" ? "reviewLead" : "actionableSignal",
+              { ...finding.observations, sourceSpanStart: child.getStart(source), classification: finding.confidence === "low" ? "reviewLead" : "actionableSignal",
                 scoreDisposition: finding.confidence === "low" ? "excludedReviewLead" : "scored" },
               finding.confidence, finding.confidence === "low" ? "info" : "warning");
         }

@@ -6,7 +6,7 @@
     "version": "0.3.0",
     "ecosystem": "javascript-typescript"
   },
-  "ruleset": "javascript-typescript-2026-10-02-module-graph",
+  "ruleset": "javascript-typescript-2026-10-03-owner-population",
   "scope": "Only listed rules have accuracy labels. Fixture distributions do not establish cross-ecosystem comparability.",
   "accuracy": {
     "codeQuality/highFunctionComplexity": {
@@ -44,9 +44,9 @@
     "errorHandling": null,
     "performanceAsync": {
       "count": 3,
-      "median": 6.0,
-      "p25": 6.0,
-      "p10": 6.0
+      "median": 0.0,
+      "p25": 0.0,
+      "p10": 0.0
     },
     "security": null,
     "testing": null,
@@ -105,7 +105,7 @@
         "codeQuality": 10,
         "maintainability": 10,
         "errorHandling": null,
-        "performanceAsync": 6,
+        "performanceAsync": 0,
         "security": null,
         "testing": null,
         "documentation": null,
@@ -126,7 +126,7 @@
         "codeQuality": 10,
         "maintainability": 10,
         "errorHandling": null,
-        "performanceAsync": 6,
+        "performanceAsync": 0,
         "security": null,
         "testing": null,
         "documentation": null,

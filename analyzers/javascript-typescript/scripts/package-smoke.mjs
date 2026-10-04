@@ -27,7 +27,7 @@ try {
   run([cli, '--scorecard-output', 'before.json', '--sarif', 'before.sarif'], fixture);
   const evidence = JSON.parse(fs.readFileSync(path.join(fixture, 'before.json'), 'utf8'));
   assert.equal(evidence.schemaVersion, 3); assert.ok(evidence.population.members >= 1);
-  assert.equal(evidence.analysis.ruleset, 'javascript-typescript-2026-10-02-module-graph');
+  assert.equal(evidence.analysis.ruleset, 'javascript-typescript-2026-10-03-owner-population');
   assert.equal(evidence.dimensions.codeQuality.scoringDecision.operation, 'deductions');
   assert.equal(evidence.dimensions.codeQuality.componentDetails.methodComplexity.score, evidence.dimensions.codeQuality.score);
   assert.equal(evidence.dimensions.codeQuality.componentDetails.decomposition.score, null);
@@ -48,7 +48,7 @@ try {
   fs.writeFileSync(path.join(promises, 'work.ts'), 'export const work = new Promise(async resolve => resolve(1)); export const start = () => [1].forEach(async item => { await Promise.resolve(item); });');
   run([cli, '--scorecard-output', 'before.json'], promises);
   const promiseEvidence = JSON.parse(fs.readFileSync(path.join(promises, 'before.json'), 'utf8'));
-  assert.equal(promiseEvidence.dimensions.performanceAsync.score, 6);
+  assert.equal(promiseEvidence.dimensions.performanceAsync.score, 0);
   assert.deepEqual(promiseEvidence.dimensions.performanceAsync.findings.map(f => f.category).sort(), ['asyncForEachCallback', 'asyncPromiseExecutor']);
   fs.writeFileSync(path.join(promises, 'work.ts'), 'export const work = new Promise(resolve => resolve(1)); export const start = () => [1].forEach(async item => { await Promise.resolve(item); });');
   run([cli, '--scorecard-output', 'after.json', '--baseline', 'before.json', '--fail-on-new', 'warning', '--max-score-drop', '0', '--sarif', 'after.sarif'], promises);
@@ -102,5 +102,23 @@ try {
   const graphInspection = JSON.parse(fs.readFileSync(path.join(modules, 'inspection.json'), 'utf8'));
   assert.equal(graphInspection.usable, true);
   assert.deepEqual(graphInspection.evidence.dimensions.architecture.dependencyGraph, splitEvidence.dimensions.architecture.dependencyGraph);
+  const handlers = path.join(temporary, 'handler-fixture'); fs.mkdirSync(handlers);
+  fs.writeFileSync(path.join(handlers, 'package.json'), '{"name":"installed-handlers"}');
+  fs.writeFileSync(path.join(handlers, 'code.ts'), `export async function work(){try {await Promise.resolve(1)} catch { /* Optional operation. */ }}
+    Promise.reject(1).catch(()=>{});`);
+  run([cli, '--scorecard-output', 'evidence.json', '--sarif', 'handlers.sarif'], handlers);
+  run([evidenceCli, '--input', 'evidence.json', '--inspect-output', 'inspection.json'], handlers);
+  const handlerInspection = JSON.parse(fs.readFileSync(path.join(handlers, 'inspection.json'), 'utf8'));
+  const dimensions = handlerInspection.evidence.dimensions;
+  assert.equal(handlerInspection.usable, true);
+  assert.equal(dimensions.errorHandling.score, undefined);
+  assert.equal(dimensions.errorHandling.handlerEvidence.totalHandlers, 2);
+  assert.equal(dimensions.errorHandling.handlerEvidence.documentedEmptyHandlers, 1);
+  assert.equal(dimensions.errorHandling.handlerEvidence.unexplainedEmptyHandlers, 1);
+  assert.equal(dimensions.errorHandling.findings[0].severity, 'info');
+  assert.equal(dimensions.codeQuality.componentDetails.decomposition.population.functions, 2);
+  assert.equal(dimensions.codeQuality.componentDetails.decomposition.score, null);
+  assert.equal(dimensions.performanceAsync.scoring.observations.eligibleOwners, 2);
+  assert.equal(dimensions.performanceAsync.scoring.observations.affectedOwners, 0);
   console.log('Installed package analysis, schema validation, baseline gates, SARIF and invalid-input smoke checks passed.');
 } finally { fs.rmSync(temporary, { recursive: true, force: true }); }

@@ -11,7 +11,7 @@ function isReactImport(declaration: ts.Declaration): boolean {
   return !!cursor && !cursor.importClause?.isTypeOnly && ts.isStringLiteral(cursor.moduleSpecifier) && cursor.moduleSpecifier.text === "react";
 }
 
-function importedHookName(call: ts.CallExpression, checker: ts.TypeChecker): string | undefined {
+export function importedHookName(call: ts.CallExpression, checker: ts.TypeChecker): string | undefined {
   const symbol = checker.getSymbolAtLocation(ts.isPropertyAccessExpression(call.expression) ? call.expression.name : call.expression);
   const declarations = symbol?.declarations ?? [];
   const reactHook = declarations.some(isReactImport);

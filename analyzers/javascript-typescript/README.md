@@ -4,7 +4,7 @@ Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0
 
 Each scored dimension includes `scoringDecision`: policy inputs, executed steps, rounding and finding attribution. These are aggregate policy decisions, not independent finding deductions. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md).
 
-The unpublished development ruleset `javascript-typescript-2026-10-02-module-graph` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements and adds unscored module dependency evidence. Generate new baselines for this ruleset; package version alone does not identify development scoring behavior.
+The unpublished development ruleset `javascript-typescript-2026-10-03-owner-population` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines for this ruleset; package version alone does not identify development scoring behavior.
 
 ```sh
 npx codemetrics-ai --project package.json
@@ -18,10 +18,11 @@ Default output paths are `.scorecard/javascript-typescript/metrics.csv` and `.sc
 
 | Dimension | Implementation |
 |---|---|
-| codeQuality (Method Complexity) | 40% one worst function score + 60% mean remaining; owned CC findings above 10. Decomposition is unmeasured. |
+| codeQuality (Method Complexity) | 40% one worst function score + 60% mean remaining; owned CC findings above 10. Decomposition has descriptive size/distribution evidence and no score. |
 | maintainability | 40% mean weakest ceil(N/5) function scores + 60% mean remaining |
 | performanceAsync (Async/Blocking Usage) | React hook/effect checks, standard Promise async executors, and informational async Array.forEach callbacks |
 | architecture | Module dependencies, explicit type-only separation, internal cycle groups and fan-in/out rankings; score remains unmeasured |
+| errorHandling | Catch clauses and inline standard Promise rejection handlers; documented empty bodies recognized; no score |
 | Other dimensions | Explicitly skipped |
 
 React checks run only when a source file imports React. Aliased named imports and namespace imports are recognized; local functions shadowing imports are excluded. Missing dependency arrays are advisory because running after every render can be intentional. The implementation does not claim exhaustive Rules of Hooks, dependency-array correctness, or general concurrency analysis. Source syntax errors make the run incomplete and source dimensions unscored. Semantic type errors are outside this AST-focused version's completeness check.
@@ -35,9 +36,15 @@ The metric checks avoidable usage hazards, not execution speed or throughput. I/
 - React hooks in condition expressions, logical left operands and once-evaluated loop initializers/iterables are not penalized merely for that surrounding syntax. Conditional branches, logical right operands and repeated loop positions remain findings. Outer conditional contexts still apply. The special React `use` API is not treated as an ordinary conditional hook.
 - Effects without dependency arrays are informational, excluded from scoring and warning/error quality gates. They remain visible in evidence and SARIF.
 
-An applicable async/React scope retains the provisional 6/10 policy: any scored signal selects 6; otherwise 10. A synchronous-only or type-only scope is skipped rather than awarded 10. Module-level promise operations and top-level await are inspected even without function metrics. Findings, scope and scoring dispositions distinguish observed usage from demonstrated runtime defects.
+Async usage scores the percentage of eligible function/module owners with scored findings. An owner counts once regardless of its finding count. Rates below 1%, below 2%, below 5%, at most 10%, at most 15%, at most 20%, and above 20% score 10, 9, 8, 6, 4, 2, and 0 respectively. Zero findings scores 10 only when an eligible population exists. Async syntax, standard Promise operations, imported React hook calls, and recognized usage findings establish eligibility; a React import alone and synchronous padding do not. Module/class initialization uses one module owner per file. Always report affected/eligible counts: a small population can score 0 from one affected owner. These are product-policy bands, not a runtime-performance measurement.
 
 This is bounded source analysis, not promise-flow verification. Referenced executor/callback functions, constructor aliases, runtime monkey-patching, arbitrary libraries, floating promises and exhaustive hook control flow are outside scope. See the [policy and supporting references](../../shared/scorecard-schema/javascript-typescript-async-policy.md).
+
+## Decomposition and error-handling evidence
+
+`codeQuality.componentDetails.decomposition` reports owned function lines/statements, median/p90 size, largest functions, module concentration, and separate initializer/literal/declaration/re-export context. Nested bodies are counted separately. Size is not responsibility: data tables, barrels, and orchestration roles receive no inferred defect or deduction. Code Quality remains a method-complexity score.
+
+`errorHandling.handlerEvidence` distinguishes unexplained empty syntax, documented empty bodies, and bodies containing code. Body comments acknowledge developer intent without judging the business rationale. Empty bodies produce informational review leads only; fallback behavior outside the handler may explain them. Referenced Promise callbacks are disclosed as uninspected. No handlers means an unavailable percentage, not a perfect score. See the [evidence contract](../../shared/scorecard-schema/javascript-typescript-context-evidence.md).
 
 ## Module architecture evidence
 
@@ -65,7 +72,7 @@ Measurements use each function's **own body**, excluding its signature, nested f
 
 Measurement `owned-function-body-v2-type-erasure` also excludes `as`, `satisfies`, angle-bracket assertions, non-null assertions, annotation delimiters, definite-assignment assertions and generic type-argument delimiters/commas. Their runtime expressions remain in scope, including functions and decisions inside `factory<T>` instantiation expressions. TypeScript's AST classifies those expressions as type nodes, so they require explicit executable traversal. Runtime negation, comparisons and object-property colons remain measured. The [hotspot audit](../../shared/scorecard-schema/calibration-runs/javascript-typescript-hotspot-review-2026-10-02.md) explains the correction and its corpus impact.
 
-Interpolation and weighting use exact rational arithmetic on decimal measurement representations, with one half-up rounding to one decimal at the end (8.65 → 8.7). The logarithmic MI measurement itself uses JavaScript floating-point arithmetic. `scoring.observations.functionContributions` records every function, measurements, group, individual score, rational weight and weighted loss. `topOffenders` samples five functions; it is not the scoring population. `componentDetails.methodComplexity` exposes the same complexity score; decomposition has a null score and unsupported status.
+Interpolation and weighting use exact rational arithmetic on decimal measurement representations, with one half-up rounding to one decimal at the end (8.65 → 8.7). The logarithmic MI measurement itself uses JavaScript floating-point arithmetic. `scoring.observations.functionContributions` records every function, measurements, group, individual score, rational weight and weighted loss. `topOffenders` samples five functions; it is not the scoring population. `componentDetails.methodComplexity` exposes the same complexity score; decomposition has a null score and unscored descriptive evidence.
 
 Function rows and complexity findings also carry optional `complexityBreakdown` version 1: baseline 1, counts of `ifStatements`, `switchCases`, `loops`, `catchClauses`, `ternaryExpressions`, `logicalAnd`, `logicalOr` and `nullishCoalescing`, plus `decisionIncrements` and `total`. `total = baseline + sum(counts) = ownComplexity`. The same owned traversal supplies the count and explanation. Counts include each non-default case label, even when labels share a body. They do not measure nesting, prove defects or add penalties. Older evidence can omit this diagnostic detail without becoming incompatible.
 
@@ -113,7 +120,7 @@ evidence. Overall dependencies and cycle findings remain intact, including mixed
 files and cycles crossing the views. Architecture is still unscored. See the
 [dependency view contract](../../shared/scorecard-schema/javascript-typescript-module-graph.md#implementation-reference-and-public-re-export-views).
 
-`metrics.ts` owns source traversal, raw member metrics and finding identities. `function-measurements.ts` collects the separate owned-body measurements; `function-scoring.ts` applies the two population policies with exact interpolation/rounding from `score-arithmetic.ts`. `react-probe.ts` checks calls owned by each function for React hook/effect observations. `async-probe.ts` checks each visited node once for bounded standard-library promise patterns, including module-level operations. Neither probe traverses nested bodies or calculates metrics. `async-scoring.ts` owns applicability, scope and the provisional async score. Regression fixtures preserve raw metrics, source locations and existing finding fingerprints; advisory severity/disposition changes are intentional.
+`metrics.ts` owns source traversal, raw member metrics and finding identities. `function-measurements.ts` collects the separate owned-body measurements; `function-scoring.ts` applies the two population policies with exact interpolation/rounding from `score-arithmetic.ts`. `react-probe.ts` checks calls owned by each function for React hook/effect observations. `async-probe.ts` checks each visited node once for bounded standard-library promise patterns, including module-level operations. Neither probe traverses nested bodies or calculates metrics. `async-population.ts` assigns distinct eligible owners; `async-scoring.ts` applies the population ladder. `decomposition-evidence.ts` records function size and module distribution without deductions. `error-handling.ts` records handler syntax and body comments without a score. Regression fixtures preserve raw metrics, source locations and existing finding fingerprints; advisory severity/disposition changes are intentional.
 
 ```sh
 npm ci
