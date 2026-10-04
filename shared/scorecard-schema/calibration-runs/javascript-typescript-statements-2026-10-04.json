@@ -1,0 +1,1515 @@
+{
+  "scope": "Explicit source-only package selections; no dependency install, build, semantic validation or runtime tests. Not whole-repository scorecards or cross-ecosystem calibration.",
+  "generatedAtUtc": "2026-10-04T16:25:41.557Z",
+  "nodeVersion": "v24.18.0",
+  "beforeAnalyzerBundleSha256": "2e0fbf1990914d7d588bb15984d68d9d7051a174be2ab50d96446c3dbb35d629",
+  "afterAnalyzerBundleSha256": "aa139d23ab4df4f560f4475c1eb0cd3a3d267ab494832d2e792d04384e5b0c34",
+  "policy": {
+    "candidates": {
+      "ownedStatements": [
+        [
+          10,
+          10
+        ],
+        [
+          20,
+          8
+        ],
+        [
+          40,
+          6
+        ],
+        [
+          80,
+          4
+        ],
+        [
+          160,
+          0
+        ]
+      ]
+    },
+    "aggregation": "40% one worst + 60% mean remaining; one half-up rounding to one decimal",
+    "purpose": "Statement-based sensitivity preview; thresholds and weights are not yet accepted production policy.",
+    "limits": "Size does not establish responsibility. CC and MI overlap must be reviewed before adding any deduction."
+  },
+  "measurement": "owned-executable-statements-v2",
+  "primaryMeasure": "ownedStatements",
+  "status": "experimental-unscored",
+  "verification": {
+    "tests": 184,
+    "sharedFixtures": 6,
+    "scoreBaselines": "compatible; no new/resolved findings or warning/score-drop gates",
+    "rawCsv": "byte-identical per pair",
+    "productionScores": "unchanged",
+    "profileChange": "decomposition v1 to v2 only"
+  },
+  "samples": [
+    {
+      "id": "express",
+      "repository": "express",
+      "commit": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "package": ".",
+      "include": [
+        "index.js",
+        "lib/**/*.js"
+      ],
+      "configurationSha256": "0756ff795edb28b3cc6dac8b759283e05733a1fb90e825538e16c394fd3833c7",
+      "csvSha256": "3007f51f5bb3e10faffbe13b04d87b62fa3d872fbf47318456c5334792237014",
+      "before": {
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "d6797dad-5b62-4fe4-a559-07b3923c2dec"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "15aafba6-ae58-4def-950e-160eb36ef87b"
+      },
+      "evidenceHashes": {
+        "before": "608c3401b9c372b7e228679e7212b81f64afed78b59300760cb05f38bee18bab",
+        "after": "6285a9ab43c05dc1284a0795dfe290e501d051aa7e706e84af62fdd421e1fec2"
+      },
+      "functionCountsChanged": 8,
+      "population": {
+        "modules": 7,
+        "functions": 109,
+        "sumOwnedFunctionLines": 768,
+        "sumOwnedFunctionStatements": 646,
+        "medianFunctionStatements": 4,
+        "p90FunctionStatements": 15,
+        "medianFunctionLines": 5,
+        "p90FunctionLines": 19
+      },
+      "largestFunctionContainers": [
+        {
+          "file": "lib/response.js",
+          "project": "express",
+          "implementedFunctions": 41,
+          "sumOwnedFunctionLines": 340,
+          "sumOwnedFunctionStatements": 298,
+          "initializer": {
+            "ownedStatements": 45,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 0,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.4613003095975232,
+          "shareOfOwnedFunctionLines": 0.4427083333333333
+        },
+        {
+          "file": "lib/application.js",
+          "project": "express",
+          "implementedFunctions": 25,
+          "sumOwnedFunctionLines": 181,
+          "sumOwnedFunctionStatements": 146,
+          "initializer": {
+            "ownedStatements": 33,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 0,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.2260061919504644,
+          "shareOfOwnedFunctionLines": 0.23567708333333334
+        },
+        {
+          "file": "lib/request.js",
+          "project": "express",
+          "implementedFunctions": 20,
+          "sumOwnedFunctionLines": 93,
+          "sumOwnedFunctionStatements": 76,
+          "initializer": {
+            "ownedStatements": 30,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 0,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.11764705882352941,
+          "shareOfOwnedFunctionLines": 0.12109375
+        }
+      ],
+      "preview": {
+        "id": "express",
+        "commit": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+        "runId": "15aafba6-ae58-4def-950e-160eb36ef87b",
+        "status": "experimental-unscored",
+        "productionScoresUnchanged": true,
+        "functions": 109,
+        "primaryMeasure": "ownedStatements",
+        "candidateScores": {
+          "ownedStatements": 8.2
+        },
+        "rankCorrelation": {
+          "linesWithCC": 0.848,
+          "statementsWithCC": 0.86,
+          "linesWithMIRisk": 0.989,
+          "statementsWithMIRisk": 0.953
+        },
+        "largestFunctions": [
+          {
+            "id": "3495ebd3fcd27608878bdf47a48945914b174cce9e40042483c1ec8a291f40d5",
+            "member": "send",
+            "line": 126,
+            "ownedSourceLines": 57,
+            "ownedStatements": 47,
+            "dataLiteralEntries": 0,
+            "file": "lib/response.js",
+            "ownComplexity": 23,
+            "ownMaintainabilityIndex": 34.70979551084187
+          },
+          {
+            "id": "5e2858fefd3b640a044176a7ccfbabbd88a6245e47a737edac5984f25023bd90",
+            "member": "download",
+            "line": 437,
+            "ownedSourceLines": 28,
+            "ownedStatements": 24,
+            "dataLiteralEntries": 1,
+            "file": "lib/response.js",
+            "ownComplexity": 13,
+            "ownMaintainabilityIndex": 45.159692098204125
+          },
+          {
+            "id": "cdb26b2ab14efed0815945ddbd8eb43e857127327cfa91205f05bba96da3e0f0",
+            "member": "render",
+            "line": 522,
+            "ownedSourceLines": 30,
+            "ownedStatements": 23,
+            "dataLiteralEntries": 6,
+            "file": "lib/application.js",
+            "ownComplexity": 10,
+            "ownMaintainabilityIndex": 43.84918989302365
+          },
+          {
+            "id": "7c0c471048263a69f2febc65eb865b9ec7a7db809534ae0008e4cbffa5132797",
+            "member": "jsonp",
+            "line": 264,
+            "ownedSourceLines": 23,
+            "ownedStatements": 21,
+            "dataLiteralEntries": 0,
+            "file": "lib/response.js",
+            "ownComplexity": 7,
+            "ownMaintainabilityIndex": 47.52353775892205
+          },
+          {
+            "id": "37801129d32dcf0579d9d35f5e05b8bf4c4ef701ff7a0141b2997fd2dfc22068",
+            "member": "acceptParams",
+            "line": 89,
+            "ownedSourceLines": 20,
+            "ownedStatements": 20,
+            "dataLiteralEntries": 3,
+            "file": "lib/utils.js",
+            "ownComplexity": 7,
+            "ownMaintainabilityIndex": 49.23812641316086
+          },
+          {
+            "id": "ad907a30bab37eff33e28add5a7d5bbb61ebc76e377b3975169468e221a24e03",
+            "member": "View",
+            "line": 52,
+            "ownedSourceLines": 22,
+            "ownedStatements": 20,
+            "dataLiteralEntries": 0,
+            "file": "lib/view.js",
+            "ownComplexity": 8,
+            "ownMaintainabilityIndex": 48.28123769579444
+          },
+          {
+            "id": "06a09e464cdb98908e15dea4937d1e43086ea6669e1ed27a4a4ffd286f7ff3fb",
+            "member": "defaultConfiguration",
+            "line": 90,
+            "ownedSourceLines": 22,
+            "ownedStatements": 18,
+            "dataLiteralEntries": 2,
+            "file": "lib/application.js",
+            "ownComplexity": 3,
+            "ownMaintainabilityIndex": 49.337943629613164
+          },
+          {
+            "id": "52502daaec8f315ff3ff6066ff716ff24857f8d6209aff520e59b677e736d42a",
+            "member": "sendFile",
+            "line": 375,
+            "ownedSourceLines": 19,
+            "ownedStatements": 18,
+            "dataLiteralEntries": 0,
+            "file": "lib/response.js",
+            "ownComplexity": 7,
+            "ownMaintainabilityIndex": 50.84745131090386
+          },
+          {
+            "id": "c3ff1057ad74a414cd21aed304a5856a6df989af408f738ac9702619280b507a",
+            "member": "redirect",
+            "line": 814,
+            "ownedSourceLines": 26,
+            "ownedStatements": 18,
+            "dataLiteralEntries": 3,
+            "file": "lib/response.js",
+            "ownComplexity": 6,
+            "ownMaintainabilityIndex": 47.70797284696481
+          },
+          {
+            "id": "871864b71453ff78fe5569454ad802396d0b4741b04b79ee854b858d4c7c18d3",
+            "member": "anonymous",
+            "line": 747,
+            "ownedSourceLines": 19,
+            "ownedStatements": 17,
+            "dataLiteralEntries": 1,
+            "file": "lib/response.js",
+            "ownComplexity": 8,
+            "ownMaintainabilityIndex": 49.91762557657744
+          }
+        ],
+        "largeLowComplexity": [],
+        "largeLowComplexityCount": 0
+      }
+    },
+    {
+      "id": "zod-v4",
+      "repository": "zod",
+      "commit": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "package": "packages/zod",
+      "include": [
+        "src/v4/**/*.ts"
+      ],
+      "configurationSha256": "500628532e30ebf69760655d30170970b1374cd55e70f37fa945f9b005683c9a",
+      "csvSha256": "7f714913b9d4c86a67acda3e320d6cdfda9700a7838b3957a2964ce738757d7d",
+      "before": {
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "67a26b97-286f-4e74-ba98-f02cea38fb1b"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "89bf3f6a-f20a-4274-9b56-27c838248d5a"
+      },
+      "evidenceHashes": {
+        "before": "eb6c7db564220f918867b52e8d20f958e81e33124ac8a123c15c0df4ecdcef0b",
+        "after": "fe9087e1d8eb1f9ac8f8f06b95669230c463ac71cc56f1608763c09dc63c88f4"
+      },
+      "functionCountsChanged": 347,
+      "population": {
+        "modules": 107,
+        "functions": 1948,
+        "sumOwnedFunctionLines": 14367,
+        "sumOwnedFunctionStatements": 9021,
+        "medianFunctionStatements": 1,
+        "p90FunctionStatements": 9,
+        "medianFunctionLines": 2,
+        "p90FunctionLines": 18
+      },
+      "largestFunctionContainers": [
+        {
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "project": "zod",
+          "implementedFunctions": 306,
+          "sumOwnedFunctionLines": 1901,
+          "sumOwnedFunctionStatements": 1457,
+          "initializer": {
+            "ownedStatements": 85,
+            "dataLiteralEntries": 2
+          },
+          "directReExports": 1,
+          "typeDeclarations": 285,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.16151202749140894,
+          "shareOfOwnedFunctionLines": 0.13231711561216677
+        },
+        {
+          "file": "packages/zod/src/v4/core/compile.ts",
+          "project": "zod",
+          "implementedFunctions": 123,
+          "sumOwnedFunctionLines": 1295,
+          "sumOwnedFunctionStatements": 1080,
+          "initializer": {
+            "ownedStatements": 4,
+            "dataLiteralEntries": 30
+          },
+          "directReExports": 0,
+          "typeDeclarations": 10,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.11972065181243764,
+          "shareOfOwnedFunctionLines": 0.09013711978840398
+        },
+        {
+          "file": "packages/zod/src/v4/classic/schemas.ts",
+          "project": "zod",
+          "implementedFunctions": 405,
+          "sumOwnedFunctionLines": 846,
+          "sumOwnedFunctionStatements": 645,
+          "initializer": {
+            "ownedStatements": 80,
+            "dataLiteralEntries": 149
+          },
+          "directReExports": 0,
+          "typeDeclarations": 96,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.07149983372131692,
+          "shareOfOwnedFunctionLines": 0.05888494466485696
+        }
+      ],
+      "preview": {
+        "id": "zod-v4",
+        "commit": "0b216ef674e297ebe41d8bf902262e56f8755822",
+        "runId": "89bf3f6a-f20a-4274-9b56-27c838248d5a",
+        "status": "experimental-unscored",
+        "productionScoresUnchanged": true,
+        "functions": 1948,
+        "primaryMeasure": "ownedStatements",
+        "candidateScores": {
+          "ownedStatements": 5.9
+        },
+        "rankCorrelation": {
+          "linesWithCC": 0.483,
+          "statementsWithCC": 0.62,
+          "linesWithMIRisk": 0.964,
+          "statementsWithMIRisk": 0.806
+        },
+        "largestFunctions": [
+          {
+            "id": "683255cb164f3ed97c20b06521f852fdb842cf2b5137145a0a5d4c4fb2c538f9",
+            "member": "convertBaseSchema",
+            "line": 390,
+            "ownedSourceLines": 255,
+            "ownedStatements": 220,
+            "dataLiteralEntries": 13,
+            "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+            "ownComplexity": 122,
+            "ownMaintainabilityIndex": 0.9938207694987709
+          },
+          {
+            "id": "8d21fb6277b8d3808a748d6eda3e79731cb9993f7074261f36c9bf8739dcf509",
+            "member": "generateCheck",
+            "line": 958,
+            "ownedSourceLines": 124,
+            "ownedStatements": 86,
+            "dataLiteralEntries": 0,
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "ownComplexity": 41,
+            "ownMaintainabilityIndex": 22.913693379914104
+          },
+          {
+            "id": "f4979992d6c0f6c06fdbc5ab1b0d62d6c78024c1d4a1161e5d02b951583a6fdc",
+            "member": "generateStringFormatCheck",
+            "line": 783,
+            "ownedSourceLines": 94,
+            "ownedStatements": 81,
+            "dataLiteralEntries": 0,
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "ownComplexity": 28,
+            "ownMaintainabilityIndex": 27.16864964889209
+          },
+          {
+            "id": "daf2087d3655f70305a8f59b4741c7474a0364b837dd438c9350a1e0e5fb8b7c",
+            "member": "core.$constructor:callback1/anonymous",
+            "line": 3242,
+            "ownedSourceLines": 115,
+            "ownedStatements": 77,
+            "dataLiteralEntries": 38,
+            "file": "packages/zod/src/v4/core/schemas.ts",
+            "ownComplexity": 43,
+            "ownMaintainabilityIndex": 22.740183131412053
+          },
+          {
+            "id": "88c771b0147769013aee9cfa563c24ab48a116023dfc5e481afddb080cff6e4b",
+            "member": "error/anonymous",
+            "line": 108,
+            "ownedSourceLines": 83,
+            "ownedStatements": 72,
+            "dataLiteralEntries": 0,
+            "file": "packages/zod/src/v4/locales/he.ts",
+            "ownComplexity": 65,
+            "ownMaintainabilityIndex": 22.401526459281936
+          },
+          {
+            "id": "aecc585ee2ad4dc3cfdddfc9017cc57a06c0e71874147ea067a329a0c9099ed9",
+            "member": "generateObjectCheck",
+            "line": 1190,
+            "ownedSourceLines": 83,
+            "ownedStatements": 72,
+            "dataLiteralEntries": 2,
+            "file": "packages/zod/src/v4/core/compile.ts",
+            "ownComplexity": 23,
+            "ownMaintainabilityIndex": 29.228532020778346
+          },
+          {
+            "id": "40aa5b5cac023082d5abdaa13f0796a1272019d0c271682d0ad4be6dc3c28281",
+            "member": "visit/mapInner",
+            "line": 59,
+            "ownedSourceLines": 107,
+            "ownedStatements": 65,
+            "dataLiteralEntries": 28,
+            "file": "packages/zod/src/v4/core/visit.ts",
+            "ownComplexity": 65,
+            "ownMaintainabilityIndex": 20.69210448451508
+          },
+          {
+            "id": "d5212ea89217c56565c72f5a81919f725ca9b70823f69d1eb1027f18cb7e4f62",
+            "member": "finalize",
+            "line": 568,
+            "ownedSourceLines": 68,
+            "ownedStatements": 63,
+            "dataLiteralEntries": 11,
+            "file": "packages/zod/src/v4/core/to-json-schema.ts",
+            "ownComplexity": 39,
+            "ownMaintainabilityIndex": 29.050858109044317
+          },
+          {
+            "id": "0128152cecafa0ef3801b4ccf860463ea7550be81299e9bbc5f0c9c0ab1ad871",
+            "member": "isRecursive",
+            "line": 50,
+            "ownedSourceLines": 93,
+            "ownedStatements": 61,
+            "dataLiteralEntries": 0,
+            "file": "packages/zod/src/v4/core/memoizer.ts",
+            "ownComplexity": 58,
+            "ownMaintainabilityIndex": 24.38773764247743
+          },
+          {
+            "id": "e9dd6259cc728a4a4b3812b0f0782226cf39e221705c294fc573717cfecddc16",
+            "member": "convertSchema",
+            "line": 808,
+            "ownedSourceLines": 54,
+            "ownedStatements": 55,
+            "dataLiteralEntries": 15,
+            "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+            "ownComplexity": 42,
+            "ownMaintainabilityIndex": 31.005185721478437
+          }
+        ],
+        "largeLowComplexity": [],
+        "largeLowComplexityCount": 0
+      }
+    },
+    {
+      "id": "tanstack-query-core",
+      "repository": "tanstack-query",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "package": "packages/query-core",
+      "include": [
+        "src/**/*.ts"
+      ],
+      "configurationSha256": "afbcf8e32b2b28049e640fa5f046dde5e4ee203bc2b99708044acd8c1139ccaa",
+      "csvSha256": "9f345cee4f6646f9480e3b2f5d6c5df70baefb54f29142301edb7a7552bf3f4d",
+      "before": {
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "2c9b5faa-c734-4b9f-90fc-b1da89690223"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "5e12f55e-e26f-44ef-a0dd-51dc9cb61a16"
+      },
+      "evidenceHashes": {
+        "before": "883889b00a055e323578239ba38276c76a68feae7105ada24d1bab44d1043147",
+        "after": "eb692056b16eea35521b41b2e806526afcb94286787e1c0618b72ed2f7e99e89"
+      },
+      "functionCountsChanged": 66,
+      "population": {
+        "modules": 23,
+        "functions": 427,
+        "sumOwnedFunctionLines": 2444,
+        "sumOwnedFunctionStatements": 1401,
+        "medianFunctionStatements": 1,
+        "p90FunctionStatements": 7,
+        "medianFunctionLines": 3,
+        "p90FunctionLines": 11
+      },
+      "largestFunctionContainers": [
+        {
+          "file": "packages/query-core/src/queryObserver.ts",
+          "project": "@tanstack/query-core",
+          "implementedFunctions": 46,
+          "sumOwnedFunctionLines": 395,
+          "sumOwnedFunctionStatements": 206,
+          "initializer": {
+            "ownedStatements": 0,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 2,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.1470378301213419,
+          "shareOfOwnedFunctionLines": 0.161620294599018
+        },
+        {
+          "file": "packages/query-core/src/query.ts",
+          "project": "@tanstack/query-core",
+          "implementedFunctions": 48,
+          "sumOwnedFunctionLines": 342,
+          "sumOwnedFunctionStatements": 182,
+          "initializer": {
+            "ownedStatements": 0,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 16,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.1299072091363312,
+          "shareOfOwnedFunctionLines": 0.13993453355155483
+        },
+        {
+          "file": "packages/query-core/src/utils.ts",
+          "project": "@tanstack/query-core",
+          "implementedFunctions": 29,
+          "sumOwnedFunctionLines": 189,
+          "sumOwnedFunctionStatements": 157,
+          "initializer": {
+            "ownedStatements": 3,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 7,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.11206281227694503,
+          "shareOfOwnedFunctionLines": 0.07733224222585924
+        }
+      ],
+      "preview": {
+        "id": "tanstack-query-core",
+        "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+        "runId": "5e12f55e-e26f-44ef-a0dd-51dc9cb61a16",
+        "status": "experimental-unscored",
+        "productionScoresUnchanged": true,
+        "functions": 427,
+        "primaryMeasure": "ownedStatements",
+        "candidateScores": {
+          "ownedStatements": 8
+        },
+        "rankCorrelation": {
+          "linesWithCC": 0.66,
+          "statementsWithCC": 0.637,
+          "linesWithMIRisk": 0.977,
+          "statementsWithMIRisk": 0.808
+        },
+        "largestFunctions": [
+          {
+            "id": "7ac2fa46c8302f9bab3c1c501b9564055b08be764e1e7890125ac185a8059912",
+            "member": "createResult",
+            "line": 558,
+            "ownedSourceLines": 116,
+            "ownedStatements": 56,
+            "dataLiteralEntries": 28,
+            "file": "packages/query-core/src/queryObserver.ts",
+            "ownComplexity": 29,
+            "ownMaintainabilityIndex": 25.81085469403287
+          },
+          {
+            "id": "43ce5b9fa2f8e5456f7e0780ee813bab0e454e60c06b8ec4cef427c1326df13b",
+            "member": "fetch",
+            "line": 590,
+            "ownedSourceLines": 97,
+            "ownedStatements": 50,
+            "dataLiteralEntries": 15,
+            "file": "packages/query-core/src/query.ts",
+            "ownComplexity": 22,
+            "ownMaintainabilityIndex": 28.717343577741268
+          },
+          {
+            "id": "a9d28fd79a8b6e1c5b598edb71f7e44a5df66685a186976603086f887f2cdb71",
+            "member": "execute",
+            "line": 284,
+            "ownedSourceLines": 120,
+            "ownedStatements": 38,
+            "dataLiteralEntries": 22,
+            "file": "packages/query-core/src/mutation.ts",
+            "ownComplexity": 11,
+            "ownMaintainabilityIndex": 28.551676056032814
+          },
+          {
+            "id": "1a27a0d841550d3131caf154afd4513d254349a90c262e2e266767876ae35ddb",
+            "member": "replaceEqualDeep",
+            "line": 341,
+            "ownedSourceLines": 31,
+            "ownedStatements": 30,
+            "dataLiteralEntries": 0,
+            "file": "packages/query-core/src/utils.ts",
+            "ownComplexity": 22,
+            "ownMaintainabilityIndex": 42.342236545570266
+          },
+          {
+            "id": "6cd494b9edabe2e45c70a2c00092858a846371c9437a9e627da01cd234612cd8",
+            "member": "setQueries/notifyManager.batch:callback0",
+            "line": 145,
+            "ownedSourceLines": 30,
+            "ownedStatements": 21,
+            "dataLiteralEntries": 0,
+            "file": "packages/query-core/src/queriesObserver.ts",
+            "ownComplexity": 8,
+            "ownMaintainabilityIndex": 46.42372283233971
+          },
+          {
+            "id": "e87b63fe2f9d35938f5da564ccdd0ffe2fbf4c563f36bb6eac6bf104afc99298",
+            "member": "matchQuery",
+            "line": 175,
+            "ownedSourceLines": 27,
+            "ownedStatements": 20,
+            "dataLiteralEntries": 0,
+            "file": "packages/query-core/src/utils.ts",
+            "ownComplexity": 16,
+            "ownMaintainabilityIndex": 46.15302364714824
+          },
+          {
+            "id": "61323ea17a77a2b180e5000fc566be819cd268d6144b5f29daf1ac516da6a71b",
+            "member": "streamedQuery/anonymous",
+            "line": 82,
+            "ownedSourceLines": 37,
+            "ownedStatements": 19,
+            "dataLiteralEntries": 9,
+            "file": "packages/query-core/src/streamedQuery.ts",
+            "ownComplexity": 11,
+            "ownMaintainabilityIndex": 42.57514035748058
+          },
+          {
+            "id": "d8e28b2d7f381b139089d4d4b67bc4543e3889b55ee2401e1a61d103cfdb13ac",
+            "member": "#notify/notifyManager.batch:callback0",
+            "line": 241,
+            "ownedSourceLines": 49,
+            "ownedStatements": 19,
+            "dataLiteralEntries": 3,
+            "file": "packages/query-core/src/mutationObserver.ts",
+            "ownComplexity": 9,
+            "ownMaintainabilityIndex": 40.31521964680734
+          },
+          {
+            "id": "2603ca80d55f552d868133f5e4e04b1b5978f5fdc8510a601853aa0a5a2c16a3",
+            "member": "partialMatchKey",
+            "line": 301,
+            "ownedSourceLines": 17,
+            "ownedStatements": 18,
+            "dataLiteralEntries": 0,
+            "file": "packages/query-core/src/utils.ts",
+            "ownComplexity": 14,
+            "ownMaintainabilityIndex": 50.89593973008638
+          },
+          {
+            "id": "7e12ac77158b69372876460347e916ff81031b961548116c0c802cdc7eaa75e9",
+            "member": "infiniteQueryBehavior/onFetch/fetchFn",
+            "line": 28,
+            "ownedSourceLines": 25,
+            "ownedStatements": 18,
+            "dataLiteralEntries": 2,
+            "file": "packages/query-core/src/infiniteQueryBehavior.ts",
+            "ownComplexity": 10,
+            "ownMaintainabilityIndex": 47.547316170148875
+          }
+        ],
+        "largeLowComplexity": [],
+        "largeLowComplexityCount": 0
+      }
+    },
+    {
+      "id": "tanstack-react-query",
+      "repository": "tanstack-query",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "package": "packages/react-query",
+      "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "configurationSha256": "de7addcb26f9aa4b8b1a0afadf13d9075df920c287ba7ff8738459f20e77dacb",
+      "csvSha256": "e2dc06bd0145c8c14d56ec768ffdd27fb3b1e6b6c03bd18d90ad94de3be34483",
+      "before": {
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "366cc706-83aa-4d24-af98-92b5984e3f4d"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "867cef9a-be98-438e-8526-14d36f28f68b"
+      },
+      "evidenceHashes": {
+        "before": "6bf78e8a10f652ab453604f4728941f09cbc0870dff673397b860a96c8f4791c",
+        "after": "9bee5d1324b148849804ae3e1dacc962201abb850f00b9a741201cf9df381637"
+      },
+      "functionCountsChanged": 28,
+      "population": {
+        "modules": 23,
+        "functions": 76,
+        "sumOwnedFunctionLines": 429,
+        "sumOwnedFunctionStatements": 205,
+        "medianFunctionStatements": 1,
+        "p90FunctionStatements": 6,
+        "medianFunctionLines": 2,
+        "p90FunctionLines": 13
+      },
+      "largestFunctionContainers": [
+        {
+          "file": "packages/react-query/src/useQueries.ts",
+          "project": "@tanstack/react-query",
+          "implementedFunctions": 12,
+          "sumOwnedFunctionLines": 90,
+          "sumOwnedFunctionStatements": 40,
+          "initializer": {
+            "ownedStatements": 1,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 8,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.1951219512195122,
+          "shareOfOwnedFunctionLines": 0.2097902097902098
+        },
+        {
+          "file": "packages/react-query/src/useBaseQuery.ts",
+          "project": "@tanstack/react-query",
+          "implementedFunctions": 6,
+          "sumOwnedFunctionLines": 70,
+          "sumOwnedFunctionStatements": 33,
+          "initializer": {
+            "ownedStatements": 1,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 0,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.16097560975609757,
+          "shareOfOwnedFunctionLines": 0.16317016317016317
+        },
+        {
+          "file": "packages/react-query/src/HydrationBoundary.tsx",
+          "project": "@tanstack/react-query",
+          "implementedFunctions": 4,
+          "sumOwnedFunctionLines": 40,
+          "sumOwnedFunctionStatements": 28,
+          "initializer": {
+            "ownedStatements": 2,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 1,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.13658536585365855,
+          "shareOfOwnedFunctionLines": 0.09324009324009325
+        }
+      ],
+      "preview": {
+        "id": "tanstack-react-query",
+        "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+        "runId": "867cef9a-be98-438e-8526-14d36f28f68b",
+        "status": "experimental-unscored",
+        "productionScoresUnchanged": true,
+        "functions": 76,
+        "primaryMeasure": "ownedStatements",
+        "candidateScores": {
+          "ownedStatements": 8.9
+        },
+        "rankCorrelation": {
+          "linesWithCC": 0.676,
+          "statementsWithCC": 0.716,
+          "linesWithMIRisk": 0.951,
+          "statementsWithMIRisk": 0.79
+        },
+        "largestFunctions": [
+          {
+            "id": "fafd991313315e4e0e382a81884461dc6266568070d322a115ddb22b299b9fc1",
+            "member": "useBaseQuery",
+            "line": 26,
+            "ownedSourceLines": 58,
+            "ownedStatements": 26,
+            "dataLiteralEntries": 9,
+            "file": "packages/react-query/src/useBaseQuery.ts",
+            "ownComplexity": 12,
+            "ownMaintainabilityIndex": 37.29647845989767
+          },
+          {
+            "id": "701eb60f349a4e8c620a325008c9aed42f1619ee97d7aee6b176a5a5faab91ea",
+            "member": "useQueries",
+            "line": 359,
+            "ownedSourceLines": 45,
+            "ownedStatements": 20,
+            "dataLiteralEntries": 9,
+            "file": "packages/react-query/src/useQueries.ts",
+            "ownComplexity": 5,
+            "ownMaintainabilityIndex": 41.86678624784844
+          },
+          {
+            "id": "5324c386464d6185f8bd204b978acde64879e8f9ab0b417c82bf15e2f1643f53",
+            "member": "HydrationBoundary/React.useMemo:callback0",
+            "line": 115,
+            "ownedSourceLines": 27,
+            "ownedStatements": 19,
+            "dataLiteralEntries": 1,
+            "file": "packages/react-query/src/HydrationBoundary.tsx",
+            "ownComplexity": 13,
+            "ownMaintainabilityIndex": 46.040606210761716
+          },
+          {
+            "id": "20f0a3a989897cc77fbb08d4e7ba8743dcbd45d9476981b2b641873c0519cef5",
+            "member": "useMutation",
+            "line": 191,
+            "ownedSourceLines": 25,
+            "ownedStatements": 8,
+            "dataLiteralEntries": 8,
+            "file": "packages/react-query/src/useMutation.ts",
+            "ownComplexity": 3,
+            "ownMaintainabilityIndex": 50.05528694249048
+          },
+          {
+            "id": "4bedbf81c9be197ff60ec510b4edf2f356c5baf558caca86f18fb42987d57666",
+            "member": "ensureSuspenseTimers",
+            "line": 21,
+            "ownedSourceLines": 13,
+            "ownedStatements": 7,
+            "dataLiteralEntries": 0,
+            "file": "packages/react-query/src/suspense.ts",
+            "ownComplexity": 4,
+            "ownMaintainabilityIndex": 57.893968029385846
+          },
+          {
+            "id": "c7cdf1efaf8457d3d75e802ea8b4437352b0f29703414191f24a4320dba5e77f",
+            "member": "useMutationState",
+            "line": 157,
+            "ownedSourceLines": 15,
+            "ownedStatements": 7,
+            "dataLiteralEntries": 1,
+            "file": "packages/react-query/src/useMutationState.ts",
+            "ownComplexity": 2,
+            "ownMaintainabilityIndex": 56.17186201438738
+          },
+          {
+            "id": "b1e614b8f9e99aa709dead4475ec2ea0551d7accb94ee2ae60a8da43dd35e63b",
+            "member": "useQueryClient",
+            "line": 21,
+            "ownedSourceLines": 6,
+            "ownedStatements": 6,
+            "dataLiteralEntries": 0,
+            "file": "packages/react-query/src/QueryClientProvider.tsx",
+            "ownComplexity": 3,
+            "ownMaintainabilityIndex": 67.49998802687836
+          },
+          {
+            "id": "e9c8aa34258948b50697356cea9cebae09d49fa51fab26d183c82dbbe1f13def",
+            "member": "HydrationBoundary",
+            "line": 86,
+            "ownedSourceLines": 10,
+            "ownedStatements": 6,
+            "dataLiteralEntries": 4,
+            "file": "packages/react-query/src/HydrationBoundary.tsx",
+            "ownComplexity": 1,
+            "ownMaintainabilityIndex": 61.565639348253015
+          },
+          {
+            "id": "9bd4223ea4ac470a1d4357e24d8578064f810cb2ab8d4371166b73585101e95c",
+            "member": "useQueries/optimisticResult.flatMap:callback0",
+            "line": 463,
+            "ownedSourceLines": 5,
+            "ownedStatements": 5,
+            "dataLiteralEntries": 0,
+            "file": "packages/react-query/src/useQueries.ts",
+            "ownComplexity": 3,
+            "ownMaintainabilityIndex": 68.2520240599036
+          },
+          {
+            "id": "33a1ff2d47f6a146eb6b10b5cdf9d9abbc519726844cae1b97bff5abf7dbe3e6",
+            "member": "ensurePreventErrorBoundaryRetry",
+            "line": 13,
+            "ownedSourceLines": 7,
+            "ownedStatements": 4,
+            "dataLiteralEntries": 2,
+            "file": "packages/react-query/src/errorBoundaryUtils.ts",
+            "ownComplexity": 6,
+            "ownMaintainabilityIndex": 63.24493671100938
+          }
+        ],
+        "largeLowComplexity": [],
+        "largeLowComplexityCount": 0
+      }
+    },
+    {
+      "id": "excalidraw-app",
+      "repository": "excalidraw",
+      "commit": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e",
+      "package": "excalidraw-app",
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "configurationSha256": "730c54afcb81fa77c64190d053c646e79b80b2640503048e01144bbb7bde55ef",
+      "csvSha256": "7728026ed231f2eb81c510c4ded4e544caec4f6665d6e96f853e54e7e6a55e77",
+      "before": {
+        "scores": {
+          "codeQuality": 7.3,
+          "maintainability": 5.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "238f0a22-9985-4b50-805f-09fc61e0f7cf"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 7.3,
+          "maintainability": 5.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "d2d74da3-122b-40d6-9ff3-0c80536caa1d"
+      },
+      "evidenceHashes": {
+        "before": "10811e40979b76cc6b1e4e9e808c23372e2c5d4ae954c7cba7387168837d63ad",
+        "after": "432641d33c1d5f27171e123620b176db33e84861805f07ec603233fb8c3af882"
+      },
+      "functionCountsChanged": 65,
+      "population": {
+        "modules": 37,
+        "functions": 360,
+        "sumOwnedFunctionLines": 3650,
+        "sumOwnedFunctionStatements": 1518,
+        "medianFunctionStatements": 2,
+        "p90FunctionStatements": 9,
+        "medianFunctionLines": 5,
+        "p90FunctionLines": 24
+      },
+      "largestFunctionContainers": [
+        {
+          "file": "excalidraw-app/collab/Collab.tsx",
+          "project": "excalidraw-app",
+          "implementedFunctions": 62,
+          "sumOwnedFunctionLines": 587,
+          "sumOwnedFunctionStatements": 305,
+          "initializer": {
+            "ownedStatements": 9,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 5,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.20092226613965744,
+          "shareOfOwnedFunctionLines": 0.16082191780821917
+        },
+        {
+          "file": "excalidraw-app/App.tsx",
+          "project": "excalidraw-app",
+          "implementedFunctions": 73,
+          "sumOwnedFunctionLines": 871,
+          "sumOwnedFunctionStatements": 278,
+          "initializer": {
+            "ownedStatements": 17,
+            "dataLiteralEntries": 4
+          },
+          "directReExports": 0,
+          "typeDeclarations": 0,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.1831357048748353,
+          "shareOfOwnedFunctionLines": 0.23863013698630137
+        },
+        {
+          "file": "excalidraw-app/components/DebugCanvas.tsx",
+          "project": "excalidraw-app",
+          "implementedFunctions": 29,
+          "sumOwnedFunctionLines": 363,
+          "sumOwnedFunctionStatements": 155,
+          "initializer": {
+            "ownedStatements": 18,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 1,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.10210803689064558,
+          "shareOfOwnedFunctionLines": 0.09945205479452054
+        }
+      ],
+      "preview": {
+        "id": "excalidraw-app",
+        "commit": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e",
+        "runId": "d2d74da3-122b-40d6-9ff3-0c80536caa1d",
+        "status": "experimental-unscored",
+        "productionScoresUnchanged": true,
+        "functions": 360,
+        "primaryMeasure": "ownedStatements",
+        "candidateScores": {
+          "ownedStatements": 8.4
+        },
+        "rankCorrelation": {
+          "linesWithCC": 0.684,
+          "statementsWithCC": 0.715,
+          "linesWithMIRisk": 0.988,
+          "statementsWithMIRisk": 0.812
+        },
+        "largestFunctions": [
+          {
+            "id": "f5ed360566b3ed2653c4bf6ad83c1ba63e33826377efa8c1ba8cd6a5fffb731d",
+            "member": "AIComponents/anonymous",
+            "line": 27,
+            "ownedSourceLines": 84,
+            "ownedStatements": 39,
+            "dataLiteralEntries": 18,
+            "file": "excalidraw-app/components/AI.tsx",
+            "ownComplexity": 17,
+            "ownMaintainabilityIndex": 31.644490947745872
+          },
+          {
+            "id": "3c031663391b586eadf60e8bc068bde1ce231dce8b295f32cf3d4b5da67a2676",
+            "member": "ExcalidrawWrapper",
+            "line": 375,
+            "ownedSourceLines": 319,
+            "ownedStatements": 37,
+            "dataLiteralEntries": 169,
+            "file": "excalidraw-app/App.tsx",
+            "ownComplexity": 16,
+            "ownMaintainabilityIndex": 15.085535373306698
+          },
+          {
+            "id": "8d6e290282701a1f11da85d920af24bb901879487680be9cd3e44b38f900bf67",
+            "member": "initializeScene",
+            "line": 217,
+            "ownedSourceLines": 100,
+            "ownedStatements": 36,
+            "dataLiteralEntries": 33,
+            "file": "excalidraw-app/App.tsx",
+            "ownComplexity": 21,
+            "ownMaintainabilityIndex": 28.385565118260157
+          },
+          {
+            "id": "230cedfb86034d444a2dc5634823444fb82d529b1183cee2d046221e98c94dda",
+            "member": "anonymous/this.portal.socket.on:callback1",
+            "line": 580,
+            "ownedSourceLines": 73,
+            "ownedStatements": 32,
+            "dataLiteralEntries": 13,
+            "file": "excalidraw-app/collab/Collab.tsx",
+            "ownComplexity": 12,
+            "ownMaintainabilityIndex": 34.157595588721605
+          },
+          {
+            "id": "bc08f8230346259042cff8fe5897c4d3cd68cc9bc2c294baebb194ac4fc2d3fb",
+            "member": "anonymous",
+            "line": 481,
+            "ownedSourceLines": 65,
+            "ownedStatements": 32,
+            "dataLiteralEntries": 11,
+            "file": "excalidraw-app/collab/Collab.tsx",
+            "ownComplexity": 6,
+            "ownMaintainabilityIndex": 36.14865975812263
+          },
+          {
+            "id": "7a0981ce35a0a3aaffe791c1cfad0132ce5cc441177fec1767fc966724390c59",
+            "member": "verifyJWT",
+            "line": 89,
+            "ownedSourceLines": 38,
+            "ownedStatements": 22,
+            "dataLiteralEntries": 3,
+            "file": "excalidraw-app/ExcalidrawPlusIframeExport.tsx",
+            "ownComplexity": 10,
+            "ownMaintainabilityIndex": 41.5361874787723
+          },
+          {
+            "id": "713f121f80ef0b9ebce0c2b4753571be70aa2b489b8dce9ecffa598ba4ab6647",
+            "member": "exportToBackend",
+            "line": 248,
+            "ownedSourceLines": 39,
+            "ownedStatements": 21,
+            "dataLiteralEntries": 16,
+            "file": "excalidraw-app/data/index.ts",
+            "ownComplexity": 7,
+            "ownMaintainabilityIndex": 41.57062726630235
+          },
+          {
+            "id": "c37ca909b0cc0584344ef451b4a2d86a00f4702b01605184a5cefd93a4eaa498",
+            "member": "renderPolygon",
+            "line": 81,
+            "ownedSourceLines": 19,
+            "ownedStatements": 19,
+            "dataLiteralEntries": 0,
+            "file": "excalidraw-app/components/DebugCanvas.tsx",
+            "ownComplexity": 5,
+            "ownMaintainabilityIndex": 50.60145950083315
+          },
+          {
+            "id": "8263d4ca2fa0842f42c9906d69db569d2cf8e736f466944fb6a51c98f65343e5",
+            "member": "anonymous",
+            "line": 365,
+            "ownedSourceLines": 30,
+            "ownedStatements": 17,
+            "dataLiteralEntries": 2,
+            "file": "excalidraw-app/collab/Collab.tsx",
+            "ownComplexity": 5,
+            "ownMaintainabilityIndex": 45.93655700443815
+          },
+          {
+            "id": "ff99973e44ed46db1368cd6710acb1871349cac5e397a83509aa29ec39748e94",
+            "member": "importFromLocalStorage",
+            "line": 37,
+            "ownedSourceLines": 24,
+            "ownedStatements": 17,
+            "dataLiteralEntries": 4,
+            "file": "excalidraw-app/data/localStorage.ts",
+            "ownComplexity": 6,
+            "ownMaintainabilityIndex": 49.09921562944705
+          }
+        ],
+        "largeLowComplexity": [],
+        "largeLowComplexityCount": 0
+      }
+    },
+    {
+      "id": "uptime-kuma-server",
+      "repository": "uptime-kuma",
+      "commit": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "package": ".",
+      "include": [
+        "server/**/*.js",
+        "server/**/*.ts"
+      ],
+      "configurationSha256": "953b8be8e97dcf7b7cbeae9273ec47c718aeb07d04a58682b72bf25133be51f1",
+      "csvSha256": "16b1cfbc6fa68e6d5dc73fad2e310f264e7c76672d13a43782870e2d48337f85",
+      "before": {
+        "scores": {
+          "codeQuality": 5.5,
+          "maintainability": 4.7,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "ad2ec5fe-57e7-4294-939a-77f5f83dc1b7"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 5.5,
+          "maintainability": 4.7,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "runId": "a4338550-f08e-405c-b40a-12b8a5606220"
+      },
+      "evidenceHashes": {
+        "before": "6050c84feca1f9d8cf01b5748d3c1afa5073c49d8b98646e0a8392b7753f14f6",
+        "after": "6dbb57605357250fe8dfc09d31439113359f5c8b2bd5e6e6f2caa0e0272da639"
+      },
+      "functionCountsChanged": 138,
+      "population": {
+        "modules": 213,
+        "functions": 1142,
+        "sumOwnedFunctionLines": 14981,
+        "sumOwnedFunctionStatements": 9347,
+        "medianFunctionStatements": 4,
+        "p90FunctionStatements": 19,
+        "medianFunctionLines": 7,
+        "p90FunctionLines": 31
+      },
+      "largestFunctionContainers": [
+        {
+          "file": "server/model/monitor.js",
+          "project": "uptime-kuma",
+          "implementedFunctions": 72,
+          "sumOwnedFunctionLines": 1128,
+          "sumOwnedFunctionStatements": 653,
+          "initializer": {
+            "ownedStatements": 27,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 0,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.06986198780357333,
+          "shareOfOwnedFunctionLines": 0.07529537414057806
+        },
+        {
+          "file": "server/server.js",
+          "project": "uptime-kuma",
+          "implementedFunctions": 58,
+          "sumOwnedFunctionLines": 961,
+          "sumOwnedFunctionStatements": 625,
+          "initializer": {
+            "ownedStatements": 103,
+            "dataLiteralEntries": 6
+          },
+          "directReExports": 0,
+          "typeDeclarations": 0,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.06686637423772333,
+          "shareOfOwnedFunctionLines": 0.06414792069955276
+        },
+        {
+          "file": "server/database.js",
+          "project": "uptime-kuma",
+          "implementedFunctions": 32,
+          "sumOwnedFunctionLines": 504,
+          "sumOwnedFunctionStatements": 337,
+          "initializer": {
+            "ownedStatements": 18,
+            "dataLiteralEntries": 0
+          },
+          "directReExports": 0,
+          "typeDeclarations": 0,
+          "enums": 0,
+          "shareOfOwnedFunctionStatements": 0.03605434898898042,
+          "shareOfOwnedFunctionLines": 0.03364261397770509
+        }
+      ],
+      "preview": {
+        "id": "uptime-kuma-server",
+        "commit": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+        "runId": "a4338550-f08e-405c-b40a-12b8a5606220",
+        "status": "experimental-unscored",
+        "productionScoresUnchanged": true,
+        "functions": 1142,
+        "primaryMeasure": "ownedStatements",
+        "candidateScores": {
+          "ownedStatements": 5.8
+        },
+        "rankCorrelation": {
+          "linesWithCC": 0.799,
+          "statementsWithCC": 0.868,
+          "linesWithMIRisk": 0.993,
+          "statementsWithMIRisk": 0.935
+        },
+        "largestFunctions": [
+          {
+            "id": "f9636396deb59b9fcb3f6aa61a650878654fbffe3054cba1ba5b45db98302adf",
+            "member": "start/beat",
+            "line": 431,
+            "ownedSourceLines": 442,
+            "ownedStatements": 289,
+            "dataLiteralEntries": 52,
+            "file": "server/model/monitor.js",
+            "ownComplexity": 126,
+            "ownMaintainabilityIndex": 0
+          },
+          {
+            "id": "062486edc30010f93f519f06529f7d671cddd2f690f9a592a714ed4392fbbabb",
+            "member": "anonymous/io.on:callback1/socket.on:callback1",
+            "line": 476,
+            "ownedSourceLines": 151,
+            "ownedStatements": 142,
+            "dataLiteralEntries": 7,
+            "file": "server/server.js",
+            "ownComplexity": 12,
+            "ownMaintainabilityIndex": 22.97548195232996
+          },
+          {
+            "id": "f7a40e0103841f7ed54a4eb91d71a652e827712a185274426823fc6bbcba37bd",
+            "member": "update",
+            "line": 212,
+            "ownedSourceLines": 101,
+            "ownedStatements": 92,
+            "dataLiteralEntries": 4,
+            "file": "server/uptime-calculator.js",
+            "ownComplexity": 26,
+            "ownMaintainabilityIndex": 25.923826252521554
+          },
+          {
+            "id": "9c6472e7ef78364131c6b3cd31ff37552454940f32cfd8eb48c621296345a4db",
+            "member": "send",
+            "line": 12,
+            "ownedSourceLines": 176,
+            "ownedStatements": 87,
+            "dataLiteralEntries": 58,
+            "file": "server/notification-providers/discord.js",
+            "ownComplexity": 47,
+            "ownMaintainabilityIndex": 17.242086131308504
+          },
+          {
+            "id": "616368c00ed854a8d3e6d00983d9479ec0e3a2398d9f517fb2cab4f91240e549",
+            "member": "anonymous/socket.on:callback1",
+            "line": 292,
+            "ownedSourceLines": 89,
+            "ownedStatements": 75,
+            "dataLiteralEntries": 16,
+            "file": "server/socket-handlers/status-page-socket-handler.js",
+            "ownComplexity": 15,
+            "ownMaintainabilityIndex": 29.306178053340112
+          },
+          {
+            "id": "932c53f5eccb30efa9291a5228b19e5aea530f1f13ae9bdec03cfa87234a2311",
+            "member": "send",
+            "line": 10,
+            "ownedSourceLines": 88,
+            "ownedStatements": 72,
+            "dataLiteralEntries": 8,
+            "file": "server/notification-providers/smseagle.js",
+            "ownComplexity": 35,
+            "ownMaintainabilityIndex": 26.839161021203537
+          },
+          {
+            "id": "beacb905c4e61276677d367be3544ec8ca6e27f78d8a261547db400a49147296",
+            "member": "validate",
+            "line": 1630,
+            "ownedSourceLines": 91,
+            "ownedStatements": 68,
+            "dataLiteralEntries": 2,
+            "file": "server/model/monitor.js",
+            "ownComplexity": 50,
+            "ownMaintainabilityIndex": 24.540630904785395
+          },
+          {
+            "id": "80c80a33dbe464ac7bea8bf9fb4d483e5fa984921edb7ab58c1941582f733ea6",
+            "member": "getData",
+            "line": 563,
+            "ownedSourceLines": 91,
+            "ownedStatements": 65,
+            "dataLiteralEntries": 2,
+            "file": "server/uptime-calculator.js",
+            "ownComplexity": 28,
+            "ownMaintainabilityIndex": 28.894723088049005
+          },
+          {
+            "id": "f35bd42e3fa5225767c0a49123172d4be5c911381b225b02db9a5efd3d281730",
+            "member": "send",
+            "line": 11,
+            "ownedSourceLines": 151,
+            "ownedStatements": 64,
+            "dataLiteralEntries": 56,
+            "file": "server/notification-providers/fluxer.js",
+            "ownComplexity": 36,
+            "ownMaintainabilityIndex": 20.763483727256297
+          },
+          {
+            "id": "f739b010cfa03c047e09db9408fb6c6e91f41458297c9e70ba19294104614e34",
+            "member": "connect",
+            "line": 252,
+            "ownedSourceLines": 137,
+            "ownedStatements": 61,
+            "dataLiteralEntries": 54,
+            "file": "server/database.js",
+            "ownComplexity": 22,
+            "ownMaintainabilityIndex": 23.90269517133265
+          }
+        ],
+        "largeLowComplexity": [
+          {
+            "id": "49bd9997906016024155847853069f15bc3b171534d70ca88bceea7f435bdccf",
+            "member": "anonymous/io.on:callback1",
+            "line": 373,
+            "ownedSourceLines": 87,
+            "ownedStatements": 56,
+            "dataLiteralEntries": 0,
+            "file": "server/server.js",
+            "ownComplexity": 5,
+            "ownMaintainabilityIndex": 32.7301302493417
+          },
+          {
+            "id": "1ba0391b0ade504ebdf6c5bb6d0db54ec68326162aad91ec7a2f0f6ac64acec5",
+            "member": "constructor",
+            "line": 73,
+            "ownedSourceLines": 60,
+            "ownedStatements": 44,
+            "dataLiteralEntries": 11,
+            "file": "server/uptime-kuma-server.js",
+            "ownComplexity": 5,
+            "ownMaintainabilityIndex": 35.42934726462588
+          },
+          {
+            "id": "67b250989803cd53c95910c574a016615a33c29a95b373dbc8b184cf55efc870",
+            "member": "anonymous",
+            "line": 208,
+            "ownedSourceLines": 62,
+            "ownedStatements": 43,
+            "dataLiteralEntries": 2,
+            "file": "server/server.js",
+            "ownComplexity": 4,
+            "ownMaintainabilityIndex": 36.51308487504644
+          }
+        ],
+        "largeLowComplexityCount": 3
+      }
+    }
+  ]
+}

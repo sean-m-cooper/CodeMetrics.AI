@@ -60,10 +60,17 @@ score 0 from one affected owner, and a rate below 1% can score 10 with findings.
 This is a usage policy, not a runtime-performance claim. A changed ruleset/scope
 requires a fresh baseline; do not bypass compatibility checks to claim improvement.
 
-`codeQuality.componentDetails.decomposition` version 1 contains unscored size and
-module-distribution evidence. Code Quality still measures method complexity only.
-`errorHandling.handlerEvidence` version 1 reports inspected handler counts and
-body-comment context, with no error-handling score. Recognize documented swallowing;
+`codeQuality.componentDetails.decomposition` contains unscored size and module
+distribution evidence. Version 1 ranks by owned lines; version 2 ranks by owned
+executable statements and retains lines as context. Version 2 counts concise
+function bodies as one implicit return. Require matching measurement versions for
+size/ranking comparisons; unchanged production scores remain compatible. Code
+Quality still measures method complexity only.
+`errorHandling.handlerEvidence` version 1 reports handler occurrences; version 2
+(`javascript-typescript-2026-10-04-local-handlers`) reports distinct handler bodies
+with their use sites, bounded local-reference resolution, and reasoned inspection
+gaps. Do not compare these populations as if the counting unit were unchanged.
+Both retain body-comment context and have no error-handling score. Recognize documented swallowing;
 do not turn empty-body review leads or code presence into correctness judgments.
 Disclose uninspected callbacks and absent populations. Missing optional evidence
 means unavailable, not zero. See the [context contract](../shared/scorecard-schema/javascript-typescript-context-evidence.md).

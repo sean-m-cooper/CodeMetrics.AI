@@ -1,17 +1,15 @@
 import ts from "typescript";
 import { hash, type Dimension, type Finding } from "./evidence.js";
-import { isFunction } from "./function-nodes.js";
+import { HandlerResolver, unwrapHandler } from "./handler-resolution.js";
 
+type UsageKind = "catchClause" | "promiseCatch" | "promiseThenRejection";
 interface Handler {
-  id: string; file: string; project: string; line: number; kind: "catchClause" | "promiseCatch" | "promiseThenRejection";
+  id: string; file: string; project: string; line: number; kind: "catchClause" | "promiseRejection";
   classification: "unexplainedEmpty" | "documentedEmpty" | "containsCode"; comments: string[];
-}
-function unwrap(node: ts.Expression): ts.Expression {
-  while (ts.isParenthesizedExpression(node) || ts.isAsExpression(node) || ts.isTypeAssertionExpression(node) || ts.isNonNullExpression(node) || ts.isSatisfiesExpression(node)) node = node.expression;
-  return node;
+  uses: { file: string; line: number; kind: UsageKind; resolution: "inline" | "reference" }[];
 }
 function undefinedValue(node: ts.Expression, checker: ts.TypeChecker): boolean {
-  node = unwrap(node);
+  node = unwrapHandler(node);
   if (ts.isVoidExpression(node)) return ts.isNumericLiteral(node.expression);
   if (!ts.isIdentifier(node) || node.text !== "undefined") return false;
   const declarations = checker.getSymbolAtLocation(node)?.declarations ?? [];
@@ -32,7 +30,7 @@ function bodyComments(body: ts.ConciseBody, source: ts.SourceFile): string[] {
   }
   return comments;
 }
-function rejectionArgument(call: ts.CallExpression, checker: ts.TypeChecker): { index: number; kind: Handler["kind"] } | undefined {
+function rejectionArgument(call: ts.CallExpression, checker: ts.TypeChecker): { index: number; kind: UsageKind } | undefined {
   const declaration = checker.getResolvedSignature(call)?.declaration;
   if (!declaration || !ts.isMethodSignature(declaration) || !ts.isIdentifier(declaration.name) ||
     !ts.isInterfaceDeclaration(declaration.parent) || !["Promise", "PromiseLike"].includes(declaration.parent.name.text)) return;
@@ -41,50 +39,63 @@ function rejectionArgument(call: ts.CallExpression, checker: ts.TypeChecker): { 
   if (declaration.name.text === "catch") return { index: 0, kind: "promiseCatch" };
   if (declaration.name.text === "then" && call.arguments.length > 1) return { index: 1, kind: "promiseThenRejection" };
 }
-export function inspectErrorHandling(source: ts.SourceFile, checker: ts.TypeChecker, file: string, project: string) {
-  const handlers: Handler[] = [], findings: Finding[] = [];
-  let uninspectedRejectionCallbacks = 0;
-  const occurrences = new Map<string, number>();
-  function add(body: ts.ConciseBody, kind: Handler["kind"]) {
-    const empty = emptyBody(body, checker), comments = empty ? bodyComments(body, source) : [];
+export function inspectErrorHandling(source: ts.SourceFile, checker: ts.TypeChecker, file: string, project: string, resolver: HandlerResolver) {
+  const handlers = new Map<string, Handler>();
+  const uninspectedCallbacks: { file: string; line: number; kind: UsageKind; reason: string }[] = [];
+  function add(body: ts.ConciseBody, kind: UsageKind, at: ts.Node, resolution: "inline" | "reference") {
+    const identity = resolver.identity(body);
+    const existing = handlers.get(identity.id);
+    const use = { file, line: source.getLineAndCharacterOfPosition(at.getStart(source)).line + 1, kind, resolution };
+    if (existing) { existing.uses.push(use); return; }
+    const empty = emptyBody(body, checker), comments = empty ? bodyComments(body, body.getSourceFile()) : [];
     const classification = !empty ? "containsCode" : comments.length ? "documentedEmpty" : "unexplainedEmpty";
-    const ordinal = occurrences.get(kind) ?? 0; occurrences.set(kind, ordinal + 1);
-    const handler: Handler = { id: hash(`${file}|${project}|${kind}|${ordinal}`), file, project,
-      line: source.getLineAndCharacterOfPosition(body.getStart(source)).line + 1, kind, classification, comments };
-    handlers.push(handler);
-    if (classification === "unexplainedEmpty") findings.push({ category: "unexplainedEmptyHandler",
-      ruleId: "javascript-typescript/errorHandling/unexplainedEmptyHandler", fingerprint: hash(`${handler.id}|unexplainedEmptyHandler`),
-      file, project, line: handler.line, severity: "info", confidence: "high",
-      message: "Handler contains only empty syntax or an undefined return, without a body comment. Review whether discarding the failure is intentional.",
-      observations: { handlerId: handler.id, kind, classification: "reviewLead", scoreDisposition: "excludedUncalibrated" } });
+    handlers.set(identity.id, { ...identity, kind: kind === "catchClause" ? "catchClause" : "promiseRejection", classification, comments, uses: [use] });
   }
   function visit(node: ts.Node) {
     if (ts.isTypeNode(node) && !ts.isExpressionWithTypeArguments(node)) return;
-    if (ts.isCatchClause(node)) add(node.block, "catchClause");
+    if (ts.isCatchClause(node)) add(node.block, "catchClause", node, "inline");
     if (ts.isCallExpression(node)) {
       const rejection = rejectionArgument(node, checker);
       if (rejection) {
-        const argument = node.arguments[rejection.index];
-        const callback = argument && unwrap(argument);
-        if (callback && isFunction(callback) && callback.body) add(callback.body, rejection.kind);
-        else uninspectedRejectionCallbacks++;
+        const resolved = resolver.resolve(node.arguments[rejection.index]);
+        if ("body" in resolved) add(resolved.body, rejection.kind, node, resolved.resolution);
+        else uninspectedCallbacks.push({ file, line: source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1,
+          kind: rejection.kind, reason: resolved.reason });
       }
     }
     ts.forEachChild(node, visit);
   }
-  visit(source); return { handlers, findings, uninspectedRejectionCallbacks };
+  visit(source); return { handlers: [...handlers.values()], uninspectedCallbacks };
+}
+function handlerFinding(handler: Handler): Finding {
+  return { category: "unexplainedEmptyHandler", ruleId: "javascript-typescript/errorHandling/unexplainedEmptyHandler",
+    fingerprint: hash(`${handler.id}|unexplainedEmptyHandler`), file: handler.file, project: handler.project, line: handler.line,
+    severity: "info", confidence: "high",
+    message: "Handler contains only empty syntax or an undefined return, without a body comment. Review whether discarding the failure is intentional.",
+    observations: { handlerId: handler.id, kind: handler.kind, uses: handler.uses, classification: "reviewLead", scoreDisposition: "excludedUncalibrated" } };
 }
 export function errorHandlingEvidence(results: ReturnType<typeof inspectErrorHandling>[], incomplete: boolean): Dimension {
-  const handlers = results.flatMap(result => result.handlers).sort((a, b) => a.file.localeCompare(b.file, "en") || a.line - b.line);
+  const unique = new Map<string, Handler>();
+  for (const row of results.flatMap(result => result.handlers)) {
+    const existing = unique.get(row.id);
+    if (existing) existing.uses.push(...row.uses);
+    else unique.set(row.id, { ...row, uses: [...row.uses] });
+  }
+  const handlers = [...unique.values()].sort((a, b) => a.file.localeCompare(b.file, "en") || a.line - b.line);
+  for (const handler of handlers) handler.uses.sort((a,b) => a.file.localeCompare(b.file, "en") || a.line - b.line || a.kind.localeCompare(b.kind, "en"));
+  const uninspectedCallbacks = results.flatMap(result => result.uninspectedCallbacks)
+    .sort((a,b) => a.file.localeCompare(b.file, "en") || a.line - b.line);
   const count = (classification: Handler["classification"]) => handlers.filter(handler => handler.classification === classification).length;
   const unexplained = count("unexplainedEmpty");
   return { status: incomplete ? "failed" : "skipped", basis: incomplete ? "Incomplete source; handler observations are diagnostic only." :
     "Handler syntax and documented intent are observed; error-handling scoring is not calibrated. Code presence is not proof of recovery.",
-    scope: { id: "javascript-typescript/errorHandling/handler-evidence-v1", coverage: "partial",
-      includes: ["catch-clauses", "inline-standard-promise-rejection-handlers", "body-comments"],
-      excludes: ["error-handling-score", "general-exception-flow", "referenced-callback-bodies", "correctness-of-recovery", "semantic-rationale-judgment"] },
-    findings: results.flatMap(result => result.findings), handlerEvidence: { version: 1, countingUnit: "handlerOccurrence",
+    scope: { id: "javascript-typescript/errorHandling/handler-evidence-v2", coverage: "partial",
+      includes: ["catch-clauses", "inline-standard-promise-rejection-handlers", "body-comments", "selected-source-referenced-handlers"],
+      excludes: ["error-handling-score", "general-exception-flow", "arbitrary-callback-value-flow", "correctness-of-recovery", "semantic-rationale-judgment"] },
+    findings: handlers.filter(handler => handler.classification === "unexplainedEmpty").map(handlerFinding), handlerEvidence: { version: 2, countingUnit: "distinctHandlerBody",
       totalHandlers: handlers.length, unexplainedEmptyHandlers: unexplained, documentedEmptyHandlers: count("documentedEmpty"),
       handlersContainingCode: count("containsCode"), unexplainedEmptyPercent: handlers.length ? 100 * unexplained / handlers.length : null,
-      uninspectedRejectionCallbacks: results.reduce((sum, result) => sum + result.uninspectedRejectionCallbacks, 0), handlers } };
+      handlerUseSites: handlers.reduce((sum, handler) => sum + handler.uses.length, 0),
+      referencedCallbackUseSites: handlers.reduce((sum, handler) => sum + handler.uses.filter(use => use.resolution === "reference").length, 0),
+      uninspectedRejectionCallbacks: uninspectedCallbacks.length, uninspectedCallbacks, handlers } };
 }

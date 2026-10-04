@@ -4,7 +4,7 @@ Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0
 
 Each scored dimension includes `scoringDecision`: policy inputs, executed steps, rounding and finding attribution. These are aggregate policy decisions, not independent finding deductions. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md).
 
-The unpublished development ruleset `javascript-typescript-2026-10-03-owner-population` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines for this ruleset; package version alone does not identify development scoring behavior.
+The unpublished development ruleset `javascript-typescript-2026-10-04-local-handlers` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines for this ruleset; package version alone does not identify development scoring behavior.
 
 ```sh
 npx codemetrics-ai --project package.json
@@ -22,7 +22,7 @@ Default output paths are `.scorecard/javascript-typescript/metrics.csv` and `.sc
 | maintainability | 40% mean weakest ceil(N/5) function scores + 60% mean remaining |
 | performanceAsync (Async/Blocking Usage) | React hook/effect checks, standard Promise async executors, and informational async Array.forEach callbacks |
 | architecture | Module dependencies, explicit type-only separation, internal cycle groups and fan-in/out rankings; score remains unmeasured |
-| errorHandling | Catch clauses and inline standard Promise rejection handlers; documented empty bodies recognized; no score |
+| errorHandling | Catch clauses and inline/referenced standard Promise rejection handlers; unique bodies, linked uses, and documented intent; no score |
 | Other dimensions | Explicitly skipped |
 
 React checks run only when a source file imports React. Aliased named imports and namespace imports are recognized; local functions shadowing imports are excluded. Missing dependency arrays are advisory because running after every render can be intentional. The implementation does not claim exhaustive Rules of Hooks, dependency-array correctness, or general concurrency analysis. Source syntax errors make the run incomplete and source dimensions unscored. Semantic type errors are outside this AST-focused version's completeness check.
@@ -42,9 +42,9 @@ This is bounded source analysis, not promise-flow verification. Referenced execu
 
 ## Decomposition and error-handling evidence
 
-`codeQuality.componentDetails.decomposition` reports owned function lines/statements, median/p90 size, largest functions, module concentration, and separate initializer/literal/declaration/re-export context. Nested bodies are counted separately. Size is not responsibility: data tables, barrels, and orchestration roles receive no inferred defect or deduction. Code Quality remains a method-complexity score.
+`codeQuality.componentDetails.decomposition` version 2 uses owned executable statements as its primary measure. It ranks functions/modules by statements and reports statement totals, median/p90, and module concentration. Lines and initializer/literal/declaration/re-export observations remain context. Nested bodies are counted separately. Size is not responsibility: data tables, barrels, and orchestration roles receive no inferred defect or deduction. Code Quality remains a method-complexity score.
 
-`errorHandling.handlerEvidence` distinguishes unexplained empty syntax, documented empty bodies, and bodies containing code. Body comments acknowledge developer intent without judging the business rationale. Empty bodies produce informational review leads only; fallback behavior outside the handler may explain them. Referenced Promise callbacks are disclosed as uninspected. No handlers means an unavailable percentage, not a perfect score. See the [evidence contract](../../shared/scorecard-schema/javascript-typescript-context-evidence.md).
+`errorHandling.handlerEvidence` distinguishes unexplained empty syntax, documented empty bodies, and bodies containing code. Body comments acknowledge developer intent without judging the business rationale. Empty bodies produce informational review leads only; fallback behavior outside the handler may explain them. Referenced Promise callbacks resolve through function declarations, const aliases, and imports within selected source. Shared implementations count once, with call sites attached. Reassigned, mutable, unsupported, and out-of-scope references retain reasoned inspection gaps. No handlers means an unavailable percentage, not a perfect score. See the [evidence contract](../../shared/scorecard-schema/javascript-typescript-context-evidence.md).
 
 ## Module architecture evidence
 
@@ -120,7 +120,7 @@ evidence. Overall dependencies and cycle findings remain intact, including mixed
 files and cycles crossing the views. Architecture is still unscored. See the
 [dependency view contract](../../shared/scorecard-schema/javascript-typescript-module-graph.md#implementation-reference-and-public-re-export-views).
 
-`metrics.ts` owns source traversal, raw member metrics and finding identities. `function-measurements.ts` collects the separate owned-body measurements; `function-scoring.ts` applies the two population policies with exact interpolation/rounding from `score-arithmetic.ts`. `react-probe.ts` checks calls owned by each function for React hook/effect observations. `async-probe.ts` checks each visited node once for bounded standard-library promise patterns, including module-level operations. Neither probe traverses nested bodies or calculates metrics. `async-population.ts` assigns distinct eligible owners; `async-scoring.ts` applies the population ladder. `decomposition-evidence.ts` records function size and module distribution without deductions. `error-handling.ts` records handler syntax and body comments without a score. Regression fixtures preserve raw metrics, source locations and existing finding fingerprints; advisory severity/disposition changes are intentional.
+`metrics.ts` owns source traversal, raw member metrics and finding identities. `function-measurements.ts` collects the separate owned-body measurements; `function-scoring.ts` applies the two population policies with exact interpolation/rounding from `score-arithmetic.ts`. `react-probe.ts` checks calls owned by each function for React hook/effect observations. `async-probe.ts` checks each visited node once for bounded standard-library promise patterns, including module-level operations. Neither probe traverses nested bodies or calculates metrics. `async-population.ts` assigns distinct eligible owners; `async-scoring.ts` applies the population ladder. `decomposition-evidence.ts` records function size and module distribution without deductions. `handler-resolution.ts` performs bounded declaration lookup; `error-handling.ts` records distinct handler bodies, use sites, and body comments without a score. Regression fixtures preserve raw metrics, source locations and existing finding fingerprints; advisory severity/disposition changes are intentional.
 
 ```sh
 npm ci
@@ -136,3 +136,27 @@ The test command limits Vitest to two workers to avoid contention between concur
 `test:architecture` verifies eleven labeled graph examples against their observed loading behavior and tests a real, offline npm installation alongside a competing workspace version. It executes only repository-authored fixture code. Safe deferred cycles, eager initialization failures, an immediately invoked function and partial CommonJS exports demonstrate why cycle counts alone are not defect labels. Results are written to `TestResults/js-ts-architecture-context/` at the repository root. CI and npm release verification both run this check; Architecture remains unscored.
 
 The packaged `codemetrics-evidence --inspect-output <path>` command reads v2/v3 and validates optional expected provenance; historical v2 cannot be compared, gated or exported as SARIF. Structured dimension scope identifies implemented coverage. See [consumer integration](../../docs/evidence-workflows.md#skill-and-other-evidence-consumers).
+
+## Application corpus and decomposition experiment
+
+The source-only corpus now includes pinned Excalidraw app and Uptime Kuma server
+selections alongside Express, Zod, and TanStack Query. Clones live under `E:/repos`;
+no sample installation, build, or application execution is needed. The explicit
+selections and dependency-resolution gaps remain part of the report.
+
+`function-policy-corpus.mjs --statement-decomposition` (after its three path arguments)
+compares a saved handler-v2/decomposition-v1 bundle with the statement-based profile.
+It asserts identical raw CSV, unchanged production scoring/findings, and compatible
+score gates. The earlier `--application-context` experiment compares the `4a68403`
+bundle to the original local-handler extension; that historical scope migration
+requires fresh baselines.
+
+`decomposition-preview.mjs <corpus-directory> <output-json>` evaluates
+a statement-based size ladder and measures overlap with CC/MI. Historical line-based
+results remain in the earlier report, not the current candidate.
+It is an offline script, excluded from the npm package, and never changes evidence
+or production scores. The [application corpus and preview report](../../shared/scorecard-schema/calibration-runs/javascript-typescript-application-context-2026-10-04.md)
+records results and limitations. Executable statements are the accepted primary size measure. The numerical ladder
+and weights remain experimental; Code Quality continues to score method complexity
+only. The [statement calibration report](../../shared/scorecard-schema/calibration-runs/javascript-typescript-statements-2026-10-04.md)
+records the updated preview and counting contract.

@@ -27,7 +27,7 @@ try {
   run([cli, '--scorecard-output', 'before.json', '--sarif', 'before.sarif'], fixture);
   const evidence = JSON.parse(fs.readFileSync(path.join(fixture, 'before.json'), 'utf8'));
   assert.equal(evidence.schemaVersion, 3); assert.ok(evidence.population.members >= 1);
-  assert.equal(evidence.analysis.ruleset, 'javascript-typescript-2026-10-03-owner-population');
+  assert.equal(evidence.analysis.ruleset, 'javascript-typescript-2026-10-04-local-handlers');
   assert.equal(evidence.dimensions.codeQuality.scoringDecision.operation, 'deductions');
   assert.equal(evidence.dimensions.codeQuality.componentDetails.methodComplexity.score, evidence.dimensions.codeQuality.score);
   assert.equal(evidence.dimensions.codeQuality.componentDetails.decomposition.score, null);
@@ -105,7 +105,7 @@ try {
   const handlers = path.join(temporary, 'handler-fixture'); fs.mkdirSync(handlers);
   fs.writeFileSync(path.join(handlers, 'package.json'), '{"name":"installed-handlers"}');
   fs.writeFileSync(path.join(handlers, 'code.ts'), `export async function work(){try {await Promise.resolve(1)} catch { /* Optional operation. */ }}
-    Promise.reject(1).catch(()=>{});`);
+    const ignore=()=>{}; Promise.reject(1).catch(ignore); Promise.reject(2).then(undefined,ignore);`);
   run([cli, '--scorecard-output', 'evidence.json', '--sarif', 'handlers.sarif'], handlers);
   run([evidenceCli, '--input', 'evidence.json', '--inspect-output', 'inspection.json'], handlers);
   const handlerInspection = JSON.parse(fs.readFileSync(path.join(handlers, 'inspection.json'), 'utf8'));
@@ -113,11 +113,15 @@ try {
   assert.equal(handlerInspection.usable, true);
   assert.equal(dimensions.errorHandling.score, undefined);
   assert.equal(dimensions.errorHandling.handlerEvidence.totalHandlers, 2);
+  assert.equal(dimensions.errorHandling.handlerEvidence.version, 2);
+  assert.equal(dimensions.errorHandling.handlerEvidence.referencedCallbackUseSites, 2);
   assert.equal(dimensions.errorHandling.handlerEvidence.documentedEmptyHandlers, 1);
   assert.equal(dimensions.errorHandling.handlerEvidence.unexplainedEmptyHandlers, 1);
   assert.equal(dimensions.errorHandling.findings[0].severity, 'info');
   assert.equal(dimensions.codeQuality.componentDetails.decomposition.population.functions, 2);
   assert.equal(dimensions.codeQuality.componentDetails.decomposition.score, null);
+  assert.equal(dimensions.codeQuality.componentDetails.decomposition.version, 2);
+  assert.equal(dimensions.codeQuality.componentDetails.decomposition.primaryMeasure, "ownedStatements");
   assert.equal(dimensions.performanceAsync.scoring.observations.eligibleOwners, 2);
   assert.equal(dimensions.performanceAsync.scoring.observations.affectedOwners, 0);
   console.log('Installed package analysis, schema validation, baseline gates, SARIF and invalid-input smoke checks passed.');

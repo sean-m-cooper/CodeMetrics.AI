@@ -87,12 +87,45 @@ describe("decomposition evidence", () => {
     expect(component.modules.find((item: any) => item.file === "index.ts").sumOwnedFunctionLines).toBe(0);
     expect(component.population.sumOwnedFunctionLines).toBe(module.functions.reduce((sum: number, item: any) => sum + item.ownedSourceLines, 0));
   });
+  it("counts concise bodies and nested implementations once", () => {
+    const result = run(`export const short=()=>1;
+      export const explicit=()=>{return 1;};
+      export const outer=()=>()=>2;
+      export function declarationOnly(){let placeholder:number; type T=string; function empty(){};}
+      export function initialized(){const value={a:1,b:2}; return value;}`);
+    const profile=(result.dimensions.codeQuality.componentDetails as any).decomposition;
+    const rows=profile.modules[0].functions;
+    expect(profile.version).toBe(2); expect(profile.primaryMeasure).toBe("ownedStatements");
+    expect(rows.find((r:any)=>r.member==="short").ownedStatements).toBe(1);
+    expect(rows.find((r:any)=>r.member==="explicit").ownedStatements).toBe(1);
+    expect(rows.filter((r:any)=>r.member.startsWith("outer")).map((r:any)=>r.ownedStatements)).toEqual([1,1]);
+    expect(rows.find((r:any)=>r.member==="declarationOnly").ownedStatements).toBe(0);
+    expect(profile.population.sumOwnedFunctionStatements).toBe(6);
+    expect(profile.population.medianFunctionStatements).toBe(1);
+    expect(profile.population.p90FunctionStatements).toBe(2);
+  });
+  it("ranks executable work ahead of multiline data and ignores label wrappers", () => {
+    const result=run(`export const data=()=>({
+      a:1,
+      b:2,
+      c:3,
+      d:4
+    });
+    export function work(){label: { log(); } log(); log();}`);
+    const profile=(result.dimensions.codeQuality.componentDetails as any).decomposition;
+    expect(profile.largestFunctions[0].member).toBe("work");
+    expect(profile.largestFunctions[0].ownedStatements).toBe(3);
+    expect(profile.population.sumOwnedFunctionStatements).toBe(4);
+    expect(profile.largestFunctionContainers[0].shareOfOwnedFunctionStatements).toBe(1);
+    expect(profile.largestFunctions[1].ownedSourceLines).toBeGreaterThan(profile.largestFunctions[0].ownedSourceLines);
+  });
   it("does not fabricate functions or a score for data-only and empty modules", () => {
     const result = run("export const table={a:1,b:2}; interface Shape {x:number}");
     const component = (result.dimensions.codeQuality.componentDetails as any).decomposition;
     expect(result.dimensions.codeQuality.status).toBe("skipped");
     expect(component.population.functions).toBe(0);
     expect(component.population.p90FunctionLines).toBeNull();
+    expect(component.population.p90FunctionStatements).toBeNull();
     expect(component.largestFunctionContainers).toEqual([]);
   });
 });
@@ -125,15 +158,55 @@ describe("error-handling evidence", () => {
     expect(data.documentedEmptyHandlers).toBe(1);
     expect(data.handlersContainingCode).toBe(3);
   });
-  it("excludes custom catch APIs, discloses referenced callbacks and keeps nested handlers distinct", () => {
+  it("excludes custom catch APIs, resolves local callbacks and keeps nested handlers distinct", () => {
     const result = run(`const custom={catch(cb:()=>void){cb()}}; custom.catch(()=>{});
       const callback=()=>{}; Promise.reject(1).catch(callback);
       try {work()} catch { try {cleanup()} catch {} }`);
     const data = result.dimensions.errorHandling.handlerEvidence as any;
-    expect(data.totalHandlers).toBe(2);
-    expect(data.uninspectedRejectionCallbacks).toBe(1);
-    expect(data.unexplainedEmptyHandlers).toBe(1);
+    expect(data.totalHandlers).toBe(3);
+    expect(data.uninspectedRejectionCallbacks).toBe(0);
+    expect(data.unexplainedEmptyHandlers).toBe(2);
     expect(data.handlersContainingCode).toBe(1);
+  });
+  it("counts a referenced implementation once across catch and then call sites", () => {
+    const data = run(`function ignore(){ /* Deliberate best-effort operation */ }
+      const alias=ignore; Promise.reject(1).catch(alias); Promise.reject(2).then(undefined,ignore);`).dimensions.errorHandling.handlerEvidence as any;
+    expect(data.version).toBe(2); expect(data.countingUnit).toBe("distinctHandlerBody");
+    expect(data.totalHandlers).toBe(1); expect(data.documentedEmptyHandlers).toBe(1);
+    expect(data.handlerUseSites).toBe(2); expect(data.referencedCallbackUseSites).toBe(2);
+    expect(data.handlers[0].uses.map((use:any)=>use.kind)).toEqual(["promiseCatch","promiseThenRejection"]);
+  });
+  it("resolves selected-module imports and deduplicates across source files", () => {
+    const result = run("import {ignore as local} from './handlers'; Promise.reject(1).catch(local);", {
+      "other.ts":"import {ignore} from './handlers'; Promise.reject(2).catch(ignore);",
+      "handlers.ts":"export const ignore=()=>{};"});
+    const data = result.dimensions.errorHandling.handlerEvidence as any;
+    expect(data.totalHandlers).toBe(1); expect(data.handlerUseSites).toBe(2);
+    expect(data.handlers[0].file).toBe("handlers.ts");
+    expect(result.dimensions.errorHandling.findings).toHaveLength(1);
+    expect(data.handlers[0].uses.map((use:any)=>use.file)).toEqual(["code.ts","other.ts"]);
+  });
+  it("leaves mutable, reassigned, property and cyclic callbacks unresolved", () => {
+    const data = run(`let mutable=()=>{}; Promise.reject(1).catch(mutable);
+      function changed(){} changed=()=>console.log('x'); Promise.reject(1).catch(changed);
+      const a=b; const b=a; Promise.reject(1).catch(a);
+      const object={ignore(){}}; Promise.reject(1).catch(object.ignore);`).dimensions.errorHandling.handlerEvidence as any;
+    expect(data.totalHandlers).toBe(0); expect(data.uninspectedRejectionCallbacks).toBe(4);
+    expect(data.uninspectedCallbacks.map((row:any)=>row.reason)).toEqual([
+      "mutableBinding","reassignedBinding","aliasCycleOrDepth","unsupportedExpression"]);
+  });
+  it("does not pull excluded callback bodies into the handler population", () => {
+    const data = run("import {ignore} from './helper.test'; Promise.reject(1).catch(ignore);", {
+      "helper.test.ts":"export function ignore(){}"}).dimensions.errorHandling.handlerEvidence as any;
+    expect(data.totalHandlers).toBe(0);
+    expect(data.uninspectedCallbacks[0].reason).toBe("outsideSelectedSource");
+  });
+  it("keeps referenced identities across checkout roots and line movement", () => {
+    const code="function ignore(){} Promise.reject(1).catch(ignore);";
+    const before=run(code).dimensions.errorHandling.findings[0];
+    const after=run("\n\n"+code).dimensions.errorHandling.findings[0];
+    expect(before.fingerprint).toBe(after.fingerprint);
+    expect(after.line).toBe(before.line!+2);
   });
   it("has no percentage or perfect score without observed handlers", () => {
     const dimension = run("export const value=1;").dimensions.errorHandling;

@@ -6,7 +6,7 @@
     "version": "0.3.0",
     "ecosystem": "javascript-typescript"
   },
-  "ruleset": "javascript-typescript-2026-10-03-owner-population",
+  "ruleset": "javascript-typescript-2026-10-04-local-handlers",
   "scope": "Only listed rules have accuracy labels. Fixture distributions do not establish cross-ecosystem comparability.",
   "accuracy": {
     "codeQuality/highFunctionComplexity": {
