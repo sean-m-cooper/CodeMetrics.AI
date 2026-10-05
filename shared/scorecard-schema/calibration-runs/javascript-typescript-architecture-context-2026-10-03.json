@@ -1,0 +1,346 @@
+{
+  "generatedAtUtc": "2026-10-03T14:48:27.526Z",
+  "nodeVersion": "v24.18.0",
+  "fixtureSha256": "157ca4197ca16f8c54f6850c3c8cb831e8b7b479174ff7da9959c30749633657",
+  "analyzerBundleSha256": "89a506c1b68c187420174a3570276167c628417200eee443f7832df3ea3cdfd4",
+  "scope": "Authored source-graph counterexamples, not a scored architecture ladder or representative defect prevalence estimate.",
+  "architectureScored": false,
+  "samples": [
+    {
+      "id": "barrel",
+      "label": "Intentional public export surface",
+      "evidenceSha256": "853b38f2a4523bf1964db79f6fadadc1f8610c864011f4b4f603cebe57d6f43e",
+      "runId": "286d1e45-7ed8-48ff-9d8d-cff1a34c8354",
+      "observed": {
+        "cycles": 0,
+        "typeOnly": 0,
+        "fanOut": 3,
+        "barrels": 1
+      },
+      "runtime": {
+        "value": 3
+      }
+    },
+    {
+      "id": "service-dependencies",
+      "label": "Ordinary acyclic service composition",
+      "evidenceSha256": "25e59eb5581b22ffd3f1651170160a2070b0258ccd3cfdc7b5e5ba55d772d7fe",
+      "runId": "6c8c88c8-83c8-453c-82fe-57c762590a1c",
+      "observed": {
+        "cycles": 0,
+        "typeOnly": 0,
+        "fanOut": 2,
+        "barrels": 0
+      },
+      "runtime": {
+        "value": "value:4"
+      }
+    },
+    {
+      "id": "type-only-cycle",
+      "label": "Mutually referring types, no value edge",
+      "evidenceSha256": "d08f09569773386ea2736dfc245394e36077f6f863bd33efa675fa4efe48ff8a",
+      "runId": "6131dfdc-8836-42f1-886e-ccbe058fa50a",
+      "observed": {
+        "cycles": 0,
+        "typeOnly": 2,
+        "fanOut": 0,
+        "barrels": 0
+      },
+      "runtime": null
+    },
+    {
+      "id": "esm-deferred-cycle",
+      "label": "Cycle with bindings read after initialization",
+      "evidenceSha256": "b693b19f913e179a4585b369288459a382e5deab41ab18c536ba058dd564acfe",
+      "runId": "d76637ac-7956-46c7-bf03-7fef75a1b1ca",
+      "observed": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "value": 1
+      }
+    },
+    {
+      "id": "esm-eager-cycle",
+      "label": "Demonstrated uninitialized binding access",
+      "evidenceSha256": "a6500c5c40153bf340a5ea331e68858d63cf6d446a9b7137e1dcc230fa2697e0",
+      "runId": "c8a9be1f-2003-4544-ba5f-76288bda6997",
+      "observed": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "errorName": "ReferenceError",
+        "message": "Cannot access 'a' before initialization"
+      }
+    },
+    {
+      "id": "esm-iife-cycle",
+      "label": "Function nesting does not prove deferred execution",
+      "evidenceSha256": "8b9967b1ddab9d19f003e7416e51cf1ef97d11a68935786c31b26433b980dd47",
+      "runId": "77393298-640f-43a3-8857-779c7091a882",
+      "observed": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "errorName": "ReferenceError",
+        "message": "Cannot access 'a' before initialization"
+      }
+    },
+    {
+      "id": "commonjs-deferred-cycle",
+      "label": "CommonJS reads populated exports after loading",
+      "evidenceSha256": "3b77493fd3d36c2bad49f754354d399b8b71b933bd0b81ec387785cea7a23aea",
+      "runId": "34a92d4a-1944-4a1c-a14d-931d89a7dcee",
+      "observed": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "value": 1
+      }
+    },
+    {
+      "id": "commonjs-partial-exports",
+      "label": "Early export read captures undefined without throwing",
+      "evidenceSha256": "f45006d095d489e8c339293f7149f9d1d1805aa57ae1021af1ddfd7925077cd1",
+      "runId": "891c2a12-e92f-411f-8c28-955363e2ad00",
+      "observed": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "value": "undefined"
+      }
+    },
+    {
+      "id": "dynamic-deferred-cycle",
+      "label": "Literal dynamic imports form a source cycle without a loading failure",
+      "evidenceSha256": "edb8632084c5380ecb301a89111b84370414b6db20de058637b4c04f715e65a3",
+      "runId": "42803235-b4cf-4538-8230-fefff304dff5",
+      "observed": {
+        "cycles": 1,
+        "typeOnly": 0,
+        "fanOut": 1,
+        "barrels": 0
+      },
+      "runtime": {
+        "value": 1
+      }
+    }
+  ],
+  "installedPackage": {
+    "runId": "db3e5343-0f23-4108-907f-27bb4b768647",
+    "evidenceSha256": "23440810933f1469b7c30eb01f8d369c3f9d15787a71cdf4801734fd8e4c6ca6",
+    "tarballSha256": "9c8cba8fbdb6f8d16674cdcb5ccd4487458d0280541b2521470016fb214d203f",
+    "runtimeVersion": 1,
+    "resolutionOutcomes": [
+      {
+        "specifier": "@fixture/library",
+        "resolution": "external",
+        "via": "typescript"
+      },
+      {
+        "specifier": "@fixture/library/private",
+        "resolution": "unresolved",
+        "via": "unresolved"
+      },
+      {
+        "specifier": "@fixture/library/missing",
+        "resolution": "unresolved",
+        "via": "unresolved"
+      }
+    ]
+  },
+  "publicCorpus": [
+    {
+      "id": "express",
+      "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "runId": "bab5c401-6171-42f9-b367-376724e12d34",
+      "evidenceSha256": "e0db268ae9cb99760eabcf9d1b5bb90142e44af61552e8011604f1bdd11f256e",
+      "scores": {
+        "codeQuality": 7,
+        "maintainability": 5.9,
+        "errorHandling": null,
+        "performanceAsync": null,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "dependencyManagement": null,
+        "architecture": null
+      },
+      "coverage": {
+        "status": "gaps",
+        "selectedModules": 7,
+        "analyzedModules": 7,
+        "dependencyOccurrences": 59,
+        "literalOccurrences": 58,
+        "resolvedLiteralOccurrences": 26,
+        "literalResolutionPercent": 44.827586206896555,
+        "occurrencesByResolution": {
+          "internal": 12,
+          "external": 0,
+          "builtin": 14,
+          "outOfScope": 0,
+          "unavailableSource": 0,
+          "unresolved": 32,
+          "dynamic": 1
+        },
+        "explicitTypeOnlyOccurrences": 0
+      },
+      "graphAndAllDimensionsIdenticalToFirstPass": true,
+      "rawCsvIdentical": true,
+      "configurationContentsIdentical": true,
+      "previousConfigurationFingerprint": "93bfc5f2671cb8216f7f0b12f60164eb359567dc114c7ea8d25d8add04004c30",
+      "currentConfigurationFingerprint": "02fb7c9c3968ba554b993f215f30a86185bc049ae2bb7b088094de9d2db85792"
+    },
+    {
+      "id": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "e311e4d4-61d7-4dd5-b7ba-4c9017242e78",
+      "evidenceSha256": "542db5b013224bf3393396cbd1e30f948cb9659d79940b5f42a713156aba6795",
+      "scores": {
+        "codeQuality": 5.7,
+        "maintainability": 6.6,
+        "errorHandling": null,
+        "performanceAsync": 10,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "dependencyManagement": null,
+        "architecture": null
+      },
+      "coverage": {
+        "status": "observedDependenciesResolved",
+        "selectedModules": 107,
+        "analyzedModules": 107,
+        "dependencyOccurrences": 447,
+        "literalOccurrences": 447,
+        "resolvedLiteralOccurrences": 447,
+        "literalResolutionPercent": 100,
+        "occurrencesByResolution": {
+          "internal": 447,
+          "external": 0,
+          "builtin": 0,
+          "outOfScope": 0,
+          "unavailableSource": 0,
+          "unresolved": 0,
+          "dynamic": 0
+        },
+        "explicitTypeOnlyOccurrences": 182
+      },
+      "graphAndAllDimensionsIdenticalToFirstPass": true,
+      "rawCsvIdentical": true,
+      "configurationContentsIdentical": true,
+      "previousConfigurationFingerprint": "5bb30ee52390a1cb1d13a73bf96806652b3bd47367605b5df0ba33e5fb493713",
+      "currentConfigurationFingerprint": "5d64d47666c8e85f93d85ea52ce94baae673b1836b762f8afc9ce87743238560"
+    },
+    {
+      "id": "tanstack-query-core",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "runId": "77cf4c0f-2fbf-4593-8f8e-f3013f745493",
+      "evidenceSha256": "7a3b52d1f1341390cd8cbef39b4802a2a154a1f46d9275d379048315fe3ff22e",
+      "scores": {
+        "codeQuality": 6.7,
+        "maintainability": 7.2,
+        "errorHandling": null,
+        "performanceAsync": 10,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "dependencyManagement": null,
+        "architecture": null
+      },
+      "coverage": {
+        "status": "observedDependenciesResolved",
+        "selectedModules": 23,
+        "analyzedModules": 23,
+        "dependencyOccurrences": 140,
+        "literalOccurrences": 140,
+        "resolvedLiteralOccurrences": 140,
+        "literalResolutionPercent": 100,
+        "occurrencesByResolution": {
+          "internal": 140,
+          "external": 0,
+          "builtin": 0,
+          "outOfScope": 0,
+          "unavailableSource": 0,
+          "unresolved": 0,
+          "dynamic": 0
+        },
+        "explicitTypeOnlyOccurrences": 67
+      },
+      "graphAndAllDimensionsIdenticalToFirstPass": true,
+      "rawCsvIdentical": true,
+      "configurationContentsIdentical": true,
+      "previousConfigurationFingerprint": "8328200a3ad39f4e3b0569487026db42bfebbd3e4128dca68c9a2bfcef288796",
+      "currentConfigurationFingerprint": "60bd1f2f65fabf7be4bc3d400c1229d8baa3ed6db43a800270f5c6d48737593d"
+    },
+    {
+      "id": "tanstack-react-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "runId": "41937356-8f48-447d-b105-0c230fd9d845",
+      "evidenceSha256": "8d2a8b4a32f9197e1f63a5f6ce764ff97284c33fb1ed23d6e41f90992f6b2afa",
+      "scores": {
+        "codeQuality": 8.1,
+        "maintainability": 7.2,
+        "errorHandling": null,
+        "performanceAsync": 10,
+        "security": null,
+        "testing": null,
+        "documentation": null,
+        "dependencyManagement": null,
+        "architecture": null
+      },
+      "coverage": {
+        "status": "gaps",
+        "selectedModules": 23,
+        "analyzedModules": 23,
+        "dependencyOccurrences": 113,
+        "literalOccurrences": 113,
+        "resolvedLiteralOccurrences": 68,
+        "literalResolutionPercent": 60.176991150442475,
+        "occurrencesByResolution": {
+          "internal": 68,
+          "external": 0,
+          "builtin": 0,
+          "outOfScope": 0,
+          "unavailableSource": 0,
+          "unresolved": 45,
+          "dynamic": 0
+        },
+        "explicitTypeOnlyOccurrences": 46
+      },
+      "graphAndAllDimensionsIdenticalToFirstPass": true,
+      "rawCsvIdentical": true,
+      "configurationContentsIdentical": true,
+      "previousConfigurationFingerprint": "d21b33fd51ca38872551f71d169cd132198d142aa8462dea72fa69265ded9746",
+      "currentConfigurationFingerprint": "8fc5ab88d1eee789ac69b17e94cc54b78889ff4c57a969bb926587ecffaf2465"
+    }
+  ],
+  "configurationNote": "Scope file contents match the first pass. Config file paths changed with the new output directory, so configuration fingerprints differ. This is an explicit evidence invariance check, not an override of baseline compatibility.",
+  "verification": {
+    "unitAndIntegrationTests": 132,
+    "graphTests": 18,
+    "labeledContextCases": 9,
+    "observedRuntimeCases": 8,
+    "offlineInstalledPackageCheck": "passed",
+    "sharedCalibrationFixtures": 6,
+    "installedAnalyzerPackageSmoke": "passed",
+    "publicCorpusPairs": 4,
+    "hostedCiExecuted": false
+  }
+}

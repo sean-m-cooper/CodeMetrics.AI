@@ -1,5 +1,14 @@
 # Accuracy and score regression corpus
 
+The separate [JS/TS architecture context corpus](javascript-typescript-architecture.json)
+contains eleven authored examples with graph expectations and, where applicable,
+observed Node loading outcomes. `npm run test:architecture --prefix analyzers/javascript-typescript`
+also packs and installs a local fixture offline to check installed-package versus
+workspace resolution. These checks run in CI and the npm release workflow. They
+do not assign Architecture scores or contribute to the precision/recall figures
+of the pinned score regression corpus below. See the
+[context verification record](../scorecard-schema/calibration-runs/javascript-typescript-architecture-context-2026-10-03.md).
+
 The [maintainability policy](../scorecard-schema/maintainability-policy.md), implemented in the unpublished .NET 2.3.0 candidate, specifies exclusive executable-function ownership and 40/60 weighting of the weakest fifth and remaining functions. Its initial MI ladder preserves former reference points and requires broader labeled calibration. The [verification record](../scorecard-schema/calibration-runs/dotnet-function-maintainability.md) distinguishes this policy change from code improvement and documents baseline review.
 
 The [executable-function scoring verification](../scorecard-schema/calibration-runs/dotnet-executable-functions.md) records the corrected C&D measurements across the four pinned public repositories, exact raw-CSV preservation and the decision to retain thresholds pending labeled calibration.

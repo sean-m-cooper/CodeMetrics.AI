@@ -1,9 +1,16 @@
 import ts from "typescript";
+import path from "node:path";
 import { discover } from "./discovery.js";
 import { analyzeFile, type Metric } from "./metrics.js";
-import { hash, invocationIds, scored, skippedDimensions, type Evidence } from "./evidence.js";
+import { hash, invocationIds, skippedDimensions, type Evidence } from "./evidence.js";
 import { metricsCsvHeader } from "./scorecard-contract.js";
-import { firstMatch, thresholdDecision } from "./scoring-decision.js";
+import { scoreFunctions } from "./function-scoring.js";
+import { scoreAsyncUsage } from "./async-scoring.js";
+import { ModuleGraphCollector } from "./module-graph.js";
+import { asyncPopulation, type AsyncOwner } from "./async-population.js";
+import { decompositionModule, decompositionEvidence } from "./decomposition-evidence.js";
+import { HandlerResolver } from "./handler-resolution.js";
+import { inspectErrorHandling, errorHandlingEvidence } from "./error-handling.js";
 
 export function analyze(options: { project?: string; tsconfig?: string; runId?: string; auditId?: string }, version: string): { evidence: Evidence; metrics: Metric[]; csv: string; inputs: string[] } {
   const identity = invocationIds(options.runId, options.auditId);
@@ -11,12 +18,20 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
   const dimensions = skippedDimensions();
   const diagnostics: Evidence["analysis"]["diagnostics"] = [];
   const metrics: Metric[] = [];
+  const functions: ReturnType<typeof analyzeFile>["functions"] = [];
   const collected: ReturnType<typeof analyzeFile>["findings"] = [];
+  const moduleGraph = new ModuleGraphCollector(discovery.repositoryRoot, discovery.packages);
   let analyzedFiles = 0;
-  let reactSupported = false;
+  const asyncOwners: AsyncOwner[] = [];
+  const decompositionModules: ReturnType<typeof decompositionModule>[] = [];
+  const errorHandling: ReturnType<typeof inspectErrorHandling>[] = [];
   for (const pkg of discovery.packages) {
     const program = ts.createProgram(pkg.files, { ...pkg.options, noEmit: true });
     const checker = program.getTypeChecker();
+    const handlerSources = pkg.files.map(filename => program.getSourceFile(filename))
+      .filter((source): source is ts.SourceFile => !!source && !program.getSyntacticDiagnostics(source).length);
+    const handlerResolver = new HandlerResolver(checker, handlerSources, discovery.repositoryRoot, pkg.name);
+    const collectModules = moduleGraph.forPackage(pkg, program);
     for (const filename of pkg.files) {
       const source = program.getSourceFile(filename);
       if (!source) { diagnostics.push({ kind: "sourceUnavailable", message: filename, project: pkg.name }); continue; }
@@ -26,47 +41,37 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
         continue;
       }
       analyzedFiles++;
+      collectModules(source);
       const result = analyzeFile(source, checker, pkg.name, discovery.repositoryRoot);
-      reactSupported ||= result.reactSupported;
+      const file = path.relative(discovery.repositoryRoot, filename).replaceAll("\\", "/");
+      asyncOwners.push(...asyncPopulation(source, checker, file, pkg.name, result.functions,
+        result.findings.filter(item => item.dimension === "performanceAsync").map(item => item.finding)));
+      decompositionModules.push(decompositionModule(source, file, pkg.name, result.functions));
+      errorHandling.push(inspectErrorHandling(source, checker, file, pkg.name, handlerResolver));
       metrics.push(...result.metrics); collected.push(...result.findings);
+      functions.push(...result.functions);
     }
   }
   metrics.sort((a,b) => a.file < b.file ? -1 : a.file > b.file ? 1 : a.line - b.line);
   if (analyzedFiles === 0) diagnostics.push({ kind: "emptyPopulation", message: "No production source files were analyzed." });
-  if (metrics.length) {
-    const maximum = Math.max(...metrics.map(metric => metric.complexity));
-    const quality = thresholdDecision("javascript-typescript/codeQuality/v1", maximum, [5, 10, 20, 40], false,
-      [...new Set(collected.filter(item => item.dimension === "codeQuality").map(item => item.finding.category))]);
-    dimensions.codeQuality = scored(quality, `Maximum member cyclomatic complexity=${maximum}; uncalibrated JS/TS policy.`,
-      collected.filter(item => item.dimension === "codeQuality").map(item => item.finding), { maxMemberComplexity: maximum, thresholds: [5, 10, 20, 40] });
-    const values = metrics.map(metric => metric.maintainabilityIndex).sort((a,b) => a-b);
-    const median = (values[Math.floor((values.length-1)/2)] + values[Math.ceil((values.length-1)/2)]) / 2;
-    dimensions.maintainability = scored(thresholdDecision("javascript-typescript/maintainability/v1", median, [85, 65, 40, 20], true),
-      `Median member maintainability index=${median}; uncalibrated JS/TS policy.`, [], { median, thresholds: [85,65,40,20] });
-    const performance = collected.filter(item => item.dimension === "performanceAsync").map(item => item.finding);
-    const actionable = performance.filter(finding => finding.confidence !== "low");
-    if (reactSupported) dimensions.performanceAsync = scored(firstMatch("javascript-typescript/performanceAsync/react-hooks/v1",
-      { actionableFindings: actionable.length, advisoryFindings: performance.length - actionable.length }, [
-        { id: "actionableHooks", condition: "actionableFindings > 0", matched: actionable.length > 0, score: 6, categories: [...new Set(actionable.map(f => f.category))] },
-        { id: "noActionableHooks", condition: "otherwise", matched: true, score: 10 }
-      ]),
-      "Limited scope: React hook placement and effect callbacks. General async and concurrency analysis is not implemented.", performance,
-      { actionableFindings: actionable.length, advisoryFindings: performance.length-actionable.length, scope: "react-hooks" }, finding => finding.confidence !== "low");
-  }
+  dimensions.codeQuality = scoreFunctions(functions, "codeQuality", collected.filter(item => item.dimension === "codeQuality").map(item => item.finding));
+  dimensions.maintainability = scoreFunctions(functions, "maintainability");
+  dimensions.performanceAsync = scoreAsyncUsage(collected.filter(item => item.dimension === "performanceAsync").map(item => item.finding),
+    asyncOwners);
+  if (dimensions.performanceAsync.status === "failed") diagnostics.push({ kind: "asyncOwnership", message: dimensions.performanceAsync.basis });
   if (diagnostics.length) for (const key of ["codeQuality", "maintainability", "performanceAsync"] as const)
-    dimensions[key] = { status: "failed", basis: "Incomplete source analysis; partial findings are unscored.", findings: dimensions[key].findings };
-  for (const [key, includes, excludes] of [
-    ["codeQuality", ["maximum-member-cyclomatic-complexity"], ["design-quality", "runtime-behavior"]],
-    ["maintainability", ["median-member-maintainability-index"], ["change-cost", "comprehensive-human-review"]],
-    ["performanceAsync", ["react-hook-placement", "react-effect-callbacks"], ["general-async", "concurrency", "runtime-performance"]]
-  ] as const) dimensions[key].scope = { id: `javascript-typescript/${key}/v1`, coverage: "partial", includes: [...includes], excludes: [...excludes] };
+    dimensions[key] = { status: "failed", basis: "Incomplete source analysis; partial findings are unscored.", findings: dimensions[key].findings, scope: dimensions[key].scope };
+  dimensions.architecture = moduleGraph.finish(diagnostics.length > 0);
+  dimensions.errorHandling = errorHandlingEvidence(errorHandling, diagnostics.length > 0);
+  dimensions.codeQuality.componentDetails = { ...(dimensions.codeQuality.componentDetails as object ?? {}),
+    decomposition: decompositionEvidence(decompositionModules, diagnostics.length > 0) };
   const evidence: Evidence = {
     schemaVersion: 3, generatedAtUtc: new Date().toISOString(), tool: { name: "codemetrics-ai", version, ecosystem: "javascript-typescript" },
     subject: { root: discovery.repositoryRoot, entryPoint: discovery.entryPoint, name: discovery.name, variant: "source" },
     filters: { totalUnits: discovery.packages.reduce((sum,pkg) => sum + pkg.files.length, 0) + discovery.skipped.length,
       analyzedUnits: analyzedFiles, skipped: discovery.skipped },
     population: { types: new Set(metrics.map(metric => `${metric.project}|${metric.file}|${metric.type}`)).size, members: metrics.length },
-    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-09-05",
+    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-10-04-local-handlers",
       calibration: "uncalibrated", configurationFingerprint: hash(JSON.stringify(canonicalConfiguration(discovery.packages.map(pkg => ({ name: pkg.name,
         options: pkg.options, selection: pkg.selection })), discovery.repositoryRoot))), diagnostics, suppressions: [] }
   };

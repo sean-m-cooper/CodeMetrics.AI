@@ -1,0 +1,1055 @@
+{
+  "measurement": "owned-function-body-v2-type-erasure",
+  "scope": "Direct source audit of the highest-CC function in each pinned package selection; static measurements are not defect claims.",
+  "audited": [
+    {
+      "id": "express",
+      "commit": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "file": "lib/response.js",
+      "member": "send",
+      "line": 126,
+      "endLine": 222,
+      "ownComplexity": 23,
+      "ownSourceLines": 57,
+      "beforeOwnMi": 34.70979551084187,
+      "afterOwnMi": 34.70979551084187,
+      "baseline": 1,
+      "decisionCounts": {
+        "&&": 3,
+        "case": 4,
+        "if": 14,
+        "||": 1
+      },
+      "decisionEvents": [
+        {
+          "kind": "case",
+          "line": 136
+        },
+        {
+          "kind": "if",
+          "line": 140
+        },
+        {
+          "kind": "case",
+          "line": 146
+        },
+        {
+          "kind": "case",
+          "line": 147
+        },
+        {
+          "kind": "case",
+          "line": 148
+        },
+        {
+          "kind": "if",
+          "line": 149
+        },
+        {
+          "kind": "if",
+          "line": 151
+        },
+        {
+          "kind": "if",
+          "line": 152
+        },
+        {
+          "kind": "&&",
+          "line": 163
+        },
+        {
+          "kind": "if",
+          "line": 166
+        },
+        {
+          "kind": "if",
+          "line": 167
+        },
+        {
+          "kind": "if",
+          "line": 170
+        },
+        {
+          "kind": "&&",
+          "line": 170
+        },
+        {
+          "kind": "if",
+          "line": 182
+        },
+        {
+          "kind": "if",
+          "line": 189
+        },
+        {
+          "kind": "&&",
+          "line": 189
+        },
+        {
+          "kind": "if",
+          "line": 190
+        },
+        {
+          "kind": "if",
+          "line": 196
+        },
+        {
+          "kind": "if",
+          "line": 199
+        },
+        {
+          "kind": "||",
+          "line": 199
+        },
+        {
+          "kind": "if",
+          "line": 207
+        },
+        {
+          "kind": "if",
+          "line": 213
+        }
+      ],
+      "directlyNestedFunctionsExcluded": 0,
+      "directlyNestedDecisionIncrementsExcluded": 0,
+      "changedMiFunctionCount": 0,
+      "beforeUnroundedMiScore": 5.92648205220541,
+      "afterUnroundedMiScore": 5.92648205220541
+    },
+    {
+      "id": "zod-v4",
+      "commit": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+      "member": "convertBaseSchema",
+      "line": 390,
+      "endLine": 806,
+      "ownComplexity": 122,
+      "ownSourceLines": 255,
+      "beforeOwnMi": 0.9578421168887952,
+      "afterOwnMi": 0.9938207694987709,
+      "baseline": 1,
+      "decisionCounts": {
+        "&&": 11,
+        "case": 7,
+        "if": 76,
+        "loop": 3,
+        "ternary": 14,
+        "||": 10
+      },
+      "decisionEvents": [
+        {
+          "kind": "if",
+          "line": 392
+        },
+        {
+          "kind": "if",
+          "line": 394
+        },
+        {
+          "kind": "&&",
+          "line": 394
+        },
+        {
+          "kind": "if",
+          "line": 399
+        },
+        {
+          "kind": "if",
+          "line": 402
+        },
+        {
+          "kind": "if",
+          "line": 405
+        },
+        {
+          "kind": "||",
+          "line": 405
+        },
+        {
+          "kind": "||",
+          "line": 405
+        },
+        {
+          "kind": "if",
+          "line": 408
+        },
+        {
+          "kind": "||",
+          "line": 408
+        },
+        {
+          "kind": "if",
+          "line": 413
+        },
+        {
+          "kind": "if",
+          "line": 415
+        },
+        {
+          "kind": "if",
+          "line": 419
+        },
+        {
+          "kind": "if",
+          "line": 438
+        },
+        {
+          "kind": "if",
+          "line": 442
+        },
+        {
+          "kind": "&&",
+          "line": 443
+        },
+        {
+          "kind": "&&",
+          "line": 443
+        },
+        {
+          "kind": "&&",
+          "line": 443
+        },
+        {
+          "kind": "if",
+          "line": 451
+        },
+        {
+          "kind": "if",
+          "line": 454
+        },
+        {
+          "kind": "if",
+          "line": 458
+        },
+        {
+          "kind": "if",
+          "line": 463
+        },
+        {
+          "kind": "if",
+          "line": 474
+        },
+        {
+          "kind": "if",
+          "line": 481
+        },
+        {
+          "kind": "if",
+          "line": 487
+        },
+        {
+          "kind": "if",
+          "line": 490
+        },
+        {
+          "kind": "if",
+          "line": 496
+        },
+        {
+          "kind": "case",
+          "line": 504
+        },
+        {
+          "kind": "if",
+          "line": 508
+        },
+        {
+          "kind": "if",
+          "line": 511
+        },
+        {
+          "kind": "if",
+          "line": 513
+        },
+        {
+          "kind": "||",
+          "line": 513
+        },
+        {
+          "kind": "if",
+          "line": 515
+        },
+        {
+          "kind": "||",
+          "line": 515
+        },
+        {
+          "kind": "if",
+          "line": 517
+        },
+        {
+          "kind": "if",
+          "line": 519
+        },
+        {
+          "kind": "if",
+          "line": 521
+        },
+        {
+          "kind": "if",
+          "line": 523
+        },
+        {
+          "kind": "if",
+          "line": 525
+        },
+        {
+          "kind": "if",
+          "line": 527
+        },
+        {
+          "kind": "if",
+          "line": 529
+        },
+        {
+          "kind": "if",
+          "line": 531
+        },
+        {
+          "kind": "if",
+          "line": 533
+        },
+        {
+          "kind": "if",
+          "line": 535
+        },
+        {
+          "kind": "if",
+          "line": 537
+        },
+        {
+          "kind": "if",
+          "line": 539
+        },
+        {
+          "kind": "if",
+          "line": 541
+        },
+        {
+          "kind": "if",
+          "line": 543
+        },
+        {
+          "kind": "if",
+          "line": 545
+        },
+        {
+          "kind": "if",
+          "line": 547
+        },
+        {
+          "kind": "if",
+          "line": 549
+        },
+        {
+          "kind": "if",
+          "line": 551
+        },
+        {
+          "kind": "if",
+          "line": 553
+        },
+        {
+          "kind": "if",
+          "line": 555
+        },
+        {
+          "kind": "if",
+          "line": 557
+        },
+        {
+          "kind": "if",
+          "line": 559
+        },
+        {
+          "kind": "if",
+          "line": 561
+        },
+        {
+          "kind": "if",
+          "line": 569
+        },
+        {
+          "kind": "if",
+          "line": 572
+        },
+        {
+          "kind": "if",
+          "line": 575
+        },
+        {
+          "kind": "case",
+          "line": 584
+        },
+        {
+          "kind": "case",
+          "line": 585
+        },
+        {
+          "kind": "ternary",
+          "line": 586
+        },
+        {
+          "kind": "if",
+          "line": 591
+        },
+        {
+          "kind": "&&",
+          "line": 591
+        },
+        {
+          "kind": "if",
+          "line": 594
+        },
+        {
+          "kind": "&&",
+          "line": 594
+        },
+        {
+          "kind": "if",
+          "line": 597
+        },
+        {
+          "kind": "if",
+          "line": 599
+        },
+        {
+          "kind": "&&",
+          "line": 599
+        },
+        {
+          "kind": "if",
+          "line": 602
+        },
+        {
+          "kind": "if",
+          "line": 604
+        },
+        {
+          "kind": "&&",
+          "line": 604
+        },
+        {
+          "kind": "if",
+          "line": 607
+        },
+        {
+          "kind": "case",
+          "line": 615
+        },
+        {
+          "kind": "case",
+          "line": 620
+        },
+        {
+          "kind": "case",
+          "line": 625
+        },
+        {
+          "kind": "||",
+          "line": 627
+        },
+        {
+          "kind": "||",
+          "line": 628
+        },
+        {
+          "kind": "ternary",
+          "line": 631
+        },
+        {
+          "kind": "loop",
+          "line": 636
+        },
+        {
+          "kind": "ternary",
+          "line": 639
+        },
+        {
+          "kind": "if",
+          "line": 643
+        },
+        {
+          "kind": "loop",
+          "line": 649
+        },
+        {
+          "kind": "if",
+          "line": 657
+        },
+        {
+          "kind": "if",
+          "line": 663
+        },
+        {
+          "kind": "if",
+          "line": 665
+        },
+        {
+          "kind": "loop",
+          "line": 670
+        },
+        {
+          "kind": "if",
+          "line": 677
+        },
+        {
+          "kind": "if",
+          "line": 702
+        },
+        {
+          "kind": "if",
+          "line": 705
+        },
+        {
+          "kind": "&&",
+          "line": 715
+        },
+        {
+          "kind": "ternary",
+          "line": 716
+        },
+        {
+          "kind": "ternary",
+          "line": 717
+        },
+        {
+          "kind": "if",
+          "line": 718
+        },
+        {
+          "kind": "||",
+          "line": 718
+        },
+        {
+          "kind": "||",
+          "line": 718
+        },
+        {
+          "kind": "if",
+          "line": 720
+        },
+        {
+          "kind": "ternary",
+          "line": 723
+        },
+        {
+          "kind": "&&",
+          "line": 723
+        },
+        {
+          "kind": "case",
+          "line": 733
+        },
+        {
+          "kind": "if",
+          "line": 738
+        },
+        {
+          "kind": "&&",
+          "line": 738
+        },
+        {
+          "kind": "ternary",
+          "line": 740
+        },
+        {
+          "kind": "ternary",
+          "line": 743
+        },
+        {
+          "kind": "ternary",
+          "line": 745
+        },
+        {
+          "kind": "if",
+          "line": 747
+        },
+        {
+          "kind": "if",
+          "line": 750
+        },
+        {
+          "kind": "if",
+          "line": 753
+        },
+        {
+          "kind": "ternary",
+          "line": 755
+        },
+        {
+          "kind": "ternary",
+          "line": 760
+        },
+        {
+          "kind": "if",
+          "line": 762
+        },
+        {
+          "kind": "if",
+          "line": 765
+        },
+        {
+          "kind": "if",
+          "line": 768
+        },
+        {
+          "kind": "if",
+          "line": 774
+        },
+        {
+          "kind": "if",
+          "line": 777
+        },
+        {
+          "kind": "if",
+          "line": 788
+        },
+        {
+          "kind": "||",
+          "line": 788
+        },
+        {
+          "kind": "ternary",
+          "line": 792
+        },
+        {
+          "kind": "ternary",
+          "line": 793
+        },
+        {
+          "kind": "ternary",
+          "line": 794
+        }
+      ],
+      "directlyNestedFunctionsExcluded": 8,
+      "directlyNestedDecisionIncrementsExcluded": 6,
+      "changedMiFunctionCount": 614,
+      "beforeUnroundedMiScore": 6.620562323259091,
+      "afterUnroundedMiScore": 6.6326808689189
+    },
+    {
+      "id": "tanstack-query-core",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "file": "packages/query-core/src/queryObserver.ts",
+      "member": "createResult",
+      "line": 558,
+      "endLine": 726,
+      "ownComplexity": 29,
+      "ownSourceLines": 116,
+      "beforeOwnMi": 25.739661983427407,
+      "afterOwnMi": 25.81085469403287,
+      "baseline": 1,
+      "decisionCounts": {
+        "&&": 13,
+        "catch": 1,
+        "if": 10,
+        "ternary": 2,
+        "||": 2
+      },
+      "decisionEvents": [
+        {
+          "kind": "ternary",
+          "line": 575
+        },
+        {
+          "kind": "if",
+          "line": 585
+        },
+        {
+          "kind": "&&",
+          "line": 588
+        },
+        {
+          "kind": "&&",
+          "line": 591
+        },
+        {
+          "kind": "if",
+          "line": 593
+        },
+        {
+          "kind": "||",
+          "line": 593
+        },
+        {
+          "kind": "if",
+          "line": 599
+        },
+        {
+          "kind": "if",
+          "line": 611
+        },
+        {
+          "kind": "&&",
+          "line": 612
+        },
+        {
+          "kind": "&&",
+          "line": 612
+        },
+        {
+          "kind": "if",
+          "line": 619
+        },
+        {
+          "kind": "&&",
+          "line": 620
+        },
+        {
+          "kind": "ternary",
+          "line": 630
+        },
+        {
+          "kind": "if",
+          "line": 640
+        },
+        {
+          "kind": "if",
+          "line": 653
+        },
+        {
+          "kind": "&&",
+          "line": 653
+        },
+        {
+          "kind": "&&",
+          "line": 653
+        },
+        {
+          "kind": "if",
+          "line": 655
+        },
+        {
+          "kind": "&&",
+          "line": 656
+        },
+        {
+          "kind": "&&",
+          "line": 656
+        },
+        {
+          "kind": "catch",
+          "line": 668
+        },
+        {
+          "kind": "if",
+          "line": 672
+        },
+        {
+          "kind": "if",
+          "line": 678
+        },
+        {
+          "kind": "&&",
+          "line": 690
+        },
+        {
+          "kind": "||",
+          "line": 710
+        },
+        {
+          "kind": "&&",
+          "line": 713
+        },
+        {
+          "kind": "&&",
+          "line": 714
+        },
+        {
+          "kind": "&&",
+          "line": 717
+        }
+      ],
+      "directlyNestedFunctionsExcluded": 0,
+      "directlyNestedDecisionIncrementsExcluded": 0,
+      "changedMiFunctionCount": 66,
+      "beforeUnroundedMiScore": 7.226347718793688,
+      "afterUnroundedMiScore": 7.243145042562228
+    },
+    {
+      "id": "tanstack-react-query",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "file": "packages/react-query/src/HydrationBoundary.tsx",
+      "member": "HydrationBoundary/React.useMemo:callback0",
+      "line": 115,
+      "endLine": 162,
+      "ownComplexity": 13,
+      "ownSourceLines": 27,
+      "beforeOwnMi": 46.006438034745344,
+      "afterOwnMi": 46.040606210761716,
+      "baseline": 1,
+      "decisionCounts": {
+        "&&": 3,
+        "if": 6,
+        "loop": 1,
+        "||": 2
+      },
+      "decisionEvents": [
+        {
+          "kind": "if",
+          "line": 116
+        },
+        {
+          "kind": "if",
+          "line": 117
+        },
+        {
+          "kind": "||",
+          "line": 126
+        },
+        {
+          "kind": "loop",
+          "line": 130
+        },
+        {
+          "kind": "if",
+          "line": 133
+        },
+        {
+          "kind": "||",
+          "line": 137
+        },
+        {
+          "kind": "&&",
+          "line": 139
+        },
+        {
+          "kind": "&&",
+          "line": 139
+        },
+        {
+          "kind": "&&",
+          "line": 139
+        },
+        {
+          "kind": "if",
+          "line": 145
+        },
+        {
+          "kind": "if",
+          "line": 151
+        },
+        {
+          "kind": "if",
+          "line": 157
+        }
+      ],
+      "directlyNestedFunctionsExcluded": 0,
+      "directlyNestedDecisionIncrementsExcluded": 0,
+      "changedMiFunctionCount": 16,
+      "beforeUnroundedMiScore": 7.218616941085573,
+      "afterUnroundedMiScore": 7.232476514191217
+    }
+  ],
+  "provenance": {
+    "scope": "Explicit source-only package selections; no dependency install, build, semantic validation or runtime tests. Not whole-repository scorecards or cross-ecosystem calibration.",
+    "generatedAtUtc": "2026-10-03T04:33:29.728Z",
+    "nodeVersion": "v24.18.0",
+    "beforeAnalyzerBundleSha256": "d0473214235d18ec51f4c572f9c72de7f3e6d20dd70237bfe5edf531086efdfd",
+    "afterAnalyzerBundleSha256": "05535376376e3d276373af60bb290a266e95af94946c0988cb7690787eb93a17"
+  },
+  "samples": [
+    {
+      "id": "express",
+      "repository": "express",
+      "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "package": ".",
+      "include": [
+        "index.js",
+        "lib/**/*.js"
+      ],
+      "commit": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "remote": "https://github.com/expressjs/express.git",
+      "trackedChanges": "",
+      "packageVersion": "5.2.1",
+      "configurationSha256": "0756ff795edb28b3cc6dac8b759283e05733a1fb90e825538e16c394fd3833c7",
+      "csvSha256": "3007f51f5bb3e10faffbe13b04d87b62fa3d872fbf47318456c5334792237014",
+      "population": {
+        "types": 72,
+        "members": 109
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-function-policy",
+        "runId": "0d1ec802-2485-43ee-9d45-0c8f58aea08a"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "7cc7f08c-00cd-42bf-9ebb-4568504ea72b"
+      }
+    },
+    {
+      "id": "zod-v4",
+      "repository": "zod",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "package": "packages/zod",
+      "include": [
+        "src/v4/**/*.ts"
+      ],
+      "config": "tsconfig.json",
+      "commit": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "remote": "https://github.com/colinhacks/zod.git",
+      "trackedChanges": "",
+      "packageVersion": "4.6.5",
+      "configurationSha256": "500628532e30ebf69760655d30170970b1374cd55e70f37fa945f9b005683c9a",
+      "csvSha256": "7f714913b9d4c86a67acda3e320d6cdfda9700a7838b3957a2964ce738757d7d",
+      "population": {
+        "types": 981,
+        "members": 1948
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-function-policy",
+        "runId": "1c692676-f735-45cc-ab5a-56211c63f542"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "34d0580f-bf1d-434f-8e78-f3a4d54538c2"
+      }
+    },
+    {
+      "id": "tanstack-query-core",
+      "repository": "tanstack-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "package": "packages/query-core",
+      "include": [
+        "src/**/*.ts"
+      ],
+      "config": "tsconfig.json",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "remote": "https://github.com/TanStack/query.git",
+      "trackedChanges": "",
+      "packageVersion": "5.104.1",
+      "configurationSha256": "afbcf8e32b2b28049e640fa5f046dde5e4ee203bc2b99708044acd8c1139ccaa",
+      "csvSha256": "9f345cee4f6646f9480e3b2f5d6c5df70baefb54f29142301edb7a7552bf3f4d",
+      "population": {
+        "types": 178,
+        "members": 427
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-function-policy",
+        "runId": "82f77206-8252-46f3-9a4b-1300059bdfb8"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "bb2ce76f-466c-4933-8b39-896fa6b09586"
+      }
+    },
+    {
+      "id": "tanstack-react-query",
+      "repository": "tanstack-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "package": "packages/react-query",
+      "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "config": "tsconfig.json",
+      "commit": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "remote": "https://github.com/TanStack/query.git",
+      "trackedChanges": "",
+      "packageVersion": "5.104.1",
+      "configurationSha256": "de7addcb26f9aa4b8b1a0afadf13d9075df920c287ba7ff8738459f20e77dacb",
+      "csvSha256": "e2dc06bd0145c8c14d56ec768ffdd27fb3b1e6b6c03bd18d90ad94de3be34483",
+      "population": {
+        "types": 34,
+        "members": 76
+      },
+      "before": {
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-function-policy",
+        "runId": "6c969a4a-f76f-45a3-ae52-1c3406061894"
+      },
+      "after": {
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        },
+        "ruleset": "javascript-typescript-2026-10-02-type-erasure",
+        "runId": "9da48d25-7bea-4074-a972-1a7be52213ff"
+      }
+    }
+  ]
+}

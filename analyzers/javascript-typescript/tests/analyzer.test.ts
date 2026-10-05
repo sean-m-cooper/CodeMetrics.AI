@@ -84,7 +84,7 @@ describe("evidence workflows", () => {
     const after=run(fixture({"src/a.ts":"\n\n"+source})).evidence;
     expect(compare(after,before).unchanged).toHaveLength(1);
     expect(gate(compare(after,before),"warning",0)).toBe(false);
-    const clean=run(fixture({"src/a.ts":"import {useEffect} from 'react'; export function App(){return null;}"})).evidence;
+    const clean=run(fixture({"src/a.ts":"import {useEffect} from 'react'; export function App(){useEffect(()=>{},[]); return null;}"})).evidence;
     expect(compare(after,clean).new).toHaveLength(1);
     expect(compare(clean,after).resolved).toHaveLength(1);
     expect(gate(compare(after,clean),"warning")).toBe(true);

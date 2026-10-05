@@ -3,6 +3,8 @@ import ts from "typescript";
 import { hash, type Finding } from "./evidence.js";
 import { isFunction, type FunctionNode } from "./function-nodes.js";
 import { inspectReactCall } from "./react-probe.js";
+import { inspectAsyncNode, isAsyncFunction, isPromiseConstruction } from "./async-probe.js";
+import { measureFunction, type FunctionMeasurement } from "./function-measurements.js";
 
 export interface Metric {
   project: string; file: string; type: string; member: string; kind: "function" | "component" | "hook" | "method";
@@ -27,19 +29,25 @@ export function maintainability(volume: number, complexity: number, lines: numbe
 export function analyzeFile(source: ts.SourceFile, checker: ts.TypeChecker, project: string, root: string) {
   const file = path.relative(root, source.fileName).replaceAll("\\", "/");
   const metrics: Metric[] = [];
+  const functions: FunctionMeasurement[] = [];
   const findings: { dimension: "codeQuality" | "performanceAsync"; finding: Finding }[] = [];
   const importCount = new Set(source.statements.filter(ts.isImportDeclaration).map(node => node.moduleSpecifier.getText(source))).size;
   const identities = new Map<string, number>();
+  let asyncSupported = false;
   function emit(category: string, dimension: "codeQuality" | "performanceAsync", node: ts.Node, member: string,
-    message: string, observations: Record<string, unknown>, confidence: Finding["confidence"] = "high") {
+    message: string, observations: Record<string, unknown>, confidence: Finding["confidence"] = "high", severity: Finding["severity"] = "warning") {
     const ruleId = `javascript-typescript/${dimension}/${category}`;
     const identity = `${ruleId}|${file}|${project}|${member}`;
     const occurrence = identities.get(identity) ?? 0; identities.set(identity, occurrence + 1);
     findings.push({ dimension, finding: { category, ruleId, fingerprint: hash(`${identity}|${occurrence}`),
-      severity: "warning", confidence, file, line: source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1,
+      severity, confidence, file, line: source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1,
       project, member, message, observations } });
   }
   function visit(node: ts.Node, parentName = "") {
+    asyncSupported ||= isAsyncFunction(node) || ts.isAwaitExpression(node) || isPromiseConstruction(node, checker);
+    for (const finding of inspectAsyncNode(node, checker))
+      emit(finding.category, "performanceAsync", node, parentName || "<module>", finding.message,
+        { ...finding.observations, sourceSpanStart: node.getStart(source), sourceSpanLength: node.getWidth(source) }, finding.confidence, finding.severity);
     if (isFunction(node) && node.body) {
       const name = nameOf(node, source);
       const member = parentName ? `${parentName}/${name}` : name;
@@ -53,7 +61,10 @@ export function analyzeFile(source: ts.SourceFile, checker: ts.TypeChecker, proj
         if (ts.isJsxElement(child) || ts.isJsxSelfClosingElement(child) || ts.isJsxFragment(child)) hasJsx = true;
         if (ts.isCallExpression(child)) {
           for (const finding of inspectReactCall(child, node.body!, checker))
-            emit(finding.category, "performanceAsync", child, member, finding.message, finding.observations, finding.confidence);
+            emit(finding.category, "performanceAsync", child, member, finding.message,
+              { ...finding.observations, sourceSpanStart: child.getStart(source), classification: finding.confidence === "low" ? "reviewLead" : "actionableSignal",
+                scoreDisposition: finding.confidence === "low" ? "excludedReviewLead" : "scored" },
+              finding.confidence, finding.confidence === "low" ? "info" : "warning");
         }
       });
       if (!ts.isBlock(node.body)) executableLines++;
@@ -85,15 +96,21 @@ export function analyzeFile(source: ts.SourceFile, checker: ts.TypeChecker, proj
         complexity, sourceLines: Math.max(1, sourceLineSet.size), executableLines, halsteadVolume: volume,
         maintainabilityIndex: maintainability(volume, complexity, Math.max(1, sourceLineSet.size)), coupling: importCount, inheritance };
       metrics.push(metric);
-      if (complexity > 10) emit("highFunctionComplexity", "codeQuality", node, member,
-        `${member} has cyclomatic complexity ${complexity} (threshold: 10).`, { measured: complexity, threshold: 10, metric: "cyclomaticComplexity", kind });
+      const measurement = measureFunction(node, source, file, project, member);
+      functions.push(measurement);
+      if (measurement.ownComplexity > 10) emit("highFunctionComplexity", "codeQuality", node, member,
+        `${member} has cyclomatic complexity ${measurement.ownComplexity} (threshold: 10).`,
+        { measured: measurement.ownComplexity, threshold: 10, metric: "ownedCyclomaticComplexity", kind, functionId: measurement.id,
+          complexityBreakdown: measurement.complexityBreakdown });
       ts.forEachChild(node, child => visit(child, member));
       return;
     }
-    if (!ts.isTypeNode(node)) ts.forEachChild(node, child => visit(child, parentName));
+    // An instantiation expression (factory<T>) is classified as a TypeNode by
+    // TypeScript, but its expression can contain real functions and operations.
+    if (!ts.isTypeNode(node) || ts.isExpressionWithTypeArguments(node)) ts.forEachChild(node, child => visit(child, parentName));
   }
   visit(source);
   const reactSupported = source.statements.some(statement => ts.isImportDeclaration(statement) && !statement.importClause?.isTypeOnly &&
     ts.isStringLiteral(statement.moduleSpecifier) && statement.moduleSpecifier.text === "react");
-  return { metrics, findings, reactSupported };
+  return { metrics, functions, findings, reactSupported, asyncSupported };
 }

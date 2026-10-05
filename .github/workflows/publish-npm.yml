@@ -21,6 +21,7 @@ jobs:
         run: node -e 'if ("js-v" + require("./package.json").version !== process.env.GITHUB_REF_NAME) process.exit(1)'
       - run: npm test
       - run: npm run test:package
+      - run: npm run test:architecture
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

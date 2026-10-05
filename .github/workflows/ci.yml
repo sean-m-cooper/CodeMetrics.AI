@@ -59,6 +59,9 @@ jobs:
       - name: Verify installed package
         run: npm run test:package
 
+      - name: Verify architecture context and offline workspace resolution
+        run: npm run test:architecture
+
   calibration:
     runs-on: ubuntu-latest
     steps:
