@@ -1,10 +1,10 @@
 # codemetrics-ai
 
-Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0.3.0 implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
+Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0.4.0 implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
 
 Each scored dimension includes `scoringDecision`: policy inputs, executed steps, rounding and finding attribution. These are aggregate policy decisions, not independent finding deductions. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md).
 
-The unpublished development ruleset `javascript-typescript-2026-10-04-local-handlers` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines for this ruleset; package version alone does not identify development scoring behavior.
+The 0.4.0 ruleset `javascript-typescript-2026-10-04-local-handlers` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines when upgrading from 0.3.0. See the [0.4.0 release and migration notes](https://github.com/sean-m-cooper/CodeMetrics.AI/blob/master/docs/releases/javascript-typescript-0.4.0.md).
 
 ```sh
 npx codemetrics-ai --project package.json
