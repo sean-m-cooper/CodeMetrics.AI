@@ -1,0 +1,348 @@
+{
+  "generatedAtUtc": "2026-10-06T19:48:44.480Z",
+  "toolVersion": "0.4.0-dev",
+  "analyzerSourceSha256": "b2ac134a0a461147e9ef74bdae3d243ed863ef2e9e80f5b7986dc31887b32b58",
+  "scope": "Development source-only classifier; not a released package run or runtime correctness assessment.",
+  "samples": [
+    {
+      "id": "express",
+      "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "runId": "2a1fb71e-b94b-4342-aa89-8e9a699a9b93",
+      "auditId": "2a1fb71e-b94b-4342-aa89-8e9a699a9b93",
+      "configurationFingerprint": "cf9b810ed60b579e3b9688b78a787b1e8014c0b3baa6cd42bfbf1096ec598288",
+      "evidenceSha256": "f7ba9616a4adb6a6a1f8d41ee6b92373d83b04fdc91d7c8ce0c401277000eab7",
+      "ruleset": "javascript-typescript-2026-10-06-handler-disposition",
+      "status": "skipped",
+      "score": null,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 2,
+      "assessedHandlers": 0,
+      "unknownHandlers": 2,
+      "counts": {
+        "propagated": 0,
+        "failureResult": 0,
+        "reported": 0,
+        "fallback": 0,
+        "documented": 0,
+        "unexplainedSwallowing": 0,
+        "unknown": 2
+      },
+      "assessedPercent": 0,
+      "unresolvedCallbackUses": 0,
+      "populationComplete": false,
+      "reviewed": [
+        {
+          "handlerId": "8e3321f13c8a955115189d0ad680ba09db066ab24b82e180c01718dc7a8840ef",
+          "file": "lib/view.js",
+          "line": 202,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Success returns a value; the implicit/undefined failure result may be a caller contract."
+        }
+      ],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    },
+    {
+      "id": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "33acbfc0-b587-45ac-b491-b72294cac96b",
+      "auditId": "33acbfc0-b587-45ac-b491-b72294cac96b",
+      "configurationFingerprint": "4c6726e64a1527a607c1142c36300173eb52671badc2f437fa0d742959aee7cd",
+      "evidenceSha256": "c785875098464bbc9c820738710703b493b0d3d5ac88105f1f7e3233794e8b5c",
+      "ruleset": "javascript-typescript-2026-10-06-handler-disposition",
+      "status": "skipped",
+      "score": null,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 22,
+      "assessedHandlers": 8,
+      "unknownHandlers": 14,
+      "counts": {
+        "propagated": 4,
+        "failureResult": 4,
+        "reported": 0,
+        "fallback": 0,
+        "documented": 0,
+        "unexplainedSwallowing": 0,
+        "unknown": 14
+      },
+      "assessedPercent": 36.36363636363637,
+      "unresolvedCallbackUses": 0,
+      "populationComplete": false,
+      "reviewed": [
+        {
+          "handlerId": "772c306fbd97a016902cc0ac22500ed0682b98d483044235f023ee769b203731",
+          "file": "packages/zod/src/v4/core/compile.ts",
+          "line": 242,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Continuation after the empty catch needs a failure-contract review."
+        },
+        {
+          "handlerId": "898900a14a8f7c60441729750f5c41bf97fc3980a4a52a7c567c71fd427b4e60",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 353,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Continuation after the empty catch needs a failure-contract review."
+        },
+        {
+          "handlerId": "2474ad087da1392b353fe761c29757d14e4f0f32d6db13179d7c8c3ec8465267",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 407,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Enclosing control flow requires context."
+        },
+        {
+          "handlerId": "0a61cfdcf6bed46c0430a226f2f79be251c7fbdc9fa1dd4f37c33e4d40bf2ec1",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 1337,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Enclosing control flow requires context."
+        },
+        {
+          "handlerId": "ee03ec5d3aaa7cf5c1066be45146a910fa36ab065f8d54aecdcff264d9658c4f",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 1424,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Enclosing control flow requires context."
+        },
+        {
+          "handlerId": "206549b6e6d40390624e4e564326fc553693894a0dea60194fd4d658cfb60a4b",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 1477,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Enclosing control flow requires context."
+        },
+        {
+          "handlerId": "411a38bbeff84c91f766bbce783b6e647721fda429364792c40724df402020ab",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 1804,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Outer continuation or control flow requires context."
+        }
+      ],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    },
+    {
+      "id": "tanstack-query-core",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "runId": "5b83471d-2b18-4444-bbed-5c2da73d149a",
+      "auditId": "5b83471d-2b18-4444-bbed-5c2da73d149a",
+      "configurationFingerprint": "019a35461ce7162955cc475dc431964f8ab58e883f3b6be499e5a962d44950d0",
+      "evidenceSha256": "90cc8ece009b1bceba6af04e7a58cc6597295ba23559dde6b205764393214ad7",
+      "ruleset": "javascript-typescript-2026-10-06-handler-disposition",
+      "status": "skipped",
+      "score": null,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 16,
+      "assessedHandlers": 2,
+      "unknownHandlers": 14,
+      "counts": {
+        "propagated": 0,
+        "failureResult": 0,
+        "reported": 1,
+        "fallback": 0,
+        "documented": 1,
+        "unexplainedSwallowing": 0,
+        "unknown": 14
+      },
+      "assessedPercent": 12.5,
+      "unresolvedCallbackUses": 0,
+      "populationComplete": false,
+      "reviewed": [
+        {
+          "handlerId": "bdd3f140a9b932f1a1d4edb78615ac625882ca149aa6b3ea5cd7f1b1fddac972",
+          "file": "packages/query-core/src/utils.ts",
+          "line": 121,
+          "reviewLabel": "declaredIntentOutsideBody",
+          "classification": "documented",
+          "reason": "Attached developer intent is honored without judging the business decision.",
+          "comments": [
+            "/**\n * A function that does nothing.\n */"
+          ]
+        }
+      ],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    },
+    {
+      "id": "tanstack-react-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "runId": "ea3ad794-a932-4e49-a1b0-edc08f96c236",
+      "auditId": "ea3ad794-a932-4e49-a1b0-edc08f96c236",
+      "configurationFingerprint": "18cd82d79c17c4506f0fdf43d866ca4a4ec258faebc1ef8d4f155fb247b013a1",
+      "evidenceSha256": "2fc554995a9ab5382986914ffc1431ebf134a8e3dbc676bfab5906aa51d0f7f3",
+      "ruleset": "javascript-typescript-2026-10-06-handler-disposition",
+      "status": "skipped",
+      "score": null,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 0,
+      "assessedHandlers": 0,
+      "unknownHandlers": 0,
+      "counts": {
+        "propagated": 0,
+        "failureResult": 0,
+        "reported": 0,
+        "fallback": 0,
+        "documented": 0,
+        "unexplainedSwallowing": 0,
+        "unknown": 0
+      },
+      "assessedPercent": null,
+      "unresolvedCallbackUses": 0,
+      "populationComplete": true,
+      "reviewed": [],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    },
+    {
+      "id": "excalidraw-app",
+      "revision": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e",
+      "runId": "424d110d-6cbc-4c99-a5dd-96cedeeb021f",
+      "auditId": "424d110d-6cbc-4c99-a5dd-96cedeeb021f",
+      "configurationFingerprint": "d3401f0a8111e9f0f7fead41b6daa1cb4e7614a10a79e26da8b4c8e68ca62a21",
+      "evidenceSha256": "95853227678dc6ae8f75dd750041aded9b263acd990e46976f6c72b36a5df587",
+      "ruleset": "javascript-typescript-2026-10-06-handler-disposition",
+      "status": "skipped",
+      "score": null,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 45,
+      "assessedHandlers": 32,
+      "unknownHandlers": 13,
+      "counts": {
+        "propagated": 1,
+        "failureResult": 0,
+        "reported": 28,
+        "fallback": 0,
+        "documented": 2,
+        "unexplainedSwallowing": 1,
+        "unknown": 13
+      },
+      "assessedPercent": 71.11111111111111,
+      "unresolvedCallbackUses": 1,
+      "populationComplete": false,
+      "reviewed": [
+        {
+          "handlerId": "608a82213262f26ce62f63cfab114624708a973e078989d22550422c1ab62701",
+          "file": "excalidraw-app/CustomStats.tsx",
+          "line": 69,
+          "reviewLabel": "requiresReview",
+          "classification": "unexplainedSwallowing",
+          "reason": "Terminal empty catch discards failure without an explicit result or attached intent."
+        }
+      ],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    },
+    {
+      "id": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "584001e0-e733-4c2e-bdae-c33d78a35161",
+      "auditId": "584001e0-e733-4c2e-bdae-c33d78a35161",
+      "configurationFingerprint": "e0741fecbd03437726a961f9163a684e97e8d23fc4e93ba03b91c78462e2b1da",
+      "evidenceSha256": "ee00800b386a123662c61ccf32186f89e100d6a908d1535cb684406c3808325d",
+      "ruleset": "javascript-typescript-2026-10-06-handler-disposition",
+      "status": "skipped",
+      "score": null,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 341,
+      "assessedHandlers": 45,
+      "unknownHandlers": 296,
+      "counts": {
+        "propagated": 31,
+        "failureResult": 8,
+        "reported": 1,
+        "fallback": 0,
+        "documented": 4,
+        "unexplainedSwallowing": 1,
+        "unknown": 296
+      },
+      "assessedPercent": 13.196480938416423,
+      "unresolvedCallbackUses": 0,
+      "populationComplete": false,
+      "reviewed": [
+        {
+          "handlerId": "799134aefcf7797b3900b78df06c84fbcb6c3d52fee8a757ba6a38ce3b4dda58",
+          "file": "server/model/maintenance.js",
+          "line": 278,
+          "reviewLabel": "declaredIntentOutsideBody",
+          "classification": "unknown",
+          "reason": "Continuation after the empty catch needs a failure-contract review."
+        },
+        {
+          "handlerId": "460f2d8bf1c7a034d7179d5d9d5065a516a2b141c9cc85624059218a6251ef78",
+          "file": "server/model/monitor.js",
+          "line": 1292,
+          "reviewLabel": "requiresReview",
+          "classification": "unknown",
+          "reason": "Outer continuation or control flow requires context."
+        },
+        {
+          "handlerId": "f6d5cfd33267f74b92e5a19961fff6939f693812c297b80407b8e49bbd65dd00",
+          "file": "server/model/monitor.js",
+          "line": 1380,
+          "reviewLabel": "requiresReview",
+          "classification": "unexplainedSwallowing",
+          "reason": "Terminal empty catch discards failure without an explicit result or attached intent."
+        },
+        {
+          "handlerId": "bc57b423ef4b14155c13ee41ab172b4e0d8234a25ae369ea367e2e7be43338f7",
+          "file": "server/monitor-types/globalping.js",
+          "line": 477,
+          "reviewLabel": "requiresReview",
+          "classification": "unknown",
+          "reason": "Outer continuation or control flow requires context."
+        },
+        {
+          "handlerId": "d11489e7b665af88354b4d9572250f3436caeef8e601c4f88a6adfb33f56bea0",
+          "file": "server/monitor-types/steam.js",
+          "line": 87,
+          "reviewLabel": "requiresReview",
+          "classification": "unknown",
+          "reason": "Outer continuation or control flow requires context."
+        },
+        {
+          "handlerId": "e36df4983a09190524af8363a7241f951cf3adf2d0833cdde2673a10ec4b08ca",
+          "file": "server/server.js",
+          "line": 24,
+          "reviewLabel": "requiresReview",
+          "classification": "unknown",
+          "reason": "Continuation after the empty catch needs a failure-contract review."
+        },
+        {
+          "handlerId": "1c9b588bfc0d6e6af6c72bba2f739403bcaf003d6050b0df153c283e16ba791c",
+          "file": "server/socket-handlers/general-socket-handler.js",
+          "line": 143,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Continuation after the empty catch needs a failure-contract review."
+        },
+        {
+          "handlerId": "11b65ef3e23b3e9ef0970a5ed6db9baa74a2c6090e4696c104381c74383d2556",
+          "file": "server/uptime-kuma-server.js",
+          "line": 586,
+          "reviewLabel": "requiresReview",
+          "classification": "unknown",
+          "reason": "Outer continuation or control flow requires context."
+        }
+      ],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    }
+  ],
+  "sourceReview": {
+    "reviewedBodies": 18,
+    "fallbackOutsideBody": 9,
+    "declaredIntentOutsideBody": 2,
+    "requiresReview": 7,
+    "provenance": "Original review run IDs retained. Reuse across fresh runs requires identical revision, handler identity, location, and source hashes.",
+    "interpretation": "Source-context counterexamples and unresolved review questions; unknowns are not labeled defects. No runtime correctness claim."
+  }
+}

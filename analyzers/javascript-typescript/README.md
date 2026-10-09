@@ -1,10 +1,14 @@
 # codemetrics-ai
 
-Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0.4.0 implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
+Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0.5.0 implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
 
 Each scored dimension includes `scoringDecision`: policy inputs, executed steps, rounding and finding attribution. These are aggregate policy decisions, not independent finding deductions. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md).
 
-The 0.4.0 ruleset `javascript-typescript-2026-10-04-local-handlers` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines when upgrading from 0.3.0. See the [0.4.0 release and migration notes](https://github.com/sean-m-cooper/CodeMetrics.AI/blob/master/docs/releases/javascript-typescript-0.4.0.md).
+Version 0.5.0 uses `javascript-typescript-2026-10-09-handler-contracts` and adds
+contextual Error Handling scoring. Adopting it requires a fresh baseline. See the
+[0.5.0 release notes](../../docs/releases/javascript-typescript-0.5.0.md).
+
+The earlier 0.4.0 ruleset `javascript-typescript-2026-10-04-local-handlers` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines when upgrading from 0.3.0. See the [0.4.0 release and migration notes](https://github.com/sean-m-cooper/CodeMetrics.AI/blob/master/docs/releases/javascript-typescript-0.4.0.md).
 
 ```sh
 npx codemetrics-ai --project package.json
@@ -22,7 +26,7 @@ Default output paths are `.scorecard/javascript-typescript/metrics.csv` and `.sc
 | maintainability | 40% mean weakest ceil(N/5) function scores + 60% mean remaining |
 | performanceAsync (Async/Blocking Usage) | React hook/effect checks, standard Promise async executors, and informational async Array.forEach callbacks |
 | architecture | Module dependencies, explicit type-only separation, internal cycle groups and fan-in/out rankings; score remains unmeasured |
-| errorHandling | Catch clauses and inline/referenced standard Promise rejection handlers; unique bodies, linked uses, and documented intent; no score |
+| errorHandling | Contextual failure dispositions for distinct catch/Promise handler bodies; scores unexplained swallowing only with a fully assessed population |
 | Other dimensions | Explicitly skipped |
 
 React checks run only when a source file imports React. Aliased named imports and namespace imports are recognized; local functions shadowing imports are excluded. Missing dependency arrays are advisory because running after every render can be intentional. The implementation does not claim exhaustive Rules of Hooks, dependency-array correctness, or general concurrency analysis. Source syntax errors make the run incomplete and source dimensions unscored. Semantic type errors are outside this AST-focused version's completeness check.
@@ -44,7 +48,9 @@ This is bounded source analysis, not promise-flow verification. Referenced execu
 
 `codeQuality.componentDetails.decomposition` version 2 uses owned executable statements as its primary measure. It ranks functions/modules by statements and reports statement totals, median/p90, and module concentration. Lines and initializer/literal/declaration/re-export observations remain context. Nested bodies are counted separately. Size is not responsibility: data tables, barrels, and orchestration roles receive no inferred defect or deduction. Code Quality remains a method-complexity score.
 
-`errorHandling.handlerEvidence` distinguishes unexplained empty syntax, documented empty bodies, and bodies containing code. Body comments acknowledge developer intent without judging the business rationale. Empty bodies produce informational review leads only; fallback behavior outside the handler may explain them. Referenced Promise callbacks resolve through function declarations, const aliases, and imports within selected source. Shared implementations count once, with call sites attached. Reassigned, mutable, unsupported, and out-of-scope references retain reasoned inspection gaps. No handlers means an unavailable percentage, not a perfect score. See the [evidence contract](../../shared/scorecard-schema/javascript-typescript-context-evidence.md).
+`errorHandling.handlerEvidence` preserves empty/documented/nonempty syntax measurements and links each distinct implementation to its uses. Referenced Promise callbacks resolve through function declarations, const aliases, and imports within selected source. The new `dispositionEvidence` separates explicit outcomes, recognized fallback, documented intent, unexplained swallowing, and unknown paths. Nonempty code alone does not establish handling. Attached intent is honored without judging the business rationale.
+
+When every observed body is assessed and no callback uses are unresolved, Error Handling scores `10 - 10 * unexplainedSwallowing / assessedHandlers`, capped at 9 if any issue exists, rounded half up to one decimal. Shared bodies count once. Unknown dispositions, unresolved callbacks, and absent populations yield no score. Scores describe bounded handling signals, not proven recovery or bugs. See the [policy and recognition limits](../../shared/scorecard-schema/javascript-typescript-error-handling-policy.md).
 
 ## Module architecture evidence
 
@@ -120,7 +126,7 @@ evidence. Overall dependencies and cycle findings remain intact, including mixed
 files and cycles crossing the views. Architecture is still unscored. See the
 [dependency view contract](../../shared/scorecard-schema/javascript-typescript-module-graph.md#implementation-reference-and-public-re-export-views).
 
-`metrics.ts` owns source traversal, raw member metrics and finding identities. `function-measurements.ts` collects the separate owned-body measurements; `function-scoring.ts` applies the two population policies with exact interpolation/rounding from `score-arithmetic.ts`. `react-probe.ts` checks calls owned by each function for React hook/effect observations. `async-probe.ts` checks each visited node once for bounded standard-library promise patterns, including module-level operations. Neither probe traverses nested bodies or calculates metrics. `async-population.ts` assigns distinct eligible owners; `async-scoring.ts` applies the population ladder. `decomposition-evidence.ts` records function size and module distribution without deductions. `handler-resolution.ts` performs bounded declaration lookup; `error-handling.ts` records distinct handler bodies, use sites, and body comments without a score. Regression fixtures preserve raw metrics, source locations and existing finding fingerprints; advisory severity/disposition changes are intentional.
+`metrics.ts` owns source traversal, raw member metrics and finding identities. `function-measurements.ts` collects the separate owned-body measurements; `function-scoring.ts` applies the two population policies with exact interpolation/rounding from `score-arithmetic.ts`. `react-probe.ts` checks calls owned by each function for React hook/effect observations. `async-probe.ts` checks each visited node once for bounded standard-library promise patterns, including module-level operations. Neither probe traverses nested bodies or calculates metrics. `async-population.ts` assigns distinct eligible owners; `async-scoring.ts` applies the population ladder. `decomposition-evidence.ts` records function size and module distribution without deductions. `handler-resolution.ts` performs bounded declaration lookup; `handler-disposition.ts` classifies bounded failure paths; `failure-contracts.ts` resolves local logging, callback, and guarded-result contracts; `error-handling.ts` aggregates bodies, uses, context, and findings; `error-handling-scoring.ts` applies the population formula. Regression fixtures preserve raw metrics and source identities; the handler policy and ruleset change is intentional.
 
 ```sh
 npm ci
@@ -160,3 +166,13 @@ records results and limitations. Executable statements are the accepted primary 
 and weights remain experimental; Code Quality continues to score method complexity
 only. The [statement calibration report](../../shared/scorecard-schema/calibration-runs/javascript-typescript-statements-2026-10-04.md)
 records the updated preview and counting contract.
+
+The [completed context calibration](../../shared/scorecard-schema/javascript-typescript-context-policy-decision.md)
+retained decomposition and error handling as unscored evidence at that stage. Across 4,062 functions,
+the large-statement candidates overlapped existing CC/MI review groups; source review
+also found explicit fallback and declared-intent counterexamples to body-only handler
+deductions. The released workflow was verified on all six selections and a compatible
+Uptime Kuma rerun. Numerical experiments remain outside the analyzer and are not
+consumer scoring policies. The subsequent [contextual handler policy](../../shared/scorecard-schema/javascript-typescript-error-handling-policy.md)
+enables the agreed population formula only where bounded classification establishes
+an assessable population. Decomposition remains unscored.

@@ -1,11 +1,15 @@
 import ts from "typescript";
-import { hash, type Dimension, type Finding } from "./evidence.js";
+import { hash, scored, type Dimension, type Finding } from "./evidence.js";
 import { HandlerResolver, unwrapHandler } from "./handler-resolution.js";
+import { classifyDisposition, type HandlerDisposition } from "./handler-disposition.js";
+import { errorHandlingDecision } from "./error-handling-scoring.js";
+import type { FailureContracts } from "./failure-contracts.js";
 
 type UsageKind = "catchClause" | "promiseCatch" | "promiseThenRejection";
 interface Handler {
   id: string; file: string; project: string; line: number; kind: "catchClause" | "promiseRejection";
   classification: "unexplainedEmpty" | "documentedEmpty" | "containsCode"; comments: string[];
+  disposition: HandlerDisposition;
   uses: { file: string; line: number; kind: UsageKind; resolution: "inline" | "reference" }[];
 }
 function undefinedValue(node: ts.Expression, checker: ts.TypeChecker): boolean {
@@ -21,10 +25,19 @@ function emptyBody(body: ts.ConciseBody, checker: ts.TypeChecker): boolean {
     (ts.isReturnStatement(statement) && (!statement.expression || undefinedValue(statement.expression, checker))));
 }
 function bodyComments(body: ts.ConciseBody, source: ts.SourceFile): string[] {
+  const nested: { start: number; end: number }[] = [];
+  function visit(node: ts.Node) {
+    if (node !== body && (ts.isFunctionLike(node) || ts.isLiteralExpression(node) || ts.isTemplateExpression(node))) {
+      nested.push({ start: ts.isFunctionLike(node) ? node.pos : node.getStart(source), end: node.end }); return;
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(body);
   const scanner = ts.createScanner(ts.ScriptTarget.Latest, false, source.languageVariant, source.text.slice(body.pos, body.end));
   const comments: string[] = [];
   for (let token = scanner.scan(); token !== ts.SyntaxKind.EndOfFileToken; token = scanner.scan()) {
     if (token !== ts.SyntaxKind.SingleLineCommentTrivia && token !== ts.SyntaxKind.MultiLineCommentTrivia) continue;
+    if (nested.some(range => body.pos + scanner.getTokenPos() >= range.start && body.pos + scanner.getTokenPos() < range.end)) continue;
     const text = scanner.getTokenText().replace(/^\/\/?\*?|\*\/$/g, "").trim();
     if (/[\p{L}\p{N}]/u.test(text)) comments.push(text);
   }
@@ -39,17 +52,24 @@ function rejectionArgument(call: ts.CallExpression, checker: ts.TypeChecker): { 
   if (declaration.name.text === "catch") return { index: 0, kind: "promiseCatch" };
   if (declaration.name.text === "then" && call.arguments.length > 1) return { index: 1, kind: "promiseThenRejection" };
 }
-export function inspectErrorHandling(source: ts.SourceFile, checker: ts.TypeChecker, file: string, project: string, resolver: HandlerResolver) {
+export function inspectErrorHandling(source: ts.SourceFile, checker: ts.TypeChecker, file: string, project: string, resolver: HandlerResolver, contracts: FailureContracts) {
   const handlers = new Map<string, Handler>();
   const uninspectedCallbacks: { file: string; line: number; kind: UsageKind; reason: string }[] = [];
   function add(body: ts.ConciseBody, kind: UsageKind, at: ts.Node, resolution: "inline" | "reference") {
     const identity = resolver.identity(body);
     const existing = handlers.get(identity.id);
     const use = { file, line: source.getLineAndCharacterOfPosition(at.getStart(source)).line + 1, kind, resolution };
-    if (existing) { existing.uses.push(use); return; }
-    const empty = emptyBody(body, checker), comments = empty ? bodyComments(body, body.getSourceFile()) : [];
+    const empty = emptyBody(body, checker), comments = bodyComments(body, body.getSourceFile());
+    const disposition = classifyDisposition(body, checker, empty, comments, at, contracts);
+    if (existing) {
+      existing.uses.push(use);
+      if (existing.disposition.classification !== disposition.classification)
+        existing.disposition = { classification: "unknown", reason: "Uses of the shared handler have different failure contexts." };
+      return;
+    }
     const classification = !empty ? "containsCode" : comments.length ? "documentedEmpty" : "unexplainedEmpty";
-    handlers.set(identity.id, { ...identity, kind: kind === "catchClause" ? "catchClause" : "promiseRejection", classification, comments, uses: [use] });
+    handlers.set(identity.id, { ...identity, kind: kind === "catchClause" ? "catchClause" : "promiseRejection", classification, comments,
+      disposition, uses: [use] });
   }
   function visit(node: ts.Node) {
     if (ts.isTypeNode(node) && !ts.isExpressionWithTypeArguments(node)) return;
@@ -67,18 +87,25 @@ export function inspectErrorHandling(source: ts.SourceFile, checker: ts.TypeChec
   }
   visit(source); return { handlers: [...handlers.values()], uninspectedCallbacks };
 }
-function handlerFinding(handler: Handler): Finding {
-  return { category: "unexplainedEmptyHandler", ruleId: "javascript-typescript/errorHandling/unexplainedEmptyHandler",
-    fingerprint: hash(`${handler.id}|unexplainedEmptyHandler`), file: handler.file, project: handler.project, line: handler.line,
-    severity: "info", confidence: "high",
-    message: "Handler contains only empty syntax or an undefined return, without a body comment. Review whether discarding the failure is intentional.",
-    observations: { handlerId: handler.id, kind: handler.kind, uses: handler.uses, classification: "reviewLead", scoreDisposition: "excludedUncalibrated" } };
+function handlerFinding(handler: Handler, scoreAvailable: boolean): Finding {
+  const actionable = handler.disposition.classification === "unexplainedSwallowing";
+  const category = actionable ? "unexplainedSwallowing" : "unknownHandlerDisposition";
+  return { category, ruleId: `javascript-typescript/errorHandling/${category}`,
+    fingerprint: hash(`${handler.id}|${category}`), file: handler.file, project: handler.project, line: handler.line,
+    severity: actionable && scoreAvailable ? "warning" : "info", confidence: actionable ? "high" : "low",
+    message: handler.disposition.reason,
+    observations: { handlerId: handler.id, kind: handler.kind, uses: handler.uses, classification: handler.disposition.classification,
+      scoreDisposition: !actionable ? "excludedUnknown" : scoreAvailable ? "policyInput" : "excludedUnavailablePopulation" } };
 }
 export function errorHandlingEvidence(results: ReturnType<typeof inspectErrorHandling>[], incomplete: boolean): Dimension {
   const unique = new Map<string, Handler>();
   for (const row of results.flatMap(result => result.handlers)) {
     const existing = unique.get(row.id);
-    if (existing) existing.uses.push(...row.uses);
+    if (existing) {
+      existing.uses.push(...row.uses);
+      if (existing.disposition.classification !== row.disposition.classification)
+        existing.disposition = { classification: "unknown", reason: "Selected project contexts disagree about the shared handler disposition." };
+    }
     else unique.set(row.id, { ...row, uses: [...row.uses] });
   }
   const handlers = [...unique.values()].sort((a, b) => a.file.localeCompare(b.file, "en") || a.line - b.line);
@@ -87,12 +114,24 @@ export function errorHandlingEvidence(results: ReturnType<typeof inspectErrorHan
     .sort((a,b) => a.file.localeCompare(b.file, "en") || a.line - b.line);
   const count = (classification: Handler["classification"]) => handlers.filter(handler => handler.classification === classification).length;
   const unexplained = count("unexplainedEmpty");
-  return { status: incomplete ? "failed" : "skipped", basis: incomplete ? "Incomplete source; handler observations are diagnostic only." :
-    "Handler syntax and documented intent are observed; error-handling scoring is not calibrated. Code presence is not proof of recovery.",
-    scope: { id: "javascript-typescript/errorHandling/handler-evidence-v2", coverage: "partial",
-      includes: ["catch-clauses", "inline-standard-promise-rejection-handlers", "body-comments", "selected-source-referenced-handlers"],
-      excludes: ["error-handling-score", "general-exception-flow", "arbitrary-callback-value-flow", "correctness-of-recovery", "semantic-rationale-judgment"] },
-    findings: handlers.filter(handler => handler.classification === "unexplainedEmpty").map(handlerFinding), handlerEvidence: { version: 2, countingUnit: "distinctHandlerBody",
+  const dispositions = Object.fromEntries(["propagated", "failureResult", "reported", "fallback", "documented", "unexplainedSwallowing", "unknown"]
+    .map(kind => [kind, handlers.filter(handler => handler.disposition.classification === kind).length]));
+  const decision = incomplete ? undefined : errorHandlingDecision(handlers.length, dispositions.unexplainedSwallowing, dispositions.unknown, uninspectedCallbacks.length);
+  const findings = handlers.filter(handler => ["unexplainedSwallowing", "unknown"].includes(handler.disposition.classification))
+    .map(handler => handlerFinding(handler, !!decision));
+  const scope: Dimension["scope"] = { id: "javascript-typescript/errorHandling/failure-disposition-v2", coverage: "partial",
+    includes: ["catch-clauses", "inline-standard-promise-rejection-handlers", "attached-intent", "selected-source-referenced-handlers", "bounded-failure-continuations"],
+    excludes: ["general-exception-flow", "arbitrary-callback-value-flow", "correctness-of-recovery", "semantic-rationale-judgment"] };
+  const dispositionEvidence = { version: 1, countingUnit: "distinctHandlerBody", totalHandlers: handlers.length,
+    assessedHandlers: handlers.length - dispositions.unknown, unknownHandlers: dispositions.unknown, counts: dispositions,
+    assessedPercent: handlers.length ? 100 * (handlers.length - dispositions.unknown) / handlers.length : null,
+    unresolvedCallbackUses: uninspectedCallbacks.length, populationComplete: !incomplete && !dispositions.unknown && !uninspectedCallbacks.length };
+  const dimension: Dimension = decision ? scored(decision,
+    "Partial Error Handling: unexplained swallowing among distinct assessed handler bodies. Documented intent is honored; failure outcomes are signals, not proof of correct recovery.",
+    findings, dispositionEvidence) : { status: incomplete ? "failed" : "skipped", findings,
+      basis: incomplete ? "Incomplete source; handler observations are diagnostic only." : !handlers.length ? "No assessed handler population; error handling is unavailable." :
+      "Unknown handler dispositions or unresolved callback uses prevent a reliable population score." };
+  return { ...dimension, scope, dispositionEvidence, handlerEvidence: { version: 2, countingUnit: "distinctHandlerBody",
       totalHandlers: handlers.length, unexplainedEmptyHandlers: unexplained, documentedEmptyHandlers: count("documentedEmpty"),
       handlersContainingCode: count("containsCode"), unexplainedEmptyPercent: handlers.length ? 100 * unexplained / handlers.length : null,
       handlerUseSites: handlers.reduce((sum, handler) => sum + handler.uses.length, 0),

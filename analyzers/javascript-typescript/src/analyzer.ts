@@ -11,6 +11,7 @@ import { asyncPopulation, type AsyncOwner } from "./async-population.js";
 import { decompositionModule, decompositionEvidence } from "./decomposition-evidence.js";
 import { HandlerResolver } from "./handler-resolution.js";
 import { inspectErrorHandling, errorHandlingEvidence } from "./error-handling.js";
+import { FailureContracts } from "./failure-contracts.js";
 
 export function analyze(options: { project?: string; tsconfig?: string; runId?: string; auditId?: string }, version: string): { evidence: Evidence; metrics: Metric[]; csv: string; inputs: string[] } {
   const identity = invocationIds(options.runId, options.auditId);
@@ -31,6 +32,7 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
     const handlerSources = pkg.files.map(filename => program.getSourceFile(filename))
       .filter((source): source is ts.SourceFile => !!source && !program.getSyntacticDiagnostics(source).length);
     const handlerResolver = new HandlerResolver(checker, handlerSources, discovery.repositoryRoot, pkg.name);
+    const failureContracts = new FailureContracts(checker, program.getSourceFiles(), handlerSources, discovery.repositoryRoot);
     const collectModules = moduleGraph.forPackage(pkg, program);
     for (const filename of pkg.files) {
       const source = program.getSourceFile(filename);
@@ -47,7 +49,7 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
       asyncOwners.push(...asyncPopulation(source, checker, file, pkg.name, result.functions,
         result.findings.filter(item => item.dimension === "performanceAsync").map(item => item.finding)));
       decompositionModules.push(decompositionModule(source, file, pkg.name, result.functions));
-      errorHandling.push(inspectErrorHandling(source, checker, file, pkg.name, handlerResolver));
+      errorHandling.push(inspectErrorHandling(source, checker, file, pkg.name, handlerResolver, failureContracts));
       metrics.push(...result.metrics); collected.push(...result.findings);
       functions.push(...result.functions);
     }
@@ -71,7 +73,7 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
     filters: { totalUnits: discovery.packages.reduce((sum,pkg) => sum + pkg.files.length, 0) + discovery.skipped.length,
       analyzedUnits: analyzedFiles, skipped: discovery.skipped },
     population: { types: new Set(metrics.map(metric => `${metric.project}|${metric.file}|${metric.type}`)).size, members: metrics.length },
-    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-10-04-local-handlers",
+    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-10-09-handler-contracts",
       calibration: "uncalibrated", configurationFingerprint: hash(JSON.stringify(canonicalConfiguration(discovery.packages.map(pkg => ({ name: pkg.name,
         options: pkg.options, selection: pkg.selection })), discovery.repositoryRoot))), diagnostics, suppressions: [] }
   };

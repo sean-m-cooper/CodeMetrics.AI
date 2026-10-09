@@ -1,0 +1,2635 @@
+{
+  "status": "completed-calibration-production-scores-unchanged",
+  "date": "2026-10-05",
+  "releaseWorkflow": {
+    "generatedAtUtc": "2026-10-05T18:31:22.482Z",
+    "corpusSha256": "918466ea4dd39df1d20ed4ffd06a31e9651957a2975731571c0adf86799a6be5",
+    "skillRevision": "c56ed08e7f925a04d5faa87b1c981c6016733776",
+    "skillSha256": "e6f035859385b8c244830359f8bcb0cce7416ebbb03611249dad940222034edb",
+    "nodeVersion": "v24.18.0",
+    "packageVersion": "0.4.0",
+    "scope": "Pinned selected-source calibration, using repository compiler configuration where present. Does not install or execute sample applications.",
+    "samples": [
+      {
+        "id": "express",
+        "repository": "express",
+        "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+        "package": ".",
+        "include": [
+          "index.js",
+          "lib/**/*.js"
+        ],
+        "target": "ES2022",
+        "runId": "59476fc5-611a-47ea-9ba1-e9cbe9252c7a",
+        "auditId": "5b9bfd7f-94dc-4bf5-9352-b7a36b75cb69",
+        "artifacts": {
+          "evidence": "E:\\repos\\express\\.scorecard\\javascript-typescript\\runs\\59476fc5-611a-47ea-9ba1-e9cbe9252c7a\\evidence.json",
+          "inspection": "E:\\repos\\express\\.scorecard\\javascript-typescript\\runs\\59476fc5-611a-47ea-9ba1-e9cbe9252c7a\\inspection.json",
+          "metrics": "E:\\repos\\express\\.scorecard\\javascript-typescript\\runs\\59476fc5-611a-47ea-9ba1-e9cbe9252c7a\\metrics.csv"
+        },
+        "configurationFingerprint": "cf9b810ed60b579e3b9688b78a787b1e8014c0b3baa6cd42bfbf1096ec598288",
+        "configurationSha256": "4107a4d633e8b761089fa76ed4a532ffea899ed4b67f8b2d42e62b3c23a4dc3d",
+        "evidenceSha256": "59e6fcdb44ce9a91a5edecb1d8674bb5403d2948e0b987d3a996d4fb612e0f65",
+        "csvSha256": "3007f51f5bb3e10faffbe13b04d87b62fa3d872fbf47318456c5334792237014",
+        "population": {
+          "types": 72,
+          "members": 109
+        },
+        "filters": {
+          "totalUnits": 7,
+          "analyzedUnits": 7,
+          "skipped": []
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "scores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      },
+      {
+        "id": "zod-v4",
+        "repository": "zod",
+        "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+        "package": "packages/zod",
+        "include": [
+          "src/v4/**/*.ts"
+        ],
+        "config": "tsconfig.json",
+        "runId": "9da460ba-ab5b-47bb-b43d-51ad23a572ff",
+        "auditId": "01c4c238-6978-4cf6-a802-ab1d008dcef6",
+        "artifacts": {
+          "evidence": "E:\\repos\\zod\\.scorecard\\javascript-typescript\\runs\\9da460ba-ab5b-47bb-b43d-51ad23a572ff\\evidence.json",
+          "inspection": "E:\\repos\\zod\\.scorecard\\javascript-typescript\\runs\\9da460ba-ab5b-47bb-b43d-51ad23a572ff\\inspection.json",
+          "metrics": "E:\\repos\\zod\\.scorecard\\javascript-typescript\\runs\\9da460ba-ab5b-47bb-b43d-51ad23a572ff\\metrics.csv"
+        },
+        "configurationFingerprint": "4c6726e64a1527a607c1142c36300173eb52671badc2f437fa0d742959aee7cd",
+        "configurationSha256": "500628532e30ebf69760655d30170970b1374cd55e70f37fa945f9b005683c9a",
+        "evidenceSha256": "f1457b2e9791f2520fa1b626e9ac98efe6e33994ec3b27b00e472b818b8cf46f",
+        "csvSha256": "7f714913b9d4c86a67acda3e320d6cdfda9700a7838b3957a2964ce738757d7d",
+        "population": {
+          "types": 981,
+          "members": 1948
+        },
+        "filters": {
+          "totalUnits": 244,
+          "analyzedUnits": 107,
+          "skipped": [
+            {
+              "name": "src/v4/classic/tests/anyunknown.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/apply.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/array.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/assignability.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/async-parsing.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/async-refinements.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/base.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/bigint.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/brand.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/catch.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/coalesce.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/codec-examples.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/codec.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/coerce.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/continuability.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/credit-card.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/custom.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/cyclic-data.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/date.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/datetime.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/deep-partial.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/default-locale.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/default.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/describe-meta-checks.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/description.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/detached-methods.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/discriminated-unions.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/enum.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/error-utils.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/error.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/file.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/firstparty.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/fix-json-issue.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/from-json-schema.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/function.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/generics.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/global-config.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/hash.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/iban.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/in-out.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/index.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/instance-footprint.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/instanceof.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/intersection.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/issue-schema.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/jitless-allows-eval.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/json.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/lazy.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/literal.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/locales_ka.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/locales_ro.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/map.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/nan.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/nested-refine.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/nonoptional.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/nullable.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/number.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/object.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/optin-ladder.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/optional.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/partial.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/pickomit.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/pipe.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/prefault.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/preprocess-types.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/preprocess.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/primitive.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/promise.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/properties.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/prototypes.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/readonly.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/record.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/recursive-types.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/redos.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/refine.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/registries.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/set.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/standard-schema.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/string-formats.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/string.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/stringbool.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/template-literal.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/to-json-schema-methods.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/to-json-schema.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/transform.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/tuple.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/union.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/url.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/validate.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/validations.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/classic/tests/void.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/cached.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/compile-differential.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/compile-generative.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/compile-global.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/compile-off-by-default.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/compile-stats.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/compile.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/email-regex.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/extend.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/index.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/be.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/el.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/en.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/es.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/fr.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/he.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/hr.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/nl.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/parity.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/ru.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/tg.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/tk.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/tr.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/locales/uz.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/polyfill-collision.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/record-constructor.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/recursive-tuples.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/treeshake.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/core/tests/url-no-canparse.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/apply.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/assignability.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/brand.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/checks.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/codec.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/computed.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/cyclic-data.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/deep-partial.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/error.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/functions.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/index.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/number.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/object.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/prototypes.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/recursive-types.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/standard-schema.test.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/v4/mini/tests/string.test.ts",
+              "reason": "Test or fixture source"
+            }
+          ]
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "scores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      },
+      {
+        "id": "tanstack-query-core",
+        "repository": "tanstack-query",
+        "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+        "package": "packages/query-core",
+        "include": [
+          "src/**/*.ts"
+        ],
+        "config": "tsconfig.json",
+        "runId": "6bc47835-855c-4d02-a67a-310fabc1c787",
+        "auditId": "4a1d8433-85b7-4193-b117-605a3d576020",
+        "artifacts": {
+          "evidence": "E:\\repos\\tanstack-query\\.scorecard\\javascript-typescript\\runs\\6bc47835-855c-4d02-a67a-310fabc1c787\\evidence.json",
+          "inspection": "E:\\repos\\tanstack-query\\.scorecard\\javascript-typescript\\runs\\6bc47835-855c-4d02-a67a-310fabc1c787\\inspection.json",
+          "metrics": "E:\\repos\\tanstack-query\\.scorecard\\javascript-typescript\\runs\\6bc47835-855c-4d02-a67a-310fabc1c787\\metrics.csv"
+        },
+        "configurationFingerprint": "019a35461ce7162955cc475dc431964f8ab58e883f3b6be499e5a962d44950d0",
+        "configurationSha256": "afbcf8e32b2b28049e640fa5f046dde5e4ee203bc2b99708044acd8c1139ccaa",
+        "evidenceSha256": "86c2b12ed6770e4a03c4f0be6c54ea7d6158fed8a211af5c5116e7e48b7888ab",
+        "csvSha256": "9f345cee4f6646f9480e3b2f5d6c5df70baefb54f29142301edb7a7552bf3f4d",
+        "population": {
+          "types": 178,
+          "members": 427
+        },
+        "filters": {
+          "totalUnits": 26,
+          "analyzedUnits": 23,
+          "skipped": [
+            {
+              "name": "src/__tests__/OmitKeyof.test-d.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/environmentManager.test-d.ts",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/utils.ts",
+              "reason": "Test or fixture source"
+            }
+          ]
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "scores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      },
+      {
+        "id": "tanstack-react-query",
+        "repository": "tanstack-query",
+        "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+        "package": "packages/react-query",
+        "include": [
+          "src/**/*.ts",
+          "src/**/*.tsx"
+        ],
+        "config": "tsconfig.json",
+        "runId": "8ab92931-d067-40d7-928a-5440407339ec",
+        "auditId": "141320ee-4c37-491b-8740-d1113e916fbb",
+        "artifacts": {
+          "evidence": "E:\\repos\\tanstack-query\\.scorecard\\javascript-typescript\\runs\\8ab92931-d067-40d7-928a-5440407339ec\\evidence.json",
+          "inspection": "E:\\repos\\tanstack-query\\.scorecard\\javascript-typescript\\runs\\8ab92931-d067-40d7-928a-5440407339ec\\inspection.json",
+          "metrics": "E:\\repos\\tanstack-query\\.scorecard\\javascript-typescript\\runs\\8ab92931-d067-40d7-928a-5440407339ec\\metrics.csv"
+        },
+        "configurationFingerprint": "18cd82d79c17c4506f0fdf43d866ca4a4ec258faebc1ef8d4f155fb247b013a1",
+        "configurationSha256": "de7addcb26f9aa4b8b1a0afadf13d9075df920c287ba7ff8738459f20e77dacb",
+        "evidenceSha256": "c77d34ad705998dd4ad3f8691d293b22f17ea4783fb081d5a801ec1dd250b2ec",
+        "csvSha256": "e2dc06bd0145c8c14d56ec768ffdd27fb3b1e6b6c03bd18d90ad94de3be34483",
+        "population": {
+          "types": 34,
+          "members": 76
+        },
+        "filters": {
+          "totalUnits": 59,
+          "analyzedUnits": 23,
+          "skipped": [
+            {
+              "name": "src/__tests__/HydrationBoundary.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/QueryClientProvider.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/QueryResetErrorBoundary.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/fine-grained-persister.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/infiniteQueryOptions.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/infiniteQueryOptions.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/mutationOptions.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/mutationOptions.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/queryOptions.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/queryOptions.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/ssr-hydration.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/ssr.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/suspense.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/transition.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useInfiniteQuery.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useInfiniteQuery.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useIsFetching.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useMutation.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useMutation.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useMutationState.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useMutationState.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/usePrefetchInfiniteQuery.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/usePrefetchInfiniteQuery.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/usePrefetchQuery.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/usePrefetchQuery.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useQueries.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useQueries.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useQuery.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useQuery.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useSuspenseInfiniteQuery.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useSuspenseInfiniteQuery.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useSuspenseQueries.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useSuspenseQueries.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useSuspenseQuery.test-d.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/useSuspenseQuery.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "src/__tests__/utils.tsx",
+              "reason": "Test or fixture source"
+            }
+          ]
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "scores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      },
+      {
+        "id": "excalidraw-app",
+        "repository": "excalidraw",
+        "revision": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e",
+        "package": "excalidraw-app",
+        "include": [
+          "**/*.ts",
+          "**/*.tsx"
+        ],
+        "config": "../tsconfig.json",
+        "runId": "e845d8ac-7799-4252-89a8-c35a4ba2c006",
+        "auditId": "ef9e734c-c4df-4ae1-867f-90bbde89a392",
+        "artifacts": {
+          "evidence": "E:\\repos\\excalidraw\\.scorecard\\javascript-typescript\\runs\\e845d8ac-7799-4252-89a8-c35a4ba2c006\\evidence.json",
+          "inspection": "E:\\repos\\excalidraw\\.scorecard\\javascript-typescript\\runs\\e845d8ac-7799-4252-89a8-c35a4ba2c006\\inspection.json",
+          "metrics": "E:\\repos\\excalidraw\\.scorecard\\javascript-typescript\\runs\\e845d8ac-7799-4252-89a8-c35a4ba2c006\\metrics.csv"
+        },
+        "configurationFingerprint": "d3401f0a8111e9f0f7fead41b6daa1cb4e7614a10a79e26da8b4c8e68ca62a21",
+        "configurationSha256": "730c54afcb81fa77c64190d053c646e79b80b2640503048e01144bbb7bde55ef",
+        "evidenceSha256": "f852bddb82cb92e67f411d0ae9f8679de77fe25eb36bd80f787039f1a195eecb",
+        "csvSha256": "7728026ed231f2eb81c510c4ded4e544caec4f6665d6e96f853e54e7e6a55e77",
+        "population": {
+          "types": 146,
+          "members": 360
+        },
+        "filters": {
+          "totalUnits": 42,
+          "analyzedUnits": 37,
+          "skipped": [
+            {
+              "name": "global.d.ts",
+              "reason": "Type declarations"
+            },
+            {
+              "name": "tests/LanguageList.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "tests/MobileMenu.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "tests/collab.test.tsx",
+              "reason": "Test or fixture source"
+            },
+            {
+              "name": "vite-env.d.ts",
+              "reason": "Type declarations"
+            }
+          ]
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "scores": {
+          "codeQuality": 7.3,
+          "maintainability": 5.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      },
+      {
+        "id": "uptime-kuma-server",
+        "repository": "uptime-kuma",
+        "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+        "package": ".",
+        "include": [
+          "server/**/*.js",
+          "server/**/*.ts"
+        ],
+        "config": "tsconfig.json",
+        "runId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+        "auditId": "1ad6d5d6-d326-4f32-9156-2a3212ee865b",
+        "artifacts": {
+          "evidence": "E:\\repos\\uptime-kuma\\.scorecard\\javascript-typescript\\runs\\c0c59e8a-0909-4bcd-bf3b-6403dddc15ab\\evidence.json",
+          "inspection": "E:\\repos\\uptime-kuma\\.scorecard\\javascript-typescript\\runs\\c0c59e8a-0909-4bcd-bf3b-6403dddc15ab\\inspection.json",
+          "metrics": "E:\\repos\\uptime-kuma\\.scorecard\\javascript-typescript\\runs\\c0c59e8a-0909-4bcd-bf3b-6403dddc15ab\\metrics.csv"
+        },
+        "configurationFingerprint": "e0741fecbd03437726a961f9163a684e97e8d23fc4e93ba03b91c78462e2b1da",
+        "configurationSha256": "f087de55acd9304c7e493cdac04d3b5893f26eb5dbba76aa4c38b0cdc832a6f2",
+        "evidenceSha256": "dc5449af0d26080625a0742cd191bd0d8bddf13ba1e7bf0c3633ec1fd19ba155",
+        "csvSha256": "16b1cfbc6fa68e6d5dc73fad2e310f264e7c76672d13a43782870e2d48337f85",
+        "population": {
+          "types": 467,
+          "members": 1142
+        },
+        "filters": {
+          "totalUnits": 214,
+          "analyzedUnits": 213,
+          "skipped": [
+            {
+              "name": "server/modules/dayjs/plugin/timezone.d.ts",
+              "reason": "Type declarations"
+            }
+          ]
+        },
+        "ruleset": "javascript-typescript-2026-10-04-local-handlers",
+        "scores": {
+          "codeQuality": 5.5,
+          "maintainability": 4.7,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      }
+    ]
+  },
+  "experiments": {
+    "status": "experimental-unscored",
+    "generatedAtUtc": "2026-10-05T18:42:23.124Z",
+    "decisions": "Candidates require source-context review. No scores in this document are applied to evidence or gates.",
+    "sourceReview": {
+      "reviewedBodies": 18,
+      "fallbackOutsideBody": 9,
+      "declaredIntentOutsideBody": 2,
+      "requiresReview": 7,
+      "provenance": "Original review run IDs retained. Reuse across fresh runs requires identical revision, handler identity, location, and source hashes.",
+      "interpretation": "Source-context counterexamples and unresolved review questions; unknowns are not labeled defects. No runtime correctness claim."
+    },
+    "samples": [
+      {
+        "id": "express",
+        "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+        "status": "experimental-unscored",
+        "runId": "59476fc5-611a-47ea-9ba1-e9cbe9252c7a",
+        "auditId": "5b9bfd7f-94dc-4bf5-9352-b7a36b75cb69",
+        "decomposition": {
+          "status": "experimental-unscored",
+          "productionScoresUnchanged": true,
+          "functions": 109,
+          "primaryMeasure": "ownedStatements",
+          "candidateScores": {
+            "ownedStatements": 8.2
+          },
+          "rankCorrelation": {
+            "linesWithCC": 0.848,
+            "statementsWithCC": 0.86,
+            "linesWithMIRisk": 0.989,
+            "statementsWithMIRisk": 0.953
+          },
+          "largestFunctions": [
+            {
+              "id": "3495ebd3fcd27608878bdf47a48945914b174cce9e40042483c1ec8a291f40d5",
+              "member": "send",
+              "line": 126,
+              "ownedSourceLines": 57,
+              "ownedStatements": 47,
+              "dataLiteralEntries": 0,
+              "file": "lib/response.js",
+              "ownComplexity": 23,
+              "ownMaintainabilityIndex": 34.70979551084187
+            },
+            {
+              "id": "5e2858fefd3b640a044176a7ccfbabbd88a6245e47a737edac5984f25023bd90",
+              "member": "download",
+              "line": 437,
+              "ownedSourceLines": 28,
+              "ownedStatements": 24,
+              "dataLiteralEntries": 1,
+              "file": "lib/response.js",
+              "ownComplexity": 13,
+              "ownMaintainabilityIndex": 45.159692098204125
+            },
+            {
+              "id": "cdb26b2ab14efed0815945ddbd8eb43e857127327cfa91205f05bba96da3e0f0",
+              "member": "render",
+              "line": 522,
+              "ownedSourceLines": 30,
+              "ownedStatements": 23,
+              "dataLiteralEntries": 6,
+              "file": "lib/application.js",
+              "ownComplexity": 10,
+              "ownMaintainabilityIndex": 43.84918989302365
+            },
+            {
+              "id": "7c0c471048263a69f2febc65eb865b9ec7a7db809534ae0008e4cbffa5132797",
+              "member": "jsonp",
+              "line": 264,
+              "ownedSourceLines": 23,
+              "ownedStatements": 21,
+              "dataLiteralEntries": 0,
+              "file": "lib/response.js",
+              "ownComplexity": 7,
+              "ownMaintainabilityIndex": 47.52353775892205
+            },
+            {
+              "id": "37801129d32dcf0579d9d35f5e05b8bf4c4ef701ff7a0141b2997fd2dfc22068",
+              "member": "acceptParams",
+              "line": 89,
+              "ownedSourceLines": 20,
+              "ownedStatements": 20,
+              "dataLiteralEntries": 3,
+              "file": "lib/utils.js",
+              "ownComplexity": 7,
+              "ownMaintainabilityIndex": 49.23812641316086
+            },
+            {
+              "id": "ad907a30bab37eff33e28add5a7d5bbb61ebc76e377b3975169468e221a24e03",
+              "member": "View",
+              "line": 52,
+              "ownedSourceLines": 22,
+              "ownedStatements": 20,
+              "dataLiteralEntries": 0,
+              "file": "lib/view.js",
+              "ownComplexity": 8,
+              "ownMaintainabilityIndex": 48.28123769579444
+            },
+            {
+              "id": "06a09e464cdb98908e15dea4937d1e43086ea6669e1ed27a4a4ffd286f7ff3fb",
+              "member": "defaultConfiguration",
+              "line": 90,
+              "ownedSourceLines": 22,
+              "ownedStatements": 18,
+              "dataLiteralEntries": 2,
+              "file": "lib/application.js",
+              "ownComplexity": 3,
+              "ownMaintainabilityIndex": 49.337943629613164
+            },
+            {
+              "id": "52502daaec8f315ff3ff6066ff716ff24857f8d6209aff520e59b677e736d42a",
+              "member": "sendFile",
+              "line": 375,
+              "ownedSourceLines": 19,
+              "ownedStatements": 18,
+              "dataLiteralEntries": 0,
+              "file": "lib/response.js",
+              "ownComplexity": 7,
+              "ownMaintainabilityIndex": 50.84745131090386
+            },
+            {
+              "id": "c3ff1057ad74a414cd21aed304a5856a6df989af408f738ac9702619280b507a",
+              "member": "redirect",
+              "line": 814,
+              "ownedSourceLines": 26,
+              "ownedStatements": 18,
+              "dataLiteralEntries": 3,
+              "file": "lib/response.js",
+              "ownComplexity": 6,
+              "ownMaintainabilityIndex": 47.70797284696481
+            },
+            {
+              "id": "871864b71453ff78fe5569454ad802396d0b4741b04b79ee854b858d4c7c18d3",
+              "member": "anonymous",
+              "line": 747,
+              "ownedSourceLines": 19,
+              "ownedStatements": 17,
+              "dataLiteralEntries": 1,
+              "file": "lib/response.js",
+              "ownComplexity": 8,
+              "ownMaintainabilityIndex": 49.91762557657744
+            }
+          ],
+          "largeLowComplexity": [],
+          "largeLowComplexityCount": 0,
+          "reviewThresholds": {
+            "ownedStatementsGreaterThan": 40,
+            "existingCcGreaterThan": 10,
+            "existingMiLessThan": 65
+          },
+          "largeFunctions": 1,
+          "alsoHighCc": 1,
+          "alsoLowMi": 1,
+          "additionalReviewCandidates": []
+        },
+        "handlers": {
+          "totalBodies": 2,
+          "unexplainedBodies": 1,
+          "documentedBodies": 0,
+          "bodiesContainingCode": 1,
+          "useSites": 2,
+          "referencedUses": 0,
+          "unresolvedUses": 0,
+          "candidate": {
+            "score": 5,
+            "reason": "Experimental: 10 - 10*unexplained/total; cap 9 when unexplained > 0; half-up once."
+          },
+          "unexplained": [
+            {
+              "id": "8e3321f13c8a955115189d0ad680ba09db066ab24b82e180c01718dc7a8840ef",
+              "file": "lib/view.js",
+              "project": "express",
+              "line": 202,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "lib/view.js",
+                  "line": 202,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            }
+          ],
+          "unresolved": []
+        },
+        "productionScores": {
+          "codeQuality": 7,
+          "maintainability": 5.9,
+          "errorHandling": null,
+          "performanceAsync": null,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      },
+      {
+        "id": "zod-v4",
+        "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+        "status": "experimental-unscored",
+        "runId": "9da460ba-ab5b-47bb-b43d-51ad23a572ff",
+        "auditId": "01c4c238-6978-4cf6-a802-ab1d008dcef6",
+        "decomposition": {
+          "status": "experimental-unscored",
+          "productionScoresUnchanged": true,
+          "functions": 1948,
+          "primaryMeasure": "ownedStatements",
+          "candidateScores": {
+            "ownedStatements": 5.9
+          },
+          "rankCorrelation": {
+            "linesWithCC": 0.483,
+            "statementsWithCC": 0.62,
+            "linesWithMIRisk": 0.964,
+            "statementsWithMIRisk": 0.806
+          },
+          "largestFunctions": [
+            {
+              "id": "683255cb164f3ed97c20b06521f852fdb842cf2b5137145a0a5d4c4fb2c538f9",
+              "member": "convertBaseSchema",
+              "line": 390,
+              "ownedSourceLines": 255,
+              "ownedStatements": 220,
+              "dataLiteralEntries": 13,
+              "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+              "ownComplexity": 122,
+              "ownMaintainabilityIndex": 0.9938207694987709
+            },
+            {
+              "id": "8d21fb6277b8d3808a748d6eda3e79731cb9993f7074261f36c9bf8739dcf509",
+              "member": "generateCheck",
+              "line": 958,
+              "ownedSourceLines": 124,
+              "ownedStatements": 86,
+              "dataLiteralEntries": 0,
+              "file": "packages/zod/src/v4/core/compile.ts",
+              "ownComplexity": 41,
+              "ownMaintainabilityIndex": 22.913693379914104
+            },
+            {
+              "id": "f4979992d6c0f6c06fdbc5ab1b0d62d6c78024c1d4a1161e5d02b951583a6fdc",
+              "member": "generateStringFormatCheck",
+              "line": 783,
+              "ownedSourceLines": 94,
+              "ownedStatements": 81,
+              "dataLiteralEntries": 0,
+              "file": "packages/zod/src/v4/core/compile.ts",
+              "ownComplexity": 28,
+              "ownMaintainabilityIndex": 27.16864964889209
+            },
+            {
+              "id": "daf2087d3655f70305a8f59b4741c7474a0364b837dd438c9350a1e0e5fb8b7c",
+              "member": "core.$constructor:callback1/anonymous",
+              "line": 3242,
+              "ownedSourceLines": 115,
+              "ownedStatements": 77,
+              "dataLiteralEntries": 38,
+              "file": "packages/zod/src/v4/core/schemas.ts",
+              "ownComplexity": 43,
+              "ownMaintainabilityIndex": 22.740183131412053
+            },
+            {
+              "id": "88c771b0147769013aee9cfa563c24ab48a116023dfc5e481afddb080cff6e4b",
+              "member": "error/anonymous",
+              "line": 108,
+              "ownedSourceLines": 83,
+              "ownedStatements": 72,
+              "dataLiteralEntries": 0,
+              "file": "packages/zod/src/v4/locales/he.ts",
+              "ownComplexity": 65,
+              "ownMaintainabilityIndex": 22.401526459281936
+            },
+            {
+              "id": "aecc585ee2ad4dc3cfdddfc9017cc57a06c0e71874147ea067a329a0c9099ed9",
+              "member": "generateObjectCheck",
+              "line": 1190,
+              "ownedSourceLines": 83,
+              "ownedStatements": 72,
+              "dataLiteralEntries": 2,
+              "file": "packages/zod/src/v4/core/compile.ts",
+              "ownComplexity": 23,
+              "ownMaintainabilityIndex": 29.228532020778346
+            },
+            {
+              "id": "40aa5b5cac023082d5abdaa13f0796a1272019d0c271682d0ad4be6dc3c28281",
+              "member": "visit/mapInner",
+              "line": 59,
+              "ownedSourceLines": 107,
+              "ownedStatements": 65,
+              "dataLiteralEntries": 28,
+              "file": "packages/zod/src/v4/core/visit.ts",
+              "ownComplexity": 65,
+              "ownMaintainabilityIndex": 20.69210448451508
+            },
+            {
+              "id": "d5212ea89217c56565c72f5a81919f725ca9b70823f69d1eb1027f18cb7e4f62",
+              "member": "finalize",
+              "line": 568,
+              "ownedSourceLines": 68,
+              "ownedStatements": 63,
+              "dataLiteralEntries": 11,
+              "file": "packages/zod/src/v4/core/to-json-schema.ts",
+              "ownComplexity": 39,
+              "ownMaintainabilityIndex": 29.050858109044317
+            },
+            {
+              "id": "0128152cecafa0ef3801b4ccf860463ea7550be81299e9bbc5f0c9c0ab1ad871",
+              "member": "isRecursive",
+              "line": 50,
+              "ownedSourceLines": 93,
+              "ownedStatements": 61,
+              "dataLiteralEntries": 0,
+              "file": "packages/zod/src/v4/core/memoizer.ts",
+              "ownComplexity": 58,
+              "ownMaintainabilityIndex": 24.38773764247743
+            },
+            {
+              "id": "e9dd6259cc728a4a4b3812b0f0782226cf39e221705c294fc573717cfecddc16",
+              "member": "convertSchema",
+              "line": 808,
+              "ownedSourceLines": 54,
+              "ownedStatements": 55,
+              "dataLiteralEntries": 15,
+              "file": "packages/zod/src/v4/classic/from-json-schema.ts",
+              "ownComplexity": 42,
+              "ownMaintainabilityIndex": 31.005185721478437
+            }
+          ],
+          "largeLowComplexity": [],
+          "largeLowComplexityCount": 0,
+          "reviewThresholds": {
+            "ownedStatementsGreaterThan": 40,
+            "existingCcGreaterThan": 10,
+            "existingMiLessThan": 65
+          },
+          "largeFunctions": 19,
+          "alsoHighCc": 19,
+          "alsoLowMi": 19,
+          "additionalReviewCandidates": []
+        },
+        "handlers": {
+          "totalBodies": 22,
+          "unexplainedBodies": 7,
+          "documentedBodies": 0,
+          "bodiesContainingCode": 15,
+          "useSites": 22,
+          "referencedUses": 0,
+          "unresolvedUses": 0,
+          "candidate": {
+            "score": 6.8,
+            "reason": "Experimental: 10 - 10*unexplained/total; cap 9 when unexplained > 0; half-up once."
+          },
+          "unexplained": [
+            {
+              "id": "772c306fbd97a016902cc0ac22500ed0682b98d483044235f023ee769b203731",
+              "file": "packages/zod/src/v4/core/compile.ts",
+              "project": "zod",
+              "line": 242,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "packages/zod/src/v4/core/compile.ts",
+                  "line": 242,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "898900a14a8f7c60441729750f5c41bf97fc3980a4a52a7c567c71fd427b4e60",
+              "file": "packages/zod/src/v4/core/schemas.ts",
+              "project": "zod",
+              "line": 353,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "packages/zod/src/v4/core/schemas.ts",
+                  "line": 353,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "2474ad087da1392b353fe761c29757d14e4f0f32d6db13179d7c8c3ec8465267",
+              "file": "packages/zod/src/v4/core/schemas.ts",
+              "project": "zod",
+              "line": 407,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "packages/zod/src/v4/core/schemas.ts",
+                  "line": 407,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "0a61cfdcf6bed46c0430a226f2f79be251c7fbdc9fa1dd4f37c33e4d40bf2ec1",
+              "file": "packages/zod/src/v4/core/schemas.ts",
+              "project": "zod",
+              "line": 1337,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "packages/zod/src/v4/core/schemas.ts",
+                  "line": 1337,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "ee03ec5d3aaa7cf5c1066be45146a910fa36ab065f8d54aecdcff264d9658c4f",
+              "file": "packages/zod/src/v4/core/schemas.ts",
+              "project": "zod",
+              "line": 1424,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "packages/zod/src/v4/core/schemas.ts",
+                  "line": 1424,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "206549b6e6d40390624e4e564326fc553693894a0dea60194fd4d658cfb60a4b",
+              "file": "packages/zod/src/v4/core/schemas.ts",
+              "project": "zod",
+              "line": 1477,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "packages/zod/src/v4/core/schemas.ts",
+                  "line": 1477,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "411a38bbeff84c91f766bbce783b6e647721fda429364792c40724df402020ab",
+              "file": "packages/zod/src/v4/core/schemas.ts",
+              "project": "zod",
+              "line": 1804,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "packages/zod/src/v4/core/schemas.ts",
+                  "line": 1804,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            }
+          ],
+          "unresolved": []
+        },
+        "productionScores": {
+          "codeQuality": 5.7,
+          "maintainability": 6.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      },
+      {
+        "id": "tanstack-query-core",
+        "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+        "status": "experimental-unscored",
+        "runId": "6bc47835-855c-4d02-a67a-310fabc1c787",
+        "auditId": "4a1d8433-85b7-4193-b117-605a3d576020",
+        "decomposition": {
+          "status": "experimental-unscored",
+          "productionScoresUnchanged": true,
+          "functions": 427,
+          "primaryMeasure": "ownedStatements",
+          "candidateScores": {
+            "ownedStatements": 8
+          },
+          "rankCorrelation": {
+            "linesWithCC": 0.66,
+            "statementsWithCC": 0.637,
+            "linesWithMIRisk": 0.977,
+            "statementsWithMIRisk": 0.808
+          },
+          "largestFunctions": [
+            {
+              "id": "7ac2fa46c8302f9bab3c1c501b9564055b08be764e1e7890125ac185a8059912",
+              "member": "createResult",
+              "line": 558,
+              "ownedSourceLines": 116,
+              "ownedStatements": 56,
+              "dataLiteralEntries": 28,
+              "file": "packages/query-core/src/queryObserver.ts",
+              "ownComplexity": 29,
+              "ownMaintainabilityIndex": 25.81085469403287
+            },
+            {
+              "id": "43ce5b9fa2f8e5456f7e0780ee813bab0e454e60c06b8ec4cef427c1326df13b",
+              "member": "fetch",
+              "line": 590,
+              "ownedSourceLines": 97,
+              "ownedStatements": 50,
+              "dataLiteralEntries": 15,
+              "file": "packages/query-core/src/query.ts",
+              "ownComplexity": 22,
+              "ownMaintainabilityIndex": 28.717343577741268
+            },
+            {
+              "id": "a9d28fd79a8b6e1c5b598edb71f7e44a5df66685a186976603086f887f2cdb71",
+              "member": "execute",
+              "line": 284,
+              "ownedSourceLines": 120,
+              "ownedStatements": 38,
+              "dataLiteralEntries": 22,
+              "file": "packages/query-core/src/mutation.ts",
+              "ownComplexity": 11,
+              "ownMaintainabilityIndex": 28.551676056032814
+            },
+            {
+              "id": "1a27a0d841550d3131caf154afd4513d254349a90c262e2e266767876ae35ddb",
+              "member": "replaceEqualDeep",
+              "line": 341,
+              "ownedSourceLines": 31,
+              "ownedStatements": 30,
+              "dataLiteralEntries": 0,
+              "file": "packages/query-core/src/utils.ts",
+              "ownComplexity": 22,
+              "ownMaintainabilityIndex": 42.342236545570266
+            },
+            {
+              "id": "6cd494b9edabe2e45c70a2c00092858a846371c9437a9e627da01cd234612cd8",
+              "member": "setQueries/notifyManager.batch:callback0",
+              "line": 145,
+              "ownedSourceLines": 30,
+              "ownedStatements": 21,
+              "dataLiteralEntries": 0,
+              "file": "packages/query-core/src/queriesObserver.ts",
+              "ownComplexity": 8,
+              "ownMaintainabilityIndex": 46.42372283233971
+            },
+            {
+              "id": "e87b63fe2f9d35938f5da564ccdd0ffe2fbf4c563f36bb6eac6bf104afc99298",
+              "member": "matchQuery",
+              "line": 175,
+              "ownedSourceLines": 27,
+              "ownedStatements": 20,
+              "dataLiteralEntries": 0,
+              "file": "packages/query-core/src/utils.ts",
+              "ownComplexity": 16,
+              "ownMaintainabilityIndex": 46.15302364714824
+            },
+            {
+              "id": "61323ea17a77a2b180e5000fc566be819cd268d6144b5f29daf1ac516da6a71b",
+              "member": "streamedQuery/anonymous",
+              "line": 82,
+              "ownedSourceLines": 37,
+              "ownedStatements": 19,
+              "dataLiteralEntries": 9,
+              "file": "packages/query-core/src/streamedQuery.ts",
+              "ownComplexity": 11,
+              "ownMaintainabilityIndex": 42.57514035748058
+            },
+            {
+              "id": "d8e28b2d7f381b139089d4d4b67bc4543e3889b55ee2401e1a61d103cfdb13ac",
+              "member": "#notify/notifyManager.batch:callback0",
+              "line": 241,
+              "ownedSourceLines": 49,
+              "ownedStatements": 19,
+              "dataLiteralEntries": 3,
+              "file": "packages/query-core/src/mutationObserver.ts",
+              "ownComplexity": 9,
+              "ownMaintainabilityIndex": 40.31521964680734
+            },
+            {
+              "id": "2603ca80d55f552d868133f5e4e04b1b5978f5fdc8510a601853aa0a5a2c16a3",
+              "member": "partialMatchKey",
+              "line": 301,
+              "ownedSourceLines": 17,
+              "ownedStatements": 18,
+              "dataLiteralEntries": 0,
+              "file": "packages/query-core/src/utils.ts",
+              "ownComplexity": 14,
+              "ownMaintainabilityIndex": 50.89593973008638
+            },
+            {
+              "id": "7e12ac77158b69372876460347e916ff81031b961548116c0c802cdc7eaa75e9",
+              "member": "infiniteQueryBehavior/onFetch/fetchFn",
+              "line": 28,
+              "ownedSourceLines": 25,
+              "ownedStatements": 18,
+              "dataLiteralEntries": 2,
+              "file": "packages/query-core/src/infiniteQueryBehavior.ts",
+              "ownComplexity": 10,
+              "ownMaintainabilityIndex": 47.547316170148875
+            }
+          ],
+          "largeLowComplexity": [],
+          "largeLowComplexityCount": 0,
+          "reviewThresholds": {
+            "ownedStatementsGreaterThan": 40,
+            "existingCcGreaterThan": 10,
+            "existingMiLessThan": 65
+          },
+          "largeFunctions": 2,
+          "alsoHighCc": 2,
+          "alsoLowMi": 2,
+          "additionalReviewCandidates": []
+        },
+        "handlers": {
+          "totalBodies": 16,
+          "unexplainedBodies": 1,
+          "documentedBodies": 0,
+          "bodiesContainingCode": 15,
+          "useSites": 27,
+          "referencedUses": 12,
+          "unresolvedUses": 0,
+          "candidate": {
+            "score": 9,
+            "reason": "Experimental: 10 - 10*unexplained/total; cap 9 when unexplained > 0; half-up once."
+          },
+          "unexplained": [
+            {
+              "id": "bdd3f140a9b932f1a1d4edb78615ac625882ca149aa6b3ea5cd7f1b1fddac972",
+              "file": "packages/query-core/src/utils.ts",
+              "project": "@tanstack/query-core",
+              "line": 121,
+              "kind": "promiseRejection",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "packages/query-core/src/hydration.ts",
+                  "line": 22,
+                  "kind": "promiseThenRejection",
+                  "resolution": "reference"
+                },
+                {
+                  "file": "packages/query-core/src/hydration.ts",
+                  "line": 29,
+                  "kind": "promiseCatch",
+                  "resolution": "reference"
+                },
+                {
+                  "file": "packages/query-core/src/hydration.ts",
+                  "line": 134,
+                  "kind": "promiseCatch",
+                  "resolution": "reference"
+                },
+                {
+                  "file": "packages/query-core/src/hydration.ts",
+                  "line": 385,
+                  "kind": "promiseCatch",
+                  "resolution": "reference"
+                },
+                {
+                  "file": "packages/query-core/src/mutationCache.ts",
+                  "line": 327,
+                  "kind": "promiseCatch",
+                  "resolution": "reference"
+                },
+                {
+                  "file": "packages/query-core/src/query.ts",
+                  "line": 351,
+                  "kind": "promiseCatch",
+                  "resolution": "reference"
+                },
+                {
+                  "file": "packages/query-core/src/queryClient.ts",
+                  "line": 453,
+                  "kind": "promiseCatch",
+                  "resolution": "reference"
+                },
+                {
+                  "file": "packages/query-core/src/queryClient.ts",
+                  "line": 521,
+                  "kind": "promiseCatch",
+                  "resolution": "reference"
+                },
+                {
+                  "file": "packages/query-core/src/queryClient.ts",
+                  "line": 652,
+                  "kind": "promiseCatch",
+                  "resolution": "reference"
+                },
+                {
+                  "file": "packages/query-core/src/queryClient.ts",
+                  "line": 741,
+                  "kind": "promiseCatch",
+                  "resolution": "reference"
+                },
+                {
+                  "file": "packages/query-core/src/queryObserver.ts",
+                  "line": 472,
+                  "kind": "promiseCatch",
+                  "resolution": "reference"
+                },
+                {
+                  "file": "packages/query-core/src/retryer.ts",
+                  "line": 112,
+                  "kind": "promiseCatch",
+                  "resolution": "reference"
+                }
+              ]
+            }
+          ],
+          "unresolved": []
+        },
+        "productionScores": {
+          "codeQuality": 6.7,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      },
+      {
+        "id": "tanstack-react-query",
+        "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+        "status": "experimental-unscored",
+        "runId": "8ab92931-d067-40d7-928a-5440407339ec",
+        "auditId": "141320ee-4c37-491b-8740-d1113e916fbb",
+        "decomposition": {
+          "status": "experimental-unscored",
+          "productionScoresUnchanged": true,
+          "functions": 76,
+          "primaryMeasure": "ownedStatements",
+          "candidateScores": {
+            "ownedStatements": 8.9
+          },
+          "rankCorrelation": {
+            "linesWithCC": 0.676,
+            "statementsWithCC": 0.716,
+            "linesWithMIRisk": 0.951,
+            "statementsWithMIRisk": 0.79
+          },
+          "largestFunctions": [
+            {
+              "id": "fafd991313315e4e0e382a81884461dc6266568070d322a115ddb22b299b9fc1",
+              "member": "useBaseQuery",
+              "line": 26,
+              "ownedSourceLines": 58,
+              "ownedStatements": 26,
+              "dataLiteralEntries": 9,
+              "file": "packages/react-query/src/useBaseQuery.ts",
+              "ownComplexity": 12,
+              "ownMaintainabilityIndex": 37.29647845989767
+            },
+            {
+              "id": "701eb60f349a4e8c620a325008c9aed42f1619ee97d7aee6b176a5a5faab91ea",
+              "member": "useQueries",
+              "line": 359,
+              "ownedSourceLines": 45,
+              "ownedStatements": 20,
+              "dataLiteralEntries": 9,
+              "file": "packages/react-query/src/useQueries.ts",
+              "ownComplexity": 5,
+              "ownMaintainabilityIndex": 41.86678624784844
+            },
+            {
+              "id": "5324c386464d6185f8bd204b978acde64879e8f9ab0b417c82bf15e2f1643f53",
+              "member": "HydrationBoundary/React.useMemo:callback0",
+              "line": 115,
+              "ownedSourceLines": 27,
+              "ownedStatements": 19,
+              "dataLiteralEntries": 1,
+              "file": "packages/react-query/src/HydrationBoundary.tsx",
+              "ownComplexity": 13,
+              "ownMaintainabilityIndex": 46.040606210761716
+            },
+            {
+              "id": "20f0a3a989897cc77fbb08d4e7ba8743dcbd45d9476981b2b641873c0519cef5",
+              "member": "useMutation",
+              "line": 191,
+              "ownedSourceLines": 25,
+              "ownedStatements": 8,
+              "dataLiteralEntries": 8,
+              "file": "packages/react-query/src/useMutation.ts",
+              "ownComplexity": 3,
+              "ownMaintainabilityIndex": 50.05528694249048
+            },
+            {
+              "id": "4bedbf81c9be197ff60ec510b4edf2f356c5baf558caca86f18fb42987d57666",
+              "member": "ensureSuspenseTimers",
+              "line": 21,
+              "ownedSourceLines": 13,
+              "ownedStatements": 7,
+              "dataLiteralEntries": 0,
+              "file": "packages/react-query/src/suspense.ts",
+              "ownComplexity": 4,
+              "ownMaintainabilityIndex": 57.893968029385846
+            },
+            {
+              "id": "c7cdf1efaf8457d3d75e802ea8b4437352b0f29703414191f24a4320dba5e77f",
+              "member": "useMutationState",
+              "line": 157,
+              "ownedSourceLines": 15,
+              "ownedStatements": 7,
+              "dataLiteralEntries": 1,
+              "file": "packages/react-query/src/useMutationState.ts",
+              "ownComplexity": 2,
+              "ownMaintainabilityIndex": 56.17186201438738
+            },
+            {
+              "id": "b1e614b8f9e99aa709dead4475ec2ea0551d7accb94ee2ae60a8da43dd35e63b",
+              "member": "useQueryClient",
+              "line": 21,
+              "ownedSourceLines": 6,
+              "ownedStatements": 6,
+              "dataLiteralEntries": 0,
+              "file": "packages/react-query/src/QueryClientProvider.tsx",
+              "ownComplexity": 3,
+              "ownMaintainabilityIndex": 67.49998802687836
+            },
+            {
+              "id": "e9c8aa34258948b50697356cea9cebae09d49fa51fab26d183c82dbbe1f13def",
+              "member": "HydrationBoundary",
+              "line": 86,
+              "ownedSourceLines": 10,
+              "ownedStatements": 6,
+              "dataLiteralEntries": 4,
+              "file": "packages/react-query/src/HydrationBoundary.tsx",
+              "ownComplexity": 1,
+              "ownMaintainabilityIndex": 61.565639348253015
+            },
+            {
+              "id": "9bd4223ea4ac470a1d4357e24d8578064f810cb2ab8d4371166b73585101e95c",
+              "member": "useQueries/optimisticResult.flatMap:callback0",
+              "line": 463,
+              "ownedSourceLines": 5,
+              "ownedStatements": 5,
+              "dataLiteralEntries": 0,
+              "file": "packages/react-query/src/useQueries.ts",
+              "ownComplexity": 3,
+              "ownMaintainabilityIndex": 68.2520240599036
+            },
+            {
+              "id": "33a1ff2d47f6a146eb6b10b5cdf9d9abbc519726844cae1b97bff5abf7dbe3e6",
+              "member": "ensurePreventErrorBoundaryRetry",
+              "line": 13,
+              "ownedSourceLines": 7,
+              "ownedStatements": 4,
+              "dataLiteralEntries": 2,
+              "file": "packages/react-query/src/errorBoundaryUtils.ts",
+              "ownComplexity": 6,
+              "ownMaintainabilityIndex": 63.24493671100938
+            }
+          ],
+          "largeLowComplexity": [],
+          "largeLowComplexityCount": 0,
+          "reviewThresholds": {
+            "ownedStatementsGreaterThan": 40,
+            "existingCcGreaterThan": 10,
+            "existingMiLessThan": 65
+          },
+          "largeFunctions": 0,
+          "alsoHighCc": 0,
+          "alsoLowMi": 0,
+          "additionalReviewCandidates": []
+        },
+        "handlers": {
+          "totalBodies": 0,
+          "unexplainedBodies": 0,
+          "documentedBodies": 0,
+          "bodiesContainingCode": 0,
+          "useSites": 0,
+          "referencedUses": 0,
+          "unresolvedUses": 0,
+          "candidate": {
+            "score": null,
+            "reason": "No inspected handler bodies."
+          },
+          "unexplained": [],
+          "unresolved": []
+        },
+        "productionScores": {
+          "codeQuality": 8.1,
+          "maintainability": 7.2,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      },
+      {
+        "id": "excalidraw-app",
+        "revision": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e",
+        "status": "experimental-unscored",
+        "runId": "e845d8ac-7799-4252-89a8-c35a4ba2c006",
+        "auditId": "ef9e734c-c4df-4ae1-867f-90bbde89a392",
+        "decomposition": {
+          "status": "experimental-unscored",
+          "productionScoresUnchanged": true,
+          "functions": 360,
+          "primaryMeasure": "ownedStatements",
+          "candidateScores": {
+            "ownedStatements": 8.4
+          },
+          "rankCorrelation": {
+            "linesWithCC": 0.684,
+            "statementsWithCC": 0.715,
+            "linesWithMIRisk": 0.988,
+            "statementsWithMIRisk": 0.812
+          },
+          "largestFunctions": [
+            {
+              "id": "f5ed360566b3ed2653c4bf6ad83c1ba63e33826377efa8c1ba8cd6a5fffb731d",
+              "member": "AIComponents/anonymous",
+              "line": 27,
+              "ownedSourceLines": 84,
+              "ownedStatements": 39,
+              "dataLiteralEntries": 18,
+              "file": "excalidraw-app/components/AI.tsx",
+              "ownComplexity": 17,
+              "ownMaintainabilityIndex": 31.644490947745872
+            },
+            {
+              "id": "3c031663391b586eadf60e8bc068bde1ce231dce8b295f32cf3d4b5da67a2676",
+              "member": "ExcalidrawWrapper",
+              "line": 375,
+              "ownedSourceLines": 319,
+              "ownedStatements": 37,
+              "dataLiteralEntries": 169,
+              "file": "excalidraw-app/App.tsx",
+              "ownComplexity": 16,
+              "ownMaintainabilityIndex": 15.085535373306698
+            },
+            {
+              "id": "8d6e290282701a1f11da85d920af24bb901879487680be9cd3e44b38f900bf67",
+              "member": "initializeScene",
+              "line": 217,
+              "ownedSourceLines": 100,
+              "ownedStatements": 36,
+              "dataLiteralEntries": 33,
+              "file": "excalidraw-app/App.tsx",
+              "ownComplexity": 21,
+              "ownMaintainabilityIndex": 28.385565118260157
+            },
+            {
+              "id": "230cedfb86034d444a2dc5634823444fb82d529b1183cee2d046221e98c94dda",
+              "member": "anonymous/this.portal.socket.on:callback1",
+              "line": 580,
+              "ownedSourceLines": 73,
+              "ownedStatements": 32,
+              "dataLiteralEntries": 13,
+              "file": "excalidraw-app/collab/Collab.tsx",
+              "ownComplexity": 12,
+              "ownMaintainabilityIndex": 34.157595588721605
+            },
+            {
+              "id": "bc08f8230346259042cff8fe5897c4d3cd68cc9bc2c294baebb194ac4fc2d3fb",
+              "member": "anonymous",
+              "line": 481,
+              "ownedSourceLines": 65,
+              "ownedStatements": 32,
+              "dataLiteralEntries": 11,
+              "file": "excalidraw-app/collab/Collab.tsx",
+              "ownComplexity": 6,
+              "ownMaintainabilityIndex": 36.14865975812263
+            },
+            {
+              "id": "7a0981ce35a0a3aaffe791c1cfad0132ce5cc441177fec1767fc966724390c59",
+              "member": "verifyJWT",
+              "line": 89,
+              "ownedSourceLines": 38,
+              "ownedStatements": 22,
+              "dataLiteralEntries": 3,
+              "file": "excalidraw-app/ExcalidrawPlusIframeExport.tsx",
+              "ownComplexity": 10,
+              "ownMaintainabilityIndex": 41.5361874787723
+            },
+            {
+              "id": "713f121f80ef0b9ebce0c2b4753571be70aa2b489b8dce9ecffa598ba4ab6647",
+              "member": "exportToBackend",
+              "line": 248,
+              "ownedSourceLines": 39,
+              "ownedStatements": 21,
+              "dataLiteralEntries": 16,
+              "file": "excalidraw-app/data/index.ts",
+              "ownComplexity": 7,
+              "ownMaintainabilityIndex": 41.57062726630235
+            },
+            {
+              "id": "c37ca909b0cc0584344ef451b4a2d86a00f4702b01605184a5cefd93a4eaa498",
+              "member": "renderPolygon",
+              "line": 81,
+              "ownedSourceLines": 19,
+              "ownedStatements": 19,
+              "dataLiteralEntries": 0,
+              "file": "excalidraw-app/components/DebugCanvas.tsx",
+              "ownComplexity": 5,
+              "ownMaintainabilityIndex": 50.60145950083315
+            },
+            {
+              "id": "8263d4ca2fa0842f42c9906d69db569d2cf8e736f466944fb6a51c98f65343e5",
+              "member": "anonymous",
+              "line": 365,
+              "ownedSourceLines": 30,
+              "ownedStatements": 17,
+              "dataLiteralEntries": 2,
+              "file": "excalidraw-app/collab/Collab.tsx",
+              "ownComplexity": 5,
+              "ownMaintainabilityIndex": 45.93655700443815
+            },
+            {
+              "id": "ff99973e44ed46db1368cd6710acb1871349cac5e397a83509aa29ec39748e94",
+              "member": "importFromLocalStorage",
+              "line": 37,
+              "ownedSourceLines": 24,
+              "ownedStatements": 17,
+              "dataLiteralEntries": 4,
+              "file": "excalidraw-app/data/localStorage.ts",
+              "ownComplexity": 6,
+              "ownMaintainabilityIndex": 49.09921562944705
+            }
+          ],
+          "largeLowComplexity": [],
+          "largeLowComplexityCount": 0,
+          "reviewThresholds": {
+            "ownedStatementsGreaterThan": 40,
+            "existingCcGreaterThan": 10,
+            "existingMiLessThan": 65
+          },
+          "largeFunctions": 0,
+          "alsoHighCc": 0,
+          "alsoLowMi": 0,
+          "additionalReviewCandidates": []
+        },
+        "handlers": {
+          "totalBodies": 45,
+          "unexplainedBodies": 1,
+          "documentedBodies": 2,
+          "bodiesContainingCode": 42,
+          "useSites": 45,
+          "referencedUses": 0,
+          "unresolvedUses": 1,
+          "candidate": {
+            "score": null,
+            "reason": "Unresolved callback uses prevent a complete candidate population."
+          },
+          "unexplained": [
+            {
+              "id": "608a82213262f26ce62f63cfab114624708a973e078989d22550422c1ab62701",
+              "file": "excalidraw-app/CustomStats.tsx",
+              "project": "excalidraw-app",
+              "line": 69,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "excalidraw-app/CustomStats.tsx",
+                  "line": 69,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            }
+          ],
+          "unresolved": [
+            {
+              "file": "excalidraw-app/App.tsx",
+              "line": 293,
+              "kind": "promiseCatch",
+              "reason": "unsupportedDeclaration"
+            }
+          ]
+        },
+        "productionScores": {
+          "codeQuality": 7.3,
+          "maintainability": 5.6,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      },
+      {
+        "id": "uptime-kuma-server",
+        "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+        "status": "experimental-unscored",
+        "runId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+        "auditId": "1ad6d5d6-d326-4f32-9156-2a3212ee865b",
+        "decomposition": {
+          "status": "experimental-unscored",
+          "productionScoresUnchanged": true,
+          "functions": 1142,
+          "primaryMeasure": "ownedStatements",
+          "candidateScores": {
+            "ownedStatements": 5.8
+          },
+          "rankCorrelation": {
+            "linesWithCC": 0.799,
+            "statementsWithCC": 0.868,
+            "linesWithMIRisk": 0.993,
+            "statementsWithMIRisk": 0.935
+          },
+          "largestFunctions": [
+            {
+              "id": "f9636396deb59b9fcb3f6aa61a650878654fbffe3054cba1ba5b45db98302adf",
+              "member": "start/beat",
+              "line": 431,
+              "ownedSourceLines": 442,
+              "ownedStatements": 289,
+              "dataLiteralEntries": 52,
+              "file": "server/model/monitor.js",
+              "ownComplexity": 126,
+              "ownMaintainabilityIndex": 0
+            },
+            {
+              "id": "062486edc30010f93f519f06529f7d671cddd2f690f9a592a714ed4392fbbabb",
+              "member": "anonymous/io.on:callback1/socket.on:callback1",
+              "line": 476,
+              "ownedSourceLines": 151,
+              "ownedStatements": 142,
+              "dataLiteralEntries": 7,
+              "file": "server/server.js",
+              "ownComplexity": 12,
+              "ownMaintainabilityIndex": 22.97548195232996
+            },
+            {
+              "id": "f7a40e0103841f7ed54a4eb91d71a652e827712a185274426823fc6bbcba37bd",
+              "member": "update",
+              "line": 212,
+              "ownedSourceLines": 101,
+              "ownedStatements": 92,
+              "dataLiteralEntries": 4,
+              "file": "server/uptime-calculator.js",
+              "ownComplexity": 26,
+              "ownMaintainabilityIndex": 25.923826252521554
+            },
+            {
+              "id": "9c6472e7ef78364131c6b3cd31ff37552454940f32cfd8eb48c621296345a4db",
+              "member": "send",
+              "line": 12,
+              "ownedSourceLines": 176,
+              "ownedStatements": 87,
+              "dataLiteralEntries": 58,
+              "file": "server/notification-providers/discord.js",
+              "ownComplexity": 47,
+              "ownMaintainabilityIndex": 17.242086131308504
+            },
+            {
+              "id": "616368c00ed854a8d3e6d00983d9479ec0e3a2398d9f517fb2cab4f91240e549",
+              "member": "anonymous/socket.on:callback1",
+              "line": 292,
+              "ownedSourceLines": 89,
+              "ownedStatements": 75,
+              "dataLiteralEntries": 16,
+              "file": "server/socket-handlers/status-page-socket-handler.js",
+              "ownComplexity": 15,
+              "ownMaintainabilityIndex": 29.306178053340112
+            },
+            {
+              "id": "932c53f5eccb30efa9291a5228b19e5aea530f1f13ae9bdec03cfa87234a2311",
+              "member": "send",
+              "line": 10,
+              "ownedSourceLines": 88,
+              "ownedStatements": 72,
+              "dataLiteralEntries": 8,
+              "file": "server/notification-providers/smseagle.js",
+              "ownComplexity": 35,
+              "ownMaintainabilityIndex": 26.839161021203537
+            },
+            {
+              "id": "beacb905c4e61276677d367be3544ec8ca6e27f78d8a261547db400a49147296",
+              "member": "validate",
+              "line": 1630,
+              "ownedSourceLines": 91,
+              "ownedStatements": 68,
+              "dataLiteralEntries": 2,
+              "file": "server/model/monitor.js",
+              "ownComplexity": 50,
+              "ownMaintainabilityIndex": 24.540630904785395
+            },
+            {
+              "id": "80c80a33dbe464ac7bea8bf9fb4d483e5fa984921edb7ab58c1941582f733ea6",
+              "member": "getData",
+              "line": 563,
+              "ownedSourceLines": 91,
+              "ownedStatements": 65,
+              "dataLiteralEntries": 2,
+              "file": "server/uptime-calculator.js",
+              "ownComplexity": 28,
+              "ownMaintainabilityIndex": 28.894723088049005
+            },
+            {
+              "id": "f35bd42e3fa5225767c0a49123172d4be5c911381b225b02db9a5efd3d281730",
+              "member": "send",
+              "line": 11,
+              "ownedSourceLines": 151,
+              "ownedStatements": 64,
+              "dataLiteralEntries": 56,
+              "file": "server/notification-providers/fluxer.js",
+              "ownComplexity": 36,
+              "ownMaintainabilityIndex": 20.763483727256297
+            },
+            {
+              "id": "f739b010cfa03c047e09db9408fb6c6e91f41458297c9e70ba19294104614e34",
+              "member": "connect",
+              "line": 252,
+              "ownedSourceLines": 137,
+              "ownedStatements": 61,
+              "dataLiteralEntries": 54,
+              "file": "server/database.js",
+              "ownComplexity": 22,
+              "ownMaintainabilityIndex": 23.90269517133265
+            }
+          ],
+          "largeLowComplexity": [
+            {
+              "id": "49bd9997906016024155847853069f15bc3b171534d70ca88bceea7f435bdccf",
+              "member": "anonymous/io.on:callback1",
+              "line": 373,
+              "ownedSourceLines": 87,
+              "ownedStatements": 56,
+              "dataLiteralEntries": 0,
+              "file": "server/server.js",
+              "ownComplexity": 5,
+              "ownMaintainabilityIndex": 32.7301302493417
+            },
+            {
+              "id": "1ba0391b0ade504ebdf6c5bb6d0db54ec68326162aad91ec7a2f0f6ac64acec5",
+              "member": "constructor",
+              "line": 73,
+              "ownedSourceLines": 60,
+              "ownedStatements": 44,
+              "dataLiteralEntries": 11,
+              "file": "server/uptime-kuma-server.js",
+              "ownComplexity": 5,
+              "ownMaintainabilityIndex": 35.42934726462588
+            },
+            {
+              "id": "67b250989803cd53c95910c574a016615a33c29a95b373dbc8b184cf55efc870",
+              "member": "anonymous",
+              "line": 208,
+              "ownedSourceLines": 62,
+              "ownedStatements": 43,
+              "dataLiteralEntries": 2,
+              "file": "server/server.js",
+              "ownComplexity": 4,
+              "ownMaintainabilityIndex": 36.51308487504644
+            }
+          ],
+          "largeLowComplexityCount": 3,
+          "reviewThresholds": {
+            "ownedStatementsGreaterThan": 40,
+            "existingCcGreaterThan": 10,
+            "existingMiLessThan": 65
+          },
+          "largeFunctions": 23,
+          "alsoHighCc": 20,
+          "alsoLowMi": 23,
+          "additionalReviewCandidates": []
+        },
+        "handlers": {
+          "totalBodies": 341,
+          "unexplainedBodies": 8,
+          "documentedBodies": 3,
+          "bodiesContainingCode": 330,
+          "useSites": 341,
+          "referencedUses": 0,
+          "unresolvedUses": 0,
+          "candidate": {
+            "score": 9,
+            "reason": "Experimental: 10 - 10*unexplained/total; cap 9 when unexplained > 0; half-up once."
+          },
+          "unexplained": [
+            {
+              "id": "799134aefcf7797b3900b78df06c84fbcb6c3d52fee8a757ba6a38ce3b4dda58",
+              "file": "server/model/maintenance.js",
+              "project": "uptime-kuma",
+              "line": 278,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "server/model/maintenance.js",
+                  "line": 278,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "460f2d8bf1c7a034d7179d5d9d5065a516a2b141c9cc85624059218a6251ef78",
+              "file": "server/model/monitor.js",
+              "project": "uptime-kuma",
+              "line": 1292,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "server/model/monitor.js",
+                  "line": 1292,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "f6d5cfd33267f74b92e5a19961fff6939f693812c297b80407b8e49bbd65dd00",
+              "file": "server/model/monitor.js",
+              "project": "uptime-kuma",
+              "line": 1380,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "server/model/monitor.js",
+                  "line": 1380,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "bc57b423ef4b14155c13ee41ab172b4e0d8234a25ae369ea367e2e7be43338f7",
+              "file": "server/monitor-types/globalping.js",
+              "project": "uptime-kuma",
+              "line": 477,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "server/monitor-types/globalping.js",
+                  "line": 477,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "d11489e7b665af88354b4d9572250f3436caeef8e601c4f88a6adfb33f56bea0",
+              "file": "server/monitor-types/steam.js",
+              "project": "uptime-kuma",
+              "line": 87,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "server/monitor-types/steam.js",
+                  "line": 87,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "e36df4983a09190524af8363a7241f951cf3adf2d0833cdde2673a10ec4b08ca",
+              "file": "server/server.js",
+              "project": "uptime-kuma",
+              "line": 24,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "server/server.js",
+                  "line": 24,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "1c9b588bfc0d6e6af6c72bba2f739403bcaf003d6050b0df153c283e16ba791c",
+              "file": "server/socket-handlers/general-socket-handler.js",
+              "project": "uptime-kuma",
+              "line": 143,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "server/socket-handlers/general-socket-handler.js",
+                  "line": 143,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            },
+            {
+              "id": "11b65ef3e23b3e9ef0970a5ed6db9baa74a2c6090e4696c104381c74383d2556",
+              "file": "server/uptime-kuma-server.js",
+              "project": "uptime-kuma",
+              "line": 586,
+              "kind": "catchClause",
+              "classification": "unexplainedEmpty",
+              "comments": [],
+              "uses": [
+                {
+                  "file": "server/uptime-kuma-server.js",
+                  "line": 586,
+                  "kind": "catchClause",
+                  "resolution": "inline"
+                }
+              ]
+            }
+          ],
+          "unresolved": []
+        },
+        "productionScores": {
+          "codeQuality": 5.5,
+          "maintainability": 4.7,
+          "errorHandling": null,
+          "performanceAsync": 10,
+          "security": null,
+          "testing": null,
+          "documentation": null,
+          "dependencyManagement": null,
+          "architecture": null
+        }
+      }
+    ]
+  },
+  "comparisonWithHistoricalCorpus": [
+    {
+      "sample": "express",
+      "historicalRunId": "15aafba6-ae58-4def-950e-160eb36ef87b",
+      "currentRunId": "59476fc5-611a-47ea-9ba1-e9cbe9252c7a",
+      "configurationChanged": true,
+      "rawCsvIdentical": true,
+      "functionAndHandlerEvidenceIdentical": true,
+      "scoresIdentical": true,
+      "asyncEligibleBefore": null,
+      "asyncEligibleAfter": null
+    },
+    {
+      "sample": "zod-v4",
+      "historicalRunId": "89bf3f6a-f20a-4274-9b56-27c838248d5a",
+      "currentRunId": "9da460ba-ab5b-47bb-b43d-51ad23a572ff",
+      "configurationChanged": true,
+      "rawCsvIdentical": true,
+      "functionAndHandlerEvidenceIdentical": true,
+      "scoresIdentical": true,
+      "asyncEligibleBefore": 46,
+      "asyncEligibleAfter": 46
+    },
+    {
+      "sample": "tanstack-query-core",
+      "historicalRunId": "5e12f55e-e26f-44ef-a0dd-51dc9cb61a16",
+      "currentRunId": "6bc47835-855c-4d02-a67a-310fabc1c787",
+      "configurationChanged": true,
+      "rawCsvIdentical": true,
+      "functionAndHandlerEvidenceIdentical": true,
+      "scoresIdentical": true,
+      "asyncEligibleBefore": 38,
+      "asyncEligibleAfter": 38
+    },
+    {
+      "sample": "tanstack-react-query",
+      "historicalRunId": "867cef9a-be98-438e-8526-14d36f28f68b",
+      "currentRunId": "8ab92931-d067-40d7-928a-5440407339ec",
+      "configurationChanged": true,
+      "rawCsvIdentical": true,
+      "functionAndHandlerEvidenceIdentical": true,
+      "scoresIdentical": true,
+      "asyncEligibleBefore": 12,
+      "asyncEligibleAfter": 12
+    },
+    {
+      "sample": "excalidraw-app",
+      "historicalRunId": "d2d74da3-122b-40d6-9ff3-0c80536caa1d",
+      "currentRunId": "e845d8ac-7799-4252-89a8-c35a4ba2c006",
+      "configurationChanged": true,
+      "rawCsvIdentical": true,
+      "functionAndHandlerEvidenceIdentical": true,
+      "scoresIdentical": true,
+      "asyncEligibleBefore": 82,
+      "asyncEligibleAfter": 82
+    },
+    {
+      "sample": "uptime-kuma-server",
+      "historicalRunId": "a4338550-f08e-405c-b40a-12b8a5606220",
+      "currentRunId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+      "configurationChanged": true,
+      "rawCsvIdentical": true,
+      "functionAndHandlerEvidenceIdentical": true,
+      "scoresIdentical": true,
+      "asyncEligibleBefore": 505,
+      "asyncEligibleAfter": 524
+    }
+  ],
+  "applicationRepeat": {
+    "runnerResult": {
+      "auditId": "2d551c48-2013-49d1-9393-8a56b6aa33d8",
+      "results": [
+        {
+          "ecosystem": "javascript-typescript",
+          "entryPoint": "E:\\repos\\uptime-kuma\\package.json",
+          "version": "0.4.0",
+          "source": "compatibility-manifest",
+          "runId": "e7676f66-3550-4c82-aac1-079ae9bcc02e",
+          "auditId": "2d551c48-2013-49d1-9393-8a56b6aa33d8",
+          "timeoutSeconds": 1800,
+          "status": "complete",
+          "fresh": true,
+          "artifacts": {
+            "evidence": "E:\\repos\\uptime-kuma\\.scorecard\\javascript-typescript\\runs\\e7676f66-3550-4c82-aac1-079ae9bcc02e\\evidence.json",
+            "inspection": "E:\\repos\\uptime-kuma\\.scorecard\\javascript-typescript\\runs\\e7676f66-3550-4c82-aac1-079ae9bcc02e\\inspection.json",
+            "metrics": "E:\\repos\\uptime-kuma\\.scorecard\\javascript-typescript\\runs\\e7676f66-3550-4c82-aac1-079ae9bcc02e\\metrics.csv",
+            "comparison": "E:\\repos\\uptime-kuma\\.scorecard\\javascript-typescript\\runs\\e7676f66-3550-4c82-aac1-079ae9bcc02e\\comparison.json"
+          },
+          "analyzerExitCode": 0,
+          "validationExitCode": 0,
+          "evidenceRunId": "e7676f66-3550-4c82-aac1-079ae9bcc02e",
+          "evidenceAuditId": "2d551c48-2013-49d1-9393-8a56b6aa33d8",
+          "assessmentFailures": [],
+          "comparisonExitCode": 0
+        }
+      ]
+    },
+    "evidenceSha256": "4c057c886c470735933abb1e0b6dde580a3e49d7dd5b8305302a7a7ba75c6f86",
+    "comparison": {
+      "compatible": true,
+      "reasons": [],
+      "currentRun": {
+        "runId": "e7676f66-3550-4c82-aac1-079ae9bcc02e",
+        "auditId": "2d551c48-2013-49d1-9393-8a56b6aa33d8"
+      },
+      "baselineRun": {
+        "runId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+        "auditId": "1ad6d5d6-d326-4f32-9156-2a3212ee865b"
+      },
+      "new": [],
+      "resolved": [],
+      "changed": [],
+      "severityIncreases": [],
+      "dimensions": {
+        "codeQuality": {
+          "before": 5.5,
+          "after": 5.5,
+          "delta": 0
+        },
+        "maintainability": {
+          "before": 4.7,
+          "after": 4.7,
+          "delta": 0
+        },
+        "errorHandling": {
+          "before": null,
+          "after": null,
+          "delta": null
+        },
+        "performanceAsync": {
+          "before": 10,
+          "after": 10,
+          "delta": 0
+        },
+        "security": {
+          "before": null,
+          "after": null,
+          "delta": null
+        },
+        "testing": {
+          "before": null,
+          "after": null,
+          "delta": null
+        },
+        "documentation": {
+          "before": null,
+          "after": null,
+          "delta": null
+        },
+        "dependencyManagement": {
+          "before": null,
+          "after": null,
+          "delta": null
+        },
+        "architecture": {
+          "before": null,
+          "after": null,
+          "delta": null
+        }
+      },
+      "unchangedCount": 88
+    }
+  },
+  "verification": {
+    "testsPassed": 190,
+    "testFilesPassed": 12,
+    "testLogSha256": "2e56c45de6ca88c22dbb2244011063df415445b0397b859cdf25a4e4a46b9469",
+    "releasedCorpusRunsPassed": 6,
+    "compatibleApplicationRerunPassed": true,
+    "sourceReviewsVerified": 18,
+    "productionPolicyChanged": false
+  }
+}

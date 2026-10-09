@@ -143,7 +143,7 @@ describe("error-handling evidence", () => {
     expect(data.totalHandlers).toBe(5);
     expect(data.unexplainedEmptyHandlers).toBe(2); expect(data.documentedEmptyHandlers).toBe(2);
     expect(data.handlersContainingCode).toBe(1); expect(data.unexplainedEmptyPercent).toBe(40);
-    expect(dimension.findings).toHaveLength(2);
+    expect(dimension.findings).toHaveLength(3);
     expect(dimension.findings.every(f => f.severity === "info")).toBe(true);
   });
   it("does not borrow nearby comments or confuse code with a no-op", () => {

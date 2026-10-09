@@ -1,0 +1,330 @@
+{
+  "reviewedAt": "2026-10-05",
+  "scope": "Manual source-context judgments for all 18 unexplained-empty bodies in the pinned released corpus. Not runtime verification or automatic exclusions. requiresReview is unknown, not a confirmed defect.",
+  "handlers": [
+    {
+      "sample": "express",
+      "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "runId": "59476fc5-611a-47ea-9ba1-e9cbe9252c7a",
+      "auditId": "5b9bfd7f-94dc-4bf5-9352-b7a36b75cb69",
+      "handlerId": "8e3321f13c8a955115189d0ad680ba09db066ab24b82e180c01718dc7a8840ef",
+      "file": "lib/view.js",
+      "line": 202,
+      "useSites": 1,
+      "reviewLabel": "fallbackOutsideBody",
+      "rationale": "tryStat returns undefined on failure; View.lookup checks stat before isFile and tries the index fallback.",
+      "sourceRange": [
+        167,
+        204
+      ],
+      "sourceSha256": "cff13999df40e0d8623ff23f41f933bb53868ddddcc8c0ef5d82dab5e65fbe79",
+      "sourceRangeSha256": "1f2622e6c996d49455b3c493a3bf32db81a2a49a820735d35835c81ddcb9db4f"
+    },
+    {
+      "sample": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "9da460ba-ab5b-47bb-b43d-51ad23a572ff",
+      "auditId": "01c4c238-6978-4cf6-a802-ab1d008dcef6",
+      "handlerId": "772c306fbd97a016902cc0ac22500ed0682b98d483044235f023ee769b203731",
+      "file": "packages/zod/src/v4/core/compile.ts",
+      "line": 242,
+      "useSites": 1,
+      "reviewLabel": "fallbackOutsideBody",
+      "rationale": "The preceding explanation chooses conservative recursion on uncertainty; the retained true value triggers ZodCompileUnsupportedError after the catch.",
+      "sourceRange": [
+        238,
+        245
+      ],
+      "sourceSha256": "05d7d077528ee382261a8215daaec62a94b6c9880795c2ccf2b41d7222c177fa",
+      "sourceRangeSha256": "7aeb2f8f4ef159ef872cc2ebb4e20f80d0956cd9a7b025596b2821716808d62a"
+    },
+    {
+      "sample": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "9da460ba-ab5b-47bb-b43d-51ad23a572ff",
+      "auditId": "01c4c238-6978-4cf6-a802-ab1d008dcef6",
+      "handlerId": "898900a14a8f7c60441729750f5c41bf97fc3980a4a52a7c567c71fd427b4e60",
+      "file": "packages/zod/src/v4/core/schemas.ts",
+      "line": 353,
+      "useSites": 1,
+      "reviewLabel": "fallbackOutsideBody",
+      "rationale": "The synchronous attempt falls through to validateAsync; the adjacent comment explains rejection instead of escaping validate.",
+      "sourceRange": [
+        345,
+        355
+      ],
+      "sourceSha256": "54be11993173ee46909b12b7a5e234e449c2c2b3d26c2bcab857e14eb5d857f0",
+      "sourceRangeSha256": "7416e1b1e0a26127aefd4164d8e3184846d1edd6ca664b996194e016fe38a73c"
+    },
+    {
+      "sample": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "9da460ba-ab5b-47bb-b43d-51ad23a572ff",
+      "auditId": "01c4c238-6978-4cf6-a802-ab1d008dcef6",
+      "handlerId": "2474ad087da1392b353fe761c29757d14e4f0f32d6db13179d7c8c3ec8465267",
+      "file": "packages/zod/src/v4/core/schemas.ts",
+      "line": 407,
+      "useSites": 1,
+      "reviewLabel": "fallbackOutsideBody",
+      "rationale": "String coercion failure flows to the type check and invalid_type issue rather than being interpreted as success.",
+      "sourceRange": [
+        403,
+        420
+      ],
+      "sourceSha256": "54be11993173ee46909b12b7a5e234e449c2c2b3d26c2bcab857e14eb5d857f0",
+      "sourceRangeSha256": "3ef9e52309b10fbe7198b724c9e73567f23da2df0ffed003054ca10e20d58cf1"
+    },
+    {
+      "sample": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "9da460ba-ab5b-47bb-b43d-51ad23a572ff",
+      "auditId": "01c4c238-6978-4cf6-a802-ab1d008dcef6",
+      "handlerId": "0a61cfdcf6bed46c0430a226f2f79be251c7fbdc9fa1dd4f37c33e4d40bf2ec1",
+      "file": "packages/zod/src/v4/core/schemas.ts",
+      "line": 1337,
+      "useSites": 1,
+      "reviewLabel": "fallbackOutsideBody",
+      "rationale": "Number coercion failure flows to validation and an invalid_type issue.",
+      "sourceRange": [
+        1333,
+        1364
+      ],
+      "sourceSha256": "54be11993173ee46909b12b7a5e234e449c2c2b3d26c2bcab857e14eb5d857f0",
+      "sourceRangeSha256": "bd8cf0bea8fd9c7f52897fffdea310ab76b67c76b7adc72cdbe4bc58d687de40"
+    },
+    {
+      "sample": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "9da460ba-ab5b-47bb-b43d-51ad23a572ff",
+      "auditId": "01c4c238-6978-4cf6-a802-ab1d008dcef6",
+      "handlerId": "ee03ec5d3aaa7cf5c1066be45146a910fa36ab065f8d54aecdcff264d9658c4f",
+      "file": "packages/zod/src/v4/core/schemas.ts",
+      "line": 1424,
+      "useSites": 1,
+      "reviewLabel": "fallbackOutsideBody",
+      "rationale": "Boolean conversion is followed by type validation and issue emission. The presence of a catch does not establish a missing failure path.",
+      "sourceRange": [
+        1420,
+        1436
+      ],
+      "sourceSha256": "54be11993173ee46909b12b7a5e234e449c2c2b3d26c2bcab857e14eb5d857f0",
+      "sourceRangeSha256": "31a6121ccf1a15f79f3a48624dd381d33655f1d7b5ba73c8fa1d96dcebfe6cdb"
+    },
+    {
+      "sample": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "9da460ba-ab5b-47bb-b43d-51ad23a572ff",
+      "auditId": "01c4c238-6978-4cf6-a802-ab1d008dcef6",
+      "handlerId": "206549b6e6d40390624e4e564326fc553693894a0dea60194fd4d658cfb60a4b",
+      "file": "packages/zod/src/v4/core/schemas.ts",
+      "line": 1477,
+      "useSites": 1,
+      "reviewLabel": "fallbackOutsideBody",
+      "rationale": "BigInt coercion failure flows to a type check and invalid_type issue.",
+      "sourceRange": [
+        1473,
+        1488
+      ],
+      "sourceSha256": "54be11993173ee46909b12b7a5e234e449c2c2b3d26c2bcab857e14eb5d857f0",
+      "sourceRangeSha256": "273c5e6a740f9da69cc36ef48756eaf6b775e032ff70cf36550c6b6e1512cefe"
+    },
+    {
+      "sample": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "9da460ba-ab5b-47bb-b43d-51ad23a572ff",
+      "auditId": "01c4c238-6978-4cf6-a802-ab1d008dcef6",
+      "handlerId": "411a38bbeff84c91f766bbce783b6e647721fda429364792c40724df402020ab",
+      "file": "packages/zod/src/v4/core/schemas.ts",
+      "line": 1804,
+      "useSites": 1,
+      "reviewLabel": "fallbackOutsideBody",
+      "rationale": "Date conversion failure flows to instanceof/NaN validation and invalid_type issue emission.",
+      "sourceRange": [
+        1800,
+        1820
+      ],
+      "sourceSha256": "54be11993173ee46909b12b7a5e234e449c2c2b3d26c2bcab857e14eb5d857f0",
+      "sourceRangeSha256": "ba9a3ed1802a04600ebf764faa9d2b68194903e7b2fc409a086ef29994cd3314"
+    },
+    {
+      "sample": "tanstack-query-core",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "runId": "6bc47835-855c-4d02-a67a-310fabc1c787",
+      "auditId": "4a1d8433-85b7-4193-b117-605a3d576020",
+      "handlerId": "bdd3f140a9b932f1a1d4edb78615ac625882ca149aa6b3ea5cd7f1b1fddac972",
+      "file": "packages/query-core/src/utils.ts",
+      "line": 121,
+      "useSites": 12,
+      "reviewLabel": "declaredIntentOutsideBody",
+      "rationale": "JSDoc attached to the overload group explicitly declares a function that does nothing. Twelve handler uses share this one implementation.",
+      "sourceRange": [
+        115,
+        121
+      ],
+      "sourceSha256": "73ee15e6fc537e4576f206d09c4432d1e18f3780e290c5c5d3812ed12f2a4736",
+      "sourceRangeSha256": "a61e34ac2b17e833461dcd7ba3678ba5c378c8c79742685ffe3af686a05776f8"
+    },
+    {
+      "sample": "excalidraw-app",
+      "revision": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e",
+      "runId": "e845d8ac-7799-4252-89a8-c35a4ba2c006",
+      "auditId": "ef9e734c-c4df-4ae1-867f-90bbde89a392",
+      "handlerId": "608a82213262f26ce62f63cfab114624708a973e078989d22550422c1ab62701",
+      "file": "excalidraw-app/CustomStats.tsx",
+      "line": 69,
+      "useSites": 1,
+      "reviewLabel": "requiresReview",
+      "rationale": "Clipboard failure shows no error toast in this callback. Intent and the desired UX require confirmation; this is not a verified defect.",
+      "sourceRange": [
+        63,
+        73
+      ],
+      "sourceSha256": "314ed62ea3f867417a60034f4f88f08dc34e1f5b5fbd56fe6a502e71ab7bbaf6",
+      "sourceRangeSha256": "4fb10b48980c40aae2686a18595f6cdb205635867d823a25d68cee7325cf99fb"
+    },
+    {
+      "sample": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+      "auditId": "1ad6d5d6-d326-4f32-9156-2a3212ee865b",
+      "handlerId": "799134aefcf7797b3900b78df06c84fbcb6c3d52fee8a757ba6a38ce3b4dda58",
+      "file": "server/model/maintenance.js",
+      "line": 278,
+      "useSites": 1,
+      "reviewLabel": "declaredIntentOutsideBody",
+      "rationale": "The preceding issue explanation describes an optional start date that can throw; the undefined startAt fallback is passed into Cron.",
+      "sourceRange": [
+        272,
+        285
+      ],
+      "sourceSha256": "119de4885d4a6aed55f0fd101807028f0cde6684b7bd5750ff58a108454531ba",
+      "sourceRangeSha256": "019106c807322abf9c97bb0028f777594d603d91b70a7b2551f81e7e300dd002"
+    },
+    {
+      "sample": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+      "auditId": "1ad6d5d6-d326-4f32-9156-2a3212ee865b",
+      "handlerId": "460f2d8bf1c7a034d7179d5d9d5065a516a2b141c9cc85624059218a6251ef78",
+      "file": "server/model/monitor.js",
+      "line": 1292,
+      "useSites": 1,
+      "reviewLabel": "requiresReview",
+      "rationale": "A failure during old-certificate parsing or notification-history cleanup is discarded before storing new TLS information. Whether continuing is the correct recovery requires review.",
+      "sourceRange": [
+        1258,
+        1298
+      ],
+      "sourceSha256": "cdc0fe971ef1958cdfcc981281157baab24044c4b295fe34b4ef400be65cefdf",
+      "sourceRangeSha256": "b6704e3a7124d8d1872d7e8b45c1e828d51e1a0cce9bb5fdde34d3961e78b158"
+    },
+    {
+      "sample": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+      "auditId": "1ad6d5d6-d326-4f32-9156-2a3212ee865b",
+      "handlerId": "f6d5cfd33267f74b92e5a19961fff6939f693812c297b80407b8e49bbd65dd00",
+      "file": "server/model/monitor.js",
+      "line": 1380,
+      "useSites": 1,
+      "reviewLabel": "requiresReview",
+      "rationale": "Domain expiry lookup/emission errors are discarded; optionality and reporting requirements remain unverified.",
+      "sourceRange": [
+        1372,
+        1381
+      ],
+      "sourceSha256": "cdc0fe971ef1958cdfcc981281157baab24044c4b295fe34b4ef400be65cefdf",
+      "sourceRangeSha256": "5843e9db79d370b9ace8c3171a58794f2022d91830b61ab0922fca4f2de6f108"
+    },
+    {
+      "sample": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+      "auditId": "1ad6d5d6-d326-4f32-9156-2a3212ee865b",
+      "handlerId": "bc57b423ef4b14155c13ee41ab172b4e0d8234a25ae369ea367e2e7be43338f7",
+      "file": "server/monitor-types/globalping.js",
+      "line": 477,
+      "useSites": 1,
+      "reviewLabel": "requiresReview",
+      "rationale": "Old-certificate parsing or history cleanup can fail before processing new certificate data; intended recovery is not established.",
+      "sourceRange": [
+        458,
+        486
+      ],
+      "sourceSha256": "5a6a2c0deeb763f025851dd6ec68509c508b17399bdb31a13f799f423c83d909",
+      "sourceRangeSha256": "715c2613090381ed142c1f2633f2cc59cdc61a8993caeba8220f2b36dc3474d5"
+    },
+    {
+      "sample": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+      "auditId": "1ad6d5d6-d326-4f32-9156-2a3212ee865b",
+      "handlerId": "d11489e7b665af88354b4d9572250f3436caeef8e601c4f88a6adfb33f56bea0",
+      "file": "server/monitor-types/steam.js",
+      "line": 87,
+      "useSites": 1,
+      "reviewLabel": "requiresReview",
+      "rationale": "A successful Steam API lookup sets UP before a ping attempt. Optional-ping intent is plausible, but not established as a developer declaration.",
+      "sourceRange": [
+        74,
+        89
+      ],
+      "sourceSha256": "67576d88ad348dca6b6e9fd0d0e32cda60ec166f8ca90efb964fce870a2a08c4",
+      "sourceRangeSha256": "a4218a47421633c9325c66f0e6af8eaf532a411b9acc2d44946ea44b7a8f8ab9"
+    },
+    {
+      "sample": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+      "auditId": "1ad6d5d6-d326-4f32-9156-2a3212ee865b",
+      "handlerId": "e36df4983a09190524af8363a7241f951cf3adf2d0833cdde2673a10ec4b08ca",
+      "file": "server/server.js",
+      "line": 24,
+      "useSites": 1,
+      "reviewLabel": "requiresReview",
+      "rationale": "Environment-file loading failures are ignored. Optional file absence and other error cases need separate review.",
+      "sourceRange": [
+        19,
+        25
+      ],
+      "sourceSha256": "87f66da5dfe8acd31102d240c482e7037d48df7a15885ef987ab46a751892201",
+      "sourceRangeSha256": "4c65f5e00c08588d952f34404c3af149058478cf44858b8b1d46cdcc3258343b"
+    },
+    {
+      "sample": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+      "auditId": "1ad6d5d6-d326-4f32-9156-2a3212ee865b",
+      "handlerId": "1c9b588bfc0d6e6af6c72bba2f739403bcaf003d6050b0df153c283e16ba791c",
+      "file": "server/socket-handlers/general-socket-handler.js",
+      "line": 143,
+      "useSites": 1,
+      "reviewLabel": "fallbackOutsideBody",
+      "rationale": "The callback immediately after the try/catch reports ok:false and Not found; earlier success paths return.",
+      "sourceRange": [
+        124,
+        148
+      ],
+      "sourceSha256": "511a64941eee0d9185a950f235ae478817c918047841ae0953376cf8b7936276",
+      "sourceRangeSha256": "2b675f0ebce4d1eb183a23dc59d0b945a9dd60afde6912e3643e9b9eb1e547e0"
+    },
+    {
+      "sample": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "c0c59e8a-0909-4bcd-bf3b-6403dddc15ab",
+      "auditId": "1ad6d5d6-d326-4f32-9156-2a3212ee865b",
+      "handlerId": "11b65ef3e23b3e9ef0970a5ed6db9baa74a2c6090e4696c104381c74383d2556",
+      "file": "server/uptime-kuma-server.js",
+      "line": 586,
+      "useSites": 1,
+      "reviewLabel": "requiresReview",
+      "rationale": "Password-reset socket refresh/disconnect failures are discarded. Remaining session behavior needs security-context review; no defect is asserted.",
+      "sourceRange": [
+        570,
+        589
+      ],
+      "sourceSha256": "e2cd05b2166a35505d67f0f2b3366b8e3336681b63cc8869a02dd8696a2073d8",
+      "sourceRangeSha256": "ee066bdbc938b43ff5155ff1837611e574bb8ec9afbfc718b896e323c8c291db"
+    }
+  ]
+}

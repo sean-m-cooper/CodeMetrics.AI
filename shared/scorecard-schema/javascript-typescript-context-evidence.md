@@ -1,5 +1,13 @@
 # JS/TS decomposition and handler context
 
+The [0.5.0 failure-disposition policy](javascript-typescript-error-handling-policy.md)
+adds contextual handler classifications and scoring when the entire observed
+population is assessable. Unknown bodies and unresolved uses withhold the score.
+
+The [2026-10-05 policy decision](javascript-typescript-context-policy-decision.md)
+completed the first numerical calibration pass and retained both dimensions as
+unscored evidence. The historical measurement contracts below remain unchanged.
+
 Development ruleset `javascript-typescript-2026-10-03-owner-population` adds
 descriptive evidence without new decomposition or error-handling scores. Schema
 v3 is unchanged. These are optional extensions for consumers of historical runs.
