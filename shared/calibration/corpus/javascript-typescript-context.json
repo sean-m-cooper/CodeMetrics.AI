@@ -1,0 +1,11 @@
+{
+  "description": "Pinned selected-source calibration, using repository compiler configuration where present. Does not install or execute sample applications.",
+  "samples": [
+    { "id": "express", "repository": "express", "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7", "package": ".", "include": ["index.js", "lib/**/*.js"], "target": "ES2022" },
+    { "id": "zod-v4", "repository": "zod", "revision": "0b216ef674e297ebe41d8bf902262e56f8755822", "package": "packages/zod", "include": ["src/v4/**/*.ts"], "config": "tsconfig.json" },
+    { "id": "tanstack-query-core", "repository": "tanstack-query", "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2", "package": "packages/query-core", "include": ["src/**/*.ts"], "config": "tsconfig.json" },
+    { "id": "tanstack-react-query", "repository": "tanstack-query", "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2", "package": "packages/react-query", "include": ["src/**/*.ts", "src/**/*.tsx"], "config": "tsconfig.json" },
+    { "id": "excalidraw-app", "repository": "excalidraw", "revision": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e", "package": "excalidraw-app", "include": ["**/*.ts", "**/*.tsx"], "config": "../tsconfig.json" },
+    { "id": "uptime-kuma-server", "repository": "uptime-kuma", "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0", "package": ".", "include": ["server/**/*.js", "server/**/*.ts"], "config": "tsconfig.json" }
+  ]
+}

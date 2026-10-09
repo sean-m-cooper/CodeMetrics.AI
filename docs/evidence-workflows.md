@@ -70,10 +70,17 @@ Quality still measures method complexity only.
 (`javascript-typescript-2026-10-04-local-handlers`) reports distinct handler bodies
 with their use sites, bounded local-reference resolution, and reasoned inspection
 gaps. Do not compare these populations as if the counting unit were unchanged.
-Both retain body-comment context and have no error-handling score. Recognize documented swallowing;
+Both historical rulesets retain body-comment context and have no error-handling score. Recognize documented swallowing;
 do not turn empty-body review leads or code presence into correctness judgments.
 Disclose uninspected callbacks and absent populations. Missing optional evidence
 means unavailable, not zero. See the [context contract](../shared/scorecard-schema/javascript-typescript-context-evidence.md).
+
+The development `javascript-typescript-2026-10-06-handler-disposition` ruleset adds
+`dispositionEvidence` and scores Error Handling only when all observed bodies are
+assessed and no callback uses remain unresolved. Honor the emitted status and
+score; disclose unknown counts and partial scope. Do not reconstruct scores from
+empty-body counts or treat nonempty code as proven recovery. This policy change
+requires fresh baselines. See the [failure-disposition policy](../shared/scorecard-schema/javascript-typescript-error-handling-policy.md).
 
 The development JS/TS module-graph scope adds
 `dimensions.architecture.dependencyGraph` version 1. Present Architecture as
