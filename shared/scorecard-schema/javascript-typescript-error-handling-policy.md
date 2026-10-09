@@ -1,8 +1,8 @@
-# JS/TS Error Handling: failure disposition v1
+# JS/TS Error Handling: failure disposition v2
 
-Development ruleset: `javascript-typescript-2026-10-06-handler-disposition`.
-This policy is implemented locally; npm 0.4.0 retains its historical unscored
-handler evidence. Fresh baselines are required when adopting the new ruleset.
+Version 0.5.0 ruleset: `javascript-typescript-2026-10-09-handler-contracts`.
+Version 0.4.0 retains its historical unscored handler evidence. Fresh baselines
+are required when adopting the new ruleset, including from the unpublished v1 prototype.
 Schema v3 and the other dimension policies are unchanged.
 
 ## Product decision
@@ -14,9 +14,9 @@ from names such as `noop`, `tryParse`, or `ignore`.
 
 | Disposition | Meaning within the recognized scope | Issue weight |
 | --- | --- | --- |
-| `propagated` | An unconditional throw on the failure path | 0 |
-| `failureResult` | An explicit literal result, or explicit outcomes on both branches | 0 |
-| `reported` | Standard `console.error` or `console.warn` reporting | 0 |
+| `propagated` | A throw or caught-error payload forwarded to a caller-supplied callback | 0 |
+| `failureResult` | An explicit value/container, or explicit outcomes on both branches | 0 |
+| `reported` | Standard console reporting or a resolved source-backed logging wrapper | 0 |
 | `fallback` | A recognized outcome in the continuation after an empty catch | 0 |
 | `documented` | Attached developer intent | 0 |
 | `unexplainedSwallowing` | A recognized silent discard without declared intent | 1 |
@@ -67,15 +67,36 @@ the overall must disclose its partial scope.
   put a meaningful explanation directly inside an empty handler, or use an
   explicit phrase such as `Intentional: ...` in the attached comment.
 - Recognize literal results, throws, standard console reporting, and explicit
-  outcomes on both branches. Arbitrary calls, nonliteral returns, partial branches,
-  custom logging APIs, and unsupported control flow remain unknown.
+  outcomes on both branches. Constructed objects/arrays/instances and bounded
+  immutable aliases also establish explicit results. Suitability and caller
+  interpretation are not inferred. Arbitrary calls and mutable return values
+  remain unknown.
+- Forwarding the caught error, or its properties in a plain first-argument payload,
+  to an unchanged caller-supplied callback is delegation of failure. It is not proof
+  that the consumer handles it correctly. Local functions with callback-like names,
+  defaulted/reassigned callbacks, and reassigned error bindings do not qualify.
+- Logging wrappers must resolve to repository-owned implementations and forward
+  parameter data through at most three implementation hops to standard console
+  output. Ordinary wrappers require a direct unconditional call. A documented
+  logging contract may have level/configuration filters; a reachable payload-bearing
+  console sink still must be present. Names alone, no-op lookalikes, external
+  declarations, optional calls, and reassigned implementations do not qualify.
+  This observes a logging contract, not guaranteed delivery under every runtime
+  configuration, dynamic dispatch, or monkey patch.
+  Already-loaded local helper source outside the selected metrics population may
+  supply this contract; tests, dependencies, declarations, generated files, and
+  source outside the repository are excluded. Helpers add no metric/body credit.
 - Recognize an empty catch followed by an explicit outcome. Also recognize the
   bounded pattern of an immediately preceding uninitialized `let` local, a single try
   assignment, and a strict `local === undefined` guard with an explicit failure
   outcome. Shadowed `undefined`, different state, prior initialization, and direct
   self-reference on the assignment's right side do not establish that pattern.
 - A try returning a value followed by an empty/undefined catch remains unknown:
-  the undefined result might be a caller contract. Outer continuation and finally
+  the undefined result might be a caller contract. A private named helper is
+  recognized when every reference is a selected-source call whose result is
+  immediately truthiness-guarded and all result reads are guarded. Exported or
+  escaping helpers, unguarded reads, and unexpected assignments remain unknown.
+  Outer continuation and finally
   blocks remain unknown where they can change the outcome. A terminal empty catch
   and an empty Promise rejection callback whose result is discarded can establish
   unexplained swallowing. Assigned, returned, awaited, or chained Promise results

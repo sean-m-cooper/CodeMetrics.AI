@@ -1,14 +1,14 @@
 # codemetrics-ai
 
-Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0.4.0 implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
+Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0.5.0 implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
 
 Each scored dimension includes `scoringDecision`: policy inputs, executed steps, rounding and finding attribution. These are aggregate policy decisions, not independent finding deductions. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md).
 
-The current development ruleset `javascript-typescript-2026-10-06-handler-disposition`
-adds contextual Error Handling scoring. It is not yet published. The scope table
-below describes this development version; adopting it requires a fresh baseline.
+Version 0.5.0 uses `javascript-typescript-2026-10-09-handler-contracts` and adds
+contextual Error Handling scoring. Adopting it requires a fresh baseline. See the
+[0.5.0 release notes](../../docs/releases/javascript-typescript-0.5.0.md).
 
-The 0.4.0 ruleset `javascript-typescript-2026-10-04-local-handlers` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines when upgrading from 0.3.0. See the [0.4.0 release and migration notes](https://github.com/sean-m-cooper/CodeMetrics.AI/blob/master/docs/releases/javascript-typescript-0.4.0.md).
+The earlier 0.4.0 ruleset `javascript-typescript-2026-10-04-local-handlers` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines when upgrading from 0.3.0. See the [0.4.0 release and migration notes](https://github.com/sean-m-cooper/CodeMetrics.AI/blob/master/docs/releases/javascript-typescript-0.4.0.md).
 
 ```sh
 npx codemetrics-ai --project package.json
@@ -126,7 +126,7 @@ evidence. Overall dependencies and cycle findings remain intact, including mixed
 files and cycles crossing the views. Architecture is still unscored. See the
 [dependency view contract](../../shared/scorecard-schema/javascript-typescript-module-graph.md#implementation-reference-and-public-re-export-views).
 
-`metrics.ts` owns source traversal, raw member metrics and finding identities. `function-measurements.ts` collects the separate owned-body measurements; `function-scoring.ts` applies the two population policies with exact interpolation/rounding from `score-arithmetic.ts`. `react-probe.ts` checks calls owned by each function for React hook/effect observations. `async-probe.ts` checks each visited node once for bounded standard-library promise patterns, including module-level operations. Neither probe traverses nested bodies or calculates metrics. `async-population.ts` assigns distinct eligible owners; `async-scoring.ts` applies the population ladder. `decomposition-evidence.ts` records function size and module distribution without deductions. `handler-resolution.ts` performs bounded declaration lookup; `handler-disposition.ts` classifies bounded failure paths; `error-handling.ts` aggregates bodies, uses, context, and findings; `error-handling-scoring.ts` applies the population formula. Regression fixtures preserve raw metrics and source identities; the handler policy and ruleset change is intentional.
+`metrics.ts` owns source traversal, raw member metrics and finding identities. `function-measurements.ts` collects the separate owned-body measurements; `function-scoring.ts` applies the two population policies with exact interpolation/rounding from `score-arithmetic.ts`. `react-probe.ts` checks calls owned by each function for React hook/effect observations. `async-probe.ts` checks each visited node once for bounded standard-library promise patterns, including module-level operations. Neither probe traverses nested bodies or calculates metrics. `async-population.ts` assigns distinct eligible owners; `async-scoring.ts` applies the population ladder. `decomposition-evidence.ts` records function size and module distribution without deductions. `handler-resolution.ts` performs bounded declaration lookup; `handler-disposition.ts` classifies bounded failure paths; `failure-contracts.ts` resolves local logging, callback, and guarded-result contracts; `error-handling.ts` aggregates bodies, uses, context, and findings; `error-handling-scoring.ts` applies the population formula. Regression fixtures preserve raw metrics and source identities; the handler policy and ruleset change is intentional.
 
 ```sh
 npm ci

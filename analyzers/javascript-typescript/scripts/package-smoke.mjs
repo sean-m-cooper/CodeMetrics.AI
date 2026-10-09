@@ -27,7 +27,7 @@ try {
   run([cli, '--scorecard-output', 'before.json', '--sarif', 'before.sarif'], fixture);
   const evidence = JSON.parse(fs.readFileSync(path.join(fixture, 'before.json'), 'utf8'));
   assert.equal(evidence.schemaVersion, 3); assert.ok(evidence.population.members >= 1);
-  assert.equal(evidence.analysis.ruleset, 'javascript-typescript-2026-10-06-handler-disposition');
+  assert.equal(evidence.analysis.ruleset, 'javascript-typescript-2026-10-09-handler-contracts');
   assert.equal(evidence.dimensions.codeQuality.scoringDecision.operation, 'deductions');
   assert.equal(evidence.dimensions.codeQuality.componentDetails.methodComplexity.score, evidence.dimensions.codeQuality.score);
   assert.equal(evidence.dimensions.codeQuality.componentDetails.decomposition.score, null);

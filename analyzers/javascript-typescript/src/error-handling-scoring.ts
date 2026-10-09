@@ -7,7 +7,7 @@ export function errorHandlingDecision(total: number, unexplained: number, unknow
   if (!total || unknown || unresolvedUses) return undefined;
   const populationScore = roundScore(fraction(10n * BigInt(total - unexplained), BigInt(total)));
   const cap = unexplained ? 9 : 10;
-  return firstMatch("javascript-typescript/errorHandling/failure-disposition-v1",
+  return firstMatch("javascript-typescript/errorHandling/failure-disposition-v2",
     { countingUnit: "distinctHandlerBody", totalHandlers: total, assessedHandlers: total, unexplainedSwallowing: unexplained,
       unknownHandlers: unknown, unresolvedCallbackUses: unresolvedUses, populationScore, cap,
       formula: "min(10 - 10 * unexplainedSwallowing / assessedHandlers, unexplainedSwallowing > 0 ? 9 : 10)", rounding: "half-up-one-decimal" },

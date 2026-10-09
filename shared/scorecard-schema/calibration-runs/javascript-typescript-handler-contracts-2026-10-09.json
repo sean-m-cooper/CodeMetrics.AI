@@ -1,0 +1,359 @@
+{
+  "generatedAtUtc": "2026-10-09T17:04:39.237Z",
+  "toolVersion": "0.5.0",
+  "analyzerSourceSha256": "937c09318e56933e9ce6b0d8f864aba5be305990733d22a280b2e4bac17dd3f8",
+  "scope": "Source-only classifier calibration; not a registry package run or runtime correctness assessment.",
+  "samples": [
+    {
+      "id": "express",
+      "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "runId": "d7fecb01-affb-44f5-96ff-e6bf9c7af954",
+      "auditId": "d7fecb01-affb-44f5-96ff-e6bf9c7af954",
+      "configurationFingerprint": "cf9b810ed60b579e3b9688b78a787b1e8014c0b3baa6cd42bfbf1096ec598288",
+      "evidenceSha256": "7bd097c09aa7f778783c136db2d572a11a5b398db0bbbbbeccc5aa6ad0c67eed",
+      "ruleset": "javascript-typescript-2026-10-09-handler-contracts",
+      "status": "scored",
+      "score": 10,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 2,
+      "assessedHandlers": 2,
+      "unknownHandlers": 0,
+      "counts": {
+        "propagated": 1,
+        "failureResult": 0,
+        "reported": 0,
+        "fallback": 1,
+        "documented": 0,
+        "unexplainedSwallowing": 0,
+        "unknown": 0
+      },
+      "assessedPercent": 100,
+      "unresolvedCallbackUses": 0,
+      "populationComplete": true,
+      "reviewed": [
+        {
+          "handlerId": "8e3321f13c8a955115189d0ad680ba09db066ab24b82e180c01718dc7a8840ef",
+          "file": "lib/view.js",
+          "line": 202,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "fallback",
+          "reason": "Every selected-source call tests the optional result before using it; no escaping function reference was found."
+        }
+      ],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    },
+    {
+      "id": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "12f0697b-06fa-4a4d-8aa8-4b91833922bd",
+      "auditId": "12f0697b-06fa-4a4d-8aa8-4b91833922bd",
+      "configurationFingerprint": "4c6726e64a1527a607c1142c36300173eb52671badc2f437fa0d742959aee7cd",
+      "evidenceSha256": "35258716d290d30c830207b6cdb14e2b4198f266ef2635722982225afe07e3f2",
+      "ruleset": "javascript-typescript-2026-10-09-handler-contracts",
+      "status": "skipped",
+      "score": null,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 22,
+      "assessedHandlers": 10,
+      "unknownHandlers": 12,
+      "counts": {
+        "propagated": 4,
+        "failureResult": 6,
+        "reported": 0,
+        "fallback": 0,
+        "documented": 0,
+        "unexplainedSwallowing": 0,
+        "unknown": 12
+      },
+      "assessedPercent": 45.45454545454545,
+      "unresolvedCallbackUses": 0,
+      "populationComplete": false,
+      "reviewed": [
+        {
+          "handlerId": "772c306fbd97a016902cc0ac22500ed0682b98d483044235f023ee769b203731",
+          "file": "packages/zod/src/v4/core/compile.ts",
+          "line": 242,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Continuation after the empty catch needs a failure-contract review."
+        },
+        {
+          "handlerId": "898900a14a8f7c60441729750f5c41bf97fc3980a4a52a7c567c71fd427b4e60",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 353,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Continuation after the empty catch needs a failure-contract review."
+        },
+        {
+          "handlerId": "2474ad087da1392b353fe761c29757d14e4f0f32d6db13179d7c8c3ec8465267",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 407,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Enclosing control flow requires context."
+        },
+        {
+          "handlerId": "0a61cfdcf6bed46c0430a226f2f79be251c7fbdc9fa1dd4f37c33e4d40bf2ec1",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 1337,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Enclosing control flow requires context."
+        },
+        {
+          "handlerId": "ee03ec5d3aaa7cf5c1066be45146a910fa36ab065f8d54aecdcff264d9658c4f",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 1424,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Enclosing control flow requires context."
+        },
+        {
+          "handlerId": "206549b6e6d40390624e4e564326fc553693894a0dea60194fd4d658cfb60a4b",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 1477,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Enclosing control flow requires context."
+        },
+        {
+          "handlerId": "411a38bbeff84c91f766bbce783b6e647721fda429364792c40724df402020ab",
+          "file": "packages/zod/src/v4/core/schemas.ts",
+          "line": 1804,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Outer continuation or control flow requires context."
+        }
+      ],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    },
+    {
+      "id": "tanstack-query-core",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "runId": "6a9f6e7e-b92d-452e-bbab-a0d9f9c52ce9",
+      "auditId": "6a9f6e7e-b92d-452e-bbab-a0d9f9c52ce9",
+      "configurationFingerprint": "019a35461ce7162955cc475dc431964f8ab58e883f3b6be499e5a962d44950d0",
+      "evidenceSha256": "79b12cf3771e50d607e154345ce7f003a6d913279eddf726f188d17ce71304a6",
+      "ruleset": "javascript-typescript-2026-10-09-handler-contracts",
+      "status": "skipped",
+      "score": null,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 16,
+      "assessedHandlers": 2,
+      "unknownHandlers": 14,
+      "counts": {
+        "propagated": 0,
+        "failureResult": 0,
+        "reported": 1,
+        "fallback": 0,
+        "documented": 1,
+        "unexplainedSwallowing": 0,
+        "unknown": 14
+      },
+      "assessedPercent": 12.5,
+      "unresolvedCallbackUses": 0,
+      "populationComplete": false,
+      "reviewed": [
+        {
+          "handlerId": "bdd3f140a9b932f1a1d4edb78615ac625882ca149aa6b3ea5cd7f1b1fddac972",
+          "file": "packages/query-core/src/utils.ts",
+          "line": 121,
+          "reviewLabel": "declaredIntentOutsideBody",
+          "classification": "documented",
+          "reason": "Attached developer intent is honored without judging the business decision.",
+          "comments": [
+            "/**\n * A function that does nothing.\n */"
+          ]
+        }
+      ],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    },
+    {
+      "id": "tanstack-react-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "runId": "74952da4-7511-415e-b0f8-3516dcd1aa75",
+      "auditId": "74952da4-7511-415e-b0f8-3516dcd1aa75",
+      "configurationFingerprint": "18cd82d79c17c4506f0fdf43d866ca4a4ec258faebc1ef8d4f155fb247b013a1",
+      "evidenceSha256": "d85180c730ef428c46d05c837a505596dc0ed9c518f8089f9b2cd15d3fa30093",
+      "ruleset": "javascript-typescript-2026-10-09-handler-contracts",
+      "status": "skipped",
+      "score": null,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 0,
+      "assessedHandlers": 0,
+      "unknownHandlers": 0,
+      "counts": {
+        "propagated": 0,
+        "failureResult": 0,
+        "reported": 0,
+        "fallback": 0,
+        "documented": 0,
+        "unexplainedSwallowing": 0,
+        "unknown": 0
+      },
+      "assessedPercent": null,
+      "unresolvedCallbackUses": 0,
+      "populationComplete": true,
+      "reviewed": [],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    },
+    {
+      "id": "excalidraw-app",
+      "revision": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e",
+      "runId": "79ee59a1-1e55-4678-bae3-81b0bfc61845",
+      "auditId": "79ee59a1-1e55-4678-bae3-81b0bfc61845",
+      "configurationFingerprint": "d3401f0a8111e9f0f7fead41b6daa1cb4e7614a10a79e26da8b4c8e68ca62a21",
+      "evidenceSha256": "0544eeade2162978fef97a3486a056a14ea8da949cd1055f009f524460ef17c5",
+      "ruleset": "javascript-typescript-2026-10-09-handler-contracts",
+      "status": "skipped",
+      "score": null,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 45,
+      "assessedHandlers": 33,
+      "unknownHandlers": 12,
+      "counts": {
+        "propagated": 1,
+        "failureResult": 1,
+        "reported": 28,
+        "fallback": 0,
+        "documented": 2,
+        "unexplainedSwallowing": 1,
+        "unknown": 12
+      },
+      "assessedPercent": 73.33333333333333,
+      "unresolvedCallbackUses": 1,
+      "populationComplete": false,
+      "reviewed": [
+        {
+          "handlerId": "608a82213262f26ce62f63cfab114624708a973e078989d22550422c1ab62701",
+          "file": "excalidraw-app/CustomStats.tsx",
+          "line": 69,
+          "reviewLabel": "requiresReview",
+          "classification": "unexplainedSwallowing",
+          "reason": "Terminal empty catch discards failure without an explicit result or attached intent."
+        }
+      ],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    },
+    {
+      "id": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "b5176db2-152e-4680-86b8-a89b51fcadb5",
+      "auditId": "b5176db2-152e-4680-86b8-a89b51fcadb5",
+      "configurationFingerprint": "e0741fecbd03437726a961f9163a684e97e8d23fc4e93ba03b91c78462e2b1da",
+      "evidenceSha256": "8fac9fb942bd3c3fdb77d4f867ade183af53762a8915b3e377b7e1a03e648d04",
+      "ruleset": "javascript-typescript-2026-10-09-handler-contracts",
+      "status": "skipped",
+      "score": null,
+      "version": 1,
+      "countingUnit": "distinctHandlerBody",
+      "totalHandlers": 341,
+      "assessedHandlers": 173,
+      "unknownHandlers": 168,
+      "counts": {
+        "propagated": 93,
+        "failureResult": 6,
+        "reported": 68,
+        "fallback": 1,
+        "documented": 4,
+        "unexplainedSwallowing": 1,
+        "unknown": 168
+      },
+      "assessedPercent": 50.733137829912025,
+      "unresolvedCallbackUses": 0,
+      "populationComplete": false,
+      "reviewed": [
+        {
+          "handlerId": "799134aefcf7797b3900b78df06c84fbcb6c3d52fee8a757ba6a38ce3b4dda58",
+          "file": "server/model/maintenance.js",
+          "line": 278,
+          "reviewLabel": "declaredIntentOutsideBody",
+          "classification": "unknown",
+          "reason": "Continuation after the empty catch needs a failure-contract review."
+        },
+        {
+          "handlerId": "460f2d8bf1c7a034d7179d5d9d5065a516a2b141c9cc85624059218a6251ef78",
+          "file": "server/model/monitor.js",
+          "line": 1292,
+          "reviewLabel": "requiresReview",
+          "classification": "unknown",
+          "reason": "Outer continuation or control flow requires context."
+        },
+        {
+          "handlerId": "f6d5cfd33267f74b92e5a19961fff6939f693812c297b80407b8e49bbd65dd00",
+          "file": "server/model/monitor.js",
+          "line": 1380,
+          "reviewLabel": "requiresReview",
+          "classification": "unexplainedSwallowing",
+          "reason": "Terminal empty catch discards failure without an explicit result or attached intent."
+        },
+        {
+          "handlerId": "bc57b423ef4b14155c13ee41ab172b4e0d8234a25ae369ea367e2e7be43338f7",
+          "file": "server/monitor-types/globalping.js",
+          "line": 477,
+          "reviewLabel": "requiresReview",
+          "classification": "unknown",
+          "reason": "Outer continuation or control flow requires context."
+        },
+        {
+          "handlerId": "d11489e7b665af88354b4d9572250f3436caeef8e601c4f88a6adfb33f56bea0",
+          "file": "server/monitor-types/steam.js",
+          "line": 87,
+          "reviewLabel": "requiresReview",
+          "classification": "unknown",
+          "reason": "Outer continuation or control flow requires context."
+        },
+        {
+          "handlerId": "e36df4983a09190524af8363a7241f951cf3adf2d0833cdde2673a10ec4b08ca",
+          "file": "server/server.js",
+          "line": 24,
+          "reviewLabel": "requiresReview",
+          "classification": "fallback",
+          "reason": "Standard console output or a resolved source-backed logging wrapper; runtime filtering is outside scope."
+        },
+        {
+          "handlerId": "1c9b588bfc0d6e6af6c72bba2f739403bcaf003d6050b0df153c283e16ba791c",
+          "file": "server/socket-handlers/general-socket-handler.js",
+          "line": 143,
+          "reviewLabel": "fallbackOutsideBody",
+          "classification": "unknown",
+          "reason": "Continuation after the empty catch needs a failure-contract review."
+        },
+        {
+          "handlerId": "11b65ef3e23b3e9ef0970a5ed6db9baa74a2c6090e4696c104381c74383d2556",
+          "file": "server/uptime-kuma-server.js",
+          "line": 586,
+          "reviewLabel": "requiresReview",
+          "classification": "unknown",
+          "reason": "Outer continuation or control flow requires context."
+        }
+      ],
+      "unchanged": "Raw CSV and every other dimension are byte/equality checked against the released corpus."
+    }
+  ],
+  "sourceReview": {
+    "reviewedBodies": 18,
+    "fallbackOutsideBody": 9,
+    "declaredIntentOutsideBody": 2,
+    "requiresReview": 7,
+    "provenance": "Original review run IDs retained. Reuse across fresh runs requires identical revision, handler identity, location, and source hashes.",
+    "interpretation": "Source-context counterexamples and unresolved review questions; unknowns are not labeled defects. No runtime correctness claim."
+  },
+  "packagedConsumer": {
+    "sample": "express",
+    "packageVersion": "0.5.0",
+    "packageSha256": "182c71f020b478c1b70f1ce280ca659f2cea3466d25f5878eeb6dd95c138f5a2",
+    "runId": "0457b2de-8cec-4b5d-9b0a-6e4f22d0f525",
+    "auditId": "2c873e8b-35a2-4a4c-a5c1-7c6d8b43d71e",
+    "fresh": true,
+    "inspectionUsable": true,
+    "errorHandlingScore": 10,
+    "scope": "Local release-candidate tarball installed by the updated scorecard skill; not a registry installation."
+  }
+}

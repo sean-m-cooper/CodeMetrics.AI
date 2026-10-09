@@ -1,4 +1,4 @@
-// Source-only development calibration. No target dependencies or application scripts run.
+// Source-only classifier calibration. No target dependencies or application scripts run.
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
@@ -12,23 +12,24 @@ const [repositories, baseline, output] = process.argv.slice(2);
 assert.ok(repositories && baseline && output, 'Usage: handler-disposition-corpus.mjs <repositories> <released-context-corpus> <output>');
 const corpus=JSON.parse(fs.readFileSync(new URL('../../../shared/calibration/corpus/javascript-typescript-context.json',import.meta.url),'utf8'));
 const labels=JSON.parse(fs.readFileSync(new URL('../../../shared/calibration/corpus/javascript-typescript-context-review.json',import.meta.url),'utf8')).handlers;
+const version=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8')).version;
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 function git(root,args){
   const run=spawnSync('git',args,{cwd:root,encoding:'utf8',windowsHide:true});
   assert.equal(run.status,0,run.stderr);return run.stdout.trim();
 }
 fs.mkdirSync(output,{recursive:true});
-const summary={generatedAtUtc:new Date().toISOString(),toolVersion:'0.4.0-dev',
+const summary={generatedAtUtc:new Date().toISOString(),toolVersion:version,
   analyzerSourceSha256:sha(fs.readdirSync(new URL('../src/',import.meta.url)).filter(name=>name.endsWith('.ts')).sort()
     .map(name=>`${name}\0${fs.readFileSync(new URL(`../src/${name}`,import.meta.url),'utf8')}`).join('\0')),
-  scope:'Development source-only classifier; not a released package run or runtime correctness assessment.',samples:[]};
+  scope:'Source-only classifier calibration; not a registry package run or runtime correctness assessment.',samples:[]};
 const previews=[];
 for(const sample of corpus.samples){
   const root=path.resolve(repositories,sample.repository), destination=path.resolve(output,sample.id);
   assert.equal(git(root,['rev-parse','HEAD']),sample.revision);
   assert.equal(git(root,['status','--porcelain','--untracked-files=no']),'');
   const previous=JSON.parse(fs.readFileSync(path.resolve(baseline,sample.id,'evidence.json'),'utf8'));
-  const result=analyze({project:path.join(root,sample.package,'package.json'),tsconfig:path.resolve(baseline,sample.id,'source-scope.json')},'0.4.0-dev');
+  const result=analyze({project:path.join(root,sample.package,'package.json'),tsconfig:path.resolve(baseline,sample.id,'source-scope.json')},version);
   const e=result.evidence;validateEvidence(e);assert.equal(e.analysis.status,'complete');
   assert.equal(result.csv,fs.readFileSync(path.resolve(baseline,sample.id,'metrics.csv'),'utf8'));
   for(const key of Object.keys(e.dimensions).filter(key=>key!=='errorHandling')) assert.deepEqual(e.dimensions[key],previous.dimensions[key]);

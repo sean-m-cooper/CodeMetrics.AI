@@ -1,6 +1,6 @@
 # JS/TS decomposition and handler context
 
-The [2026-10-06 failure-disposition policy](javascript-typescript-error-handling-policy.md)
+The [0.5.0 failure-disposition policy](javascript-typescript-error-handling-policy.md)
 adds contextual handler classifications and scoring when the entire observed
 population is assessable. Unknown bodies and unresolved uses withhold the score.
 

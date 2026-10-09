@@ -1,5 +1,6 @@
 import ts from "typescript";
 import { unwrapHandler } from "./handler-resolution.js";
+import type { FailureContracts } from "./failure-contracts.js";
 
 export type DispositionKind = "propagated" | "failureResult" | "reported" | "fallback" | "documented" | "unexplainedSwallowing" | "unknown";
 export interface HandlerDisposition { classification: DispositionKind; reason: string; comments?: string[]; }
@@ -36,36 +37,30 @@ function explicitValue(expression: ts.Expression | undefined): boolean {
   return ts.isObjectLiteralExpression(node) && node.properties.every(property => ts.isPropertyAssignment(property) &&
     !ts.isComputedPropertyName(property.name) && explicitValue(property.initializer));
 }
-function reportsFailure(statement: ts.Statement, checker: ts.TypeChecker): boolean {
-  if (!ts.isExpressionStatement(statement) || !ts.isCallExpression(statement.expression)) return false;
-  const call = statement.expression, member = call.expression;
-  if (!ts.isPropertyAccessExpression(member) || !["error", "warn"].includes(member.name.text) ||
-    !ts.isIdentifier(member.expression) || member.expression.text !== "console" || !call.arguments.length || call.questionDotToken || member.questionDotToken) return false;
-  const declarations = checker.getSymbolAtLocation(member.expression)?.declarations ?? [];
-  return declarations.length > 0 && declarations.every(declaration => declaration.getSourceFile().isDeclarationFile &&
-    /(?:lib\.dom\.d\.ts|[/\\]@types[/\\]node[/\\](?:web-globals[/\\])?(?:console|globals)\.d\.ts)$/.test(declaration.getSourceFile().fileName));
-}
-function statementOutcome(statement: ts.Statement, checker: ts.TypeChecker): HandlerDisposition | undefined {
+function statementOutcome(statement: ts.Statement, checker: ts.TypeChecker, contracts: FailureContracts): HandlerDisposition | undefined {
   if (ts.isThrowStatement(statement)) return result("propagated", "Unconditional throw on the failure path.");
-  if (ts.isReturnStatement(statement)) return explicitValue(statement.expression)
-    ? result("failureResult", "Returns an explicit literal value on the failure path; suitability is not judged.")
+  if (ts.isReturnStatement(statement)) return explicitValue(statement.expression) || contracts.explicitResult(statement.expression)
+    ? result("failureResult", "Returns an explicit value/container on the failure path; suitability and caller correctness are not judged.")
     : result("unknown", "Return value or caller contract requires additional analysis.");
-  if (ts.isBlock(statement)) return blockOutcome(statement.statements, checker);
+  if (ts.isBlock(statement)) return blockOutcome(statement.statements, checker, contracts);
   if (ts.isIfStatement(statement)) {
-    const yes = statementOutcome(statement.thenStatement, checker);
-    const no = statement.elseStatement && statementOutcome(statement.elseStatement, checker);
+    const yes = statementOutcome(statement.thenStatement, checker, contracts);
+    const no = statement.elseStatement && statementOutcome(statement.elseStatement, checker, contracts);
     if (yes && no && ![yes.classification, no.classification].includes("unknown"))
       return result(yes.classification === no.classification ? yes.classification : "failureResult", "Both branches have an explicit failure disposition.");
     return result("unknown", "Conditional failure path is not fully resolved.");
   }
-  if (reportsFailure(statement, checker)) return result("reported", "Reports through the standard console.error/console.warn API.");
+  if (ts.isExpressionStatement(statement) && ts.isCallExpression(statement.expression)) {
+    if (contracts.forwardsCaughtError(statement.expression)) return result("propagated", "Passes the caught error to a caller-supplied callback; consumer correctness is outside scope.");
+    if (contracts.reports(statement.expression)) return result("reported", "Standard console output or a resolved source-backed logging wrapper; runtime filtering is outside scope.");
+  }
   if (ts.isExpressionStatement(statement) || ts.isVariableStatement(statement) || ts.isEmptyStatement(statement) ||
     ts.isFunctionDeclaration(statement) || ts.isTypeAliasDeclaration(statement) || ts.isInterfaceDeclaration(statement)) return;
   return result("unknown", "Control flow is outside the bounded handler classifier.");
 }
-function blockOutcome(statements: readonly ts.Statement[], checker: ts.TypeChecker): HandlerDisposition | undefined {
+function blockOutcome(statements: readonly ts.Statement[], checker: ts.TypeChecker, contracts: FailureContracts): HandlerDisposition | undefined {
   for (const statement of statements) {
-    const outcome = statementOutcome(statement, checker);
+    const outcome = statementOutcome(statement, checker, contracts);
     if (outcome) return outcome;
   }
 }
@@ -74,7 +69,7 @@ function containsReturn(node: ts.Node): boolean {
   if (ts.isFunctionLike(node)) return false;
   return ts.forEachChild(node, containsReturn) ?? false;
 }
-function guardedFallback(statement: ts.TryStatement, next: ts.Statement | undefined, checker: ts.TypeChecker): boolean {
+function guardedFallback(statement: ts.TryStatement, next: ts.Statement | undefined, checker: ts.TypeChecker, contracts: FailureContracts): boolean {
   if (!next || !ts.isIfStatement(next) || statement.tryBlock.statements.length !== 1) return false;
   const assignment = statement.tryBlock.statements[0];
   if (!ts.isExpressionStatement(assignment) || !ts.isBinaryExpression(assignment.expression) ||
@@ -97,10 +92,10 @@ function guardedFallback(statement: ts.TryStatement, next: ts.Statement | undefi
   if (!ts.isIdentifier(left) || checker.getSymbolAtLocation(left) !== symbol || !ts.isIdentifier(right) || right.text !== "undefined") return false;
   const undefinedDeclarations = checker.getSymbolAtLocation(right)?.declarations ?? [];
   if (undefinedDeclarations.some(declaration => !declaration.getSourceFile().hasNoDefaultLib)) return false;
-  const outcome = statementOutcome(next.thenStatement, checker);
+  const outcome = statementOutcome(next.thenStatement, checker, contracts);
   return !!outcome && ["failureResult", "propagated", "reported"].includes(outcome.classification);
 }
-export function classifyDisposition(body: ts.ConciseBody, checker: ts.TypeChecker, empty: boolean, comments: string[], use: ts.Node): HandlerDisposition {
+export function classifyDisposition(body: ts.ConciseBody, checker: ts.TypeChecker, empty: boolean, comments: string[], use: ts.Node, contracts: FailureContracts): HandlerDisposition {
   const owner = body.parent;
   // Finally may replace a throw/return, even when the catch itself is explicit.
   if (ts.isCatchClause(owner)) {
@@ -111,7 +106,7 @@ export function classifyDisposition(body: ts.ConciseBody, checker: ts.TypeChecke
   const intent = [...(empty ? comments : comments.filter(comment => intentional.test(comment))), ...declaredIntent(body, checker)];
   if (intent.length) return { ...result("documented", "Attached developer intent is honored without judging the business decision."), comments: intent };
   if (!empty) {
-    const outcome = ts.isBlock(body) ? blockOutcome(body.statements, checker) : explicitValue(body) ? result("failureResult", "Explicit literal result from rejection handler.") : undefined;
+    const outcome = ts.isBlock(body) ? blockOutcome(body.statements, checker, contracts) : explicitValue(body) || contracts.explicitResult(body) ? result("failureResult", "Explicit value/container from rejection handler.") : undefined;
     return outcome ?? result("unknown", "Code presence alone does not establish a failure disposition.");
   }
   if (!ts.isCatchClause(owner)) {
@@ -121,12 +116,13 @@ export function classifyDisposition(body: ts.ConciseBody, checker: ts.TypeChecke
   const statement = owner.parent, parent = statement.parent;
   if (!ts.isBlock(parent) && !ts.isSourceFile(parent)) return result("unknown", "Enclosing control flow requires context.");
   const following = parent.statements.slice(parent.statements.indexOf(statement) + 1);
-  if (guardedFallback(statement, following[0], checker)) return result("fallback", "Failed assignment is followed by an explicit undefined guard and failure outcome.");
+  if (guardedFallback(statement, following[0], checker, contracts)) return result("fallback", "Failed assignment is followed by an explicit undefined guard and failure outcome.");
   if (following.length) {
-    const outcome = blockOutcome(following, checker);
+    const outcome = blockOutcome(following, checker, contracts);
     if (outcome && outcome.classification !== "unknown") return result("fallback", outcome.reason);
     return result("unknown", "Continuation after the empty catch needs a failure-contract review.");
   }
+  if (containsReturn(statement.tryBlock) && contracts.guardedUndefinedResult(body)) return result("fallback", "Every selected-source call tests the optional result before using it; no escaping function reference was found.");
   if (containsReturn(statement.tryBlock)) return result("unknown", "Success returns a value; the implicit/undefined failure result may be a caller contract.");
   if (!ts.isSourceFile(parent) && !ts.isFunctionLike(parent.parent)) return result("unknown", "Outer continuation or control flow requires context.");
   return result("unexplainedSwallowing", "Terminal empty catch discards failure without an explicit result or attached intent.");

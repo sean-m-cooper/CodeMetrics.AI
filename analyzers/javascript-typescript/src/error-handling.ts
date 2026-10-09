@@ -3,6 +3,7 @@ import { hash, scored, type Dimension, type Finding } from "./evidence.js";
 import { HandlerResolver, unwrapHandler } from "./handler-resolution.js";
 import { classifyDisposition, type HandlerDisposition } from "./handler-disposition.js";
 import { errorHandlingDecision } from "./error-handling-scoring.js";
+import type { FailureContracts } from "./failure-contracts.js";
 
 type UsageKind = "catchClause" | "promiseCatch" | "promiseThenRejection";
 interface Handler {
@@ -51,7 +52,7 @@ function rejectionArgument(call: ts.CallExpression, checker: ts.TypeChecker): { 
   if (declaration.name.text === "catch") return { index: 0, kind: "promiseCatch" };
   if (declaration.name.text === "then" && call.arguments.length > 1) return { index: 1, kind: "promiseThenRejection" };
 }
-export function inspectErrorHandling(source: ts.SourceFile, checker: ts.TypeChecker, file: string, project: string, resolver: HandlerResolver) {
+export function inspectErrorHandling(source: ts.SourceFile, checker: ts.TypeChecker, file: string, project: string, resolver: HandlerResolver, contracts: FailureContracts) {
   const handlers = new Map<string, Handler>();
   const uninspectedCallbacks: { file: string; line: number; kind: UsageKind; reason: string }[] = [];
   function add(body: ts.ConciseBody, kind: UsageKind, at: ts.Node, resolution: "inline" | "reference") {
@@ -59,7 +60,7 @@ export function inspectErrorHandling(source: ts.SourceFile, checker: ts.TypeChec
     const existing = handlers.get(identity.id);
     const use = { file, line: source.getLineAndCharacterOfPosition(at.getStart(source)).line + 1, kind, resolution };
     const empty = emptyBody(body, checker), comments = bodyComments(body, body.getSourceFile());
-    const disposition = classifyDisposition(body, checker, empty, comments, at);
+    const disposition = classifyDisposition(body, checker, empty, comments, at, contracts);
     if (existing) {
       existing.uses.push(use);
       if (existing.disposition.classification !== disposition.classification)
@@ -118,7 +119,7 @@ export function errorHandlingEvidence(results: ReturnType<typeof inspectErrorHan
   const decision = incomplete ? undefined : errorHandlingDecision(handlers.length, dispositions.unexplainedSwallowing, dispositions.unknown, uninspectedCallbacks.length);
   const findings = handlers.filter(handler => ["unexplainedSwallowing", "unknown"].includes(handler.disposition.classification))
     .map(handler => handlerFinding(handler, !!decision));
-  const scope: Dimension["scope"] = { id: "javascript-typescript/errorHandling/failure-disposition-v1", coverage: "partial",
+  const scope: Dimension["scope"] = { id: "javascript-typescript/errorHandling/failure-disposition-v2", coverage: "partial",
     includes: ["catch-clauses", "inline-standard-promise-rejection-handlers", "attached-intent", "selected-source-referenced-handlers", "bounded-failure-continuations"],
     excludes: ["general-exception-flow", "arbitrary-callback-value-flow", "correctness-of-recovery", "semantic-rationale-judgment"] };
   const dispositionEvidence = { version: 1, countingUnit: "distinctHandlerBody", totalHandlers: handlers.length,

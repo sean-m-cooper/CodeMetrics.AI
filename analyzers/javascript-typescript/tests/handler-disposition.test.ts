@@ -40,6 +40,77 @@ describe("failure disposition population", () => {
   });
 });
 describe("bounded contextual handler classification", () => {
+  it("recognizes caller-supplied error callbacks without guessing callback names", () => {
+    const data=rows(`function a(deliver){try{work()}catch(e){deliver(e)}}
+      function b(deliver){deliver=()=>{};try{work()}catch(e){deliver(e)}}
+      function c(deliver){[deliver]=[()=>{}];try{work()}catch(e){deliver(e)}}
+      function d(){function deliver(e){};try{work()}catch(e){deliver(e)}}
+      function f(deliver){try{work()}catch(e){e=null;deliver(e)}}
+      function g(deliver){try{work()}catch(e){deliver({ok:false,message:e.message})}}
+      function h(deliver){try{work()}catch(e){e=null;deliver({e})}}
+      function i(deliver){try{work()}catch(e){deliver({e})}}`);
+    expect(data.map((h:any)=>h.disposition.classification)).toEqual(["propagated","unknown","unknown","unknown","unknown","propagated","unknown","propagated"]);
+  });
+  it("recognizes explicit result containers while keeping arbitrary calls and mutable values unknown", () => {
+    const data=rows(`function a(){try{work()}catch(e){return {ok:false,error:e}}}
+      const fallback={ok:false}; function b(){try{work()}catch{return fallback}}
+      function c(){try{work()}catch{return new Error('failed')}}
+      let changing=false;function d(){try{work()}catch{return changing}}
+      function e(){try{work()}catch{return unknown()}}`);
+    expect(data.map((h:any)=>h.disposition.classification)).toEqual(["failureResult","failureResult","failureResult","unknown","unknown"]);
+  });
+  it("resolves logging wrappers and declared filtered loggers to payload-bearing console sinks", () => {
+    const data=rows(`function report(message){console.error(message)}
+      function quiet(message){console.error('unrelated')}
+      function conditional(message){if(flag)console.error(message)}
+      class Logger {
+        /** Write a message to the log. */
+        log(...message){if(hidden)return; console.error(...message)}
+        error(...message){this.log(...message)}
+      }
+      const logger=new Logger();
+      function a(){try{work()}catch(e){report(e)}}
+      function b(){try{work()}catch(e){quiet(e)}}
+      function c(){try{work()}catch(e){conditional(e)}}
+      function d(){try{work()}catch(e){logger.error(e)}}
+      function broken(message){return;console.error(message)}
+      function e(){try{work()}catch(e){broken(e)}}
+      function misdirect(message){second('unrelated',message)}
+      function second(output,ignored){console.error(output)}
+      function f(){try{work()}catch(e){misdirect(e)}}
+      function changed(message){message='unrelated';console.error(message)}
+      function g(){try{work()}catch(e){changed(e)}}`);
+    expect(data.map((h:any)=>h.disposition.classification)).toEqual(["reported","unknown","unknown","reported","unknown","unknown","unknown"]);
+  });
+  it("checks every use of a private optional-result helper before crediting its sentinel", () => {
+    const data=rows(`function maybe(){try{return read()}catch{return undefined}}
+      function use(){var v=maybe();if(v&&v.ok)return v;v=maybe();if(v&&v.ok)return v;}
+      function unsafe(){try{return read()}catch{return undefined}}
+      const leaked=unsafe();
+      function mixed(){try{return read()}catch{return undefined}}
+      function useMixed(){var v=mixed();if(v&&v.ok)return v; return v.ok;}
+      function changed(){try{return read()}catch{return undefined}}
+      function useChanged(){var v=changed();if(v){v=undefined;return v.ok}}
+      export function publicResult(){try{return read()}catch{return undefined}}
+      function usePublic(){var v=publicResult();if(v&&v.ok)return v;}
+      function aliasedExport(){try{return read()}catch{return undefined}}
+      function useAlias(){var v=aliasedExport();if(v&&v.ok)return v;}
+      export {aliasedExport as optional};`);
+    expect(data.map((h:any)=>h.disposition.classification)).toEqual(["fallback","unknown","unknown","unknown","unknown","unknown"]);
+  });
+  it("keeps CommonJS helpers private only when no shorthand reference escapes", () => {
+    const e=run('', {"module.js":`module.exports={};
+      function maybe(){try{return read()}catch{return undefined}}
+      function use(){var v=maybe();if(v&&v.ok)return v;}
+      function escaped(){try{return read()}catch{return undefined}}
+      function useEscaped(){var v=escaped();if(v&&v.ok)return v;}
+      module.exports.bad={escaped};`});
+    expect((e.dimensions.errorHandling.handlerEvidence as any).handlers.map((h:any)=>h.disposition.classification)).toEqual(["fallback","unknown"]);
+    const shadowed=run('', {"module.js":`var module={exports:{}};module.exports={};
+      function maybe(){try{return read()}catch{return undefined}}
+      function use(){var v=maybe();if(v&&v.ok)return v;}`});
+    expect((shadowed.dimensions.errorHandling.handlerEvidence as any).handlers[0].disposition.classification).toBe("unknown");
+  });
   it("recognizes explicit outcomes without equating arbitrary code with handling", () => {
     const data=rows(`function a(){try{work()}catch(e){throw e}}
       function b(){try{work()}catch{return {ok:false}}}
