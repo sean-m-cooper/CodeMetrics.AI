@@ -5,6 +5,7 @@ import { Ajv2020 } from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import type { Evidence, Finding } from "./evidence.js";
 import { dimensionKeys } from "./scorecard-contract.js";
+import { validatePythonEvidence, pythonRuleset } from "./python-evidence.js";
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 (addFormats as unknown as (instance: Ajv2020) => void)(ajv);
@@ -14,6 +15,7 @@ export function validateEvidence(value: unknown): asserts value is Evidence {
   validator ??= ajv.compile(JSON.parse(fs.readFileSync(new URL("./evidence.schema.v3.json", import.meta.url), "utf8")));
   if (!validator(value)) throw new Error("Invalid evidence: " + ajv.errorsText(validator.errors));
   const evidence = value as Evidence;
+  validatePythonEvidence(evidence);
   if (evidence.filters.analyzedUnits > evidence.filters.totalUnits) throw new Error("Analyzed units exceed total units.");
   const ids = findings(evidence).map(finding => finding.fingerprint);
   if (new Set(ids).size !== ids.length) throw new Error("Duplicate finding fingerprints.");
@@ -46,6 +48,8 @@ function entryPoint(evidence: Evidence) {
 }
 export function compare(current: Evidence, baseline: Evidence, allowIncompatible = false) {
   const reasons: string[] = [];
+  if ([current, baseline].some(item => item.tool.ecosystem === "python" && item.analysis.ruleset === pythonRuleset))
+    reasons.push("Experimental Python evidence does not support baseline gates; previews are not dimension scores");
   for (const key of ["ecosystem", "version", "name"] as const)
     if (current.tool[key] !== baseline.tool[key]) reasons.push("tool." + key + " differs");
   for (const key of ["ruleset", "configurationFingerprint"] as const)

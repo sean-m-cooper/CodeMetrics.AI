@@ -17,14 +17,14 @@ Released scorecard analyzers run in the package ecosystem natural to their targe
 |-----------|----------|---------|--------|
 | .NET / C# | `analyzers/dotnet` | `CodeMetrics.AI` NuGet global tool | Available |
 | JavaScript / TypeScript / React | `analyzers/javascript-typescript` | `codemetrics-ai` NPM package | Implemented; scores uncalibrated |
-| Python | `analyzers/python` | Python 3.12 script | Experimental function-facts adapter; no full scorecard |
+| Python | `analyzers/python` | `codemetrics-python` in development npm bundle; Python 3.12 required | Experimental complexity evidence and skill integration; no dimension scores |
 | Rust | `analyzers/rust` | Rust crate | Planned next wave |
 
 ## Shared Contract
 
 The shared scorecard contract is documented in `shared/scorecard-schema`.
 
-The experimental [language adapter contract](shared/source-facts/README.md) separates parser facts from shared scoring mechanics. The Python prototype uses this smaller contract and does not yet produce the scorecard outputs above.
+The experimental [language adapter contract](shared/source-facts/README.md) separates parser facts from shared scoring mechanics. The [Python adapter](analyzers/python/README.md) now embeds those facts in evidence v3 through a locally packaged CLI. Its experimental preview is separate from dimension scores; it produces no CSV or overall grade.
 
 Stable dimensions:
 

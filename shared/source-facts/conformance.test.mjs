@@ -42,7 +42,7 @@ test('missing, incomplete and empty populations do not become perfect scores', (
 
 test('contract rejects malformed facts before aggregation', () => {
   const mutations = [
-    f => { f.schemaVersion = 2; }, f => { delete f.producer.parserVersion; },
+    f => { f.schemaVersion = 3; }, f => { delete f.producer.parserVersion; },
     f => { f.functions.push(f.functions[0]); }, f => { f.functions[0].complexity.value = NaN; },
     f => { f.functions[0].complexity.value = 0; }, f => { f.functions[0].complexity.decisions.branches = -1; },
     f => { f.functions[0].complexity.value++; }, f => { f.functions[0].line = 0; },
@@ -61,6 +61,38 @@ test('aggregation rejects duplicate IDs and invalid policy parameters', () => {
   assert.throws(() => aggregatePopulation([...rows, ...rows], complexityAnchors, true, 1), /Unique IDs/);
   assert.throws(() => aggregatePopulation(rows, complexityAnchors, true, 0), /weakest/);
   assert.throws(() => aggregatePopulation(rows, [[3, 10], [2, 8]], true, 1), /anchors/);
+});
+
+function selectedFixture() {
+  const facts = fixture();
+  facts.schemaVersion = 2;
+  facts.functions.forEach(item => { item.population = 'production'; });
+  facts.selection = { policy: 'fixture-selection/v1', configurationFingerprint: 'a'.repeat(64),
+    options: { include: [], exclude: [], testPaths: [], productionPaths: [], includeTests: false, includeSupport: false, includeGenerated: false },
+    files: [{ file: 'fixture', category: 'production', disposition: 'analyzed', reason: 'selected', contentSha256: 'b'.repeat(64) }],
+    prunedDirectories: [], excludedFunctions: [{ id: 'declaration', file: 'fixture', member: 'declaration', line: 50, reason: 'overload-declaration' }] };
+  return facts;
+}
+
+test('v2 selection provenance does not change weighting for the same population', () => {
+  assert.deepEqual(complexityPopulation(selectedFixture()), complexityPopulation(fixture()));
+  const bad = fixture(); bad.selection = selectedFixture().selection;
+  assert.throws(() => validateSourceFacts(bad), /unknown fields/);
+});
+
+test('v2 rejects mixed populations, missing inventory and declaration double credit', () => {
+  const mutations = [
+    f => { delete f.selection; }, f => { delete f.functions[0].population; },
+    f => { f.functions[0].population = 'test'; }, f => { f.selection.files[0].disposition = 'excluded'; },
+    f => { f.selection.files[0].disposition = 'failed'; }, f => { f.selection.files[0].contentSha256 = null; },
+    f => { f.selection.files.push(f.selection.files[0]); }, f => { f.selection.excludedFunctions[0].id = '0'; },
+    f => { f.selection.excludedFunctions[0].file = 'unseen'; }, f => { f.selection.configurationFingerprint = ''; },
+    f => { f.selection.files[0].category = 'test'; f.functions.forEach(item => { item.population = 'test'; }); },
+  ];
+  for (const mutate of mutations) {
+    const facts = selectedFixture(); mutate(facts);
+    assert.throws(() => validateSourceFacts(facts), /Invalid source facts/);
+  }
 });
 
 test('Python and TypeScript producers conform and feed the same engine', async () => {

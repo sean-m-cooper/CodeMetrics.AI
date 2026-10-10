@@ -63,7 +63,10 @@ jobs:
         run: npm run test:architecture
 
   source-facts:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -78,6 +81,8 @@ jobs:
         run: python -m unittest discover -s analyzers/python/tests -v
       - name: Verify adapter contract with both real producers
         run: node --test shared/source-facts/conformance.test.mjs
+      - name: Verify installed Python CLI and evidence workflow
+        run: node analyzers/python/package-smoke.mjs
 
   calibration:
     runs-on: ubuntu-latest

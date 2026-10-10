@@ -6,7 +6,7 @@ An **ecosystem id** is the stable identifier shared by an analyzer's source dire
 |---|---|---|---|
 | `dotnet` | `analyzers/dotnet` | `.sln` / `.slnx` file | `.scorecard/dotnet/` |
 | `javascript-typescript` | `analyzers/javascript-typescript` | `package.json` | `.scorecard/javascript-typescript/` |
-| `python` | `analyzers/python` (planned) | `pyproject.toml` | `.scorecard/python/` |
+| `python` | `analyzers/python` (experimental) | `pyproject.toml`, explicit directory or `.py`/`.pyi` file | `.scorecard/python/` via skill; CLI requires explicit evidence path |
 | `rust` | `analyzers/rust` (planned) | `Cargo.toml` | `.scorecard/rust/` |
 
 ## Output path rule
@@ -19,6 +19,8 @@ Every analyzer writes its default outputs under `.scorecard/<ecosystem-id>/`:
 ```
 
 This keeps polyglot repositories collision-free: each analyzer owns its subdirectory, and consumers discover evidence by globbing `.scorecard/*/evidence.json`.
+
+The experimental Python CLI writes only evidence JSON to a required new output path. The skill uses `.scorecard/python/runs/<run-id>/evidence.json` and validates run identity through its inspection; root-level files are not a freshness signal. Python measurements and an experimental preview are embedded in evidence v3; no dimension scores or CSV are emitted.
 
 ## `subject.variant`
 

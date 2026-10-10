@@ -198,3 +198,7 @@ Uptime Kuma rerun. Numerical experiments remain outside the analyzer and are not
 consumer scoring policies. The subsequent [contextual handler policy](../../shared/scorecard-schema/javascript-typescript-error-handling-policy.md)
 enables the agreed population formula only where bounded classification establishes
 an assessable population. Decomposition remains unscored.
+
+## Experimental Python command in development builds
+
+Local development archives also bundle `codemetrics-python` and its Python 3.12 AST adapter. This command uses Node.js 20+ and an installed Python 3.12 interpreter, parses source without importing the target, and produces evidence v3 with an experimental complexity preview. All Python dimension scores remain unavailable. Published 0.5.0 does not include this command; use the local archive described in the [Python guide](../python/README.md). `codemetrics-python --help` lists entry points and selection flags. No additional Python package installation is required.

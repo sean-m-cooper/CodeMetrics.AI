@@ -1,0 +1,71 @@
+{
+  "scope": "Pinned source-only production selections; no target install, build, or test execution. Previews are uncalibrated.",
+  "samples": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "configurationFingerprint": "3a42e533f6092149af8baacf0a98dcae00c52c23dd8652d491347ea969ac9540",
+      "selectedSourceSha256": "2d607977215a449fd48af18dbaf908cdeaf67c08aba11fa0d06160700c19b677",
+      "filesAnalyzed": 19,
+      "implementedFunctions": 246,
+      "functionFactsSha256": "45891e7b93660fe54c14af8d10479e357eb4b57fdee3abb688645a7c54bfc609",
+      "excludedDeclarationsSha256": "ab26d77f24b381780ef4d2ffa23840c72e247f46ba98908b38632cd1be18132a",
+      "excludedDeclarationReasons": {
+        "protocol-declaration": 2,
+        "overload-declaration": 20
+      },
+      "complexityAtLeast10": 14,
+      "maxComplexity": 21,
+      "experimentalPreview": 7
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "configurationFingerprint": "544dbb0ea0e93df624d27de88718cb9e2be849e982c610f99fe606b2f291cbc5",
+      "selectedSourceSha256": "2a51420a3bfbda775c692446934792dfc86b9d289056bf5a1fae501579ed9dd7",
+      "filesAnalyzed": 36,
+      "implementedFunctions": 508,
+      "functionFactsSha256": "b2e5495c18c8532661f8d0269aab2b4413dfe192c116038807a03813c229457c",
+      "excludedDeclarationsSha256": "8598cca05fa005a66d40481b2457c94fd2abfee8e7d48454194bb4bd29c1aeda",
+      "excludedDeclarationReasons": {
+        "overload-declaration": 9,
+        "protocol-declaration": 2
+      },
+      "complexityAtLeast10": 22,
+      "maxComplexity": 22,
+      "experimentalPreview": 7.1
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "configurationFingerprint": "6bd0c426bc7e8e32467e5c7958000362651a4cb02982b1d088d6c4d8a45f44e1",
+      "selectedSourceSha256": "cb8ee90b048099e53b85aaee32175802082b22a7706e5c05e0d4e403d7be47a8",
+      "filesAnalyzed": 78,
+      "implementedFunctions": 464,
+      "functionFactsSha256": "d6e571d78f49775fa2ec63b0fbec632e43fab7ac6398d0cf7e633938a0d09bbb",
+      "excludedDeclarationsSha256": "1adfaef665629a4b47eb4bb0c664981e6758d9571924510c2acca5a9499c3ea6",
+      "excludedDeclarationReasons": {
+        "abstract-declaration": 1
+      },
+      "complexityAtLeast10": 17,
+      "maxComplexity": 26,
+      "experimentalPreview": 6.8
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "configurationFingerprint": "38e48233960af37b1e0104b3b9ad0c98482c84b491f7019f4c014df304100cb2",
+      "selectedSourceSha256": "2cb4a5b24cda391c3278706e0de5eb522f2d8e5458cceed6c898fdfb27b9a70f",
+      "filesAnalyzed": 907,
+      "implementedFunctions": 9748,
+      "functionFactsSha256": "592e535e112ed80b7a05dd30496988c1b374ad095bb2c64a52906d4b12ec93f1",
+      "excludedDeclarationsSha256": "393b659d8daf4f5677b25446d073c8d095f2fce445b933d919f93a1fea107bbc",
+      "excludedDeclarationReasons": {
+        "abstract-declaration": 1
+      },
+      "complexityAtLeast10": 480,
+      "maxComplexity": 99,
+      "experimentalPreview": 5.6
+    }
+  ]
+}

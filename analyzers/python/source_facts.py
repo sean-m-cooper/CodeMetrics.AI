@@ -9,6 +9,8 @@ from pathlib import Path
 import platform
 import sys
 import tokenize
+from source_selection import (declaration_reason, file_record, generated_source, import_bindings,
+                              inventory, resolve, selection_options)
 
 
 POLICY = "python/owned-function-complexity-v1"
@@ -69,10 +71,13 @@ def irrefutable(pattern):
 
 
 class Functions(ast.NodeVisitor):
-    def __init__(self, file):
+    def __init__(self, file, tree=None):
         self.file = file
         self.parents = []
         self.functions = []
+        self.excluded_functions = []
+        self.bindings = import_bindings(tree) if tree is not None else {}
+        self.contexts = []
 
     def visit_AnnAssign(self, node):
         self.visit(node.target)
@@ -81,28 +86,39 @@ class Functions(ast.NodeVisitor):
 
     def visit_ClassDef(self, node):
         self.parents.append(node.name)
+        protocol = any(resolve(base, self.bindings) in {"typing.Protocol", "typing_extensions.Protocol"} for base in node.bases)
+        self.contexts.append(("class", protocol))
         for child in node.body:
             self.visit(child)
+        self.contexts.pop()
         self.parents.pop()
 
     def visit_FunctionDef(self, node):
         name = getattr(node, "name", f"<lambda@{node.lineno}:{node.col_offset}>")
         member = ".".join(self.parents + [name])
         identity = f"{self.file}|{node.lineno}|{node.col_offset}|{type(node).__name__}"
+        location = {"id": hashlib.sha256(identity.encode("utf-8")).hexdigest(),
+                    "file": self.file, "member": member, "line": node.lineno}
+        protocol_method = bool(self.contexts and self.contexts[-1] == ("class", True))
+        reason = declaration_reason(node, self.bindings, protocol_method)
+        if reason:
+            self.excluded_functions.append({**location, "reason": reason})
+            return
         decisions = Decisions()
         body = [node.body] if isinstance(node, ast.Lambda) else node.body
         for child in body:
             decisions.visit(child)
         self.functions.append({
-            "id": hashlib.sha256(identity.encode("utf-8")).hexdigest(),
-            "file": self.file, "member": member, "line": node.lineno,
+            **location,
             "ownership": "exclusive-function-body",
             "complexity": {"value": 1 + sum(decisions.counts.values()), "baseline": 1, "decisions": decisions.counts},
         })
         self.parents.append(name)
+        self.contexts.append(("function", False))
         for child in body:
             self.visit(child)
         self.parents.pop()
+        self.contexts.pop()
 
     visit_AsyncFunctionDef = visit_FunctionDef
     visit_Lambda = visit_FunctionDef
@@ -110,24 +126,24 @@ class Functions(ast.NodeVisitor):
 
 def measure_source(source, file):
     tree = ast.parse(source, filename=file)
-    collector = Functions(file)
+    collector = Functions(file, tree)
     collector.visit(tree)
     return collector.functions
 
 
-def new_document():
+def new_document(options=None):
     return {
-        "schemaVersion": 1, "language": "python",
-        "producer": {"name": "codemetrics-ai/python-source-facts", "version": "0.1.0-experimental",
+        "schemaVersion": 2, "language": "python",
+        "producer": {"name": "codemetrics-ai/python-source-facts", "version": "0.2.0-experimental",
                      "parser": "python-ast", "parserVersion": platform.python_version()},
         "measurementPolicy": POLICY, "status": "complete",
         "capabilities": {"functionComplexity": "available", "coverage": "unsupported", "maintainability": "unsupported"},
         "scope": {
-            "description": "All .py files under the selected root, including tests. Native parser grammar; no imports or execution.",
+            "description": "Selected Python implementation bodies. File roles are explicit scope conventions, not runtime reachability or defect judgments. See selection inventory.",
             "excludes": ["nested-function-and-class-bodies-from-parent", "decorators", "class-headers", "annotations", "parameter-initializers",
                          "module-and-class-initializer-decisions", "symlinks", "directory-junctions", *sorted(EXCLUDED_DIRECTORIES)],
         },
-        "diagnostics": [], "functions": [],
+        "diagnostics": [], "functions": [], "selection": inventory(options or selection_options()),
     }
 
 
@@ -148,8 +164,8 @@ def discover(target, document):
         diagnostic(document, "linked-target", "An explicit symlink/junction target is not analyzed.")
         return []
     if target.is_file():
-        if target.suffix != ".py":
-            diagnostic(document, "unsupported-file", "The input file must have a .py extension.")
+        if target.suffix not in {".py", ".pyi"}:
+            diagnostic(document, "unsupported-file", "The input file must have a .py or .pyi extension.")
             return []
         return [target]
     if not target.is_dir():
@@ -159,10 +175,17 @@ def discover(target, document):
     def on_error(error):
         diagnostic(document, "discovery-error", str(error))
     for directory, directories, names in os.walk(target, followlinks=False, onerror=on_error):
-        directories[:] = sorted(name for name in directories if name not in EXCLUDED_DIRECTORIES and not linked(Path(directory) / name))
+        retained = []
+        for name in sorted(directories):
+            path = Path(directory) / name
+            if name in EXCLUDED_DIRECTORIES or linked(path):
+                document["selection"]["prunedDirectories"].append({"path": path.relative_to(target).as_posix(), "reason": "linked-directory" if linked(path) else "dependency-cache-or-build-directory"})
+            else:
+                retained.append(name)
+        directories[:] = retained
         for name in sorted(names):
             path = Path(directory) / name
-            if path.suffix == ".py" and not linked(path):
+            if path.suffix in {".py", ".pyi"}:
                 files.append(path)
                 if len(files) > MAX_FILES:
                     diagnostic(document, "file-limit", f"More than {MAX_FILES} Python files; select a smaller root.")
@@ -170,8 +193,14 @@ def discover(target, document):
     return files
 
 
-def analyze(target):
-    document = new_document()
+def analyze(target, **configuration):
+    try:
+        options = selection_options(**configuration)
+    except ValueError as error:
+        document = new_document()
+        diagnostic(document, "invalid-selection", str(error))
+        return document
+    document = new_document(options)
     if sys.version_info[:2] != (3, 12):
         diagnostic(document, "unsupported-parser", "This experimental policy is tested with Python 3.12 only.")
         return document
@@ -179,14 +208,32 @@ def analyze(target):
     root = target if target.is_dir() else target.parent
     for path in discover(target, document):
         file = path.relative_to(root).as_posix()
+        record = file_record(file, options)
+        document["selection"]["files"].append(record)
+        if linked(path):
+            record.update(disposition="excluded", reason="linked-file")
+        if record["disposition"] == "excluded":
+            continue
         try:
             if not path.resolve().is_relative_to(root.resolve()):
                 raise ValueError("File resolves outside the selected root.")
             if path.stat().st_size > MAX_FILE_BYTES:
                 raise ValueError(f"File exceeds {MAX_FILE_BYTES} bytes.")
             with tokenize.open(path) as source:
-                document["functions"].extend(measure_source(source.read(), file))
+                text = source.read()
+            record["contentSha256"] = hashlib.sha256(text.encode("utf-8")).hexdigest()
+            if generated_source(text):
+                record.update(category="generated", reason="generated-header-marker")
+                if not options["includeGenerated"]:
+                    record["disposition"] = "excluded"
+                    continue
+            tree = ast.parse(text, filename=file)
+            collector = Functions(file, tree)
+            collector.visit(tree)
+            document["functions"].extend({**item, "population": record["category"]} for item in collector.functions)
+            document["selection"]["excludedFunctions"].extend(collector.excluded_functions)
         except (SyntaxError, UnicodeError, OSError, ValueError, RecursionError) as error:
+            record.update(disposition="failed", reason="parse-error")
             diagnostic(document, "parse-error", str(error), file)
     document["functions"].sort(key=lambda item: (item["file"], item["line"], item["id"]))
     return document
@@ -194,10 +241,16 @@ def analyze(target):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("target", help="Python file or directory (tests included)")
+    parser.add_argument("target", help="Python file or directory (production candidates by default)")
+    for option in ("include", "exclude", "test-path", "production-path"):
+        parser.add_argument(f"--{option}", action="append", default=[], help="Root-relative POSIX pattern; repeatable")
+    for option in ("include-tests", "include-generated", "include-support"):
+        parser.add_argument(f"--{option}", action="store_true")
     parser.add_argument("--output", type=Path, help="New .json file; existing files are never overwritten")
     args = parser.parse_args()
-    document = analyze(args.target)
+    document = analyze(args.target, include=args.include, exclude=args.exclude, test_paths=args.test_path,
+                       production_paths=args.production_path, include_tests=args.include_tests,
+                       include_generated=args.include_generated, include_support=args.include_support)
     payload = json.dumps(document, indent=2, ensure_ascii=True) + "\n"
     try:
         if args.output:

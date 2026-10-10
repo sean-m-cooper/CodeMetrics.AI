@@ -19,4 +19,8 @@ analyzers/python/
 
 See the [Python adapter guide](../../analyzers/python/README.md) for commands, decision-count policy, exclusions, and failure behavior, and the [shared contract](../../shared/source-facts/README.md) for the language extension workflow.
 
-The adapter does not yet emit scorecard evidence v3, metrics CSV, or calibrated Python dimension scores. It is not integrated into the code-scorecard skill. Its optional score preview is experimental, and Python/JS/.NET scores must not be averaged or compared as equivalent measurements. Representative Python corpus calibration and production/test classification are prerequisites for production scoring.
+The adapter now classifies file populations and declaration-only bodies, records selection provenance in source-facts v2, and has pinned regression selections for Requests, Starlette, HTTPie, and Django. Path rules are explicit conventions with customer overrides; they do not claim complete runtime reachability or semantic resolution.
+
+The development npm package now includes `codemetrics-python`, which runs the Python 3.12 parser and shared engine and emits evidence v3 with embedded source facts. The code-scorecard skill routes Python manifests, explicit files, and directories through the packaged CLI, validates current run/audit identities, and records failed attempts. This integration requires an explicitly supplied local npm archive until publication; the adapter remains version `0.2.0-experimental`.
+
+There are no calibrated Python dimension scores, overall grade, metrics CSV, or score gates. Complete runs retain all nine dimensions as skipped/unavailable and show the optional complexity preview separately. Incomplete runs provide diagnostics only. Python/JS/.NET scores must not be averaged or compared as equivalent measurements. The first corpus checks measurement and population selection; broader Python calibration remains a prerequisite for production scoring.
