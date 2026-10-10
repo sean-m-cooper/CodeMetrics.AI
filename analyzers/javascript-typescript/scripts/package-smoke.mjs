@@ -22,12 +22,32 @@ try {
   fs.writeFileSync(path.join(fixture, 'package.json'), '{"name":"installed-smoke"}');
   fs.writeFileSync(path.join(fixture, 'App.tsx'), "import {useEffect} from 'react'; export function App(){useEffect(async()=>{},[]); return <div/>;}");
   const cli = path.join(install, 'node_modules/codemetrics-ai/dist/cli.js');
+  for (const name of ['arithmetic', 'contract', 'population']) {
+    for (const extension of ['mjs', 'd.mts']) {
+      const filename = `${name}.${extension}`;
+      assert.equal(fs.readFileSync(path.join(install, 'node_modules/codemetrics-ai/dist/shared-source-facts', filename), 'utf8'),
+        fs.readFileSync(new URL(`../../../shared/source-facts/${filename}`, import.meta.url), 'utf8'), `Packaged shared runtime drift: ${filename}`);
+    }
+  }
   const evidenceCli = path.join(install, 'node_modules/codemetrics-ai/dist/evidence-cli.js');
   assert.ok(fs.readFileSync(cli, 'utf8').startsWith('#!/usr/bin/env node'));
   run([cli, '--scorecard-output', 'before.json', '--sarif', 'before.sarif'], fixture);
   const evidence = JSON.parse(fs.readFileSync(path.join(fixture, 'before.json'), 'utf8'));
   assert.equal(evidence.schemaVersion, 3); assert.ok(evidence.population.members >= 1);
-  assert.equal(evidence.analysis.ruleset, 'javascript-typescript-2026-10-09-handler-contracts');
+  assert.equal(evidence.analysis.ruleset, 'javascript-typescript-2026-10-09-dependency-evidence');
+  assert.equal(evidence.dimensions.dependencyManagement.dependencyInventory.status, 'gaps');
+  assert.equal(evidence.dimensions.dependencyManagement.dependencyMetadata.status, 'notRequested');
+  assert.equal(evidence.dimensions.dependencyManagement.score, undefined);
+  fs.writeFileSync(path.join(fixture,'package-lock.json'), JSON.stringify({lockfileVersion:3,packages:{'':{name:'installed-smoke'}}}));
+  const lockBefore=fs.readFileSync(path.join(fixture,'package-lock.json'),'utf8');
+  run([cli,'--scorecard-output','package-lock.json'],fixture,2);
+  assert.equal(fs.readFileSync(path.join(fixture,'package-lock.json'),'utf8'),lockBefore);
+  run([cli,'--dependency-metadata','--scorecard-output','dependencies.json'],fixture);
+  const dependencies=JSON.parse(fs.readFileSync(path.join(fixture,'dependencies.json'),'utf8'));
+  assert.equal(dependencies.dimensions.dependencyManagement.dependencyInventory.status,'complete');
+  assert.equal(dependencies.dimensions.dependencyManagement.score,undefined);
+  assert.equal(dependencies.dimensions.dependencyManagement.dependencyMetadata.status,'unavailable');
+  // No packages means no registry traffic, no advisory population, and no perfect score.
   assert.equal(evidence.dimensions.codeQuality.scoringDecision.operation, 'deductions');
   assert.equal(evidence.dimensions.codeQuality.componentDetails.methodComplexity.score, evidence.dimensions.codeQuality.score);
   assert.equal(evidence.dimensions.codeQuality.componentDetails.decomposition.score, null);
@@ -129,5 +149,25 @@ try {
   assert.equal(dimensions.codeQuality.componentDetails.decomposition.primaryMeasure, "ownedStatements");
   assert.equal(dimensions.performanceAsync.scoring.observations.eligibleOwners, 2);
   assert.equal(dimensions.performanceAsync.scoring.observations.affectedOwners, 0);
-  console.log('Installed package analysis, schema validation, baseline gates, SARIF and invalid-input smoke checks passed.');
+  const pnpm = path.join(temporary, 'pnpm-fixture'); fs.mkdirSync(pnpm);
+  fs.writeFileSync(path.join(pnpm, 'package.json'), JSON.stringify({name:'installed-pnpm',packageManager:'pnpm@12.4.2',dependencies:{a:'catalog:'}}));
+  fs.writeFileSync(path.join(pnpm, 'index.js'), 'export const value=1;');
+  fs.writeFileSync(path.join(pnpm, 'pnpm-workspace.yaml'), 'catalog:\n  a: ^1\n');
+  const pnpmLock='---\nlockfileVersion: "9.0"\nimporters:\n  .:\n    packageManagerDependencies: {}\n---\nlockfileVersion: "9.0"\ncatalogs:\n  default:\n    a: {specifier: ^1, version: 1.0.0}\nimporters:\n  .:\n    dependencies:\n      a: {specifier: "catalog:", version: 1.0.0}\npackages:\n  a@1.0.0:\n    resolution: {integrity: sha512-fixture}\nsnapshots:\n  a@1.0.0: {}\n';
+  fs.writeFileSync(path.join(pnpm, 'pnpm-lock.yaml'), pnpmLock);
+  run([cli, '--scorecard-output', 'evidence.json', '--dependency-metadata'], pnpm);
+  run([evidenceCli, '--input', 'evidence.json', '--inspect-output', 'inspection.json'], pnpm);
+  const pnpmDimension=JSON.parse(fs.readFileSync(path.join(pnpm, 'inspection.json'),'utf8')).evidence.dimensions.dependencyManagement;
+  assert.equal(pnpmDimension.dependencyInventory.status,'complete');
+  assert.equal(pnpmDimension.dependencyInventory.packages.length,1);
+  assert.equal(pnpmDimension.dependencyInventory.lockfiles[0].projectDocument,2);
+  assert.equal(pnpmDimension.dependencyInventory.packages[0].uses[0].resolvedRange,'^1');
+  assert.equal(pnpmDimension.dependencyMetadata.status,'unavailable');
+  assert.equal(pnpmDimension.score,undefined);
+  for(const input of ['pnpm-lock.yaml','pnpm-workspace.yaml']) {
+    const before=fs.readFileSync(path.join(pnpm,input),'utf8');
+    run([cli,'--scorecard-output',input],pnpm,2);
+    assert.equal(fs.readFileSync(path.join(pnpm,input),'utf8'),before);
+  }
+  console.log('Installed package analysis, pnpm inventory/input protection, schema validation, baseline gates, SARIF and invalid-input smoke checks passed.');
 } finally { fs.rmSync(temporary, { recursive: true, force: true }); }

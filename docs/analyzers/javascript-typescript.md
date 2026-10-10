@@ -27,4 +27,4 @@ TypeScript type-only declarations do not add runtime complexity. JSX markup does
 
 React components and custom hooks are first-class analysis targets. React-specific findings are mapped into the stable scorecard dimensions.
 
-The implementation currently scores codeQuality, maintainability, and imported React hook/effect checks. Other dimensions are explicitly skipped. Scores are uncalibrated across ecosystems. See the [analyzer README](../../analyzers/javascript-typescript/README.md) for discovery, metric definitions, exclusions, and comparison options.
+Released 0.5.0 scores method complexity, maintainability, supported async/blocking usage, and fully assessed contextual error-handler populations. Architecture and decomposition remain unscored evidence. Development work adds npm/pnpm dependency inventory and optional registry observations, also unscored. Other dimensions are explicitly skipped. Scores are uncalibrated across ecosystems. See the [analyzer README](../../analyzers/javascript-typescript/README.md) for discovery, metric definitions, exclusions, and comparison options.

@@ -4,7 +4,7 @@ CodeMetrics.AI is a suite of deterministic code analyzers that produce shared sc
 
 Its goal is to guide human and AI developers toward better, more maintainable and performant code. Scores express documented product expectations and identify opportunities for improvement; they do not prove defects or replace engineering judgment. The [complexity scoring policy](shared/scorecard-schema/calibration.md#complexity-scoring-product-decision) records the accepted method-CC bands and the distinction between product decisions and their scoring implementation. Real-world usage and developer feedback should inform explicit, versioned policy revisions.
 
-Each analyzer runs in the package ecosystem natural to its target language, then writes the same default outputs:
+Released scorecard analyzers run in the package ecosystem natural to their target language, then write the same default outputs:
 
 | File | Description |
 |------|-------------|
@@ -17,12 +17,14 @@ Each analyzer runs in the package ecosystem natural to its target language, then
 |-----------|----------|---------|--------|
 | .NET / C# | `analyzers/dotnet` | `CodeMetrics.AI` NuGet global tool | Available |
 | JavaScript / TypeScript / React | `analyzers/javascript-typescript` | `codemetrics-ai` NPM package | Implemented; scores uncalibrated |
-| Python | `analyzers/python` | Python package | Planned next wave |
+| Python | `analyzers/python` | Python 3.12 script | Experimental function-facts adapter; no full scorecard |
 | Rust | `analyzers/rust` | Rust crate | Planned next wave |
 
 ## Shared Contract
 
 The shared scorecard contract is documented in `shared/scorecard-schema`.
+
+The experimental [language adapter contract](shared/source-facts/README.md) separates parser facts from shared scoring mechanics. The Python prototype uses this smaller contract and does not yet produce the scorecard outputs above.
 
 Stable dimensions:
 

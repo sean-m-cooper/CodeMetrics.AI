@@ -1,0 +1,79 @@
+{
+  "comparedAgainst": "TestResults/js-ts-pnpm/corpus",
+  "analyzerSourceSha256": "6730562a9d414daafd33c0521670c69496c7355c47070dfbc78bb4c1087da70c",
+  "sharedSourceFactsSha256": "b65acb69d9fd4369381ac3302031c6361c2cb74a1a08e849e28ecbdfe01f6024",
+  "samples": [
+    {
+      "id": "express",
+      "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "dimensionsIdentical": true,
+      "populationIdentical": true,
+      "configurationFingerprintIdentical": true,
+      "rawCsvIdenticalToPinnedScope": true
+    },
+    {
+      "id": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "dimensionsIdentical": true,
+      "populationIdentical": true,
+      "configurationFingerprintIdentical": true,
+      "rawCsvIdenticalToPinnedScope": true
+    },
+    {
+      "id": "tanstack-query-core",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "dimensionsIdentical": true,
+      "populationIdentical": true,
+      "configurationFingerprintIdentical": true,
+      "rawCsvIdenticalToPinnedScope": true
+    },
+    {
+      "id": "tanstack-react-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "dimensionsIdentical": true,
+      "populationIdentical": true,
+      "configurationFingerprintIdentical": true,
+      "rawCsvIdenticalToPinnedScope": true
+    },
+    {
+      "id": "excalidraw-app",
+      "revision": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e",
+      "dimensionsIdentical": true,
+      "populationIdentical": true,
+      "configurationFingerprintIdentical": true,
+      "rawCsvIdenticalToPinnedScope": true
+    },
+    {
+      "id": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "dimensionsIdentical": true,
+      "populationIdentical": true,
+      "configurationFingerprintIdentical": true,
+      "rawCsvIdenticalToPinnedScope": true
+    }
+  ],
+  "date": "2026-10-10",
+  "scope": "Language-adapter refactor; existing JS/TS measurement and scoring behavior preserved. Python is an experimental complexity-only producer.",
+  "checks": {
+    "javascriptTypescriptTests": 256,
+    "pythonTests": 10,
+    "sharedConformanceTests": 5,
+    "frozenCalibrationFixtures": 6,
+    "installedPackageSmoke": "passed",
+    "gitDiffCheck": "passed",
+    "architectureContextFixtures": 11,
+    "offlineInstalledPackagePrecedence": "passed"
+  },
+  "limitations": [
+    "Python 3.12 only; no production/test or stub classification yet",
+    "Python scores are experimental previews, not evidence v3 or full scorecards",
+    "No cross-language calibration or score comparability",
+    "No .NET measurement or scoring changes"
+  ],
+  "artifacts": {
+    "corpus": "TestResults/source-facts/corpus",
+    "calibration": "TestResults/source-facts/calibration.json",
+    "pythonFacts": "TestResults/source-facts/python-self.json",
+    "pythonPreview": "TestResults/source-facts/python-self-preview.json"
+  }
+}

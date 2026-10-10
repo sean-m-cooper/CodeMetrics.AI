@@ -20,6 +20,10 @@ Default output paths are `.scorecard/javascript-typescript/metrics.csv` and `.sc
 
 ## Implemented scope
 
+Development work after 0.5.0 adds unscored npm/pnpm dependency inventory and optional
+registry observations under ruleset `javascript-typescript-2026-10-09-dependency-evidence`.
+It requires fresh baselines. Published 0.5.0 does not include this extension yet.
+
 | Dimension | Implementation |
 |---|---|
 | codeQuality (Method Complexity) | 40% one worst function score + 60% mean remaining; owned CC findings above 10. Decomposition has descriptive size/distribution evidence and no score. |
@@ -27,6 +31,7 @@ Default output paths are `.scorecard/javascript-typescript/metrics.csv` and `.sc
 | performanceAsync (Async/Blocking Usage) | React hook/effect checks, standard Promise async executors, and informational async Array.forEach callbacks |
 | architecture | Module dependencies, explicit type-only separation, internal cycle groups and fan-in/out rankings; score remains unmeasured |
 | errorHandling | Contextual failure dispositions for distinct catch/Promise handler bodies; scores unexplained swallowing only with a fully assessed population |
+| dependencyManagement (development) | npm lockfile v2/v3 and pnpm v9 inventory, workspace uses, optional public-registry deprecation/update/advisory observations; no score |
 | Other dimensions | Explicitly skipped |
 
 React checks run only when a source file imports React. Aliased named imports and namespace imports are recognized; local functions shadowing imports are excluded. Missing dependency arrays are advisory because running after every render can be intentional. The implementation does not claim exhaustive Rules of Hooks, dependency-array correctness, or general concurrency analysis. Source syntax errors make the run incomplete and source dimensions unscored. Semantic type errors are outside this AST-focused version's completeness check.
@@ -63,6 +68,23 @@ Coverage distinguishes `internal`, `external`, `builtin`, `outOfScope`, `unavail
 Cycles are strongly connected groups of resolved internal value/mixed dependencies; repeated imports count once toward fan-in/out. Cycles are informational review leads and carry no score penalty. Dynamic-literal imports and CommonJS calls can be conditional or deferred; a cycle does not establish an initialization failure. Top-ten fan-in/out lists are observations, with no invented defect cutoff. Re-export-only modules are marked for barrel-file context.
 
 Architecture retains `status: skipped` and no score until calibration. Other measured dimensions remain usable when this diagnostic graph has resolution gaps. Source parse failures retain partial graph evidence with `status: failed` and the existing incomplete-analysis exit. Schema v3 is unchanged; the new scope/ruleset requires fresh baselines. See the [graph contract](../../shared/scorecard-schema/javascript-typescript-module-graph.md).
+
+## Dependency observations (development)
+
+Inventory supports npm lockfiles v2/v3 and pnpm v9, including pnpm 12 environment/project documents, catalogs, workspace links, aliases, and peer snapshots. The project graph is selected; environment tooling is explicitly excluded. Peer variants retain locations without multiplying package/version counts. Older pnpm formats and file/git/custom resolutions remain gaps. Integrity-only records do not establish public-registry provenance.
+
+Inventory is local by default. `--dependency-metadata` explicitly enables bounded
+public npm registry metadata and bulk advisory queries. It never installs target
+dependencies or runs their scripts. Unsupported package managers, stale locks,
+private/unknown sources, and failed queries are exposed as coverage gaps.
+Optional peers and locked range differences remain contextual notices. Duplicate
+installations retain their locations without creating independent penalties.
+
+Deprecation, `wanted` updates within direct declared ranges, `latest` releases,
+and advisories are separate observations. Exact pins and newer major versions do
+not establish neglect; advisory presence does not establish runtime reachability.
+The dimension remains unscored. See the [dependency policy](../../shared/scorecard-schema/javascript-typescript-dependency-policy.md)
+for counting, limits, availability, and calibration boundaries.
 
 ## Discovery
 

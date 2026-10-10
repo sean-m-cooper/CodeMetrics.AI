@@ -5,17 +5,19 @@ import { analyze } from "./analyzer.js";
 import { defaultEvidencePath, defaultMetricsPath } from "./scorecard-contract.js";
 import { compare, gate, readEvidence, sarif, validateEvidence } from "./evidence-tools.js";
 import { distinctOutputs, write } from "./io.js";
+import { enrichDependencies } from "./dependency-evidence.js";
 try {
   const { values } = parseArgs({ options: {
     project: { type: "string" }, tsconfig: { type: "string" }, "run-id": { type: "string" }, "audit-id": { type: "string" }, output: { type: "string", default: defaultMetricsPath },
     "scorecard-output": { type: "string", default: defaultEvidencePath }, baseline: { type: "string" },
     "comparison-output": { type: "string" }, sarif: { type: "string" }, "fail-on-new": { type: "string" },
-    "max-score-drop": { type: "string" }, help: { type: "boolean", short: "h" }, version: { type: "boolean" }
+    "max-score-drop": { type: "string" }, "dependency-metadata": { type: "boolean" }, help: { type: "boolean", short: "h" }, version: { type: "boolean" }
   } });
   const version: string = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8")).version;
   if (values.help) console.log([
     "codemetrics-ai — JavaScript, TypeScript and React source analysis",
     "--project <package.json> --tsconfig <tsconfig.json>",
+    "--dependency-metadata (opt in to bounded public npm registry observations; inventory is always local)",
     "--run-id <uuid> --audit-id <uuid> (generated when omitted)",
     "--output <metrics.csv> --scorecard-output <evidence.json>",
     "--baseline <evidence.json> --comparison-output <comparison.json>",
@@ -27,8 +29,10 @@ try {
   else {
     if ((values["fail-on-new"] || values["max-score-drop"] || values["comparison-output"]) && !values.baseline) throw new Error("Comparison and quality gates require --baseline.");
     distinctOutputs([values.project ?? "package.json", values.tsconfig, values.baseline], [values.output, values["scorecard-output"], values["comparison-output"], values.sarif]);
-    const result = analyze({ ...values, runId: values["run-id"], auditId: values["audit-id"] }, version); validateEvidence(result.evidence);
+    const result = analyze({ ...values, runId: values["run-id"], auditId: values["audit-id"],dependencyMetadata:values["dependency-metadata"] }, version);
     distinctOutputs(result.inputs, [values.output, values["scorecard-output"], values["comparison-output"], values.sarif]);
+    if(values["dependency-metadata"]) await enrichDependencies(result.evidence);
+    validateEvidence(result.evidence);
     const comparison = values.baseline ? compare(result.evidence, readEvidence(values.baseline)) : undefined;
     const failed = comparison ? gate(comparison, values["fail-on-new"], values["max-score-drop"] === undefined ? undefined : Number(values["max-score-drop"])) : false;
     write(values.output!, result.csv); write(values["scorecard-output"]!, result.evidence);
