@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 import { validateSourceFacts, type SourceFacts } from "#source-facts/contract.mjs";
 import { invocationIds } from "./evidence.js";
 import { pythonEvidence } from "./python-evidence.js";
+import { validateDuplication, type PythonDuplication } from "./python-duplication.js";
 
 export interface PythonOptions {
   project: string; python?: string; runId?: string; auditId?: string;
@@ -25,7 +26,7 @@ export function pythonTarget(project: string) {
 export function analyzePython(options: PythonOptions) {
   const ids = invocationIds(options.runId, options.auditId);
   const { target, root, entryPoint } = pythonTarget(options.project);
-  const script = fileURLToPath(new URL("./python/source_facts.py", import.meta.url));
+  const script = fileURLToPath(new URL("./python/analysis.py", import.meta.url));
   // Isolated stdlib interpreter; only the packaged analyzer directory is added to sys.path.
   const bootstrap = "import runpy,sys; from pathlib import Path; script=sys.argv[1]; sys.path.insert(0,str(Path(script).parent)); sys.argv=sys.argv[1:]; runpy.run_path(script,run_name='__main__')";
   const command = options.python ?? (process.platform === "win32" ? "py" : "python3");
@@ -36,16 +37,21 @@ export function analyzePython(options: PythonOptions) {
   for (const [flag, enabled] of [["include-tests", options.includeTests], ["include-generated", options.includeGenerated], ["include-support", options.includeSupport]] as const)
     if (enabled) args.push(`--${flag}`);
   let facts: SourceFacts | null = null;
+  let duplication: PythonDuplication | null = null;
+  const subject = { root, entryPoint, name: path.basename(root), variant: "source" };
+  args.push("--run-id", ids.runId, "--audit-id", ids.auditId);
   let error: string | undefined;
   const result = spawnSync(command, args, { cwd: path.dirname(script), encoding: "utf8", windowsHide: true, timeout: 1_800_000, maxBuffer: 128 * 1024 * 1024 });
   try {
     if (result.error) throw new Error(`Python 3.12 could not run: ${result.error.message}`);
     if (result.status !== 0 && result.status !== 2) throw new Error(`Python exited ${result.status}: ${result.stderr.slice(0, 2000)}`);
     if (!result.stdout.trim()) throw new Error(`Python emitted no facts (exit ${result.status}): ${result.stderr.slice(0, 2000)}`);
-    const parsed: unknown = JSON.parse(result.stdout);
-    validateSourceFacts(parsed);
-    facts = parsed;
-    if ((result.status === 0) !== (facts.status === "complete")) throw new Error("Python exit status and facts disagree.");
-  } catch (failure) { facts = null; error = failure instanceof Error ? failure.message : String(failure); }
-  return pythonEvidence(facts, { root, entryPoint, name: path.basename(root), variant: "source" }, ids, error);
+    const parsed = JSON.parse(result.stdout);
+    validateSourceFacts(parsed.sourceFacts);
+    validateDuplication(parsed.duplication, parsed.sourceFacts, subject, ids);
+    facts = parsed.sourceFacts;
+    duplication = parsed.duplication;
+    if ((result.status === 0) !== (facts!.status === "complete" && duplication!.status === "complete")) throw new Error("Python exit status and facts disagree.");
+  } catch (failure) { facts = null; duplication = null; error = failure instanceof Error ? failure.message : String(failure); }
+  return pythonEvidence(facts, subject, ids, error, duplication);
 }

@@ -107,13 +107,18 @@ def collect(root, facts, minimum_statements):
 
 
 def analyze(target, *, minimum_statements=5, run_id=None, audit_id=None, **selection):
+    facts = source_facts.analyze(target, **selection)
+    return review(target, facts, minimum_statements=minimum_statements, run_id=run_id, audit_id=audit_id)
+
+
+def review(target, facts, *, minimum_statements=5, run_id=None, audit_id=None):
+    """Use the same measured population as packaged complexity evidence."""
     if type(minimum_statements) is not int or minimum_statements < 2:
         raise ValueError("Minimum statements must be an integer of at least two.")
     run_id = str(uuid.UUID(run_id)) if run_id else str(uuid.uuid4())
     audit_id = str(uuid.UUID(audit_id)) if audit_id else str(uuid.uuid4())
     target = Path(target).absolute()
     root = target if target.is_dir() else target.parent
-    facts = source_facts.analyze(target, **selection)
     configuration = {"policy": POLICY, "minimumStatements": minimum_statements,
                      "selectionFingerprint": facts["selection"]["configurationFingerprint"],
                      "parserVersion": facts["producer"]["parserVersion"],

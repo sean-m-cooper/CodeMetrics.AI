@@ -45,7 +45,7 @@ node shared/source-facts/preview.mjs TestResults/python-facts.json
 
 Use `python3` with Python 3.12 on Linux/macOS. Output parents must exist and `--output` must name a new `.json` file. The preview reads one document and writes JSON to stdout. Invalid/incomplete input exits 2; a valid empty or unsupported document exits 0 with `population: null` and `status: unavailable`.
 
-Conformance runs actual TypeScript and Python producers, checks exclusive ownership and common numeric behavior, and rejects malformed contracts. Existing JS/TS tests, package smoke, pinned calibration fixtures, and selected-source corpus comparisons guard behavior preservation. CRAP, coverage mapping, architecture, and other dimensions remain separate future capabilities. The [offline Python duplication proof](../../analyzers/python/DUPLICATION.md) produces a separate experimental artifact; it does not extend this contract or enable a score.
+Conformance runs actual TypeScript and Python producers, checks exclusive ownership and common numeric behavior, and rejects malformed contracts. Existing JS/TS tests, package smoke, pinned calibration fixtures, and selected-source corpus comparisons guard behavior preservation. CRAP, coverage mapping, architecture, and other dimensions remain separate future capabilities. The [Python duplication review](../../analyzers/python/DUPLICATION.md) is a separate experimental artifact embedded alongside source facts in packaged evidence. It does not extend this source-facts contract or enable a score.
 
 The initial [verification record](verification-2026-10-10.md) documents the behavior-preserving corpus comparison and current limitations.
 

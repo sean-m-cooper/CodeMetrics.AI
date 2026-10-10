@@ -1,6 +1,6 @@
 # Experimental Python duplication review
 
-This offline first pass reports exact repeated function bodies for source review. It is **not bundled in `codemetrics-python`**, included in scorecard evidence, or consumed by the skill yet. It assigns no score and does not change the complexity preview. Packaging should follow corpus review of this boundary.
+This capability reports exact repeated function bodies for source review. The development `codemetrics-python` package (adapter `0.4.0-experimental`) now embeds it at `dimensions.codeQuality.duplication` in evidence v3. The code-scorecard skill presents it as unscored review evidence. The standalone CLI remains available for focused analysis. No duplication score or change to the complexity formula is introduced.
 
 ```powershell
 py -3.12 analyzers/python/duplication.py E:/repos/my-project --include 'src/**' --output TestResults/duplication.json
@@ -27,7 +27,7 @@ Each invocation gets a fresh run ID and audit ID; UUID-valued `--run-id` and `--
 
 A selected parse/read failure, source mismatch, changed function identity, or exceeded resource budget makes the report incomplete. Incomplete reports expose diagnostics and inventory, with **no groups and no summary**. No partial results become a score or a claim of no duplication. Complete empty selections explicitly report zero eligible functions. Exit codes are 0 for complete and 2 for incomplete or CLI errors. Prior output files are never overwritten or reused.
 
-In addition to the source analyzer's file-size and file-count limits, this proof allows at most 100,000 selected owners and 64 MiB of normalized eligible bodies. Limits are recorded in the configuration. It fails explicitly rather than truncating a group list. The report is a separate experimental artifact, not source-facts v2 or scorecard evidence v3; neither existing contract has been silently extended.
+In addition to the source analyzer's file-size and file-count limits, this proof allows at most 100,000 selected owners and 64 MiB of normalized eligible bodies. Limits are recorded in the configuration. It fails explicitly rather than truncating a group list. The standalone report remains its own experimental artifact. The packaged analyzer embeds it in the extensible Code Quality section of evidence v3, alongside unchanged source-facts v2. Packaged runs fix the minimum at five statements, share the exact source population and invocation IDs, and validate source provenance, owner membership, exclusions, and group accounting. Validation checks evidence consistency, not equivalence by rereading target source. If either measurement is incomplete, the combined analysis is incomplete and its preview and findings are withheld.
 
 The [first corpus review](../../shared/scorecard-schema/calibration-runs/python-duplication-2026-10-10.md) records findings and limitations. Automated tests run through the existing Python CI discovery command:
 

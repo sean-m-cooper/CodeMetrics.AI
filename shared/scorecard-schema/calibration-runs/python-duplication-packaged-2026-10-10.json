@@ -1,0 +1,93 @@
+{
+  "auditId": "6e299cfa-1247-4b9a-b0e5-ffeec9cb5e30",
+  "archiveSha256": "212f1b1f0658881595b3b2873bdd0394557229edff792781c8e2b73d103f3494",
+  "samples": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "runId": "fe138f3d-aebb-4396-91c3-81afb26c55b1",
+      "adapterVersion": "0.4.0-experimental",
+      "ruleset": "python-2026-10-10-duplication-preview",
+      "duplication": {
+        "selectedFunctions": 246,
+        "eligibleFunctions": 105,
+        "excludedFunctions": 141,
+        "exclusionReasons": {
+          "below-statement-minimum": 137,
+          "nested-definition": 4
+        },
+        "duplicateGroups": 0,
+        "matchedFunctions": 0
+      },
+      "complexityPreview": 7,
+      "allGroupsMatchOfflineEvidence": true,
+      "allDimensionsUnscored": true
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "runId": "41c7cd39-28d4-45c8-b5d7-7f50a50c525e",
+      "adapterVersion": "0.4.0-experimental",
+      "ruleset": "python-2026-10-10-duplication-preview",
+      "duplication": {
+        "selectedFunctions": 508,
+        "eligibleFunctions": 162,
+        "excludedFunctions": 346,
+        "exclusionReasons": {
+          "below-statement-minimum": 320,
+          "lambda": 1,
+          "nested-definition": 25
+        },
+        "duplicateGroups": 0,
+        "matchedFunctions": 0
+      },
+      "complexityPreview": 7.1,
+      "allGroupsMatchOfflineEvidence": true,
+      "allDimensionsUnscored": true
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "runId": "fb576b3e-6aa9-4a75-9ce3-4306c804dcfd",
+      "adapterVersion": "0.4.0-experimental",
+      "ruleset": "python-2026-10-10-duplication-preview",
+      "duplication": {
+        "selectedFunctions": 464,
+        "eligibleFunctions": 178,
+        "excludedFunctions": 286,
+        "exclusionReasons": {
+          "below-statement-minimum": 264,
+          "lambda": 4,
+          "nested-definition": 18
+        },
+        "duplicateGroups": 0,
+        "matchedFunctions": 0
+      },
+      "complexityPreview": 6.8,
+      "allGroupsMatchOfflineEvidence": true,
+      "allDimensionsUnscored": true
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "runId": "fae0cab8-c02c-4cdc-945d-72486e88ae6c",
+      "adapterVersion": "0.4.0-experimental",
+      "ruleset": "python-2026-10-10-duplication-preview",
+      "duplication": {
+        "selectedFunctions": 9748,
+        "eligibleFunctions": 3172,
+        "excludedFunctions": 6576,
+        "exclusionReasons": {
+          "below-statement-minimum": 6163,
+          "lambda": 136,
+          "nested-definition": 277
+        },
+        "duplicateGroups": 12,
+        "matchedFunctions": 24
+      },
+      "complexityPreview": 5.6,
+      "allGroupsMatchOfflineEvidence": true,
+      "allDimensionsUnscored": true
+    }
+  ]
+}

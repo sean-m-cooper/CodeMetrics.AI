@@ -2,6 +2,8 @@
 
 Date: 2026-10-10. Offline duplication producer `0.1.0-experimental`, policy `python/exact-function-body-v1`, native Python 3.12. This adds a separate review artifact; it does not change source-facts contracts, packaged evidence, the scorecard skill, complexity measurements, or any score.
 
+This is the historical offline checkpoint (`1a97d50`). The subsequent [packaged integration record](python-duplication-packaged-2026-10-10.md) documents its inclusion in the development CLI and skill without changing these measurements.
+
 ## Observed results
 
 The runner checked the four clean [pinned selections](../../calibration/corpus/python-selection.json) against their existing source digests, selection fingerprints, and function population counts. It parsed target code without installing or executing it. Each project has a fresh run ID under a shared audit ID. The [machine-readable report](python-duplication-2026-10-10.json) retains implementation provenance, parser versions, configurations, counts, and every group occurrence.

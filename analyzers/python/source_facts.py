@@ -157,7 +157,7 @@ def measure_source(source, file):
 def new_document(options=None):
     return {
         "schemaVersion": 2, "language": "python",
-        "producer": {"name": "codemetrics-ai/python-source-facts", "version": "0.3.0-experimental",
+        "producer": {"name": "codemetrics-ai/python-source-facts", "version": "0.4.0-experimental",
                      "parser": "python-ast", "parserVersion": platform.python_version()},
         "measurementPolicy": POLICY, "status": "complete",
         "capabilities": {"functionComplexity": "available", "coverage": "unsupported", "maintainability": "unsupported"},

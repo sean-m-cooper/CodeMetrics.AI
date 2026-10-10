@@ -78,11 +78,11 @@ test('installed match policy preserves guards and structural alternatives with v
 `);
   const { output, evidence } = f.run();
   const facts = evidence.dimensions.codeQuality.sourceFacts;
-  assert.equal(evidence.tool.version, '0.3.0-experimental');
+  assert.equal(evidence.tool.version, '0.4.0-experimental');
   assert.equal(facts.producer.version, evidence.tool.version);
   assert.equal(facts.measurementPolicy, 'python/owned-function-complexity-v2');
   assert.equal(evidence.dimensions.codeQuality.scope.id, facts.measurementPolicy);
-  assert.equal(evidence.analysis.ruleset, 'python-2026-10-10-match-membership-preview');
+  assert.equal(evidence.analysis.ruleset, 'python-2026-10-10-duplication-preview');
   const complexity = facts.functions[0].complexity;
   assert.equal(complexity.value, 7);
   assert.equal(complexity.decisions.matchAlternatives, 1);
@@ -166,4 +166,71 @@ test('invalid selection produces diagnostics and no experimental preview', t => 
   const { evidence } = f.run(['--include', '../outside/**'], 2);
   assert.equal(evidence.analysis.diagnostics[0].kind, 'invalid-selection');
   assert.equal(evidence.dimensions.codeQuality.experimentalPreview.population, null);
+});
+
+test('packaged duplication preserves groups, exclusions, IDs and information-only SARIF', t => {
+  const f = fixture(t);
+  const body = '    value = items[0]\n    value += 1\n    value *= 2\n    result = str(value)\n    return result\n';
+  for (const name of ['one', 'two', 'three']) f.write(`${name}.py`, `def ${name}(items):\n${body}`);
+  f.write('tiny.py', 'def tiny(): return 1\n');
+  const { output, evidence } = f.run();
+  const cq = evidence.dimensions.codeQuality, d = cq.duplication;
+  assert.equal(d.runId, evidence.analysis.runId); assert.equal(d.auditId, evidence.analysis.auditId);
+  assert.equal(d.summary.selectedFunctions, 4); assert.equal(d.summary.eligibleFunctions, 3);
+  assert.equal(d.summary.duplicateGroups, 1); assert.equal(d.summary.matchedFunctions, 3);
+  assert.equal(d.excludedFunctions[0].reason, 'below-statement-minimum');
+  assert.equal(cq.findings.length, 1); assert.equal(cq.findings[0].severity, 'info');
+  assert.equal(cq.findings[0].observations.occurrences.length, 3);
+  assert.ok(Object.values(evidence.dimensions).every(value => value.status === 'skipped' && !('score' in value)));
+  f.inspect(output);
+  const sarif = path.join(f.directory, 'duplication.sarif'); f.inspect(output, ['--sarif', sarif]);
+  const result = JSON.parse(fs.readFileSync(sarif)).runs[0].results;
+  assert.equal(result.length, 1); assert.equal(result[0].level, 'note');
+  for (const mutate of [
+    value => { value.runId = '11111111-1111-4111-8111-111111111111'; },
+    value => { value.auditId = '11111111-1111-4111-8111-111111111111'; },
+    value => { value.subject.root += '-stale'; },
+    value => { value.sourceFactsProducer.version = '0.3.0-experimental'; },
+    value => { value.selection.files[0].contentSha256 = 'a'.repeat(64); },
+    value => { value.summary.matchedFunctions++; },
+    value => { value.configuration.minimumStatements = 1; },
+    value => { value.configurationFingerprint = 'b'.repeat(64); },
+    value => { value.groups[0].occurrences[0].line++; },
+    value => { value.groups[0].occurrences[0].id = 'c'.repeat(64); },
+    value => { value.groups[0].occurrences[0].sourceSha256 = 'd'.repeat(64); },
+    value => { value.groups[0].occurrences.push(value.groups[0].occurrences[0]); },
+    value => { value.groups.push(value.groups[0]); },
+    value => { value.groups[0].population = 'test'; },
+    value => { value.groups[0].statementCount = 4; },
+    value => { value.groups[0].disposition = 'scored'; },
+    value => { value.groups[0].score = 8; },
+    value => { value.status = 'incomplete'; },
+    value => { value.excludedFunctions[0].statementCount = 5; },
+    value => { value.excludedFunctions.push(value.excludedFunctions[0]); }
+  ]) {
+    const copy = structuredClone(evidence); mutate(copy.dimensions.codeQuality.duplication);
+    assert.throws(() => validateEvidence(copy));
+  }
+  const missing = structuredClone(evidence); delete missing.dimensions.codeQuality.duplication;
+  assert.throws(() => validateEvidence(missing));
+  f.write('bad.py', 'def broken(:');
+  const failed = f.run([], 2).evidence.dimensions.codeQuality;
+  assert.deepEqual(failed.duplication.groups, []); assert.equal(failed.duplication.summary, null);
+  assert.deepEqual(failed.findings, []); assert.equal(failed.experimentalPreview.population, null);
+});
+
+test('duplication failure with complete complexity still withholds the preview and all findings', async t => {
+  const f = fixture(t); f.write('one.py', 'def one(): return 1\n');
+  const current = f.run().evidence;
+  const report = structuredClone(current.dimensions.codeQuality.duplication);
+  report.status = 'incomplete'; report.summary = null; report.excludedFunctions = [];
+  report.diagnostics = [{ code: 'duplication-analysis', message: 'Selected source changed after population measurement.' }];
+  const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
+  const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report);
+  validateEvidence(failed);
+  assert.equal(failed.analysis.status, 'incomplete');
+  assert.equal(failed.dimensions.codeQuality.experimentalPreview.population, null);
+  assert.deepEqual(failed.dimensions.codeQuality.findings, []);
+  const output = path.join(f.directory, 'duplication-failed.json'); fs.writeFileSync(output, JSON.stringify(failed));
+  f.inspect(output, [], 2);
 });

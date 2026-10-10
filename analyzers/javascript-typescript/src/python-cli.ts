@@ -16,12 +16,13 @@ try {
     help: { type: "boolean", short: "h" }, version: { type: "boolean" }
   } });
   if (values.help) console.log([
-    "codemetrics-python — experimental Python 3.12 complexity evidence (Node 20+)",
+    "codemetrics-python — experimental Python 3.12 complexity and duplication evidence (Node 20+)",
     "--project <directory|pyproject.toml|file.py> --scorecard-output <new-evidence.json>",
     "--python <absolute Python 3.12 interpreter path> (default: py -3.12 on Windows; python3 elsewhere)",
     "--include <pattern> --exclude <pattern> --test-path <pattern> --production-path <pattern> (repeatable)",
     "--include-tests --include-generated --include-support --run-id <uuid> --audit-id <uuid>",
     "Emits evidence v3 with embedded facts and an experimental preview. No dimension scores, overall, CSV, or score gates.",
+    "Exact whole-body duplication is review-only, with a five-statement minimum. Zero matches does not prove no duplication.",
     "Target code is parsed, never installed or executed. Exit 0: complete (possibly empty); 2: invalid/incomplete."
   ].join("\n"));
   else if (values.version) console.log(pythonVersion);
