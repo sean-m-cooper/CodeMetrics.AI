@@ -110,6 +110,8 @@ The [complexity calibration study](../../shared/scorecard-schema/python-complexi
 
 ## Tests
 
+An [offline duplication review](DUPLICATION.md) now detects exact whole-function bodies with a statement minimum, source provenance, and review-only groups. It remains separate from the packaged analyzer, scorecard evidence, and scoring while its corpus behavior is evaluated.
+
 ```powershell
 py -3.12 -m unittest discover -s analyzers/python/tests -v
 npm run build --prefix analyzers/javascript-typescript
