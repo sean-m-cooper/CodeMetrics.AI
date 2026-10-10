@@ -104,6 +104,8 @@ The `TestResults` directory must exist. The reference is verified against Git be
 
 The [first corpus review](../../shared/source-facts/python-selection-2026-10-10.md) records measurements, exclusions, source context, and remaining limits.
 
+The [complexity calibration study](../../shared/scorecard-schema/python-complexity-calibration.md) reviews 20 source bodies, tests Python idioms and accepted population expectations, and proposes a narrow OR-membership adjustment. Its offline candidates do not change the production measurement policy or enable dimension scores. Reproduce it with `py -3.12 analyzers/python/calibration.py --repos E:/repos --output TestResults/python-calibration-new` (a new output directory is required).
+
 ## Tests
 
 ```powershell

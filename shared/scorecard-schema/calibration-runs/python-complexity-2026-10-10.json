@@ -1,0 +1,875 @@
+{
+  "schemaVersion": 1,
+  "measurementPolicy": "python/owned-function-complexity-v1",
+  "scope": "Offline calibration study. No production policy, score status, or cross-language calibration change.",
+  "reviewSelection": "Purposive source review spanning the individual-score anchors, tail, and Python-specific constructs. Not random, blind, independent, or a labeled defect dataset.",
+  "implementationSha256": "8bb7bd8a05760a703a52e07f4843731efbae0957ff46d1237a27df9b8689da41",
+  "samples": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "producer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.2.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "functionFactsSha256": "45891e7b93660fe54c14af8d10479e357eb4b57fdee3abb688645a7c54bfc609",
+      "configurationFingerprint": "3a42e533f6092149af8baacf0a98dcae00c52c23dd8652d491347ea969ac9540",
+      "functions": 246,
+      "bands": {
+        "1-3": 167,
+        "11-20": 12,
+        "21-40": 1,
+        "4-5": 31,
+        "6-10": 35
+      },
+      "decisionCounts": {
+        "ifStatements": 336,
+        "loops": 56,
+        "exceptHandlers": 55,
+        "conditionalExpressions": 18,
+        "booleanOperators": 112,
+        "chainedComparisons": 8,
+        "comprehensionLoops": 16,
+        "comprehensionFilters": 4,
+        "matchCases": 0,
+        "matchGuards": 0,
+        "matchAlternatives": 0
+      },
+      "functionsUsing": {
+        "ifStatements": 116,
+        "loops": 48,
+        "exceptHandlers": 34,
+        "conditionalExpressions": 12,
+        "booleanOperators": 61,
+        "chainedComparisons": 6,
+        "comprehensionLoops": 16,
+        "comprehensionFilters": 4,
+        "matchCases": 0,
+        "matchGuards": 0,
+        "matchAlternatives": 0
+      },
+      "current": {
+        "score": 7,
+        "unroundedScore": 7.010612244897959,
+        "worstIndividual": 3.8,
+        "meanOnlyScore": 9.1,
+        "roundedSeverityCeiling": 7.5
+      },
+      "experiments": {
+        "membership": {
+          "score": 7,
+          "unroundedScore": 7.010612244897959,
+          "worstIndividual": 3.8,
+          "meanOnlyScore": 9.1,
+          "roundedSeverityCeiling": 7.5,
+          "changedFunctions": 0,
+          "changes": [],
+          "interpretation": "candidate"
+        },
+        "without-except": {
+          "score": 7.1,
+          "unroundedScore": 7.057142857142857,
+          "worstIndividual": 3.8,
+          "meanOnlyScore": 9.2,
+          "roundedSeverityCeiling": 7.5,
+          "changedFunctions": 34,
+          "changes": null,
+          "interpretation": "rejected ablation; not a proposed rule"
+        },
+        "without-comprehensions": {
+          "score": 7,
+          "unroundedScore": 7.0223673469387755,
+          "worstIndividual": 3.8,
+          "meanOnlyScore": 9.1,
+          "roundedSeverityCeiling": 7.5,
+          "changedFunctions": 16,
+          "changes": null,
+          "interpretation": "rejected ablation; not a proposed rule"
+        }
+      },
+      "reviews": [
+        {
+          "project": "requests",
+          "file": "src/requests/adapters.py",
+          "member": "HTTPAdapter.send",
+          "cc": 19,
+          "context": "Timeout normalization and exception translation have several distinct observable outcomes; seven handlers add reading paths without proving poor recovery.",
+          "line": 634,
+          "endLine": 748,
+          "bodySha256": "94f6f89fd85f0fe9c4170dd39e7cb680793f66093c7ed1937647065636ddfcd1",
+          "decisions": {
+            "ifStatements": 10,
+            "loops": 0,
+            "exceptHandlers": 7,
+            "conditionalExpressions": 0,
+            "booleanOperators": 1,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 19,
+          "source": "https://github.com/psf/requests/blob/611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60/src/requests/adapters.py#L634"
+        },
+        {
+          "project": "requests",
+          "file": "src/requests/hooks.py",
+          "member": "default_hooks",
+          "cc": 2,
+          "context": "One straightforward dictionary comprehension remains at the exceptional individual anchor.",
+          "line": 25,
+          "endLine": 26,
+          "bodySha256": "7fbcccc4bdf61e38c65c4916323e7b246094bfe13012f48c8f87bea8536acd6b",
+          "decisions": {
+            "ifStatements": 0,
+            "loops": 0,
+            "exceptHandlers": 0,
+            "conditionalExpressions": 0,
+            "booleanOperators": 0,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 1,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 2,
+          "source": "https://github.com/psf/requests/blob/611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60/src/requests/hooks.py#L25"
+        },
+        {
+          "project": "requests",
+          "file": "src/requests/models.py",
+          "member": "Response.json",
+          "cc": 8,
+          "context": "Encoding detection, documented codec fallback, and exception translation create moderate control flow; the documented pass is not an error-handling defect finding.",
+          "line": 1091,
+          "endLine": 1124,
+          "bodySha256": "a8eb3eb294e869f23dd1c917a174cb357ee86ce9fe4c22250b3ae54c3f4c150a",
+          "decisions": {
+            "ifStatements": 2,
+            "loops": 0,
+            "exceptHandlers": 3,
+            "conditionalExpressions": 0,
+            "booleanOperators": 2,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 8,
+          "source": "https://github.com/psf/requests/blob/611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60/src/requests/models.py#L1091"
+        },
+        {
+          "project": "requests",
+          "file": "src/requests/models.py",
+          "member": "RequestEncodingMixin._encode_files",
+          "cc": 21,
+          "context": "Multiple accepted multipart input shapes, byte/text handling, nested iteration, and file object cases justify substantial verification effort; no safe split is established.",
+          "line": 183,
+          "endLine": 251,
+          "bodySha256": "4d2ed07bf555341c3d27a0ddfb09977a8e4d3ad8e2f0593ee23256b6d2a77b4f",
+          "decisions": {
+            "ifStatements": 11,
+            "loops": 3,
+            "exceptHandlers": 0,
+            "conditionalExpressions": 2,
+            "booleanOperators": 4,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 21,
+          "source": "https://github.com/psf/requests/blob/611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60/src/requests/models.py#L183"
+        },
+        {
+          "project": "requests",
+          "file": "src/requests/sessions.py",
+          "member": "Session.__exit__",
+          "cc": 1,
+          "context": "Delegates cleanup to close(); low local CC does not measure the callee or establish overall simplicity.",
+          "line": 508,
+          "endLine": 509,
+          "bodySha256": "a1a4f821523ff3a3cd9ae1212dde831e74fee8ee61d33a24d07ae873811f0043",
+          "decisions": {
+            "ifStatements": 0,
+            "loops": 0,
+            "exceptHandlers": 0,
+            "conditionalExpressions": 0,
+            "booleanOperators": 0,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 1,
+          "source": "https://github.com/psf/requests/blob/611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60/src/requests/sessions.py#L508"
+        },
+        {
+          "project": "requests",
+          "file": "src/requests/utils.py",
+          "member": "parse_dict_header",
+          "cc": 5,
+          "context": "Iteration, absent-value handling, and paired quote checks fit the low-band upper anchor; the chained comparison contributes one short-circuit increment.",
+          "line": 440,
+          "endLine": 471,
+          "bodySha256": "5417645151c3eb5085e5e00004f7c1f6cb16a44453fd1921b214f7e086379822",
+          "decisions": {
+            "ifStatements": 2,
+            "loops": 1,
+            "exceptHandlers": 0,
+            "conditionalExpressions": 0,
+            "booleanOperators": 0,
+            "chainedComparisons": 1,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 5,
+          "source": "https://github.com/psf/requests/blob/611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60/src/requests/utils.py#L440"
+        }
+      ]
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "producer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.2.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "functionFactsSha256": "b2e5495c18c8532661f8d0269aab2b4413dfe192c116038807a03813c229457c",
+      "configurationFingerprint": "544dbb0ea0e93df624d27de88718cb9e2be849e982c610f99fe606b2f291cbc5",
+      "functions": 508,
+      "bands": {
+        "1-3": 405,
+        "11-20": 17,
+        "21-40": 2,
+        "4-5": 49,
+        "6-10": 35
+      },
+      "decisionCounts": {
+        "ifStatements": 506,
+        "loops": 85,
+        "exceptHandlers": 53,
+        "conditionalExpressions": 36,
+        "booleanOperators": 136,
+        "chainedComparisons": 1,
+        "comprehensionLoops": 45,
+        "comprehensionFilters": 10,
+        "matchCases": 0,
+        "matchGuards": 0,
+        "matchAlternatives": 0
+      },
+      "functionsUsing": {
+        "ifStatements": 206,
+        "loops": 71,
+        "exceptHandlers": 45,
+        "conditionalExpressions": 29,
+        "booleanOperators": 72,
+        "chainedComparisons": 1,
+        "comprehensionLoops": 38,
+        "comprehensionFilters": 10,
+        "matchCases": 0,
+        "matchGuards": 0,
+        "matchAlternatives": 0
+      },
+      "current": {
+        "score": 7.1,
+        "unroundedScore": 7.1301775147929,
+        "worstIndividual": 3.6,
+        "meanOnlyScore": 9.5,
+        "roundedSeverityCeiling": 7.4
+      },
+      "experiments": {
+        "membership": {
+          "score": 7.1,
+          "unroundedScore": 7.1301775147929,
+          "worstIndividual": 3.6,
+          "meanOnlyScore": 9.5,
+          "roundedSeverityCeiling": 7.4,
+          "changedFunctions": 0,
+          "changes": [],
+          "interpretation": "candidate"
+        },
+        "without-except": {
+          "score": 7.2,
+          "unroundedScore": 7.231479289940828,
+          "worstIndividual": 3.8,
+          "meanOnlyScore": 9.5,
+          "roundedSeverityCeiling": 7.5,
+          "changedFunctions": 45,
+          "changes": null,
+          "interpretation": "rejected ablation; not a proposed rule"
+        },
+        "without-comprehensions": {
+          "score": 7.1,
+          "unroundedScore": 7.1422485207100594,
+          "worstIndividual": 3.6,
+          "meanOnlyScore": 9.5,
+          "roundedSeverityCeiling": 7.4,
+          "changedFunctions": 38,
+          "changes": null,
+          "interpretation": "rejected ablation; not a proposed rule"
+        }
+      },
+      "reviews": [
+        {
+          "project": "starlette",
+          "file": "starlette/datastructures.py",
+          "member": "MultiDict.setlist",
+          "cc": 5,
+          "context": "An empty-values branch plus filtered retention and replacement comprehensions produce a compact but multi-path transformation.",
+          "line": 363,
+          "endLine": 369,
+          "bodySha256": "3024c4f906f457707446dccb25d0c9d4870c6b41a4799302ad363581cb724df3",
+          "decisions": {
+            "ifStatements": 1,
+            "loops": 0,
+            "exceptHandlers": 0,
+            "conditionalExpressions": 0,
+            "booleanOperators": 0,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 2,
+            "comprehensionFilters": 1,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 5,
+          "source": "https://github.com/Kludex/starlette/blob/96d5023c55b29224edb8d684868c49f681d079a9/starlette/datastructures.py#L363"
+        },
+        {
+          "project": "starlette",
+          "file": "starlette/formparsers.py",
+          "member": "MultiPartParser.parse",
+          "cc": 10,
+          "context": "Charset fallback, boundary validation, stream/file loops and cleanup create moderate flow. Await itself adds no CC; comments explain the asynchronous writes.",
+          "line": 251,
+          "endLine": 305,
+          "bodySha256": "f07a3fd7e60348b75e079b29603d2e71086ae543481ecd9a2da88ac1c9a85fca",
+          "decisions": {
+            "ifStatements": 2,
+            "loops": 4,
+            "exceptHandlers": 3,
+            "conditionalExpressions": 0,
+            "booleanOperators": 0,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 10,
+          "source": "https://github.com/Kludex/starlette/blob/96d5023c55b29224edb8d684868c49f681d079a9/starlette/formparsers.py#L251"
+        },
+        {
+          "project": "starlette",
+          "file": "starlette/responses.py",
+          "member": "FileResponse._parse_range_header",
+          "cc": 13,
+          "context": "Syntax validation, range limits, bound checks, and overlap merging create distinct input/error cases. Comprehensions expose real iteration rather than an arbitrary style penalty.",
+          "line": 500,
+          "endLine": 539,
+          "bodySha256": "9cf24c4ec282f19a202f84daa1e7448dca2e16c9e505967d56f907df4363d887",
+          "decisions": {
+            "ifStatements": 7,
+            "loops": 1,
+            "exceptHandlers": 1,
+            "conditionalExpressions": 0,
+            "booleanOperators": 0,
+            "chainedComparisons": 1,
+            "comprehensionLoops": 2,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 13,
+          "source": "https://github.com/Kludex/starlette/blob/96d5023c55b29224edb8d684868c49f681d079a9/starlette/responses.py#L500"
+        },
+        {
+          "project": "starlette",
+          "file": "starlette/middleware/__init__.py",
+          "member": "Middleware.__repr__",
+          "cc": 3,
+          "context": "Two simple comprehensions format arguments; the current anchor still gives this individual function 10.",
+          "line": 31,
+          "endLine": 37,
+          "bodySha256": "e2d5d3ef2f92967c910aace8b2796c17a9b7c0bf13b282d44633b7cc8fd3206d",
+          "decisions": {
+            "ifStatements": 0,
+            "loops": 0,
+            "exceptHandlers": 0,
+            "conditionalExpressions": 0,
+            "booleanOperators": 0,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 2,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 3,
+          "source": "https://github.com/Kludex/starlette/blob/96d5023c55b29224edb8d684868c49f681d079a9/starlette/middleware/__init__.py#L31"
+        }
+      ]
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "producer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.2.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "functionFactsSha256": "d6e571d78f49775fa2ec63b0fbec632e43fab7ac6398d0cf7e633938a0d09bbb",
+      "configurationFingerprint": "6bd0c426bc7e8e32467e5c7958000362651a4cb02982b1d088d6c4d8a45f44e1",
+      "functions": 464,
+      "bands": {
+        "1-3": 348,
+        "11-20": 8,
+        "21-40": 4,
+        "4-5": 62,
+        "6-10": 42
+      },
+      "decisionCounts": {
+        "ifStatements": 474,
+        "loops": 89,
+        "exceptHandlers": 66,
+        "conditionalExpressions": 21,
+        "booleanOperators": 155,
+        "chainedComparisons": 3,
+        "comprehensionLoops": 50,
+        "comprehensionFilters": 14,
+        "matchCases": 0,
+        "matchGuards": 0,
+        "matchAlternatives": 0
+      },
+      "functionsUsing": {
+        "ifStatements": 205,
+        "loops": 70,
+        "exceptHandlers": 48,
+        "conditionalExpressions": 18,
+        "booleanOperators": 87,
+        "chainedComparisons": 1,
+        "comprehensionLoops": 44,
+        "comprehensionFilters": 12,
+        "matchCases": 0,
+        "matchGuards": 0,
+        "matchAlternatives": 0
+      },
+      "current": {
+        "score": 6.8,
+        "unroundedScore": 6.784362850971922,
+        "worstIndividual": 2.8,
+        "meanOnlyScore": 9.4,
+        "roundedSeverityCeiling": 7.1
+      },
+      "experiments": {
+        "membership": {
+          "score": 6.8,
+          "unroundedScore": 6.784362850971922,
+          "worstIndividual": 2.8,
+          "meanOnlyScore": 9.4,
+          "roundedSeverityCeiling": 7.1,
+          "changedFunctions": 0,
+          "changes": [],
+          "interpretation": "candidate"
+        },
+        "without-except": {
+          "score": 7,
+          "unroundedScore": 6.974686825053996,
+          "worstIndividual": 3.2,
+          "meanOnlyScore": 9.5,
+          "roundedSeverityCeiling": 7.3,
+          "changedFunctions": 48,
+          "changes": null,
+          "interpretation": "rejected ablation; not a proposed rule"
+        },
+        "without-comprehensions": {
+          "score": 6.8,
+          "unroundedScore": 6.8120950323974085,
+          "worstIndividual": 2.8,
+          "meanOnlyScore": 9.5,
+          "roundedSeverityCeiling": 7.1,
+          "changedFunctions": 44,
+          "changes": null,
+          "interpretation": "rejected ablation; not a proposed rule"
+        }
+      },
+      "reviews": [
+        {
+          "project": "httpie",
+          "file": "httpie/config.py",
+          "member": "read_raw_config",
+          "cc": 4,
+          "context": "Missing-file fallback and separate malformed-file/I/O error translation are three distinct handlers. Counting them measures alternatives, not handling quality.",
+          "line": 65,
+          "endLine": 77,
+          "bodySha256": "b54819bf69fe09a965e2786defab89731ccd6f717af408ef142e09630584d958",
+          "decisions": {
+            "ifStatements": 0,
+            "loops": 0,
+            "exceptHandlers": 3,
+            "conditionalExpressions": 0,
+            "booleanOperators": 0,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 4,
+          "source": "https://github.com/httpie/cli/blob/5b604c37c6c67e18e7c3e9aee6c88a8c22b98345/httpie/config.py#L65"
+        },
+        {
+          "project": "httpie",
+          "file": "httpie/core.py",
+          "member": "raw_main",
+          "cc": 26,
+          "context": "Argument handling, debug/trace options, exit statuses and exception translation create substantial orchestration. Its nested error-formatting helper is counted separately.",
+          "line": 32,
+          "endLine": 143,
+          "bodySha256": "c859a0d05ac39483b9d65d01a6636470a702ffc77cd65b378f925dbaa788fddf",
+          "decisions": {
+            "ifStatements": 14,
+            "loops": 0,
+            "exceptHandlers": 9,
+            "conditionalExpressions": 0,
+            "booleanOperators": 2,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 26,
+          "source": "https://github.com/httpie/cli/blob/5b604c37c6c67e18e7c3e9aee6c88a8c22b98345/httpie/core.py#L32"
+        },
+        {
+          "project": "httpie",
+          "file": "httpie/models.py",
+          "member": "HTTPResponse.headers",
+          "cc": 6,
+          "context": "Separate ordinary-header and Set-Cookie paths contain three generator loops and two filters, including nested cookie expansion.",
+          "line": 71,
+          "endLine": 86,
+          "bodySha256": "ce638929c5f06bf6382e03debcd2c2e484f7203ca3a8e8139732592fbed96d12",
+          "decisions": {
+            "ifStatements": 0,
+            "loops": 0,
+            "exceptHandlers": 0,
+            "conditionalExpressions": 0,
+            "booleanOperators": 0,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 3,
+            "comprehensionFilters": 2,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 6,
+          "source": "https://github.com/httpie/cli/blob/5b604c37c6c67e18e7c3e9aee6c88a8c22b98345/httpie/models.py#L71"
+        },
+        {
+          "project": "httpie",
+          "file": "httpie/status.py",
+          "member": "http_status_to_exit_status",
+          "cc": 8,
+          "context": "Three status ranges and a redirect option form moderate decision density despite a flat, readable layout. CC does not measure nesting depth.",
+          "line": 23,
+          "endLine": 40,
+          "bodySha256": "e355e250babd14840b15d115a3b3e60efbc658dd6cf1c3784c0319d1ffe2bf41",
+          "decisions": {
+            "ifStatements": 3,
+            "loops": 0,
+            "exceptHandlers": 0,
+            "conditionalExpressions": 0,
+            "booleanOperators": 1,
+            "chainedComparisons": 3,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 8,
+          "source": "https://github.com/httpie/cli/blob/5b604c37c6c67e18e7c3e9aee6c88a8c22b98345/httpie/status.py#L23"
+        }
+      ]
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "producer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.2.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "functionFactsSha256": "592e535e112ed80b7a05dd30496988c1b374ad095bb2c64a52906d4b12ec93f1",
+      "configurationFingerprint": "38e48233960af37b1e0104b3b9ad0c98482c84b491f7019f4c014df304100cb2",
+      "functions": 9748,
+      "bands": {
+        "1-3": 7425,
+        "11-20": 308,
+        "21-40": 77,
+        "4-5": 1121,
+        "41+": 12,
+        "6-10": 805
+      },
+      "decisionCounts": {
+        "ifStatements": 10502,
+        "loops": 1962,
+        "exceptHandlers": 1246,
+        "conditionalExpressions": 769,
+        "booleanOperators": 3642,
+        "chainedComparisons": 39,
+        "comprehensionLoops": 1352,
+        "comprehensionFilters": 296,
+        "matchCases": 16,
+        "matchGuards": 5,
+        "matchAlternatives": 7
+      },
+      "functionsUsing": {
+        "ifStatements": 4257,
+        "loops": 1285,
+        "exceptHandlers": 940,
+        "conditionalExpressions": 605,
+        "booleanOperators": 1798,
+        "chainedComparisons": 29,
+        "comprehensionLoops": 920,
+        "comprehensionFilters": 242,
+        "matchCases": 4,
+        "matchGuards": 1,
+        "matchAlternatives": 2
+      },
+      "current": {
+        "score": 5.6,
+        "unroundedScore": 5.6253247152970145,
+        "worstIndividual": 0,
+        "meanOnlyScore": 9.4,
+        "roundedSeverityCeiling": 6
+      },
+      "experiments": {
+        "membership": {
+          "score": 5.6,
+          "unroundedScore": 5.6254355186211145,
+          "worstIndividual": 0,
+          "meanOnlyScore": 9.4,
+          "roundedSeverityCeiling": 6,
+          "changedFunctions": 2,
+          "changes": [
+            {
+              "id": "21c6f154cdf14108ad1f5e94d309b58f1e0d110ced2e9f6646a8b9a68d2fdb7d",
+              "file": "django/utils/choices.py",
+              "member": "normalize_choices",
+              "line": 72,
+              "before": 20,
+              "after": 17
+            },
+            {
+              "id": "ac71b2eb04407bb805fc563b9f9df1c6a7611d80996465f9e7ed2c7f739190e1",
+              "file": "django/utils/json.py",
+              "member": "normalize_json",
+              "line": 4,
+              "before": 12,
+              "after": 8
+            }
+          ],
+          "interpretation": "candidate"
+        },
+        "without-except": {
+          "score": 5.7,
+          "unroundedScore": 5.653739612188366,
+          "worstIndividual": 0,
+          "meanOnlyScore": 9.4,
+          "roundedSeverityCeiling": 6,
+          "changedFunctions": 940,
+          "changes": null,
+          "interpretation": "rejected ablation; not a proposed rule"
+        },
+        "without-comprehensions": {
+          "score": 5.7,
+          "unroundedScore": 5.658319482917821,
+          "worstIndividual": 0,
+          "meanOnlyScore": 9.4,
+          "roundedSeverityCeiling": 6,
+          "changedFunctions": 920,
+          "changes": null,
+          "interpretation": "rejected ablation; not a proposed rule"
+        }
+      },
+      "reviews": [
+        {
+          "project": "django",
+          "file": "django/db/transaction.py",
+          "member": "Atomic.__exit__",
+          "cc": 21,
+          "context": "Nested commit/rollback recovery and connection state restoration are consequential paths, including six handlers. Their necessity does not remove verification burden or establish a defect.",
+          "line": 238,
+          "endLine": 327,
+          "bodySha256": "6501ca352228dcaebc6ff6032634b68766324ecba74d25b42d783dade9bb6726",
+          "decisions": {
+            "ifStatements": 12,
+            "loops": 0,
+            "exceptHandlers": 6,
+            "conditionalExpressions": 0,
+            "booleanOperators": 2,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 21,
+          "source": "https://github.com/django/django/blob/dab0a5c47f159eb58472110dcbc10bd4a9b01adb/django/db/transaction.py#L238"
+        },
+        {
+          "project": "django",
+          "file": "django/db/models/base.py",
+          "member": "Model._save_table",
+          "cc": 50,
+          "context": "Insert/update choice, primary-key defaults, forced updates, generated fields, expressions and returning-column capabilities combine many branches and filtered field populations. The low individual score describes control-flow burden, not invalid ORM design.",
+          "line": 1075,
+          "endLine": 1212,
+          "bodySha256": "52c8d3bbd3d1cbaf956f91be8f97b999ae8a552345856fcce2fc0ed3ee02b24e",
+          "decisions": {
+            "ifStatements": 15,
+            "loops": 2,
+            "exceptHandlers": 0,
+            "conditionalExpressions": 2,
+            "booleanOperators": 20,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 6,
+            "comprehensionFilters": 4,
+            "matchCases": 0,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 50,
+          "source": "https://github.com/django/django/blob/dab0a5c47f159eb58472110dcbc10bd4a9b01adb/django/db/models/base.py#L1075"
+        },
+        {
+          "project": "django",
+          "file": "django/template/defaulttags.py",
+          "member": "partial_func",
+          "cc": 2,
+          "context": "One accepted token shape and a default error are a low-complexity match; implicit pattern mechanics are not individually counted.",
+          "line": 1275,
+          "endLine": 1289,
+          "bodySha256": "a9042418132c5d2cb7a447395a70635b4eb9ce341d15a60ade53a9cf9edacb12",
+          "decisions": {
+            "ifStatements": 0,
+            "loops": 0,
+            "exceptHandlers": 0,
+            "conditionalExpressions": 0,
+            "booleanOperators": 0,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 1,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 2,
+          "source": "https://github.com/django/django/blob/dab0a5c47f159eb58472110dcbc10bd4a9b01adb/django/template/defaulttags.py#L1275"
+        },
+        {
+          "project": "django",
+          "file": "django/template/defaulttags.py",
+          "member": "partialdef_func",
+          "cc": 9,
+          "context": "Four token-shape cases, location fallbacks, end-tag validation and duplicate-name checking give a moderate assessment; distinct case outcomes remain counted.",
+          "line": 1211,
+          "endLine": 1271,
+          "bodySha256": "c47c1e3a764b11222523918a484750f46c4a74b1921b453e1878fd5b264ce87c",
+          "decisions": {
+            "ifStatements": 2,
+            "loops": 0,
+            "exceptHandlers": 0,
+            "conditionalExpressions": 2,
+            "booleanOperators": 0,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 0,
+            "comprehensionFilters": 0,
+            "matchCases": 4,
+            "matchGuards": 0,
+            "matchAlternatives": 0
+          },
+          "candidateCc": 9,
+          "source": "https://github.com/django/django/blob/dab0a5c47f159eb58472110dcbc10bd4a9b01adb/django/template/defaulttags.py#L1211"
+        },
+        {
+          "project": "django",
+          "file": "django/utils/choices.py",
+          "member": "normalize_choices",
+          "cc": 20,
+          "context": "A shared passthrough type group contributes three extra alternatives; candidate CC is 17. Depth guards, iterator consumption, lazy-callable treatment and unpacking fallback remain visible.",
+          "line": 72,
+          "endLine": 116,
+          "bodySha256": "332b66b5be7b86e052ba94809433ad08a711cf559d5ed2628a51470eef4d19f7",
+          "decisions": {
+            "ifStatements": 0,
+            "loops": 0,
+            "exceptHandlers": 1,
+            "conditionalExpressions": 0,
+            "booleanOperators": 1,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 2,
+            "comprehensionFilters": 0,
+            "matchCases": 7,
+            "matchGuards": 5,
+            "matchAlternatives": 3
+          },
+          "candidateCc": 17,
+          "source": "https://github.com/django/django/blob/dab0a5c47f159eb58472110dcbc10bd4a9b01adb/django/utils/choices.py#L72"
+        },
+        {
+          "project": "django",
+          "file": "django/utils/json.py",
+          "member": "normalize_json",
+          "cc": 12,
+          "context": "Four extra increments come from non-destructuring scalar patterns sharing a single return. Candidate membership treatment reduces CC to 8 while retaining recursive comprehensions and decode failure handling.",
+          "line": 4,
+          "endLine": 19,
+          "bodySha256": "97b779e0870926136ff1e1faca4c2448cb7ffdbfb83212de068679e0e2fc4949",
+          "decisions": {
+            "ifStatements": 0,
+            "loops": 0,
+            "exceptHandlers": 1,
+            "conditionalExpressions": 0,
+            "booleanOperators": 0,
+            "chainedComparisons": 0,
+            "comprehensionLoops": 2,
+            "comprehensionFilters": 0,
+            "matchCases": 4,
+            "matchGuards": 0,
+            "matchAlternatives": 4
+          },
+          "candidateCc": 8,
+          "source": "https://github.com/django/django/blob/dab0a5c47f159eb58472110dcbc10bd4a9b01adb/django/utils/json.py#L4"
+        }
+      ]
+    }
+  ]
+}
