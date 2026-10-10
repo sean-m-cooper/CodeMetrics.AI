@@ -48,6 +48,8 @@ def membership_discounts(source, file):
 def candidate(facts, mode, discounts=None):
     if mode not in {"membership", "without-except", "without-comprehensions"}:
         raise ValueError("Unknown calibration experiment.")
+    if mode == "membership" and facts["measurementPolicy"] != "python/owned-function-complexity-v1":
+        raise ValueError("Membership candidate requires v1 facts; never discount v2 twice.")
     document = deepcopy(facts)
     document["measurementPolicy"] = f"experimental/python/calibration/{mode}"
     changes = []

@@ -65,6 +65,41 @@ test('selected parse failures withhold previews and findings and remain diagnosa
   assert.equal(f.run(['--exclude', 'bad.py']).evidence.analysis.status, 'complete');
 });
 
+test('installed match policy preserves guards and structural alternatives with versioned evidence', t => {
+  const f = fixture(t);
+  f.write('match.py', `def choose(value, ready):
+    match value:
+        case 1 | 2 | 3 if ready and value:
+            if ready: return value
+        case [x] | {"x": x}:
+            return x
+        case _:
+            return None
+`);
+  const { output, evidence } = f.run();
+  const facts = evidence.dimensions.codeQuality.sourceFacts;
+  assert.equal(evidence.tool.version, '0.3.0-experimental');
+  assert.equal(facts.producer.version, evidence.tool.version);
+  assert.equal(facts.measurementPolicy, 'python/owned-function-complexity-v2');
+  assert.equal(evidence.dimensions.codeQuality.scope.id, facts.measurementPolicy);
+  assert.equal(evidence.analysis.ruleset, 'python-2026-10-10-match-membership-preview');
+  const complexity = facts.functions[0].complexity;
+  assert.equal(complexity.value, 7);
+  assert.equal(complexity.decisions.matchAlternatives, 1);
+  assert.equal(complexity.decisions.matchCases, 2);
+  assert.equal(complexity.decisions.matchGuards, 1);
+  assert.equal(complexity.decisions.booleanOperators, 1);
+  assert.equal(complexity.decisions.ifStatements, 1);
+  f.inspect(output);
+  for (const mutate of [
+    value => { value.dimensions.codeQuality.sourceFacts.measurementPolicy = 'python/owned-function-complexity-v1'; },
+    value => { value.dimensions.codeQuality.sourceFacts.producer.version = '0.2.0-experimental'; },
+    value => { value.dimensions.codeQuality.scope.id = 'python/owned-function-complexity-v1'; }
+  ]) {
+    const copy = structuredClone(evidence); mutate(copy); assert.throws(() => validateEvidence(copy));
+  }
+});
+
 test('empty and declaration-only selections never produce perfect scores', t => {
   const f = fixture(t); f.write('empty.py', 'VALUE = 1\n');
   f.write('types.pyi', 'def stub(): ...\n');

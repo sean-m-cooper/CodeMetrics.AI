@@ -10,6 +10,7 @@ import subprocess
 import tokenize
 
 import source_facts
+from calibration_preview import candidate, membership_discounts
 
 
 REPOSITORY = Path(__file__).resolve().parents[2]
@@ -36,19 +37,25 @@ def preview(facts_file):
 
 def reference_population(reference, root, document):
     previous = reference.new_document()
+    discounts = {}
     previous["scope"]["description"] = "Same selected and successfully parsed files, with the initial adapter's declaration population."
     for file in document["selection"]["files"]:
         if file["disposition"] == "analyzed":
             with tokenize.open(root / file["file"]) as stream:
-                previous["functions"].extend(reference.measure_source(stream.read(), file["file"]))
-    by_id = {item["id"]: item for item in previous["functions"]}
+                source = stream.read()
+            previous["functions"].extend(reference.measure_source(source, file["file"]))
+            discounts.update(membership_discounts(source, file["file"]))
+    # Independently implemented offline candidate must exactly explain every
+    # retained body's change from the trusted original analyzer.
+    adjusted, changes = candidate(previous, "membership", discounts)
+    by_id = {item["id"]: item for item in adjusted["functions"]}
     for item in document["functions"]:
         assert item["complexity"] == by_id[item["id"]]["complexity"], item
     current_ids = {item["id"] for item in document["functions"]}
     excluded_ids = {item["id"] for item in document["selection"]["excludedFunctions"]}
     assert current_ids.isdisjoint(excluded_ids)
     assert current_ids | excluded_ids == set(by_id), "Every previous owner must be accounted for once."
-    return previous
+    return previous, [item for item in changes if item["id"] in current_ids]
 
 
 def sample(root, entry, output, reference):
@@ -60,7 +67,7 @@ def sample(root, entry, output, reference):
     write(destination / "source-facts.json", document)
     if document["status"] != "complete":
         raise RuntimeError(f"{entry['id']}: {document['diagnostics']}")
-    prior = reference_population(reference, root, document)
+    prior, changes = reference_population(reference, root, document)
     write(destination / "reference-facts.json", prior)
     current_score = preview(destination / "source-facts.json")
     prior_score = preview(destination / "reference-facts.json")
@@ -76,7 +83,8 @@ def sample(root, entry, output, reference):
             "implementedFunctions": len(owners), "functionFactsSha256": function_hash, "excludedDeclarationsSha256": declaration_hash,
             "priorFunctionsInSameFiles": len(prior["functions"]),
             "excludedDeclarationReasons": dict(Counter(item["reason"] for item in selection["excludedFunctions"])),
-            "declarationExamples": selection["excludedFunctions"][:6], "unchangedComplexityForEveryRetainedOwner": True,
+            "declarationExamples": selection["excludedFunctions"][:6], "unchangedComplexityForEveryRetainedOwner": not changes,
+            "matchesReviewedMatchPolicy": True, "complexityChanges": changes,
             "everyPriorOwnerAccountedForOnce": True,
             "complexityAtLeast10": sum(item["complexity"]["value"] >= 10 for item in owners),
             "maxComplexity": owners[0]["complexity"]["value"] if owners else None,
@@ -101,7 +109,8 @@ def main():
     reference = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(reference)
     args.output.mkdir(parents=True, exist_ok=True)
-    code_files = [Path(__file__), Path(source_facts.__file__), Path(__file__).with_name("source_selection.py")]
+    code_files = [Path(__file__), Path(source_facts.__file__), Path(__file__).with_name("source_selection.py"),
+                  Path(__file__).with_name("calibration_preview.py")]
     analyzer_hash = digest(b"\0".join(path.name.encode() + b"\0" + path.read_bytes().replace(b"\r\n", b"\n") for path in code_files))
     report = {"schemaVersion": 1, "measurementPolicy": source_facts.POLICY, "selectionPolicy": "python/source-selection-v1",
               "analyzerSourceSha256": analyzer_hash, "referenceAnalyzerRevision": manifest["referenceAnalyzerRevision"],
@@ -114,7 +123,8 @@ def main():
     fields = ("id", "revision", "configurationFingerprint", "selectedSourceSha256", "filesAnalyzed", "implementedFunctions",
               "functionFactsSha256", "excludedDeclarationsSha256", "excludedDeclarationReasons", "complexityAtLeast10",
               "maxComplexity", "experimentalPreview")
-    baseline = {"scope": manifest["scope"], "samples": [{key: item[key] for key in fields} for item in report["samples"]]}
+    baseline = {"measurementPolicy": source_facts.POLICY, "scope": manifest["scope"],
+                "samples": [{key: item[key] for key in fields} for item in report["samples"]]}
     baseline_path = REPOSITORY / "shared/calibration/baselines/python-selection.json"
     if args.record:
         write(baseline_path, baseline)

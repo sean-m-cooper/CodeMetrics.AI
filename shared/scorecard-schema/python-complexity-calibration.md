@@ -1,6 +1,8 @@
 # Python complexity calibration review
 
-Date: 2026-10-10. **Recommendation, not a production scoring change.** The shipped development adapter remains `python/owned-function-complexity-v1`; Python dimension scores remain unavailable and its preview remains experimental. No cross-language calibration is claimed.
+Date: 2026-10-10. **Historical v1 calibration study.** At study time, the development adapter used `python/owned-function-complexity-v1`; Python dimension scores remain unavailable and its preview remains experimental. No cross-language calibration is claimed.
+
+Implementation follow-up: the approved narrow adjustment is now measurement policy `python/owned-function-complexity-v2`, adapter `0.3.0-experimental`. The [verification record](calibration-runs/python-match-v2-2026-10-10.md) records the exact changes. The original study and machine-readable results below are preserved; current dimension scores remain unavailable.
 
 ## Recommendation
 
@@ -66,6 +68,8 @@ A plain mean hides the known tail. In a controlled population of 99 CC-3 functio
 Chained comparisons retain one increment per additional comparator. Python specifies short-circuit behavior comparable to the expanded conjunction while evaluating intermediate expressions once. The paired fixture protects the current counting convention. [Python 3.12 comparison semantics](https://docs.python.org/3.12/reference/expressions.html#comparisons)
 
 ## Reproduction and verification
+
+Replay the historical study in a checkout of commit `b6f953b`, which contains its v1 analyzer, baseline, and offline candidate. The current `corpus.py` runner verifies v2 separately.
 
 ```powershell
 py -3.12 analyzers/python/calibration.py --repos E:/repos --output TestResults/python-calibration-new

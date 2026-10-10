@@ -24,7 +24,7 @@ The evidence embeds facts at `dimensions.codeQuality.sourceFacts`. Its `experime
 
 The shared validator checks the v3 envelope and embedded facts, recomputes the preview, and rejects promoted dimension scores, inconsistent populations, and mismatched expected run IDs. Incomplete results have no usable preview or findings. Historical imports remain historical. Score comparisons/gates are disabled for this experimental policy; informational SARIF export is supported. Optional exploratory comparison through the shared CLI is marked incompatible and cannot gate or produce score deltas.
 
-The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's adapter version is `0.2.0-experimental`, independently of the enclosing npm package version.
+The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's adapter version is `0.3.0-experimental`, independently of the enclosing npm package version.
 
 ## Raw source-facts workflow
 
@@ -38,7 +38,7 @@ node shared/source-facts/preview.mjs TestResults/python-facts.json
 
 Use `python3` on Linux/macOS. The first command emits facts to stdout. `--output` requires an existing parent and a new `.json` file and never overwrites existing files. A failed read/parse or unsupported parser version produces `status: incomplete` and exit 2; partial facts cannot produce a score preview. An empty selection is complete but unmeasured. The Node preview is optional and explicitly uncalibrated across languages.
 
-## Measurement policy: `python/owned-function-complexity-v1`
+## Measurement policy: `python/owned-function-complexity-v2`
 
 Each selected `def`, `async def`, method, or lambda implementation body is an independent owner with baseline CC 1. Nested function and class bodies do not increase their parent's complexity. Nested definitions are discovered and measured separately. Decorators, class headers, annotations, default parameter expressions (including functions inside them), and module/class initializer **decisions** are excluded. Functions assigned in module/class bodies are still owners. File selection and declaration classification are recorded separately from CC measurement.
 
@@ -53,7 +53,9 @@ Each selected `def`, `async def`, method, or lambda implementation body is an in
 | Comprehension generator / filter | 1 each |
 | Refutable `match` case | 1 |
 | Match guard | 1, plus decisions within its expression |
-| Match `or` pattern | alternatives minus 1 |
+| Match `or` pattern | alternatives minus 1, except whole-case simple membership lists |
+
+A whole-case OR list of value/singleton patterns or class patterns without positional/keyword subpatterns contributes only its case increment. An optional `as` capture of the whole subject does not change that rule. Guards and body decisions still count. Structural alternatives, ORs nested inside structural patterns, and separate cases retain their increments. This is a source-complexity convention, not a claim of runtime equivalence. Policy v1 counted every OR alternative; historical evidence retains that policy and its original values.
 
 An irrefutable wildcard/capture case contributes no case increment. `else`, `finally`, `with`, `await`, `yield`, calls, and assertions add no decision by themselves. These are explicit initial product policies, not evidence of equivalent CC across languages or runtime performance. Comprehension decisions belong to the containing function; this measures syntax, not interpreter-generated scopes.
 
@@ -63,7 +65,7 @@ Syntax parsing is not semantic validation or compilation. Missing coverage, main
 
 ## Population policy: `python/source-selection-v1`
 
-Python now emits **source-facts v2** with a machine-readable selection inventory and per-function population. JS/TS continues to emit v1 facts internally; its scoring is unchanged. This adapter version is `0.2.0-experimental`.
+Python now emits **source-facts v2** with a machine-readable selection inventory and per-function population. JS/TS continues to emit v1 facts internally; its scoring is unchanged. This adapter version is `0.3.0-experimental`.
 
 By default, the preview measures production **candidates**, not a verified installed-package or reachable-code population. The following rules make that selection inspectable:
 
@@ -92,7 +94,7 @@ The selection inventory records normalized options and their fingerprint, observ
 
 ## Pinned corpus
 
-The first corpus contains Requests, Starlette, HTTPie, and Django. [The manifest](../../shared/calibration/corpus/python-selection.json) pins Git revisions, package selections, and the explicit Django testing-helper override. The runner verifies clean checkouts, validates facts through the shared engine, compares every retained owner's CC against the original adapter, and checks that each original owner is retained or explicitly excluded exactly once.
+The first corpus contains Requests, Starlette, HTTPie, and Django. [The manifest](../../shared/calibration/corpus/python-selection.json) pins Git revisions, package selections, and the explicit Django testing-helper override. The runner verifies clean checkouts, validates facts through the shared engine, checks every retained owner's CC against the original adapter plus the independently implemented, reviewed membership adjustment, and checks that each original owner is retained or explicitly excluded exactly once.
 
 ```powershell
 # Export the trusted reference analyzer from the recorded commit using Git, preserving UTF-8.
@@ -104,7 +106,7 @@ The `TestResults` directory must exist. The reference is verified against Git be
 
 The [first corpus review](../../shared/source-facts/python-selection-2026-10-10.md) records measurements, exclusions, source context, and remaining limits.
 
-The [complexity calibration study](../../shared/scorecard-schema/python-complexity-calibration.md) reviews 20 source bodies, tests Python idioms and accepted population expectations, and proposes a narrow OR-membership adjustment. Its offline candidates do not change the production measurement policy or enable dimension scores. Reproduce it with `py -3.12 analyzers/python/calibration.py --repos E:/repos --output TestResults/python-calibration-new` (a new output directory is required).
+The [complexity calibration study](../../shared/scorecard-schema/python-complexity-calibration.md) reviews 20 source bodies, tests Python idioms and accepted population expectations, and supports the narrow OR-membership adjustment. The approved narrow adjustment is now implemented as measurement policy v2; dimension scores remain unavailable. The study report remains historical v1 evidence. In a checkout of calibration checkpoint `b6f953b`, reproduce it with `py -3.12 analyzers/python/calibration.py --repos E:/repos --output TestResults/python-calibration-new` (a new output directory is required).
 
 ## Tests
 

@@ -1,4 +1,5 @@
 {
+  "measurementPolicy": "python/owned-function-complexity-v2",
   "scope": "Pinned source-only production selections; no target install, build, or test execution. Previews are uncalibrated.",
   "samples": [
     {
@@ -58,12 +59,12 @@
       "selectedSourceSha256": "2cb4a5b24cda391c3278706e0de5eb522f2d8e5458cceed6c898fdfb27b9a70f",
       "filesAnalyzed": 907,
       "implementedFunctions": 9748,
-      "functionFactsSha256": "592e535e112ed80b7a05dd30496988c1b374ad095bb2c64a52906d4b12ec93f1",
+      "functionFactsSha256": "82a893dd6660923a67138b3e313310ffff9bee80c1344c56d5a4d309cf35d455",
       "excludedDeclarationsSha256": "393b659d8daf4f5677b25446d073c8d095f2fce445b933d919f93a1fea107bbc",
       "excludedDeclarationReasons": {
         "abstract-declaration": 1
       },
-      "complexityAtLeast10": 480,
+      "complexityAtLeast10": 479,
       "maxComplexity": 99,
       "experimentalPreview": 5.6
     }

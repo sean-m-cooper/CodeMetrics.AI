@@ -97,6 +97,8 @@ def main():
     parser.add_argument("--repos", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True, help="New directory; prior studies are never overwritten")
     args = parser.parse_args()
+    if source_facts.POLICY != "python/owned-function-complexity-v1":
+        parser.error("This is the historical v1 study. Replay at commit b6f953b; use corpus.py to verify the current policy.")
     args.output.mkdir(parents=True, exist_ok=False)
     manifests = REPOSITORY / "shared/calibration/corpus"
     manifest = json.loads((manifests / "python-selection.json").read_text())

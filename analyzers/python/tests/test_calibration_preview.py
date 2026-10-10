@@ -30,35 +30,44 @@ class CalibrationTests(unittest.TestCase):
         self.source = FIXTURE.read_text(encoding="utf-8")
         self.facts = source_facts.analyze(FIXTURE)
         self.discounts = membership_discounts(self.source, FIXTURE.name)
+        # Independent, manually specified v1 values preserve the original
+        # calibration experiment without loading historical production code.
+        self.legacy = deepcopy(self.facts)
+        self.legacy["measurementPolicy"] = "python/owned-function-complexity-v1"
+        for function in self.legacy["functions"]:
+            before, after = EXPECTED[function["member"]]
+            function["complexity"]["value"] = before
+            function["complexity"]["decisions"]["matchAlternatives"] += before - after
 
     def test_independently_specified_current_and_candidate_counts(self):
         # Compile verifies pattern restrictions without executing any fixture body.
         compile(self.source, str(FIXTURE), "exec")
-        proposed, changes = candidate(self.facts, "membership", self.discounts)
+        proposed, changes = candidate(self.legacy, "membership", self.discounts)
         current = {f["member"]: f["complexity"]["value"] for f in self.facts["functions"]}
         preview = {f["member"]: f["complexity"]["value"] for f in proposed["functions"]}
         self.assertEqual(set(current), set(EXPECTED))
         for name, (before, after) in EXPECTED.items():
             with self.subTest(name=name):
-                self.assertEqual(current[name], before)
+                self.assertEqual(current[name], after)
                 self.assertEqual(preview[name], after)
         self.assertEqual(len(changes), 7)
 
     def test_candidates_do_not_mutate_production_facts_or_suppress_guard_and_body_logic(self):
-        original = deepcopy(self.facts)
+        original = deepcopy(self.legacy)
         for mode in ["membership", "without-except", "without-comprehensions"]:
-            result, _ = candidate(self.facts, mode, self.discounts)
+            result, _ = candidate(self.legacy, mode, self.discounts)
             for function in result["functions"]:
                 self.assertEqual(function["complexity"]["value"], 1 + sum(function["complexity"]["decisions"].values()))
-        self.assertEqual(self.facts, original)
+        self.assertEqual(self.legacy, original)
         with self.assertRaises(ValueError):
             candidate(self.facts, "unknown")
         with self.assertRaises(ValueError):
-            candidate(self.facts, "membership", {self.facts["functions"][0]["id"]: 99})
+            candidate(self.legacy, "membership", {self.legacy["functions"][0]["id"]: 99})
+        with self.assertRaises(ValueError):
+            candidate(self.facts, "membership", self.discounts)
 
     def test_nested_structural_alternatives_and_capture_paths_remain_visible(self):
-        result, _ = candidate(self.facts, "membership", self.discounts)
-        by_name = {f["member"]: f for f in result["functions"]}
+        by_name = {f["member"]: f for f in self.facts["functions"]}
         for name in ["structural_alternatives", "nested_pattern_alternatives", "class_structural_alternatives"]:
             self.assertEqual(by_name[name]["complexity"]["decisions"]["matchAlternatives"], 1)
         self.assertEqual(by_name["guarded_membership"]["complexity"]["decisions"]["matchGuards"], 1)

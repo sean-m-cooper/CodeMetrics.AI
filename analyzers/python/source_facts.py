@@ -13,7 +13,7 @@ from source_selection import (declaration_reason, file_record, generated_source,
                               inventory, resolve, selection_options)
 
 
-POLICY = "python/owned-function-complexity-v1"
+POLICY = "python/owned-function-complexity-v2"
 EXCLUDED_DIRECTORIES = {".git", ".venv", "venv", "env", "__pycache__", "node_modules", "build", "dist", ".tox", ".mypy_cache", ".pytest_cache"}
 OWNERS = (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)
 MAX_FILE_BYTES = 2 * 1024 * 1024
@@ -56,9 +56,32 @@ class Decisions(ast.NodeVisitor):
             if not irrefutable(node.pattern):
                 self.counts["matchCases"] += 1
             self.counts["matchGuards"] += int(node.guard is not None)
+            membership = membership_pattern(node.pattern)
+            if membership is not None:
+                # Only the whole-case OR is one membership decision. Keep all
+                # guard/body decisions and nested-owner boundaries unchanged.
+                self.generic_visit(membership)
+                if node.guard is not None:
+                    self.visit(node.guard)
+                for statement in node.body:
+                    self.visit(statement)
+                return
         elif isinstance(node, ast.MatchOr):
             self.counts["matchAlternatives"] += len(node.patterns) - 1
         super().visit(node)
+
+
+def membership_pattern(pattern):
+    """Recognize a whole-case non-destructuring OR, optionally as-bound."""
+    while isinstance(pattern, ast.MatchAs) and pattern.pattern is not None:
+        pattern = pattern.pattern
+    if isinstance(pattern, ast.MatchOr) and all(
+        isinstance(child, (ast.MatchValue, ast.MatchSingleton)) or (
+            isinstance(child, ast.MatchClass) and not child.patterns and not child.kwd_patterns)
+        for child in pattern.patterns
+    ):
+        return pattern
+    return None
 
 
 def irrefutable(pattern):
@@ -134,7 +157,7 @@ def measure_source(source, file):
 def new_document(options=None):
     return {
         "schemaVersion": 2, "language": "python",
-        "producer": {"name": "codemetrics-ai/python-source-facts", "version": "0.2.0-experimental",
+        "producer": {"name": "codemetrics-ai/python-source-facts", "version": "0.3.0-experimental",
                      "parser": "python-ast", "parserVersion": platform.python_version()},
         "measurementPolicy": POLICY, "status": "complete",
         "capabilities": {"functionComplexity": "available", "coverage": "unsupported", "maintainability": "unsupported"},

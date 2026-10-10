@@ -1,6 +1,6 @@
 # Accuracy and score regression corpus
 
-The [Python complexity calibration study](../scorecard-schema/python-complexity-calibration.md) adds a pinned 20-body source review, authored idiom fixtures, and controlled population expectations. Its proposed OR-membership adjustment is an offline candidate; Python remains unscored in production evidence. The four-project corpus is not a cross-language or statistical calibration claim.
+The [Python complexity calibration study](../scorecard-schema/python-complexity-calibration.md) adds a pinned 20-body source review, authored idiom fixtures, and controlled population expectations. Its approved OR-membership adjustment is implemented in Python measurement policy v2; Python remains unscored in production evidence. The four-project corpus is not a cross-language or statistical calibration claim.
 
 The separate [JS/TS architecture context corpus](javascript-typescript-architecture.json)
 contains eleven authored examples with graph expectations and, where applicable,

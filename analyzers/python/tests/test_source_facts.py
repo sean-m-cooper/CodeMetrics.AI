@@ -85,9 +85,10 @@ def choose(value):
         case _:
             return False
 ''')["choose"]
-        self.assertEqual(row["value"], 5)
+        self.assertEqual(row["value"], 4)
         self.assertEqual(row["decisions"]["matchCases"], 1)
         self.assertEqual(row["decisions"]["matchGuards"], 1)
+        self.assertEqual(row["decisions"]["matchAlternatives"], 0)
 
     def test_no_execution_and_deterministic_relative_ids(self):
         with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:

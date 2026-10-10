@@ -4,8 +4,8 @@ import { validateSourceFacts, type SourceFacts } from "#source-facts/contract.mj
 import { dimensionKeys } from "./scorecard-contract.js";
 import { hash, type Evidence, type Dimension, type Finding } from "./evidence.js";
 
-export const pythonVersion = "0.2.0-experimental";
-export const pythonRuleset = "python-2026-10-10-complexity-preview";
+export const pythonVersion = "0.3.0-experimental";
+export const pythonRuleset = "python-2026-10-10-match-membership-preview";
 const previewPolicy = "experimental/shared-complexity-worst-40-remainder-60/v1";
 
 function complexityDetails(facts: SourceFacts | null) {
@@ -44,7 +44,7 @@ export function pythonEvidence(facts: SourceFacts | null, subject: Evidence["sub
     status: complete ? "skipped" : "failed",
     basis: complete ? "Function complexity measured; Python dimension scoring awaits calibration. Preview is experimental, not a dimension score."
       : "Python analysis incomplete; partial measurements are diagnostic only.",
-    scope: { id: "python/owned-function-complexity-v1", coverage: "partial", includes: ["selected-function-complexity"],
+    scope: { id: "python/owned-function-complexity-v2", coverage: "partial", includes: ["selected-function-complexity"],
       excludes: ["calibrated-dimension-score", "decomposition", "runtime-performance", "semantic-validation"] },
     findings: complete ? reviewFindings(facts) : [],
     sourceFacts: facts, experimentalPreview: complete ? complexityDetails(facts) : complexityDetails(null),
@@ -72,7 +72,7 @@ export function validatePythonEvidence(evidence: Evidence) {
     validateSourceFacts(facts);
     if (facts.language !== "python" || facts.schemaVersion !== 2 || facts.producer.version !== pythonVersion ||
         facts.producer.name !== "codemetrics-ai/python-source-facts" || facts.producer.parser !== "python-ast" ||
-        facts.measurementPolicy !== "python/owned-function-complexity-v1" || facts.selection?.policy !== "python/source-selection-v1" ||
+        facts.measurementPolicy !== "python/owned-function-complexity-v2" || facts.selection?.policy !== "python/source-selection-v1" ||
         (facts.status === "complete" && !/^3\.12\./.test(facts.producer.parserVersion)))
       throw new Error("Unexpected Python source-facts producer or version.");
   }
