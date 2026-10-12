@@ -1,6 +1,6 @@
 # Python Analyzer
 
-Python has an experimental complexity-only adapter at `analyzers/python/source_facts.py`. It uses Python 3.12's native AST and emits versioned function facts consumed by the same population engine as JS/TS.
+Python has an experimental source-facts adapter at `analyzers/python/source_facts.py`. It uses Python 3.12's native AST and emits versioned function facts consumed by the same population engine as JS/TS, alongside separate review evidence.
 
 ## Location
 
@@ -16,6 +16,8 @@ analyzers/python/
 - AI, data, and tooling codebases.
 
 ## Current Outputs
+
+The standalone [coverage and CRAP review](../../analyzers/python/COVERAGE.md) imports coverage.py JSON for conditional per-function estimates. It distinguishes missing coverage from explicitly uncovered lines and withholds ambiguous attribution. Coverage source binding remains unverified; this offline first pass is not packaged, skill-integrated, or scored.
 
 The [duplication review](../../analyzers/python/DUPLICATION.md) adds exact whole-body review leads, with a five-statement default minimum and explicit exclusions. It is now embedded in the development packaged CLI evidence and presented by the scorecard skill; it assigns no score.
 

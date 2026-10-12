@@ -26,6 +26,10 @@ The shared validator checks the v3 envelope and embedded facts, recomputes the p
 
 The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's adapter version is `0.4.0-experimental`, independently of the enclosing npm package version.
 
+## Offline coverage review
+
+The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON and maps executable body lines to current function complexity. Missing or ambiguous coverage stays unavailable. CRAP estimates are conditional because the imported report has no source hashes; they do not affect scores. This first pass is a standalone development tool, not yet part of the packaged CLI or skill.
+
 ## Raw source-facts workflow
 
 From the repository root (Python 3.12 required):
