@@ -5,7 +5,7 @@ import { Ajv2020 } from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import type { Evidence, Finding } from "./evidence.js";
 import { dimensionKeys } from "./scorecard-contract.js";
-import { validatePythonEvidence, pythonRuleset } from "./python-evidence.js";
+import { validatePythonEvidence, supportsPythonComparison } from "./python-evidence.js";
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 (addFormats as unknown as (instance: Ajv2020) => void)(ajv);
@@ -48,8 +48,8 @@ function entryPoint(evidence: Evidence) {
 }
 export function compare(current: Evidence, baseline: Evidence, allowIncompatible = false) {
   const reasons: string[] = [];
-  if ([current, baseline].some(item => item.tool.ecosystem === "python" && item.analysis.ruleset === pythonRuleset))
-    reasons.push("Experimental Python evidence does not support baseline gates; previews are not dimension scores");
+  if ([current, baseline].some(item => item.tool.ecosystem === "python" && !supportsPythonComparison(item)))
+    reasons.push("Python comparisons require supported Method Complexity scores; historical previews and empty populations cannot gate");
   for (const key of ["ecosystem", "version", "name"] as const)
     if (current.tool[key] !== baseline.tool[key]) reasons.push("tool." + key + " differs");
   for (const key of ["ruleset", "configurationFingerprint"] as const)

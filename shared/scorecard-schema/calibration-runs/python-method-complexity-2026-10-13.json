@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-13",
+  "scope": "Accepted Method Complexity product baseline with installed-package verification; no live-model report evaluation or cross-language calibration.",
+  "adapterVersion": "0.7.0",
+  "ruleset": "python-2026-10-13-method-complexity-v1",
+  "calibration": "baseline",
+  "policy": "python/method-complexity-worst-40-remainder-60/v1",
+  "measurementPolicy": "python/owned-function-complexity-v2",
+  "sourceFactsVersion": "0.4.0-experimental",
+  "scoredDimension": "codeQuality",
+  "displayLabel": "Method Complexity",
+  "eligiblePopulation": "selected production implementations",
+  "unscoredEvidence": [
+    "ownedStatements",
+    "maxBlockNesting",
+    "exactBodyDuplication",
+    "coverage",
+    "CRAP"
+  ],
+  "npmDevelopmentVersion": "0.5.0",
+  "npmArchive": "TestResults/python-method-complexity-2026-10-13-verified/codemetrics-ai-0.5.0.tgz",
+  "npmArchiveSha256": "cbcefe9391efba58957cc6388f35a5e964340e2582b9dff0a13c3ab8182d0f3c",
+  "checks": {
+    "pythonUnitAndCollection": {
+      "passed": 79,
+      "failed": 0,
+      "skipped": 0
+    },
+    "javascriptTypescript": {
+      "passed": 256,
+      "failed": 0
+    },
+    "sourceFactsConformanceAndCalibration": {
+      "passed": 9,
+      "failed": 0
+    },
+    "installedPythonEvidence": {
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0
+    },
+    "skillRuntimeCatalogAndOfflineHarness": {
+      "passed": 30,
+      "failed": 0,
+      "skipped": 0
+    },
+    "skillPythonIntegrationSubtests": 13,
+    "skillStructuralValidation": "passed"
+  },
+  "scenarios": [
+    "Accepted CC anchors, interpolation, singleton weighting and decimal half-up rounding.",
+    "Included tests/support/generated bodies cannot pad production scores; explicit production overrides remain visible.",
+    "Lambdas remain in the complexity population despite unavailable decomposition or coverage.",
+    "Duplication, nesting, size and coverage observations do not supply scores or independent deductions.",
+    "Empty production populations and incomplete combined runs withhold the score.",
+    "Historical 0.5/0.6 evidence retains preview contracts; unsupported or downgraded producers cannot introduce scores.",
+    "Compatible current baselines can gate score drops; previews and empty populations cannot gate.",
+    "Helper regression produces gate-failed with a compatible Method Complexity delta of -6.",
+    "Analyzer-generated reporting fixture validates; offline harness checks its rubric and inputs, not actual model behavior."
+  ],
+  "corpus": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "selectedFunctions": 246,
+      "eligibleFunctions": 246,
+      "methodComplexityScore": 7,
+      "previousPreview": 7,
+      "rawFactsUnchanged": true,
+      "reviewEvidenceUnchanged": true,
+      "contributionsUnchanged": true,
+      "historicalComparisonRejected": true,
+      "runId": "04eb77b5-92a0-4ff8-a13c-a5d73d591b5a",
+      "auditId": "04eb77b5-92a0-4ff8-a13c-a5d73d591b5a",
+      "evidence": "TestResults/python-method-complexity-2026-10-13-verified/requests-evidence.json",
+      "evidenceSha256": "5b7e297d635c7113b5f56055bf3e2dbbb52ed16c168e7f05e2c4523f578a9514"
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "selectedFunctions": 508,
+      "eligibleFunctions": 508,
+      "methodComplexityScore": 7.1,
+      "previousPreview": 7.1,
+      "rawFactsUnchanged": true,
+      "reviewEvidenceUnchanged": true,
+      "contributionsUnchanged": true,
+      "historicalComparisonRejected": true,
+      "runId": "21f0b67e-ca5d-43f9-8cee-40890991ee01",
+      "auditId": "21f0b67e-ca5d-43f9-8cee-40890991ee01",
+      "evidence": "TestResults/python-method-complexity-2026-10-13-verified/starlette-evidence.json",
+      "evidenceSha256": "a4c48dcedb294b3870539b0d16f0ba358cc35e662cf5d47ea521da8593d8732b"
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "selectedFunctions": 464,
+      "eligibleFunctions": 464,
+      "methodComplexityScore": 6.8,
+      "previousPreview": 6.8,
+      "rawFactsUnchanged": true,
+      "reviewEvidenceUnchanged": true,
+      "contributionsUnchanged": true,
+      "historicalComparisonRejected": true,
+      "runId": "74a84a84-cd7d-4a88-905d-c1e64f3a3e7d",
+      "auditId": "74a84a84-cd7d-4a88-905d-c1e64f3a3e7d",
+      "evidence": "TestResults/python-method-complexity-2026-10-13-verified/httpie-evidence.json",
+      "evidenceSha256": "d10848f80cbc9c758c9e3d1ed0a0badf9b11036e5b490bf0060a546fc87b258d"
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "selectedFunctions": 9748,
+      "eligibleFunctions": 9748,
+      "methodComplexityScore": 5.6,
+      "previousPreview": 5.6,
+      "rawFactsUnchanged": true,
+      "reviewEvidenceUnchanged": true,
+      "contributionsUnchanged": true,
+      "historicalComparisonRejected": true,
+      "runId": "73ffa4b1-8926-4e47-8ea7-4fc027057814",
+      "auditId": "73ffa4b1-8926-4e47-8ea7-4fc027057814",
+      "evidence": "TestResults/python-method-complexity-2026-10-13-verified/django-evidence.json",
+      "evidenceSha256": "cbfd68fcc61e2d5fa087d7d75515aae82d7de960e7a7ef951bd7a6ca40af747c"
+    }
+  ],
+  "releaseState": "Local uncommitted implementation and development archive; not pushed or published. Explicit local archive remains required."
+}

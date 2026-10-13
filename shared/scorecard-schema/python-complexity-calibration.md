@@ -2,7 +2,7 @@
 
 Date: 2026-10-10. **Historical v1 calibration study.** At study time, the development adapter used `python/owned-function-complexity-v1`; Python dimension scores remain unavailable and its preview remains experimental. No cross-language calibration is claimed.
 
-Implementation follow-up: the approved narrow adjustment is now measurement policy `python/owned-function-complexity-v2`, adapter `0.3.0-experimental`. The [verification record](calibration-runs/python-match-v2-2026-10-10.md) records the exact changes. The original study and machine-readable results below are preserved; current dimension scores remain unavailable.
+Implementation follow-up: the approved narrow adjustment is now measurement policy `python/owned-function-complexity-v2`, adapter `0.3.0-experimental`. The [verification record](calibration-runs/python-match-v2-2026-10-10.md) records the exact changes. The original study and machine-readable results below are preserved. The subsequently accepted [Method Complexity baseline](../../analyzers/python/METHOD_COMPLEXITY.md) promotes the adjusted production-function metric to the first supported Python dimension in adapter 0.7.0.
 
 ## Recommendation
 

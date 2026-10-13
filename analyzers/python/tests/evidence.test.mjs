@@ -12,6 +12,13 @@ const reader = path.join(packageRoot, 'dist/evidence-cli.js');
 const { validateEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/evidence-tools.js')));
 const { complexityPopulation } = await import(pathToFileURL(path.join(packageRoot, 'dist/shared-source-facts/population.mjs')));
 
+function assertOnlyMethodComplexity(evidence) {
+  assert.equal(evidence.dimensions.codeQuality.status, 'scored');
+  assert.equal(typeof evidence.dimensions.codeQuality.score, 'number');
+  assert.ok(Object.entries(evidence.dimensions).every(([key, d]) => key === 'codeQuality' || d.status === 'skipped' && !('score' in d)));
+  assert.equal(evidence.dimensions.codeQuality.experimentalPreview, undefined);
+}
+
 function fixture(t) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'python evidence '));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
@@ -32,24 +39,24 @@ function fixture(t) {
   return { directory, root, write, run, inspect };
 }
 
-test('packaged CLI emits validated unscored evidence with current IDs and shared preview', t => {
+test('packaged CLI emits one validated Method Complexity score with current IDs', t => {
   const f = fixture(t);
   f.write('pyproject.toml', '[build-system]\nbuild-backend="do_not_execute"\n');
   f.write('work.py', 'def work(x):\n' + '    if x: x -= 1\n'.repeat(10) + '    return x\n');
   const ids = ['--run-id', '11111111-1111-4111-8111-111111111111', '--audit-id', '22222222-2222-4222-8222-222222222222'];
   const { output, evidence } = f.run(ids, 0, path.join(f.root, 'pyproject.toml'));
   assert.equal(evidence.analysis.status, 'complete'); assert.equal(evidence.population.members, 1);
-  assert.equal(evidence.analysis.calibration, 'uncalibrated');
-  assert.ok(Object.values(evidence.dimensions).every(d => d.status === 'skipped' && !('score' in d)));
-  assert.deepEqual(evidence.dimensions.codeQuality.experimentalPreview.population, complexityPopulation(evidence.dimensions.codeQuality.sourceFacts));
+  assert.equal(evidence.analysis.calibration, 'baseline');
+  assertOnlyMethodComplexity(evidence);
+  assert.deepEqual(evidence.dimensions.codeQuality.methodComplexity.population, complexityPopulation(evidence.dimensions.codeQuality.sourceFacts));
   assert.equal(evidence.dimensions.codeQuality.findings[0].severity, 'info');
   const inspection = path.join(f.directory, 'inspection.json');
   f.inspect(output, ['--inspect-output', inspection, '--expected-ecosystem', 'python', '--expected-root', f.root,
     '--expected-entry-point', path.join(f.root, 'pyproject.toml'), '--expected-run-id', ids[1], '--expected-audit-id', ids[3]]);
   const inspected = JSON.parse(fs.readFileSync(inspection));
-  assert.equal(inspected.usable, true); assert.equal(inspected.compatibility.comparisonAvailable, false);
+  assert.equal(inspected.usable, true); assert.equal(inspected.compatibility.comparisonAvailable, true);
   f.inspect(output, ['--expected-run-id', '33333333-3333-4333-8333-333333333333'], 2);
-  f.inspect(output, ['--baseline', output, '--max-score-drop', '0'], 2);
+  f.inspect(output, ['--baseline', output, '--max-score-drop', '0']);
   const sarif = path.join(f.directory, 'review.sarif'); f.inspect(output, ['--sarif', sarif]);
   assert.equal(JSON.parse(fs.readFileSync(sarif)).runs[0].results[0].level, 'note');
 });
@@ -59,7 +66,7 @@ test('selected parse failures withhold previews and findings and remain diagnosa
   const { output, evidence } = f.run([], 2);
   assert.equal(evidence.analysis.status, 'incomplete'); assert.equal(evidence.dimensions.codeQuality.status, 'failed');
   assert.equal(evidence.dimensions.codeQuality.sourceFacts.functions.length, 1);
-  assert.equal(evidence.dimensions.codeQuality.experimentalPreview.population, null);
+  assert.equal(evidence.dimensions.codeQuality.methodComplexity.population, null);
   assert.deepEqual(evidence.dimensions.codeQuality.findings, []);
   const inspection = path.join(f.directory, 'failed.json'); f.inspect(output, ['--inspect-output', inspection], 2);
   assert.equal(JSON.parse(fs.readFileSync(inspection)).usable, false);
@@ -79,11 +86,11 @@ test('installed match policy preserves guards and structural alternatives with v
 `);
   const { output, evidence } = f.run();
   const facts = evidence.dimensions.codeQuality.sourceFacts;
-  assert.equal(evidence.tool.version, '0.6.0-experimental');
+  assert.equal(evidence.tool.version, '0.7.0');
   assert.equal(facts.producer.version, '0.4.0-experimental');
   assert.equal(facts.measurementPolicy, 'python/owned-function-complexity-v2');
-  assert.equal(evidence.dimensions.codeQuality.scope.id, facts.measurementPolicy);
-  assert.equal(evidence.analysis.ruleset, 'python-2026-10-13-decomposition-preview');
+  assert.equal(evidence.dimensions.codeQuality.scope.id, evidence.dimensions.codeQuality.methodComplexity.scoringPolicy);
+  assert.equal(evidence.analysis.ruleset, 'python-2026-10-13-method-complexity-v1');
   const complexity = facts.functions[0].complexity;
   assert.equal(complexity.value, 7);
   assert.equal(complexity.decisions.matchAlternatives, 1);
@@ -106,7 +113,7 @@ test('empty and declaration-only selections never produce perfect scores', t => 
   f.write('types.pyi', 'def stub(): ...\n');
   f.write('protocol.py', 'from typing import Protocol\nclass Reader(Protocol):\n    def read(self): ...\n');
   const { evidence } = f.run();
-  assert.equal(evidence.population.members, 0); assert.equal(evidence.dimensions.codeQuality.experimentalPreview.status, 'unavailable');
+  assert.equal(evidence.population.members, 0); assert.equal(evidence.dimensions.codeQuality.methodComplexity.status, 'unavailable');
   assert.equal(evidence.dimensions.codeQuality.sourceFacts.selection.excludedFunctions.length, 1);
 });
 
@@ -146,27 +153,33 @@ test('existing output and source files cannot be overwritten', t => {
   assert.equal(fs.readFileSync(source, 'utf8'), 'def f(): return 1\n');
 });
 
-test('validator rejects preview promotion, forged populations and altered previews', t => {
+test('validator rejects altered scores, forged populations and altered contributions', t => {
   const f = fixture(t); f.write('work.py', 'def f(x):\n    if x: return 1\n    return 2\n');
   const { evidence } = f.run();
   for (const mutate of [
-    value => { value.dimensions.codeQuality.status = 'scored'; value.dimensions.codeQuality.score = 10; },
+    value => { value.dimensions.codeQuality.status = 'scored'; value.dimensions.codeQuality.score = 1; },
     value => { value.population.members++; },
-    value => { value.dimensions.codeQuality.experimentalPreview.population.score = 2; },
+    value => { value.dimensions.testing.status = 'scored'; value.dimensions.testing.score = 10; },
+    value => { value.dimensions.codeQuality.methodComplexity.population.score = 2; },
     value => { value.dimensions.codeQuality.sourceFacts.functions[0].population = 'test'; },
     value => { value.analysis.configurationFingerprint = 'forged'; },
     value => { value.dimensions.codeQuality.sourceFacts.measurementPolicy = 'unknown-policy'; },
-    value => { delete value.analysis.runId; }
+    value => { delete value.analysis.runId; },
+    value => { value.tool.version = '0.4.0-experimental'; value.analysis.ruleset = 'unknown';
+      delete value.dimensions.codeQuality.coverageReview; delete value.dimensions.codeQuality.decomposition; },
+    value => { value.tool.version = '0.4.0-experimental'; value.analysis.ruleset = 'unknown';
+      delete value.dimensions.codeQuality.coverageReview; delete value.dimensions.codeQuality.decomposition;
+      delete value.dimensions.codeQuality.methodComplexity; }
   ]) {
     const copy = structuredClone(evidence); mutate(copy); assert.throws(() => validateEvidence(copy));
   }
 });
 
-test('invalid selection produces diagnostics and no experimental preview', t => {
+test('invalid selection produces diagnostics and no score', t => {
   const f = fixture(t); f.write('work.py', 'def f(): return 1\n');
   const { evidence } = f.run(['--include', '../outside/**'], 2);
   assert.equal(evidence.analysis.diagnostics[0].kind, 'invalid-selection');
-  assert.equal(evidence.dimensions.codeQuality.experimentalPreview.population, null);
+  assert.equal(evidence.dimensions.codeQuality.methodComplexity.population, null);
 });
 
 test('packaged duplication preserves groups, exclusions, IDs and information-only SARIF', t => {
@@ -182,7 +195,7 @@ test('packaged duplication preserves groups, exclusions, IDs and information-onl
   assert.equal(d.excludedFunctions[0].reason, 'below-statement-minimum');
   assert.equal(cq.findings.length, 1); assert.equal(cq.findings[0].severity, 'info');
   assert.equal(cq.findings[0].observations.occurrences.length, 3);
-  assert.ok(Object.values(evidence.dimensions).every(value => value.status === 'skipped' && !('score' in value)));
+  assertOnlyMethodComplexity(evidence);
   f.inspect(output);
   const sarif = path.join(f.directory, 'duplication.sarif'); f.inspect(output, ['--sarif', sarif]);
   const result = JSON.parse(fs.readFileSync(sarif)).runs[0].results;
@@ -217,10 +230,10 @@ test('packaged duplication preserves groups, exclusions, IDs and information-onl
   f.write('bad.py', 'def broken(:');
   const failed = f.run([], 2).evidence.dimensions.codeQuality;
   assert.deepEqual(failed.duplication.groups, []); assert.equal(failed.duplication.summary, null);
-  assert.deepEqual(failed.findings, []); assert.equal(failed.experimentalPreview.population, null);
+  assert.deepEqual(failed.findings, []); assert.equal(failed.methodComplexity.population, null);
 });
 
-test('duplication failure with complete complexity still withholds the preview and all findings', async t => {
+test('duplication failure with complete complexity still withholds the score and all findings', async t => {
   const f = fixture(t); f.write('one.py', 'def one(): return 1\n');
   const current = f.run().evidence;
   const report = structuredClone(current.dimensions.codeQuality.duplication);
@@ -230,7 +243,7 @@ test('duplication failure with complete complexity still withholds the preview a
   const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report, current.dimensions.codeQuality.coverageReview, current.dimensions.codeQuality.decomposition);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
-  assert.equal(failed.dimensions.codeQuality.experimentalPreview.population, null);
+  assert.equal(failed.dimensions.codeQuality.methodComplexity.population, null);
   assert.deepEqual(failed.dimensions.codeQuality.findings, []);
   const output = path.join(f.directory, 'duplication-failed.json'); fs.writeFileSync(output, JSON.stringify(failed));
   f.inspect(output, [], 2);
@@ -250,7 +263,7 @@ test('coverage imports are unscored, explicit about freshness, and arithmeticall
   assert.equal(report.coverageInput.freshness, 'unverified'); assert.equal(report.summary.conditionalEstimates, 1);
   assert.equal(report.functions[0].coverage.fraction, 2 / 3);
   assert.ok(Math.abs(report.functions[0].crapEstimate.value - (2 + 4 / 27)) < 1e-12);
-  assert.ok(Object.values(evidence.dimensions).every(d => d.status === 'skipped' && !('score' in d)));
+  assertOnlyMethodComplexity(evidence);
   f.inspect(output);
   for (const mutate of [
     r => { r.runId = '11111111-1111-4111-8111-111111111111'; },
@@ -275,7 +288,7 @@ test('coverage imports are unscored, explicit about freshness, and arithmeticall
   const altered = structuredClone(evidence); altered.analysis.ruleset = 'unknown'; assert.throws(() => validateEvidence(altered));
   for (const args of [['--coverage-json', coverage + '-missing'], ['--coverage-json', coverage, '--collection-manifest', coverage + '-missing'], ['--collection-manifest', coverage]]) {
     const failed = f.run(args, 2).evidence;
-    assert.equal(failed.dimensions.codeQuality.experimentalPreview.population, null);
+    assert.equal(failed.dimensions.codeQuality.methodComplexity.population, null);
     assert.deepEqual(failed.dimensions.codeQuality.findings, []);
     assert.equal(failed.dimensions.codeQuality.coverageReview.status, 'incomplete');
   }
@@ -327,7 +340,7 @@ test('installed explicit collector binds source and rejects stale source or subs
 });
 
 
-test('decomposition preserves separate size, nesting, population and unavailable lambda evidence', t => {
+test('decomposition preserves unscored size, nesting, population and unavailable lambda evidence', t => {
   const f = fixture(t);
   f.write('work.py', 'def large(x):\n' + '    x += 1\n'.repeat(35) + '    return x\n' +
     'def nested(x):\n    if x:\n        for y in x:\n            if y:\n                return y\n    return None\n' +
@@ -341,9 +354,11 @@ test('decomposition preserves separate size, nesting, population and unavailable
   assert.deepEqual(report.summary.populations.production.ownedStatements, { count: 2, p50: 5, p90: 36, p95: 36, max: 36 });
   assert.deepEqual(report.summary.populations.production.maxBlockNesting, { count: 2, p50: 0, p90: 3, p95: 3, max: 3 });
   assert.equal(report.summary.populations.test.ownedStatements.max, 1);
-  assert.equal(report.functions.find(row => row.functionKind === 'Lambda').measurement, null);
+  const lambda = report.functions.find(row => row.functionKind === 'Lambda');
+  assert.equal(lambda.measurement, null);
+  assert.ok(cq.methodComplexity.population.contributions.some(row => row.id === lambda.id));
   assert.deepEqual(cq.findings, []); // Size and nesting add no thresholds or findings.
-  assert.ok(Object.values(evidence.dimensions).every(d => d.status === 'skipped' && !('score' in d)));
+  assertOnlyMethodComplexity(evidence);
   f.inspect(output);
   const measured = r => r.functions.find(row => row.status === 'measured');
   for (const mutate of [
@@ -390,7 +405,7 @@ test('decomposition failure with complete other measurements withholds the combi
   const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, report);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
-  assert.equal(failed.dimensions.codeQuality.experimentalPreview.population, null);
+  assert.equal(failed.dimensions.codeQuality.methodComplexity.population, null);
   assert.deepEqual(failed.dimensions.codeQuality.findings, []);
   const output = path.join(f.directory, 'decomposition-failed.json'); fs.writeFileSync(output, JSON.stringify(failed));
   f.inspect(output, [], 2);
@@ -404,10 +419,79 @@ test('saved coverage-era producer remains valid without fabricated decomposition
   assert.equal(historical.dimensions.codeQuality.decomposition, undefined);
   for (const mutate of [
     e => { e.dimensions.codeQuality.decomposition = null; },
-    e => { e.tool.version = '0.6.0-experimental'; },
-    e => { e.analysis.ruleset = 'python-2026-10-13-decomposition-preview'; },
+    e => { e.tool.version = '0.7.0'; },
+    e => { e.analysis.ruleset = 'python-2026-10-13-method-complexity-v1'; },
     e => { e.dimensions.codeQuality.coverageReview.runId = '11111111-1111-4111-8111-111111111111'; }
   ]) {
     const copy = structuredClone(historical); mutate(copy); assert.throws(() => validateEvidence(copy));
+  }
+});
+
+
+test('production-only scoring cannot be padded by included test, support or generated functions', t => {
+  const f = fixture(t);
+  f.write('work.py', 'def hard(x):\n' + '    if x: x -= 1\n'.repeat(20) + '    return x\n');
+  f.write('tests/test_work.py', 'def test_easy(): return 1\n');
+  f.write('setup.py', 'def support(): return 1\n');
+  f.write('generated.py', '# Generated by a tool\ndef generated(): return 1\n');
+  const before = f.run().evidence;
+  const { evidence, output } = f.run(['--include-tests', '--include-support', '--include-generated']);
+  assert.equal(evidence.population.members, 4);
+  assert.equal(evidence.dimensions.codeQuality.score, 3.8);
+  assert.equal(evidence.dimensions.codeQuality.score, before.dimensions.codeQuality.score);
+  const details = evidence.dimensions.codeQuality.methodComplexity;
+  assert.equal(details.selectedFunctions, 4); assert.equal(details.eligibleFunctions, 1);
+  assert.deepEqual(details.excludedPopulations, { test: 1, support: 1, generated: 1 });
+  assert.equal(details.population.contributions.length, 1);
+  f.inspect(output);
+  const onlyTests = f.run(['--include-tests', '--include', 'tests/**']).evidence;
+  assert.equal(onlyTests.dimensions.codeQuality.status, 'skipped');
+  assert.equal(onlyTests.dimensions.codeQuality.score, undefined);
+  assert.equal(onlyTests.dimensions.codeQuality.methodComplexity.population, null);
+  assert.equal(onlyTests.dimensions.codeQuality.methodComplexity.eligibleFunctions, 0);
+  const promoted = f.run(['--include', 'tests/**', '--production-path', 'tests/**']).evidence;
+  assert.equal(promoted.dimensions.codeQuality.score, 10);
+});
+
+test('supported scoring uses accepted anchors, weighting and half-up rounding without review deductions', t => {
+  const f = fixture(t);
+  const source = cc => 'def work(x):\n' + '    if x: x -= 1\n'.repeat(cc - 1) + '    return x\n';
+  for (const [cc, score] of [[1, 10], [3, 10], [5, 8], [10, 6], [20, 4], [40, 0], [60, 0]]) {
+    f.write('work.py', source(cc));
+    const cq = f.run().evidence.dimensions.codeQuality;
+    assert.equal(cq.score, score); assert.equal(cq.scoringDecision.finalScore, score);
+    assert.equal(cq.methodComplexity.population.contributions[0].weightNumerator, 1);
+    assert.equal(cq.methodComplexity.population.contributions[0].weightDenominator, 1);
+  }
+  // One CC=20 body at 40%, sixteen remaining bodies with a score mean of 8.25.
+  f.write('work.py', source(20));
+  for (let i = 0; i < 16; i++) f.write(`rest${i}.py`, source(i < 2 ? 3 : 5));
+  const cq = f.run().evidence.dimensions.codeQuality;
+  assert.equal(cq.methodComplexity.population.unroundedScore, 6.55);
+  assert.equal(cq.score, 6.6);
+  assert.ok(cq.findings.some(f => f.category === 'exactBodyDuplicationReview'));
+  assert.ok(cq.scoringDecision.findingEffects.filter(f => f.category === 'exactBodyDuplicationReview').every(f => f.effect !== 'policyInput'));
+  assert.ok(cq.scoringDecision.findingEffects.filter(f => f.category === 'methodComplexityReview').every(f => f.effect === 'policyInput'));
+});
+
+test('supported comparisons gate only recorded dimension changes and reject historical previews', t => {
+  const f = fixture(t); f.write('work.py', 'def work(x): return x\n');
+  const before = f.run();
+  f.write('work.py', 'def work(x):\n' + '    if x: x -= 1\n'.repeat(19) + '    return x\n');
+  const after = f.run();
+  f.inspect(after.output, ['--baseline', before.output]);
+  f.inspect(after.output, ['--baseline', before.output, '--max-score-drop', '1'], 1);
+  f.inspect(after.output, ['--baseline', before.output, '--max-score-drop', '6']);
+  const empty = f.run(['--include', 'missing/**']);
+  f.inspect(empty.output, ['--baseline', empty.output], 2);
+  for (const version of ['05', '06']) {
+    const old = fileURLToPath(new URL(`fixtures/python-v${version}.json`, import.meta.url));
+    const e = JSON.parse(fs.readFileSync(old)); validateEvidence(e);
+    assert.equal(e.dimensions.codeQuality.score, undefined);
+    assert.ok(e.dimensions.codeQuality.experimentalPreview);
+    f.inspect(old, ['--baseline', old, '--max-score-drop', '0'], 2);
+    f.inspect(after.output, ['--baseline', old, '--max-score-drop', '0'], 2);
+    const forged = structuredClone(e); forged.dimensions.codeQuality.status = 'scored'; forged.dimensions.codeQuality.score = 10;
+    assert.throws(() => validateEvidence(forged));
   }
 });
