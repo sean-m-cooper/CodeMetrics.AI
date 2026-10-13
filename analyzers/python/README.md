@@ -32,6 +32,8 @@ The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON through `co
 
 ## Raw source-facts workflow
 
+The standalone [decomposition reviewer](DECOMPOSITION.md) measures owned statements and block nesting as separate unscored evidence. Its first corpus study covers Requests, Starlette, HTTPie, and Django. It is not yet embedded in the npm adapter or the skill.
+
 From the repository root (Python 3.12 required):
 
 ```powershell

@@ -17,6 +17,8 @@ analyzers/python/
 
 ## Current Outputs
 
+The standalone [decomposition reviewer](../../analyzers/python/DECOMPOSITION.md) reports owned statement counts and maximum block nesting without scores. Its first pinned corpus study keeps size and nesting separate, excludes nested-body double counting, and documents long low-CC registration/initialization routines that caution against automatic length penalties. This evidence is not yet packaged or integrated into the skill.
+
 The packaged [coverage and CRAP review](../../analyzers/python/COVERAGE.md) imports coverage.py JSON for per-function estimates at `codeQuality.coverageReview`. It distinguishes missing coverage from explicitly uncovered lines and withholds ambiguous attribution. The separate `codemetrics-python-collect` command executes a caller-selected test module and binds new coverage to before/after source snapshots. Analysis rejects supplied provenance that no longer matches; imports without provenance remain conditional. The skill presents this evidence without executing tests implicitly or assigning dimension scores. The collector has been validated on a three-module Requests test slice and a [Starlette async test selection](../../shared/scorecard-schema/calibration-runs/python-coverage-starlette-2026-10-13.md), including rejection of its failed full-suite receipt.
 
 The [duplication review](../../analyzers/python/DUPLICATION.md) adds exact whole-body review leads, with a five-statement default minimum and explicit exclusions. It is now embedded in the development packaged CLI evidence and presented by the scorecard skill; it assigns no score.

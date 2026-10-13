@@ -1,0 +1,546 @@
+{
+  "artifactKind": "python-decomposition-corpus-review",
+  "date": "2026-10-13",
+  "policy": "python/owned-statements-block-nesting-v1",
+  "auditId": "05b51936-ce14-43ee-ad74-d75e64b5ca18",
+  "implementationSha256": "690c9a06f7c9415d83c20fc223a5585814cdb864fb68851c48030b97485719da",
+  "scope": "Review-only per-project distributions, diagnostic threshold counts, and ranked examples. Low complexity means the existing CC 1-5 band. Counts do not activate a threshold or scoring ladder. No target execution or scores.",
+  "fullArtifacts": "TestResults/python-decomposition-2026-10-13-verified",
+  "checks": {
+    "pythonTests": 78,
+    "sharedConformanceAndCalibrationTests": 9,
+    "allFourFrozenSourcePopulationsAndComplexitiesUnchanged": true,
+    "secondRunRowsAndSummariesMatch": true
+  },
+  "samples": [
+    {
+      "id": "requests",
+      "repository": "requests",
+      "url": "https://github.com/psf/requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "role": "HTTP client library",
+      "include": [
+        "src/requests/**"
+      ],
+      "productionPaths": [],
+      "runId": "54108e40-e8b4-4ea9-8f6f-9df44ec60944",
+      "configurationFingerprint": "e158cda8eeecbd2b3384e6d46a1a05d62a1dbd0025fd239844a63365bdb338f3",
+      "producer": {
+        "name": "codemetrics-ai/python-decomposition",
+        "version": "0.1.0-experimental"
+      },
+      "sourceFactsProducer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.4.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "selectedSourceSha256": "2d607977215a449fd48af18dbaf908cdeaf67c08aba11fa0d06160700c19b677",
+      "unchangedFunctionFactsSha256": "45891e7b93660fe54c14af8d10479e357eb4b57fdee3abb688645a7c54bfc609",
+      "decompositionRowsSha256": "eb9180429a56c6600522fad3a9819f176bf6e3c47256f4af1c3ffc0764fd810d",
+      "summary": {
+        "selectedFunctions": 246,
+        "measuredFunctions": 246,
+        "unavailableFunctions": 0,
+        "unavailableReasons": {},
+        "populations": {
+          "production": {
+            "selectedFunctions": 246,
+            "measuredFunctions": 246,
+            "unavailableFunctions": 0,
+            "ownedStatements": {
+              "count": 246,
+              "p50": 3,
+              "p90": 14,
+              "p95": 22,
+              "max": 56
+            },
+            "maxBlockNesting": {
+              "count": 246,
+              "p50": 1,
+              "p90": 2,
+              "p95": 3,
+              "max": 5
+            }
+          }
+        }
+      },
+      "reviewThresholdCounts": {
+        "statementsGreaterThan": {
+          "20": 14,
+          "30": 8,
+          "40": 2
+        },
+        "nestingAtLeast": {
+          "4": 7,
+          "5": 2,
+          "6": 0
+        }
+      }
+    },
+    {
+      "id": "starlette",
+      "repository": "starlette",
+      "url": "https://github.com/Kludex/starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "role": "ASGI framework",
+      "include": [
+        "starlette/**"
+      ],
+      "productionPaths": [],
+      "runId": "786c437d-a437-46d5-8488-3f914d3043b7",
+      "configurationFingerprint": "141a28097fd3dc2b423c0685f8a49cf1a150abc02b75ac8f2985fb6f7de41322",
+      "producer": {
+        "name": "codemetrics-ai/python-decomposition",
+        "version": "0.1.0-experimental"
+      },
+      "sourceFactsProducer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.4.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "selectedSourceSha256": "2a51420a3bfbda775c692446934792dfc86b9d289056bf5a1fae501579ed9dd7",
+      "unchangedFunctionFactsSha256": "b2e5495c18c8532661f8d0269aab2b4413dfe192c116038807a03813c229457c",
+      "decompositionRowsSha256": "792d601fbda08fdbc8df7a8245f24c3fd1e76f5390ea2581981d27334331004b",
+      "summary": {
+        "selectedFunctions": 508,
+        "measuredFunctions": 507,
+        "unavailableFunctions": 1,
+        "unavailableReasons": {
+          "lambda-expression-body": 1
+        },
+        "populations": {
+          "production": {
+            "selectedFunctions": 508,
+            "measuredFunctions": 507,
+            "unavailableFunctions": 1,
+            "ownedStatements": {
+              "count": 507,
+              "p50": 3,
+              "p90": 15,
+              "p95": 20,
+              "max": 54
+            },
+            "maxBlockNesting": {
+              "count": 507,
+              "p50": 0,
+              "p90": 2,
+              "p95": 3,
+              "max": 5
+            }
+          }
+        }
+      },
+      "reviewThresholdCounts": {
+        "statementsGreaterThan": {
+          "20": 24,
+          "30": 7,
+          "40": 4
+        },
+        "nestingAtLeast": {
+          "4": 7,
+          "5": 1,
+          "6": 0
+        }
+      }
+    },
+    {
+      "id": "httpie",
+      "repository": "httpie",
+      "url": "https://github.com/httpie/cli",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "role": "CLI application",
+      "include": [
+        "httpie/**"
+      ],
+      "productionPaths": [],
+      "runId": "7eb21378-cf12-47c1-a4eb-3bd56d7e6106",
+      "configurationFingerprint": "3f3e408b1897857bd6de1605c5cca31c6fc86751ccfa25f3803411cd096601c5",
+      "producer": {
+        "name": "codemetrics-ai/python-decomposition",
+        "version": "0.1.0-experimental"
+      },
+      "sourceFactsProducer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.4.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "selectedSourceSha256": "cb8ee90b048099e53b85aaee32175802082b22a7706e5c05e0d4e403d7be47a8",
+      "unchangedFunctionFactsSha256": "d6e571d78f49775fa2ec63b0fbec632e43fab7ac6398d0cf7e633938a0d09bbb",
+      "decompositionRowsSha256": "ebc0ed1798788a0c962197b73be65ca001f9da7c56a2ecbd8cdd6380a6297846",
+      "summary": {
+        "selectedFunctions": 464,
+        "measuredFunctions": 460,
+        "unavailableFunctions": 4,
+        "unavailableReasons": {
+          "lambda-expression-body": 4
+        },
+        "populations": {
+          "production": {
+            "selectedFunctions": 464,
+            "measuredFunctions": 460,
+            "unavailableFunctions": 4,
+            "ownedStatements": {
+              "count": 460,
+              "p50": 4,
+              "p90": 13,
+              "p95": 18,
+              "max": 60
+            },
+            "maxBlockNesting": {
+              "count": 460,
+              "p50": 1,
+              "p90": 2,
+              "p95": 3,
+              "max": 5
+            }
+          }
+        }
+      },
+      "reviewThresholdCounts": {
+        "statementsGreaterThan": {
+          "20": 15,
+          "30": 6,
+          "40": 3
+        },
+        "nestingAtLeast": {
+          "4": 7,
+          "5": 3,
+          "6": 0
+        }
+      }
+    },
+    {
+      "id": "django",
+      "repository": "django",
+      "url": "https://github.com/django/django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "role": "larger web framework",
+      "include": [
+        "django/**"
+      ],
+      "productionPaths": [
+        "django/test/**"
+      ],
+      "runId": "131fd082-2ae3-4a44-95ee-db563cce0f3a",
+      "configurationFingerprint": "0c63cff0a7b9561813d0018b5300f5e60f7c72ba978fecfec7e5403448ced1f1",
+      "producer": {
+        "name": "codemetrics-ai/python-decomposition",
+        "version": "0.1.0-experimental"
+      },
+      "sourceFactsProducer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.4.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "selectedSourceSha256": "2cb4a5b24cda391c3278706e0de5eb522f2d8e5458cceed6c898fdfb27b9a70f",
+      "unchangedFunctionFactsSha256": "82a893dd6660923a67138b3e313310ffff9bee80c1344c56d5a4d309cf35d455",
+      "decompositionRowsSha256": "d7409e0092394bb56788861816b57a1c43be262ed03b9faa5f37efe0a28c91e1",
+      "summary": {
+        "selectedFunctions": 9748,
+        "measuredFunctions": 9612,
+        "unavailableFunctions": 136,
+        "unavailableReasons": {
+          "lambda-expression-body": 136
+        },
+        "populations": {
+          "production": {
+            "selectedFunctions": 9748,
+            "measuredFunctions": 9612,
+            "unavailableFunctions": 136,
+            "ownedStatements": {
+              "count": 9612,
+              "p50": 3,
+              "p90": 12,
+              "p95": 19,
+              "max": 135
+            },
+            "maxBlockNesting": {
+              "count": 9612,
+              "p50": 0,
+              "p90": 2,
+              "p95": 3,
+              "max": 9
+            }
+          }
+        }
+      },
+      "reviewThresholdCounts": {
+        "statementsGreaterThan": {
+          "20": 397,
+          "30": 166,
+          "40": 90
+        },
+        "nestingAtLeast": {
+          "4": 221,
+          "5": 83,
+          "6": 25
+        }
+      }
+    }
+  ],
+  "reviewCases": [
+    {
+      "project": "requests",
+      "id": "9284eb5505dccfabf2badf35835524d8a9173cab006117c90540b0b2cad3d0d5",
+      "file": "src/requests/auth.py",
+      "member": "HTTPDigestAuth.build_digest_header",
+      "line": 157,
+      "population": "production",
+      "endLine": 266,
+      "sourceSha256": "fdc8bb34a8a5a088b169ca13277d107b0bc94ee63ed5e89dd4f5569d9b2bb04c",
+      "functionKind": "FunctionDef",
+      "complexity": 19,
+      "disposition": "review-only",
+      "status": "measured",
+      "measurement": {
+        "ownedStatements": 56,
+        "maxBlockNesting": 1,
+        "statementKinds": {
+          "Assign": 29,
+          "AugAssign": 9,
+          "If": 15,
+          "Return": 3
+        },
+        "excludedSyntax": {
+          "FunctionDef": 5,
+          "docstring": 1
+        }
+      },
+      "bodySha256": "91651d024f13b957dd84982f0bd28089cf82e6e6c376334ceac19ffcfa07fbfc",
+      "sourceUrl": "https://github.com/psf/requests/blob/611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60/src/requests/auth.py#L157",
+      "assessment": "Large but shallow protocol construction with 56 owned statements, 15 if nodes, and five separately owned nested helpers. Algorithm selection, nonce state, and header assembly merit contextual review; the evidence does not establish safe extraction."
+    },
+    {
+      "project": "requests",
+      "id": "57f7403a1c36f67afc3333f0f2162a8e4b765c1081de9a7551e509e0e678cedb",
+      "file": "src/requests/cookies.py",
+      "member": "RequestsCookieJar._find_no_duplicates",
+      "line": 423,
+      "population": "production",
+      "endLine": 452,
+      "sourceSha256": "05d12b965c76f229803e17aef1c9969d712e4f4d0f6a06c05e0a47212fd5b417",
+      "functionKind": "FunctionDef",
+      "complexity": 9,
+      "disposition": "review-only",
+      "status": "measured",
+      "measurement": {
+        "ownedStatements": 11,
+        "maxBlockNesting": 5,
+        "statementKinds": {
+          "Assign": 2,
+          "For": 1,
+          "If": 5,
+          "Raise": 2,
+          "Return": 1
+        },
+        "excludedSyntax": {
+          "docstring": 1
+        }
+      },
+      "bodySha256": "ad8421cb02c28ffb3c5842819a1385fdc051759ea184f9ec7c81f277dd43faab",
+      "sourceUrl": "https://github.com/psf/requests/blob/611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60/src/requests/cookies.py#L423",
+      "assessment": "Only 11 statements but depth five: cookie iteration followed by name, domain, path, and duplicate checks. Nesting supplies information that size alone would miss; preserving conflict behavior matters."
+    },
+    {
+      "project": "starlette",
+      "id": "77db172613ecfcdd76012f28c0590ef3001fd79cc0ea4c7dfca4bd0178887a86",
+      "file": "starlette/responses.py",
+      "member": "FileResponse._handle_multiple_ranges",
+      "line": 456,
+      "population": "production",
+      "endLine": 492,
+      "sourceSha256": "8c67ec598cf25c21216b662c2dbbc788a8d98e760cc42d2b91293c117ef0f295",
+      "functionKind": "AsyncFunctionDef",
+      "complexity": 5,
+      "disposition": "review-only",
+      "status": "measured",
+      "measurement": {
+        "ownedStatements": 20,
+        "maxBlockNesting": 5,
+        "statementKinds": {
+          "Assign": 6,
+          "AsyncWith": 1,
+          "AugAssign": 1,
+          "Expr": 7,
+          "For": 1,
+          "If": 2,
+          "Raise": 1,
+          "While": 1
+        },
+        "excludedSyntax": {}
+      },
+      "bodySha256": "4e3bb21f7a4a6ac3ed2eaa89025976ac560da093d81088f9283ae663701f3095",
+      "sourceUrl": "https://github.com/Kludex/starlette/blob/96d5023c55b29224edb8d684868c49f681d079a9/starlette/responses.py#L456",
+      "assessment": "Twenty statements and CC five still reach depth five through an else arm, async context manager, range iteration, chunk iteration, and EOF guard. Resource lifetime and protocol ordering explain part of the nesting; this is not a recommendation to remove safety scopes."
+    },
+    {
+      "project": "httpie",
+      "id": "d71509ead25da42d626eb2117ffe5ca8bada2d768facaef79f6bac71b929e0b4",
+      "file": "httpie/core.py",
+      "member": "raw_main",
+      "line": 32,
+      "population": "production",
+      "endLine": 143,
+      "sourceSha256": "12a78934cd277bdba722574319048213d417c9bc549145ca8bd851c123444d5b",
+      "functionKind": "FunctionDef",
+      "complexity": 26,
+      "disposition": "review-only",
+      "status": "measured",
+      "measurement": {
+        "ownedStatements": 60,
+        "maxBlockNesting": 4,
+        "statementKinds": {
+          "Assign": 24,
+          "Expr": 12,
+          "If": 14,
+          "Raise": 5,
+          "Return": 3,
+          "Try": 2
+        },
+        "excludedSyntax": {
+          "FunctionDef": 1
+        }
+      },
+      "bodySha256": "c859a0d05ac39483b9d65d01a6636470a702ffc77cd65b378f925dbaa788fddf",
+      "sourceUrl": "https://github.com/httpie/cli/blob/5b604c37c6c67e18e7c3e9aee6c88a8c22b98345/httpie/core.py#L32",
+      "assessment": "Sixty statements cover argument setup and distinct parse/execution failure outcomes. The nested generic-error helper is excluded from the parent and measured separately. Do not reward deleting exception handling to lower size or nesting."
+    },
+    {
+      "project": "django",
+      "id": "cfe5f0286c62af80ecfb3337290caafedb8112404d8e47495309493261df5300",
+      "file": "django/db/backends/sqlite3/_functions.py",
+      "member": "register",
+      "line": 46,
+      "population": "production",
+      "endLine": 116,
+      "sourceSha256": "af42d8e7af692d23a56be5359826055028bccd37440c28af628e96c64813bd4e",
+      "functionKind": "FunctionDef",
+      "complexity": 3,
+      "disposition": "review-only",
+      "status": "measured",
+      "measurement": {
+        "ownedStatements": 58,
+        "maxBlockNesting": 1,
+        "statementKinds": {
+          "Assign": 2,
+          "Expr": 54,
+          "If": 2
+        },
+        "excludedSyntax": {}
+      },
+      "bodySha256": "ee98566d52adc303a34c9dbf8a3bdf680b09719a86ae11fe1aaef5486df6ebd8",
+      "sourceUrl": "https://github.com/django/django/blob/dab0a5c47f159eb58472110dcbc10bd4a9b01adb/django/db/backends/sqlite3/_functions.py#L46",
+      "assessment": "Fifty-eight statements at CC three mostly register SQLite functions and aggregates, with version/capability checks. A high size rank alone does not establish poor decomposition."
+    },
+    {
+      "project": "django",
+      "id": "2fd77641da83ac958eab36c2ea007d0cb177939ceae6623d51aac5125eea1723",
+      "file": "django/db/models/options.py",
+      "member": "Options.__init__",
+      "line": 115,
+      "population": "production",
+      "endLine": 170,
+      "sourceSha256": "3cb6de013d977255d5004b1d777712cffd7c9d2269e95d6b98f5d9b9f015fa49",
+      "functionKind": "FunctionDef",
+      "complexity": 1,
+      "disposition": "review-only",
+      "status": "measured",
+      "measurement": {
+        "ownedStatements": 41,
+        "maxBlockNesting": 0,
+        "statementKinds": {
+          "Assign": 41
+        },
+        "excludedSyntax": {}
+      },
+      "bodySha256": "74dac3353d0e26ec2d6052b8b74123619aae4295aa5091664a0bf1b0189311f1",
+      "sourceUrl": "https://github.com/django/django/blob/dab0a5c47f159eb58472110dcbc10bd4a9b01adb/django/db/models/options.py#L115",
+      "assessment": "Forty-one assignments at CC one initialize model metadata state; nesting is zero. Constructor names are not a general exemption, but this body demonstrates the limits of automatic size penalties."
+    },
+    {
+      "project": "django",
+      "id": "7e2e39e0cf9e5a8d191d6cfb334f96bea266a6426e939aaca1747f1cf958f31c",
+      "file": "django/utils/translation/template.py",
+      "member": "templatize",
+      "line": 39,
+      "population": "production",
+      "endLine": 246,
+      "sourceSha256": "4ce7cf353eb646751b506eb86bfe9dfd543bb6c0c2d7f1754c2a29c3f1f095c0",
+      "functionKind": "FunctionDef",
+      "complexity": 51,
+      "disposition": "review-only",
+      "status": "measured",
+      "measurement": {
+        "ownedStatements": 135,
+        "maxBlockNesting": 7,
+        "statementKinds": {
+          "Assign": 59,
+          "Expr": 26,
+          "For": 10,
+          "If": 38,
+          "Raise": 1,
+          "Return": 1
+        },
+        "excludedSyntax": {
+          "FunctionDef": 1,
+          "docstring": 1
+        }
+      },
+      "bodySha256": "49f3ace5ed672739601adf27be821b2a99416dadf614aad0d9946323407c4e27",
+      "sourceUrl": "https://github.com/django/django/blob/dab0a5c47f159eb58472110dcbc10bd4a9b01adb/django/utils/translation/template.py#L39",
+      "assessment": "135 statements and depth seven process translation/comment/token state and emit gettext-compatible text. This is a substantial behavioral review lead; the nearby helper is separately owned and excluded from its parent."
+    },
+    {
+      "project": "django",
+      "id": "6733af95bb0fde390890b1ee9d8821deba67a51c6d487b9b01e0e038cf22f834",
+      "file": "django/db/migrations/autodetector.py",
+      "member": "MigrationAutodetector._build_migration_list",
+      "line": 289,
+      "population": "production",
+      "endLine": 407,
+      "sourceSha256": "235c4c6875c1d7a09e729dd4ac5991f41cdb68c2b44cab91cb6aca935b1c51f5",
+      "functionKind": "FunctionDef",
+      "complexity": 23,
+      "disposition": "review-only",
+      "status": "measured",
+      "measurement": {
+        "ownedStatements": 50,
+        "maxBlockNesting": 9,
+        "statementKinds": {
+          "Assign": 21,
+          "Break": 3,
+          "Delete": 1,
+          "Expr": 7,
+          "For": 4,
+          "If": 12,
+          "Raise": 1,
+          "While": 1
+        },
+        "excludedSyntax": {
+          "docstring": 1
+        }
+      },
+      "bodySha256": "97f7f8b41b6dd49caf0e1cac6431c90ee5af82616c45971594fa3f902d68b14d",
+      "sourceUrl": "https://github.com/django/django/blob/dab0a5c47f159eb58472110dcbc10bd4a9b01adb/django/db/migrations/autodetector.py#L289",
+      "assessment": "Fifty statements and depth nine coordinate app, operation, and dependency iteration with progress/cycle handling. Comments explain algorithmic constraints. The result exposes structural demand without judging correctness or safe refactoring."
+    }
+  ],
+  "limitations": [
+    "Purposive source review by one assistant, not independent ratings or defect labels.",
+    "Four projects, all using the existing Python 3.12 selection; Django dominates body count.",
+    "Statement count excludes expression size, class initializer work, and nested declaration metadata.",
+    "Block nesting includes resource and cleanup scopes; it is not cognitive complexity.",
+    "Standalone review only; no packaged evidence integration, dimension scores, or thresholds enabled."
+  ],
+  "artifactSha256": {
+    "django.json": "807a72e59979bfdc1d12aa11714698af4abb013d1b87ffa4738d9fb9f842559c",
+    "httpie.json": "a32c1ef8cbb5c8ee1630dbb690a4028eaeb602222a93619103d348d79168dd1e",
+    "requests.json": "d99e9462233e631815725959f6f1c32fd03e48b10ead1bca9df4f69d8330bef8",
+    "starlette.json": "f516adfcae6bf70b9a18f9882348e200acf8b16a0f7cf973cb9d35240c0320d4",
+    "summary.json": "415d034502c722e48287aa7c72d78cc5713e108124d86f51ba706b3d316925e9"
+  }
+}
