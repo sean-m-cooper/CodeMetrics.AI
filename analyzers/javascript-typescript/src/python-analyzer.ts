@@ -6,11 +6,13 @@ import { validateSourceFacts, type SourceFacts } from "#source-facts/contract.mj
 import { invocationIds } from "./evidence.js";
 import { pythonEvidence } from "./python-evidence.js";
 import { validateDuplication, type PythonDuplication } from "./python-duplication.js";
+import { validateCoverage, type PythonCoverage } from "./python-coverage.js";
 
 export interface PythonOptions {
   project: string; python?: string; runId?: string; auditId?: string;
   include?: string[]; exclude?: string[]; testPath?: string[]; productionPath?: string[];
   includeTests?: boolean; includeGenerated?: boolean; includeSupport?: boolean;
+  coverageJson?: string; collectionManifest?: string;
 }
 
 export function pythonTarget(project: string) {
@@ -38,6 +40,9 @@ export function analyzePython(options: PythonOptions) {
     if (enabled) args.push(`--${flag}`);
   let facts: SourceFacts | null = null;
   let duplication: PythonDuplication | null = null;
+  let coverage: PythonCoverage | null = null;
+  for (const [flag, value] of [["coverage-json", options.coverageJson], ["collection-manifest", options.collectionManifest]] as const)
+    if (value) args.push(`--${flag}`, path.resolve(value));
   const subject = { root, entryPoint, name: path.basename(root), variant: "source" };
   args.push("--run-id", ids.runId, "--audit-id", ids.auditId);
   let error: string | undefined;
@@ -49,9 +54,11 @@ export function analyzePython(options: PythonOptions) {
     const parsed = JSON.parse(result.stdout);
     validateSourceFacts(parsed.sourceFacts);
     validateDuplication(parsed.duplication, parsed.sourceFacts, subject, ids);
+    validateCoverage(parsed.coverageReview, parsed.sourceFacts, subject, ids);
     facts = parsed.sourceFacts;
     duplication = parsed.duplication;
-    if ((result.status === 0) !== (facts!.status === "complete" && duplication!.status === "complete")) throw new Error("Python exit status and facts disagree.");
-  } catch (failure) { facts = null; duplication = null; error = failure instanceof Error ? failure.message : String(failure); }
-  return pythonEvidence(facts, subject, ids, error, duplication);
+    coverage = parsed.coverageReview;
+    if ((result.status === 0) !== (facts!.status === "complete" && duplication!.status === "complete" && coverage!.status === "complete")) throw new Error("Python exit status and facts disagree.");
+  } catch (failure) { facts = null; duplication = null; coverage = null; error = failure instanceof Error ? failure.message : String(failure); }
+  return pythonEvidence(facts, subject, ids, error, duplication, coverage);
 }

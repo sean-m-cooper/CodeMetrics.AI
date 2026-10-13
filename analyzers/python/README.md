@@ -20,15 +20,15 @@ For repository development, invoke `node analyzers/javascript-typescript/dist/py
 
 `--scorecard-output` is required and must name a new `.json` file. Existing files are never overwritten. `--run-id` and `--audit-id` accept caller-supplied UUIDs; otherwise fresh IDs are generated. A complete selection exits 0 even when empty; parser/runtime/read/duplication failures exit 2 with incomplete evidence where the entry point and output are valid. Invalid CLI paths/options can fail before evidence is written. No previous output is reused.
 
-The evidence embeds facts at `dimensions.codeQuality.sourceFacts`. Its `experimentalPreview` contains the shared result and policy, not a dimension `score`. `codeQuality.duplication` contains exact-body review groups and explicit exclusions under the same run/audit IDs. One informational finding is emitted per duplicate group, with every occurrence in its observations. Code Quality is skipped pending calibration (failed on incomplete analysis); the other eight dimensions are unsupported. CC ≥ 10 produces informational review findings. `population.members` counts selected implementations; the schema-required `types: 0` is explicitly unmeasured, not an absence-of-classes claim. Filters count observed files; pruned directories do not imply enumerated file counts.
+The evidence embeds facts at `dimensions.codeQuality.sourceFacts`. Its `experimentalPreview` contains the shared result and policy, not a dimension `score`. `codeQuality.duplication` contains exact-body review groups and explicit exclusions under the same run/audit IDs. `codeQuality.coverageReview` contains optional line-coverage/CRAP evidence, with missing, conditional, and source-bound observations kept distinct. One informational finding is emitted per duplicate group, with every occurrence in its observations. Code Quality is skipped pending calibration (failed on incomplete analysis); the other eight dimensions are unsupported. CC ≥ 10 produces informational review findings. `population.members` counts selected implementations; the schema-required `types: 0` is explicitly unmeasured, not an absence-of-classes claim. Filters count observed files; pruned directories do not imply enumerated file counts.
 
 The shared validator checks the v3 envelope and embedded facts, recomputes the preview, and rejects promoted dimension scores, inconsistent populations, and mismatched expected run IDs. Incomplete results have no usable preview or findings. Historical imports remain historical. Score comparisons/gates are disabled for this experimental policy; informational SARIF export is supported. Optional exploratory comparison through the shared CLI is marked incompatible and cannot gate or produce score deltas.
 
-The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's adapter version is `0.4.0-experimental`, independently of the enclosing npm package version.
+The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's packaged adapter version is `0.5.0-experimental`, independently of the enclosing npm version and unchanged source-facts producer `0.4.0-experimental`.
 
-## Offline coverage review
+## Optional coverage review and explicit collection
 
-The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON and maps executable body lines to current function complexity. Missing or ambiguous coverage stays unavailable. The separate, explicit collector runs a chosen test module and binds a newly generated report to before/after source hashes. The reviewer rejects stale source or substituted reports when provenance is supplied; ordinary imports remain conditional. Both paths are unscored standalone development tools, not yet part of the packaged CLI or skill.
+The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON through `codemetrics-python --coverage-json`, with optional `--collection-manifest`. Missing or ambiguous coverage stays unavailable. The separate `codemetrics-python-collect` command explicitly runs a chosen test module using a caller-supplied interpreter with coverage.py and test dependencies. It binds newly generated coverage to before/after source hashes. Analysis rejects stale source or substituted reports when provenance is supplied; ordinary imports remain conditional. Both paths ship in the development archive; the skill imports evidence but never silently collects coverage. Neither enables a dimension score.
 
 ## Raw source-facts workflow
 
@@ -69,7 +69,7 @@ Syntax parsing is not semantic validation or compilation. Missing coverage, main
 
 ## Population policy: `python/source-selection-v1`
 
-Python now emits **source-facts v2** with a machine-readable selection inventory and per-function population. JS/TS continues to emit v1 facts internally; its scoring is unchanged. This adapter version is `0.4.0-experimental`.
+Python emits **source-facts v2** with a machine-readable selection inventory and per-function population. JS/TS continues to emit v1 facts internally; its scoring is unchanged. The source-facts producer remains `0.4.0-experimental`; the packaged coverage-enabled wrapper is `0.5.0-experimental`.
 
 By default, the preview measures production **candidates**, not a verified installed-package or reachable-code population. The following rules make that selection inspectable:
 
@@ -122,3 +122,5 @@ npm run build --prefix analyzers/javascript-typescript
 node --test shared/source-facts/conformance.test.mjs
 node analyzers/python/package-smoke.mjs
 ```
+
+Collection integration checks require coverage.py 7.6.1 in a Python 3.12 environment. Set `CODEMETRICS_COVERAGE_PYTHON` to that interpreter for Node/package tests if the default interpreter does not have it. Coverage.py is not needed for ordinary source analysis or coverage import.

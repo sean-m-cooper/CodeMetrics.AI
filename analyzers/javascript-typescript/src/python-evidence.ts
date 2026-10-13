@@ -4,9 +4,10 @@ import { validateSourceFacts, type SourceFacts } from "#source-facts/contract.mj
 import { dimensionKeys } from "./scorecard-contract.js";
 import { hash, type Evidence, type Dimension, type Finding } from "./evidence.js";
 import { duplicationFindings, validateDuplication, type PythonDuplication } from "./python-duplication.js";
+import { validateCoverage, type PythonCoverage } from "./python-coverage.js";
 
-export const pythonVersion = "0.4.0-experimental";
-export const pythonRuleset = "python-2026-10-10-duplication-preview";
+export const pythonVersion = "0.5.0-experimental";
+export const pythonRuleset = "python-2026-10-12-coverage-preview";
 const previewPolicy = "experimental/shared-complexity-worst-40-remainder-60/v1";
 
 function complexityDetails(facts: SourceFacts | null) {
@@ -34,22 +35,23 @@ function measurements(facts: SourceFacts | null) {
   population: { types: 0, members: facts?.functions.length ?? 0 } };
 }
 
-export function pythonEvidence(facts: SourceFacts | null, subject: Evidence["subject"], ids: { runId: string; auditId: string }, error?: string, duplication: PythonDuplication | null = null): Evidence {
+export function pythonEvidence(facts: SourceFacts | null, subject: Evidence["subject"], ids: { runId: string; auditId: string }, error?: string, duplication: PythonDuplication | null = null, coverage: PythonCoverage | null = null): Evidence {
   if (facts) validateSourceFacts(facts);
   if (facts && duplication) validateDuplication(duplication, facts, subject, ids);
-  const complete = facts?.status === "complete" && duplication?.status === "complete" && !error;
+  if (facts && coverage) validateCoverage(coverage, facts, subject, ids);
+  const complete = facts?.status === "complete" && duplication?.status === "complete" && coverage?.status === "complete" && !error;
   const dimensions = Object.fromEntries(dimensionKeys.map(key => [key, {
     status: "skipped", basis: "Not measured by the experimental Python analyzer.", findings: [],
     scope: { id: `python/${key}/unsupported`, coverage: "unsupported", includes: [], excludes: [key] }
   }])) as unknown as Record<typeof dimensionKeys[number], Dimension>;
   dimensions.codeQuality = {
     status: complete ? "skipped" : "failed",
-    basis: complete ? "Function complexity and exact-body duplication measured; duplication is review-only and the complexity preview is experimental, not a dimension score."
+    basis: complete ? "Complexity, duplication and optional coverage/CRAP review evidence; all unscored. Complexity preview is experimental. Missing coverage is unavailable."
       : "Python analysis incomplete; partial measurements are diagnostic only.",
-    scope: { id: "python/owned-function-complexity-v2", coverage: "partial", includes: ["selected-function-complexity", "exact-function-body-duplication"],
+    scope: { id: "python/owned-function-complexity-v2", coverage: "partial", includes: ["selected-function-complexity", "exact-function-body-duplication", "optional-line-coverage-crap-review"],
       excludes: ["calibrated-dimension-score", "decomposition", "runtime-performance", "semantic-validation"] },
     findings: complete ? [...reviewFindings(facts), ...duplicationFindings(duplication!)] : [],
-    duplication,
+    duplication, coverageReview: coverage,
     sourceFacts: facts, experimentalPreview: complete ? complexityDetails(facts) : complexityDetails(null),
     populationNotes: "Units are observed Python files; members are selected implementation bodies. Types are not measured (the required types field is a placeholder zero). Pruned directories do not enumerate unseen files."
   };
@@ -57,9 +59,11 @@ export function pythonEvidence(facts: SourceFacts | null, subject: Evidence["sub
     tool: { name: "CodeMetrics.AI.Python", version: pythonVersion, ecosystem: "python" }, subject,
     ...measurements(facts), dimensions,
     analysis: { ...ids, status: complete ? "complete" : "incomplete", ruleset: pythonRuleset, calibration: "uncalibrated",
-      configurationFingerprint: hash(JSON.stringify([pythonRuleset, facts?.producer, facts?.measurementPolicy, facts?.selection?.configurationFingerprint, duplication?.configurationFingerprint])),
+      configurationFingerprint: hash(JSON.stringify([pythonRuleset, facts?.producer, facts?.measurementPolicy, facts?.selection?.configurationFingerprint, duplication?.configurationFingerprint, coverage?.configurationFingerprint])),
       diagnostics: [...(facts?.diagnostics ?? []).map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
         ...(duplication?.diagnostics ?? []).filter(item => !facts?.diagnostics.some(other => isDeepStrictEqual(item, other)))
+          .map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
+        ...(coverage?.diagnostics ?? []).filter(item => !facts?.diagnostics.some(other => isDeepStrictEqual(item, other)))
           .map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
         ...(error ? [{ kind: "pythonExecution", message: error }] : [])], suppressions: [] }
   };
@@ -67,28 +71,35 @@ export function pythonEvidence(facts: SourceFacts | null, subject: Evidence["sub
 
 /** Validate the experimental extension as well as the shared v3 envelope. */
 export function validatePythonEvidence(evidence: Evidence) {
-  if (evidence.tool.ecosystem !== "python" || evidence.analysis.ruleset !== pythonRuleset) return;
+  if (evidence.tool.ecosystem !== "python") return;
+  if (evidence.analysis.ruleset !== pythonRuleset) {
+    if (evidence.tool.version === pythonVersion || evidence.dimensions.codeQuality.coverageReview !== undefined)
+      throw new Error("Python coverage evidence requires its recorded supported ruleset.");
+    return; // Historical producers without this extension retain their original contract.
+  }
   if (!evidence.analysis.runId || !evidence.analysis.auditId || evidence.analysis.calibration !== "uncalibrated" ||
       evidence.tool.version !== pythonVersion || evidence.tool.name !== "CodeMetrics.AI.Python")
     throw new Error("Python evidence requires invocation IDs and experimental provenance.");
   if (Object.values(evidence.dimensions).some(item => item.status === "scored")) throw new Error("Experimental Python dimensions cannot be scored.");
   const facts = evidence.dimensions.codeQuality.sourceFacts as SourceFacts | null;
   const duplication = evidence.dimensions.codeQuality.duplication as PythonDuplication | null;
-  if (facts === null && duplication !== null) throw new Error("Duplication requires source facts.");
+  const coverage = evidence.dimensions.codeQuality.coverageReview as PythonCoverage | null;
+  if (facts === null && (duplication !== null || coverage !== null)) throw new Error("Python measurements require source facts.");
   if (facts !== null) {
     validateSourceFacts(facts);
-    if (facts.language !== "python" || facts.schemaVersion !== 2 || facts.producer.version !== pythonVersion ||
+    if (facts.language !== "python" || facts.schemaVersion !== 2 || facts.producer.version !== "0.4.0-experimental" ||
         facts.producer.name !== "codemetrics-ai/python-source-facts" || facts.producer.parser !== "python-ast" ||
         facts.measurementPolicy !== "python/owned-function-complexity-v2" || facts.selection?.policy !== "python/source-selection-v1" ||
         (facts.status === "complete" && !/^3\.12\./.test(facts.producer.parserVersion)))
       throw new Error("Unexpected Python source-facts producer or version.");
     validateDuplication(duplication, facts, evidence.subject, { runId: evidence.analysis.runId, auditId: evidence.analysis.auditId });
+    validateCoverage(coverage, facts, evidence.subject, { runId: evidence.analysis.runId, auditId: evidence.analysis.auditId });
   }
-  if (evidence.analysis.status === "complete" && (facts?.status !== "complete" || duplication?.status !== "complete")) throw new Error("Complete Python evidence requires complete measurements.");
-  if (evidence.analysis.status === "incomplete" && facts?.status === "complete" && duplication?.status === "complete") throw new Error("Incomplete Python evidence must identify an incomplete measurement.");
+  if (evidence.analysis.status === "complete" && (facts?.status !== "complete" || duplication?.status !== "complete" || coverage?.status !== "complete")) throw new Error("Complete Python evidence requires complete measurements.");
+  if (evidence.analysis.status === "incomplete" && facts?.status === "complete" && duplication?.status === "complete" && coverage?.status === "complete") throw new Error("Incomplete Python evidence must identify an incomplete measurement.");
   if (evidence.analysis.status === "incomplete" && !evidence.analysis.diagnostics.length) throw new Error("Incomplete Python evidence requires diagnostics.");
   const expected = pythonEvidence(facts, evidence.subject, { runId: evidence.analysis.runId, auditId: evidence.analysis.auditId },
-    evidence.analysis.status === "incomplete" ? "Validation placeholder" : undefined, duplication);
+    evidence.analysis.status === "incomplete" ? "Validation placeholder" : undefined, duplication, coverage);
   for (const key of ["filters", "population", "dimensions"] as const)
     if (!isDeepStrictEqual(evidence[key], expected[key])) throw new Error(`Python ${key} do not match measured facts and experimental policy.`);
   if (evidence.analysis.configurationFingerprint !== expected.analysis.configurationFingerprint)

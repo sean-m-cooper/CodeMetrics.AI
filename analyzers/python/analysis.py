@@ -4,6 +4,7 @@ import argparse
 import json
 
 import duplication
+import coverage_review
 import source_facts
 
 
@@ -12,6 +13,8 @@ def main():
     parser.add_argument("target")
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--audit-id", required=True)
+    parser.add_argument("--coverage-json")
+    parser.add_argument("--collection-manifest")
     for option in ("include", "exclude", "test-path", "production-path"):
         parser.add_argument(f"--{option}", action="append", default=[])
     for option in ("include-tests", "include-generated", "include-support"):
@@ -21,8 +24,10 @@ def main():
                                  production_paths=args.production_path, include_tests=args.include_tests,
                                  include_generated=args.include_generated, include_support=args.include_support)
     duplicates = duplication.review(args.target, facts, run_id=args.run_id, audit_id=args.audit_id)
-    print(json.dumps({"sourceFacts": facts, "duplication": duplicates}, ensure_ascii=True))
-    return 0 if facts["status"] == duplicates["status"] == "complete" else 2
+    coverage = coverage_review.review(args.target, facts, coverage_json=args.coverage_json, collection_manifest=args.collection_manifest,
+                                     run_id=args.run_id, audit_id=args.audit_id)
+    print(json.dumps({"sourceFacts": facts, "duplication": duplicates, "coverageReview": coverage}, ensure_ascii=True))
+    return 0 if facts["status"] == duplicates["status"] == coverage["status"] == "complete" else 2
 
 
 if __name__ == "__main__":

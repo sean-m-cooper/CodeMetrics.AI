@@ -21,7 +21,8 @@ function fixture(t) {
   function run(args = [], expected = 0, project = root) {
     const output = path.join(directory, `evidence-${sequence++}.json`);
     const result = spawnSync(process.execPath, [cli, '--project', project, '--scorecard-output', output, ...args], { encoding: 'utf8', windowsHide: true });
-    assert.ifError(result.error); assert.equal(result.status, expected, result.stderr + result.stdout);
+    assert.ifError(result.error); assert.equal(result.status, expected, result.stderr + result.stdout +
+      (fs.existsSync(output) ? JSON.stringify(JSON.parse(fs.readFileSync(output)).analysis?.diagnostics) : ''));
     return { output, evidence: JSON.parse(fs.readFileSync(output, 'utf8')) };
   }
   const inspect = (output, args = [], expected = 0) => {
@@ -78,11 +79,11 @@ test('installed match policy preserves guards and structural alternatives with v
 `);
   const { output, evidence } = f.run();
   const facts = evidence.dimensions.codeQuality.sourceFacts;
-  assert.equal(evidence.tool.version, '0.4.0-experimental');
-  assert.equal(facts.producer.version, evidence.tool.version);
+  assert.equal(evidence.tool.version, '0.5.0-experimental');
+  assert.equal(facts.producer.version, '0.4.0-experimental');
   assert.equal(facts.measurementPolicy, 'python/owned-function-complexity-v2');
   assert.equal(evidence.dimensions.codeQuality.scope.id, facts.measurementPolicy);
-  assert.equal(evidence.analysis.ruleset, 'python-2026-10-10-duplication-preview');
+  assert.equal(evidence.analysis.ruleset, 'python-2026-10-12-coverage-preview');
   const complexity = facts.functions[0].complexity;
   assert.equal(complexity.value, 7);
   assert.equal(complexity.decisions.matchAlternatives, 1);
@@ -226,11 +227,101 @@ test('duplication failure with complete complexity still withholds the preview a
   report.status = 'incomplete'; report.summary = null; report.excludedFunctions = [];
   report.diagnostics = [{ code: 'duplication-analysis', message: 'Selected source changed after population measurement.' }];
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report);
+  const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report, current.dimensions.codeQuality.coverageReview);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
   assert.equal(failed.dimensions.codeQuality.experimentalPreview.population, null);
   assert.deepEqual(failed.dimensions.codeQuality.findings, []);
   const output = path.join(f.directory, 'duplication-failed.json'); fs.writeFileSync(output, JSON.stringify(failed));
   f.inspect(output, [], 2);
+});
+
+test('coverage imports are unscored, explicit about freshness, and arithmetically validated', t => {
+  const f = fixture(t);
+  f.write('work.py', 'def work(value):\n    if value:\n        return 1\n    return 0\n');
+  const coverage = path.join(f.directory, 'coverage.json');
+  fs.writeFileSync(coverage, JSON.stringify({ meta: { format: 3, version: '7.6.1', timestamp: '2020-01-01', branch_coverage: true },
+    files: { 'work.py': { executed_lines: [1, 2, 3], missing_lines: [4], excluded_lines: [] } } }));
+  const absent = f.run().evidence.dimensions.codeQuality.coverageReview;
+  assert.equal(absent.functions[0].coverage.reason, 'coverage-not-supplied');
+  const { output, evidence } = f.run(['--coverage-json', coverage]);
+  const report = evidence.dimensions.codeQuality.coverageReview;
+  assert.equal(report.runId, evidence.analysis.runId); assert.equal(report.auditId, evidence.analysis.auditId);
+  assert.equal(report.coverageInput.freshness, 'unverified'); assert.equal(report.summary.conditionalEstimates, 1);
+  assert.equal(report.functions[0].coverage.fraction, 2 / 3);
+  assert.ok(Math.abs(report.functions[0].crapEstimate.value - (2 + 4 / 27)) < 1e-12);
+  assert.ok(Object.values(evidence.dimensions).every(d => d.status === 'skipped' && !('score' in d)));
+  f.inspect(output);
+  for (const mutate of [
+    r => { r.runId = '11111111-1111-4111-8111-111111111111'; },
+    r => { r.coverageInput.freshness = 'source-matched'; },
+    r => { r.functions[0].complexity++; },
+    r => { r.functions[0].sourceSha256 = 'a'.repeat(64); },
+    r => { r.functions[0].coverage.fraction = 1; },
+    r => { r.functions[0].coverage.missingLines = [2]; },
+    r => { r.functions[0].coverage.executedLines.push(1); },
+    r => { r.functions[0].crapEstimate.value++; },
+    r => { r.functions[0].crapEstimate.disposition = 'review-only'; },
+    r => { r.functions[0].score = 10; },
+    r => { r.functions.push(r.functions[0]); },
+    r => { r.functions = []; },
+    r => { r.summary.sourceBoundEstimates++; },
+    r => { r.summary.conditionalEstimates++; },
+    r => { r.summary.unmatchedReportFiles.push('../escape.py'); }
+  ]) {
+    const altered = structuredClone(evidence); mutate(altered.dimensions.codeQuality.coverageReview);
+    assert.throws(() => validateEvidence(altered));
+  }
+  const altered = structuredClone(evidence); altered.analysis.ruleset = 'unknown'; assert.throws(() => validateEvidence(altered));
+  for (const args of [['--coverage-json', coverage + '-missing'], ['--coverage-json', coverage, '--collection-manifest', coverage + '-missing'], ['--collection-manifest', coverage]]) {
+    const failed = f.run(args, 2).evidence;
+    assert.equal(failed.dimensions.codeQuality.experimentalPreview.population, null);
+    assert.deepEqual(failed.dimensions.codeQuality.findings, []);
+    assert.equal(failed.dimensions.codeQuality.coverageReview.status, 'incomplete');
+  }
+});
+
+test('installed explicit collector binds source and rejects stale source or substituted reports', t => {
+  const f = fixture(t);
+  f.write('work.py', 'def work(value):\n    if value:\n        return 1\n    return 0\n');
+  f.write('caf\u00e9.py', 'VALUE = 1\n');
+  f.write('exercise.py', 'import work\nassert work.work(True) == 1\n');
+  const python = process.env.CODEMETRICS_COVERAGE_PYTHON ?? spawnSync(process.platform === 'win32' ? 'py' : 'python3',
+    [...(process.platform === 'win32' ? ['-3.12'] : []), '-c', 'import sys; print(sys.executable)'], { encoding: 'utf8', windowsHide: true }).stdout.trim();
+  const directory = path.join(f.directory, 'collection');
+  const collector = path.join(packageRoot, 'dist/python-collect-cli.js');
+  const command = [collector, f.root, '--python', python, '--module', 'exercise', '--exclude', 'exercise.py', '--output-directory', directory];
+  const collected = spawnSync(process.execPath, command, { encoding: 'utf8', windowsHide: true, timeout: 60_000 });
+  assert.equal(collected.status, 0, collected.stderr + collected.stdout + (fs.existsSync(path.join(directory, 'tests.log')) ? fs.readFileSync(path.join(directory, 'tests.log'), 'utf8') : ''));
+  const coverage = path.join(directory, 'coverage.json'), manifest = path.join(directory, 'provenance.json');
+  const args = ['--exclude', 'exercise.py', '--coverage-json', coverage, '--collection-manifest', manifest];
+  const { output, evidence } = f.run(args);
+  const report = evidence.dimensions.codeQuality.coverageReview;
+  assert.equal(report.summary.sourceBoundEstimates, 1); assert.equal(report.summary.conditionalEstimates, 0);
+  assert.equal(report.coverageInput.sourceBinding, 'matched-pre-post-snapshots');
+  assert.equal(report.collectionProvenance.receipt.reportSha256, report.coverageInput.sha256);
+  assert.notEqual(report.collectionProvenance.collectionId, report.runId);
+  f.inspect(output);
+  for (const mutate of [
+    p => { p.receipt.reportSha256 = '0'.repeat(64); },
+    p => { p.receipt.beforeSourceSha256 = '0'.repeat(64); },
+    p => { p.receipt.afterSourceSha256 = '0'.repeat(64); },
+    p => { p.receipt.sourceSelection.files[0].contentSha256 = '0'.repeat(64); },
+    p => { p.receipt.testExitCode = 1; },
+    p => { p.receipt.configuration.branch = false; },
+    p => { p.receipt.runtime.coverageVersion = 'fake'; },
+    p => { p.collectionId = '11111111-1111-4111-8111-111111111111'; },
+    p => { delete p.receipt; }
+  ]) {
+    const altered = structuredClone(evidence); mutate(altered.dimensions.codeQuality.coverageReview.collectionProvenance);
+    assert.throws(() => validateEvidence(altered));
+  }
+  f.write('work.py', 'def work(value):\n    if value:\n        return 1\n    return 2\n');
+  const stale = f.run(args, 2); f.inspect(stale.output, [], 2);
+  f.write('work.py', 'def work(value):\n    if value:\n        return 1\n    return 0\n');
+  fs.appendFileSync(coverage, '\n');
+  assert.equal(f.run(args, 2).evidence.analysis.status, 'incomplete');
+  const original = fs.readFileSync(manifest);
+  assert.equal(spawnSync(process.execPath, command, { windowsHide: true }).status, 2);
+  assert.deepEqual(fs.readFileSync(manifest), original);
 });

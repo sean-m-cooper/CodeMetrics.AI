@@ -73,5 +73,5 @@ def validate(path, root, facts, coverage_input, load_json):
     return {"path": str(Path(path).absolute()), "sha256": digest(raw.decode("utf-8")),
             "collectionId": collection_id, "policy": POLICY, "startedAtUtc": manifest["startedAtUtc"],
             "finishedAtUtc": manifest["finishedAtUtc"], "sourceBinding": "matched-pre-post-snapshots",
-            "freshness": "source-matched", "command": command,
+            "freshness": "source-matched", "command": command, "receipt": manifest,
             "limitations": "Local unsigned receipt; pre/post observations cannot detect edits reverted during execution, prove assertion quality, or cover subprocess execution."}

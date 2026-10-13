@@ -19,9 +19,11 @@ try {
   const install = path.join(temporary, 'isolated install'); fs.mkdirSync(install);
   run([npm, 'install', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund', path.join(temporary, archive.filename)], install);
   const packageRoot = path.join(install, 'node_modules/codemetrics-ai');
-  for (const file of ['source_facts.py', 'source_selection.py', 'duplication.py', 'analysis.py'])
+  for (const file of ['source_facts.py', 'source_selection.py', 'duplication.py', 'analysis.py', 'coverage_review.py',
+    'coverage_provenance.py', 'coverage_collect.py', 'coverage_worker.py', 'COVERAGE.md'])
     assert.deepEqual(fs.readFileSync(path.join(packageRoot, 'dist/python', file)), fs.readFileSync(new URL(file, import.meta.url)));
   assert.equal(JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'))).bin['codemetrics-python'], './dist/python-cli.js');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'))).bin['codemetrics-python-collect'], './dist/python-collect-cli.js');
   console.log(run(['--test', fileURLToPath(new URL('tests/evidence.test.mjs', import.meta.url))], install, { CODEMETRICS_PACKAGE_ROOT: packageRoot }));
   console.log('Installed Python package smoke passed.');
 } finally { fs.rmSync(temporary, { recursive: true, force: true }); }
