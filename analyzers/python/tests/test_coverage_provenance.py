@@ -170,7 +170,7 @@ class ProvenanceTests(unittest.TestCase):
         self.assertEqual(self.collect(timeout)["status"], "incomplete")
 
 
-@unittest.skipUnless(importlib.util.find_spec("coverage"), "Integration requires coverage==7.6.1 in the test interpreter")
+@unittest.skipUnless(importlib.util.find_spec("coverage"), "Integration requires coverage.py in the test interpreter")
 class CollectionIntegrationTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
@@ -209,6 +209,37 @@ class CollectionIntegrationTests(unittest.TestCase):
         changed = coverage_collect.collect(self.root, self.base / "changed", module="exercise", include=["code.py"])
         self.assertEqual(changed["status"], "incomplete")
         self.assertIn("changed", changed["diagnostics"][0]["message"])
+
+    def test_async_and_threaded_bodies_keep_independent_line_observations(self):
+        (self.root / "code.py").write_text(
+            "import asyncio\n"
+            "def threaded(value):\n"
+            "    if value:\n"
+            "        return value\n"
+            "    return 0\n"
+            "async def choose(value):\n"
+            "    await asyncio.sleep(0)\n"
+            "    if value:\n"
+            "        return await asyncio.to_thread(threaded, value)\n"
+            "    return 0\n"
+            "async def unused():\n"
+            "    await asyncio.sleep(0)\n"
+            "    return -1\n"
+        )
+        (self.root / "exercise.py").write_text("import asyncio, code\nassert asyncio.run(code.choose(1)) == 1\n")
+        output = self.base / "async-run"
+        collected = coverage_collect.collect(self.root, output, module="exercise", include=["code.py"])
+        self.assertEqual(collected["status"], "complete", collected["diagnostics"])
+        report = coverage_review.analyze(self.root, include=["code.py"], coverage_json=output / "coverage.json",
+                                         collection_manifest=output / "provenance.json")
+        self.assertEqual(report["status"], "complete", report["diagnostics"])
+        self.assertEqual(report["summary"]["sourceBoundEstimates"], 3)
+        rows = {row["member"]: row for row in report["functions"]}
+        self.assertEqual(rows["threaded"]["coverage"]["fraction"], 2 / 3)
+        self.assertEqual(rows["choose"]["coverage"]["fraction"], 3 / 4)
+        # Importing an async definition does not execute its body.
+        self.assertEqual(rows["unused"]["coverage"]["fraction"], 0)
+        self.assertEqual(rows["unused"]["crapEstimate"]["value"], 2)
 
     def test_real_timeout_terminates_collection(self):
         (self.root / "exercise.py").write_text("import time\ntime.sleep(60)\n")

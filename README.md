@@ -17,7 +17,7 @@ Released scorecard analyzers run in the package ecosystem natural to their targe
 |-----------|----------|---------|--------|
 | .NET / C# | `analyzers/dotnet` | `CodeMetrics.AI` NuGet global tool | Available |
 | JavaScript / TypeScript / React | `analyzers/javascript-typescript` | `codemetrics-ai` NPM package | Implemented; scores uncalibrated |
-| Python | `analyzers/python` | `codemetrics-python` in development npm bundle; Python 3.12 required | Experimental complexity and duplication evidence with skill integration; no dimension scores |
+| Python | `analyzers/python` | `codemetrics-python` in development npm bundle; Python 3.12 required | Experimental complexity, duplication, and coverage review with skill integration; no dimension scores |
 | Rust | `analyzers/rust` | Rust crate | Planned next wave |
 
 ## Shared Contract

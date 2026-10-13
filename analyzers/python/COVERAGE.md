@@ -26,7 +26,7 @@ The CLI accepts the source analyzer's include/exclude and population flags, plus
 
 ## Collect new coverage with source provenance
 
-Use Python 3.12 with coverage.py and the project's test dependencies already installed in an isolated environment. Validation uses `coverage==7.6.1`. The collector requires a project directory, an explicit new output directory outside that project with an existing parent, and an interpreter path. It executes pytest by default; `--module` selects another Python test module. Arguments after `--` belong to that module.
+Use Python 3.12 with coverage.py and the project's test dependencies already installed in an isolated environment. Validation covers `coverage==7.6.1` and `coverage==7.16.1`. The collector requires a project directory, an explicit new output directory outside that project with an existing parent, and an interpreter path. It executes pytest by default; `--module` selects another Python test module. Arguments after `--` belong to that module.
 
 ```powershell
 codemetrics-python-collect E:/repos/my-project --include 'src/**' --python E:/temp/my-project-tests/Scripts/python.exe --output-directory E:/temp/my-project-coverage-001 -- -q tests
@@ -84,7 +84,7 @@ Receipts are local and unsigned. They protect against accidental stale source/re
 
 ## Verification and next step
 
-The [authored fixture](tests/fixtures/coverage/README.md) includes a real coverage.py 7.6.1 format-3 report generated on Python 3.12, including the never-called one-line function trap. Offline tests cover format-2 field compatibility, formula boundaries, absent reports/files, exclusions, source selection, exact paths, malformed input, source drift, fresh IDs, and output preservation. Collection tests add same-size edits, report substitution, source additions/deletions, failed receipts, parser/selection mismatch, cache creation, and output reuse. Three integration tests execute only authored fixtures, covering a successful integer-enum exit, failures, mutation, and process timeout. CI installs coverage.py for these tests; without it, those three tests explicitly skip.
+The [authored fixture](tests/fixtures/coverage/README.md) includes a real coverage.py 7.6.1 format-3 report generated on Python 3.12, including the never-called one-line function trap. Offline tests cover format-2 field compatibility, formula boundaries, absent reports/files, exclusions, source selection, exact paths, malformed input, source drift, fresh IDs, and output preservation. Collection tests add same-size edits, report substitution, source additions/deletions, failed receipts, parser/selection mismatch, cache creation, and output reuse. Four integration tests execute only authored fixtures, covering a successful integer-enum exit, async/threaded body attribution, failures, mutation, and process timeout. CI defines coverage.py 7.6.1 and 7.16.1 on Ubuntu and Windows; without coverage.py, those four tests explicitly skip.
 
 ```powershell
 # In a Python 3.12 environment with coverage==7.6.1 installed:
@@ -92,3 +92,5 @@ python -m unittest discover -s analyzers/python/tests -v
 ```
 
 The [Requests validation](../../shared/scorecard-schema/calibration-runs/python-coverage-provenance-2026-10-12.md) exercised the collector against a pinned real checkout: 255 tests passed, one skipped, and 238 function estimates were source-bound. This was a three-module test slice, not a full Requests test-coverage assessment. The substituted real report was rejected. Package and skill integration retain these boundaries; broader test-suite/platform validation and any dimension-score calibration remain separate work.
+
+The [Starlette validation](../../shared/scorecard-schema/calibration-runs/python-coverage-starlette-2026-10-13.md) exercised asyncio and Trio tests with coverage.py 7.16.1. Seven full-suite Windows failures reproduced without collection and correctly withheld estimates. A separately labeled subset passed 1,338 tests and produced 459 source-bound estimates; it does not represent a passing full-suite run. Both coverage versions passed all 64 Python regression tests locally on Windows.
