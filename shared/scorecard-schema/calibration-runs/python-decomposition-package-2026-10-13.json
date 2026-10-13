@@ -1,0 +1,191 @@
+{
+  "date": "2026-10-13",
+  "scope": "Installed development archive and companion skill integration; source-only corpus comparison. No live-model report evaluation.",
+  "checkpointCommit": "9ea8c87",
+  "adapterVersion": "0.6.0-experimental",
+  "ruleset": "python-2026-10-13-decomposition-preview",
+  "sourceFactsVersion": "0.4.0-experimental",
+  "decompositionVersion": "0.1.0-experimental",
+  "decompositionPolicy": "python/owned-statements-block-nesting-v1",
+  "npmDevelopmentVersion": "0.5.0",
+  "npmArchive": "TestResults/python-decomposition-package-2026-10-13/codemetrics-ai-0.5.0.tgz",
+  "npmArchiveSha256": "ecfd125dc0505569079e2905ae8a26d944cce2f449818ff8c089fdb6ff2ba0e6",
+  "checks": {
+    "pythonUnitAndCollection": {
+      "passed": 79,
+      "failed": 0,
+      "skipped": 0
+    },
+    "javascriptTypescript": {
+      "passed": 256,
+      "failed": 0
+    },
+    "sourceFactsConformanceAndCalibration": {
+      "passed": 9,
+      "failed": 0
+    },
+    "installedPythonEvidence": {
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0
+    },
+    "skillRuntimeCatalogAndOfflineHarness": {
+      "passed": 29,
+      "failed": 0,
+      "skipped": 0
+    },
+    "skillPythonIntegrationSubtests": 12,
+    "skillStructuralValidation": "passed",
+    "historicalCoverageEvidence": "Previous installed 0.5.0-experimental synthetic fixture and saved Requests evidence validated without decomposition."
+  },
+  "corpus": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "selectedFunctions": 246,
+      "measuredFunctions": 246,
+      "unavailableFunctions": 0,
+      "complexityPreview": 7,
+      "exactStandaloneMatch": true,
+      "populationSummary": {
+        "production": {
+          "selectedFunctions": 246,
+          "measuredFunctions": 246,
+          "unavailableFunctions": 0,
+          "ownedStatements": {
+            "count": 246,
+            "p50": 3,
+            "p90": 14,
+            "p95": 22,
+            "max": 56
+          },
+          "maxBlockNesting": {
+            "count": 246,
+            "p50": 1,
+            "p90": 2,
+            "p95": 3,
+            "max": 5
+          }
+        }
+      },
+      "runId": "ea373b38-cc8f-41dc-85e8-52e02f83f586",
+      "auditId": "ea373b38-cc8f-41dc-85e8-52e02f83f586",
+      "evidence": "TestResults/python-decomposition-package-2026-10-13/requests-evidence.json",
+      "evidenceSha256": "f33b53dd6602fef214786829f33d3125c4dd66783519d7cb8d4474e128897c3f",
+      "complexityPreviewUnchanged": true
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "selectedFunctions": 508,
+      "measuredFunctions": 507,
+      "unavailableFunctions": 1,
+      "complexityPreview": 7.1,
+      "exactStandaloneMatch": true,
+      "populationSummary": {
+        "production": {
+          "selectedFunctions": 508,
+          "measuredFunctions": 507,
+          "unavailableFunctions": 1,
+          "ownedStatements": {
+            "count": 507,
+            "p50": 3,
+            "p90": 15,
+            "p95": 20,
+            "max": 54
+          },
+          "maxBlockNesting": {
+            "count": 507,
+            "p50": 0,
+            "p90": 2,
+            "p95": 3,
+            "max": 5
+          }
+        }
+      },
+      "runId": "6c55d6c9-cb28-47a7-807d-b42cf8e1fb5e",
+      "auditId": "6c55d6c9-cb28-47a7-807d-b42cf8e1fb5e",
+      "evidence": "TestResults/python-decomposition-package-2026-10-13/starlette-evidence.json",
+      "evidenceSha256": "297a82e8f8ca276a719aed3ae6904250d50782b89813bba4e8a46ef5d9b3ca7b",
+      "complexityPreviewUnchanged": true
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "selectedFunctions": 464,
+      "measuredFunctions": 460,
+      "unavailableFunctions": 4,
+      "complexityPreview": 6.8,
+      "exactStandaloneMatch": true,
+      "populationSummary": {
+        "production": {
+          "selectedFunctions": 464,
+          "measuredFunctions": 460,
+          "unavailableFunctions": 4,
+          "ownedStatements": {
+            "count": 460,
+            "p50": 4,
+            "p90": 13,
+            "p95": 18,
+            "max": 60
+          },
+          "maxBlockNesting": {
+            "count": 460,
+            "p50": 1,
+            "p90": 2,
+            "p95": 3,
+            "max": 5
+          }
+        }
+      },
+      "runId": "4c4ca1c6-ed29-47c6-b3c5-f654bfd36f33",
+      "auditId": "4c4ca1c6-ed29-47c6-b3c5-f654bfd36f33",
+      "evidence": "TestResults/python-decomposition-package-2026-10-13/httpie-evidence.json",
+      "evidenceSha256": "134bca24d59613ef9636b8901f07da849b105b97017b04927d9f6acf9d315fef",
+      "complexityPreviewUnchanged": true
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "selectedFunctions": 9748,
+      "measuredFunctions": 9612,
+      "unavailableFunctions": 136,
+      "complexityPreview": 5.6,
+      "exactStandaloneMatch": true,
+      "populationSummary": {
+        "production": {
+          "selectedFunctions": 9748,
+          "measuredFunctions": 9612,
+          "unavailableFunctions": 136,
+          "ownedStatements": {
+            "count": 9612,
+            "p50": 3,
+            "p90": 12,
+            "p95": 19,
+            "max": 135
+          },
+          "maxBlockNesting": {
+            "count": 9612,
+            "p50": 0,
+            "p90": 2,
+            "p95": 3,
+            "max": 9
+          }
+        }
+      },
+      "runId": "2c3a4514-1822-4f44-adaf-cce27ac3841b",
+      "auditId": "2c3a4514-1822-4f44-adaf-cce27ac3841b",
+      "evidence": "TestResults/python-decomposition-package-2026-10-13/django-evidence.json",
+      "evidenceSha256": "7daa13173cfbf62eeb1b70707e430bb0098ac31d198240aa8802722e823b3cab",
+      "complexityPreviewUnchanged": true
+    }
+  ],
+  "boundaries": [
+    "Statement counts and maximum block nesting remain separate, review-only observations.",
+    "All nine dimensions remain unavailable; no new score, gate, deduction or automatic extraction finding.",
+    "Lambda expression bodies remain unavailable, not zero-statement implementations.",
+    "No target code executed for corpus analysis; tests only execute authored fixtures.",
+    "Source membership, identities, digest references, histograms and summaries are validated; this does not authenticate edited evidence or independently remeasure ASTs.",
+    "Explicit local archive remains required; published npm 0.5.0 does not contain this workflow."
+  ]
+}

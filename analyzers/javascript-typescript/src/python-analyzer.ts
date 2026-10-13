@@ -8,6 +8,8 @@ import { pythonEvidence } from "./python-evidence.js";
 import { validateDuplication, type PythonDuplication } from "./python-duplication.js";
 import { validateCoverage, type PythonCoverage } from "./python-coverage.js";
 
+import { validateDecomposition, type PythonDecomposition } from "./python-decomposition.js";
+
 export interface PythonOptions {
   project: string; python?: string; runId?: string; auditId?: string;
   include?: string[]; exclude?: string[]; testPath?: string[]; productionPath?: string[];
@@ -40,6 +42,7 @@ export function analyzePython(options: PythonOptions) {
     if (enabled) args.push(`--${flag}`);
   let facts: SourceFacts | null = null;
   let duplication: PythonDuplication | null = null;
+  let decomposition: PythonDecomposition | null = null;
   let coverage: PythonCoverage | null = null;
   for (const [flag, value] of [["coverage-json", options.coverageJson], ["collection-manifest", options.collectionManifest]] as const)
     if (value) args.push(`--${flag}`, path.resolve(value));
@@ -55,10 +58,12 @@ export function analyzePython(options: PythonOptions) {
     validateSourceFacts(parsed.sourceFacts);
     validateDuplication(parsed.duplication, parsed.sourceFacts, subject, ids);
     validateCoverage(parsed.coverageReview, parsed.sourceFacts, subject, ids);
+    validateDecomposition(parsed.decomposition, parsed.sourceFacts, subject, ids);
+    decomposition = parsed.decomposition;
     facts = parsed.sourceFacts;
     duplication = parsed.duplication;
     coverage = parsed.coverageReview;
-    if ((result.status === 0) !== (facts!.status === "complete" && duplication!.status === "complete" && coverage!.status === "complete")) throw new Error("Python exit status and facts disagree.");
-  } catch (failure) { facts = null; duplication = null; coverage = null; error = failure instanceof Error ? failure.message : String(failure); }
-  return pythonEvidence(facts, subject, ids, error, duplication, coverage);
+    if ((result.status === 0) !== (facts!.status === "complete" && duplication!.status === "complete" && coverage!.status === "complete" && decomposition!.status === "complete")) throw new Error("Python exit status and facts disagree.");
+  } catch (failure) { facts = null; decomposition = null; duplication = null; coverage = null; error = failure instanceof Error ? failure.message : String(failure); }
+  return pythonEvidence(facts, subject, ids, error, duplication, coverage, decomposition);
 }

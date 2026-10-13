@@ -79,11 +79,11 @@ test('installed match policy preserves guards and structural alternatives with v
 `);
   const { output, evidence } = f.run();
   const facts = evidence.dimensions.codeQuality.sourceFacts;
-  assert.equal(evidence.tool.version, '0.5.0-experimental');
+  assert.equal(evidence.tool.version, '0.6.0-experimental');
   assert.equal(facts.producer.version, '0.4.0-experimental');
   assert.equal(facts.measurementPolicy, 'python/owned-function-complexity-v2');
   assert.equal(evidence.dimensions.codeQuality.scope.id, facts.measurementPolicy);
-  assert.equal(evidence.analysis.ruleset, 'python-2026-10-12-coverage-preview');
+  assert.equal(evidence.analysis.ruleset, 'python-2026-10-13-decomposition-preview');
   const complexity = facts.functions[0].complexity;
   assert.equal(complexity.value, 7);
   assert.equal(complexity.decisions.matchAlternatives, 1);
@@ -227,7 +227,7 @@ test('duplication failure with complete complexity still withholds the preview a
   report.status = 'incomplete'; report.summary = null; report.excludedFunctions = [];
   report.diagnostics = [{ code: 'duplication-analysis', message: 'Selected source changed after population measurement.' }];
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report, current.dimensions.codeQuality.coverageReview);
+  const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report, current.dimensions.codeQuality.coverageReview, current.dimensions.codeQuality.decomposition);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
   assert.equal(failed.dimensions.codeQuality.experimentalPreview.population, null);
@@ -324,4 +324,90 @@ test('installed explicit collector binds source and rejects stale source or subs
   const original = fs.readFileSync(manifest);
   assert.equal(spawnSync(process.execPath, command, { windowsHide: true }).status, 2);
   assert.deepEqual(fs.readFileSync(manifest), original);
+});
+
+
+test('decomposition preserves separate size, nesting, population and unavailable lambda evidence', t => {
+  const f = fixture(t);
+  f.write('work.py', 'def large(x):\n' + '    x += 1\n'.repeat(35) + '    return x\n' +
+    'def nested(x):\n    if x:\n        for y in x:\n            if y:\n                return y\n    return None\n' +
+    'callback = lambda x: x + 1\n');
+  f.write('tests/test_work.py', 'def test_work():\n    assert True\n');
+  const { evidence, output } = f.run(['--include-tests']);
+  const cq = evidence.dimensions.codeQuality, report = cq.decomposition;
+  assert.equal(report.runId, evidence.analysis.runId); assert.equal(report.auditId, evidence.analysis.auditId);
+  assert.equal(report.summary.selectedFunctions, 4); assert.equal(report.summary.measuredFunctions, 3);
+  assert.equal(report.summary.unavailableFunctions, 1);
+  assert.deepEqual(report.summary.populations.production.ownedStatements, { count: 2, p50: 5, p90: 36, p95: 36, max: 36 });
+  assert.deepEqual(report.summary.populations.production.maxBlockNesting, { count: 2, p50: 0, p90: 3, p95: 3, max: 3 });
+  assert.equal(report.summary.populations.test.ownedStatements.max, 1);
+  assert.equal(report.functions.find(row => row.functionKind === 'Lambda').measurement, null);
+  assert.deepEqual(cq.findings, []); // Size and nesting add no thresholds or findings.
+  assert.ok(Object.values(evidence.dimensions).every(d => d.status === 'skipped' && !('score' in d)));
+  f.inspect(output);
+  const measured = r => r.functions.find(row => row.status === 'measured');
+  for (const mutate of [
+    r => { r.runId = '11111111-1111-4111-8111-111111111111'; },
+    r => { r.auditId = '22222222-2222-4222-8222-222222222222'; },
+    r => { r.subject.entryPoint += '-stale'; },
+    r => { r.configuration.quantiles = 'interpolated'; },
+    r => { r.configurationFingerprint = 'a'.repeat(64); },
+    r => { r.sourceFactsPolicy = 'unknown'; },
+    r => { r.selection.files[0].contentSha256 = 'b'.repeat(64); },
+    r => { measured(r).sourceSha256 = 'c'.repeat(64); },
+    r => { measured(r).population = 'support'; },
+    r => { measured(r).complexity++; },
+    r => { measured(r).measurement.ownedStatements++; },
+    r => { measured(r).measurement.maxBlockNesting = 999; },
+    r => { measured(r).measurement.statementKinds.Unknown = 1; },
+    r => { measured(r).measurement.excludedSyntax.docstring = 2; },
+    r => { measured(r).measurement.score = 8; },
+    r => { r.functions.find(row => row.functionKind === 'Lambda').status = 'measured'; },
+    r => { r.functions.push(r.functions[0]); },
+    r => { r.functions.pop(); },
+    r => { r.summary.populations.production.ownedStatements.p50++; },
+    r => { r.summary.populations.production.maxBlockNesting.count++; },
+    r => { r.summary.unavailableReasons = {}; },
+    r => { r.status = 'incomplete'; }
+  ]) {
+    const copy = structuredClone(evidence); mutate(copy.dimensions.codeQuality.decomposition);
+    assert.throws(() => validateEvidence(copy));
+  }
+  const missing = structuredClone(evidence); delete missing.dimensions.codeQuality.decomposition;
+  assert.throws(() => validateEvidence(missing));
+  const bypass = structuredClone(evidence); bypass.analysis.ruleset = 'unknown'; bypass.tool.version = '0.1.0-experimental';
+  delete bypass.dimensions.codeQuality.coverageReview;
+  assert.throws(() => validateEvidence(bypass));
+});
+
+test('decomposition failure with complete other measurements withholds the combined preview', async t => {
+  const f = fixture(t); f.write('work.py', 'def work(): return 1\n');
+  const current = f.run().evidence, cq = current.dimensions.codeQuality;
+  const report = structuredClone(cq.decomposition);
+  report.status = 'incomplete'; report.summary = null; report.functions = [];
+  report.diagnostics = [{ code: 'decomposition-analysis', message: 'Selected source changed during measurement.' }];
+  const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, report);
+  validateEvidence(failed);
+  assert.equal(failed.analysis.status, 'incomplete');
+  assert.equal(failed.dimensions.codeQuality.experimentalPreview.population, null);
+  assert.deepEqual(failed.dimensions.codeQuality.findings, []);
+  const output = path.join(f.directory, 'decomposition-failed.json'); fs.writeFileSync(output, JSON.stringify(failed));
+  f.inspect(output, [], 2);
+});
+
+test('saved coverage-era producer remains valid without fabricated decomposition', () => {
+  // Generated by the previously installed 0.5.0-experimental adapter, not the current builder.
+  const historical = JSON.parse(fs.readFileSync(new URL('fixtures/python-v05.json', import.meta.url)));
+  validateEvidence(historical);
+  assert.equal(historical.tool.version, '0.5.0-experimental');
+  assert.equal(historical.dimensions.codeQuality.decomposition, undefined);
+  for (const mutate of [
+    e => { e.dimensions.codeQuality.decomposition = null; },
+    e => { e.tool.version = '0.6.0-experimental'; },
+    e => { e.analysis.ruleset = 'python-2026-10-13-decomposition-preview'; },
+    e => { e.dimensions.codeQuality.coverageReview.runId = '11111111-1111-4111-8111-111111111111'; }
+  ]) {
+    const copy = structuredClone(historical); mutate(copy); assert.throws(() => validateEvidence(copy));
+  }
 });

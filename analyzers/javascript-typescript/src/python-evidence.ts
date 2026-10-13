@@ -5,9 +5,12 @@ import { dimensionKeys } from "./scorecard-contract.js";
 import { hash, type Evidence, type Dimension, type Finding } from "./evidence.js";
 import { duplicationFindings, validateDuplication, type PythonDuplication } from "./python-duplication.js";
 import { validateCoverage, type PythonCoverage } from "./python-coverage.js";
+import { validateDecomposition, type PythonDecomposition } from "./python-decomposition.js";
 
-export const pythonVersion = "0.5.0-experimental";
-export const pythonRuleset = "python-2026-10-12-coverage-preview";
+export const pythonVersion = "0.6.0-experimental";
+export const pythonRuleset = "python-2026-10-13-decomposition-preview";
+const currentProfile = { version: pythonVersion, ruleset: pythonRuleset, decomposition: true };
+const coverageProfile = { version: "0.5.0-experimental", ruleset: "python-2026-10-12-coverage-preview", decomposition: false };
 const previewPolicy = "experimental/shared-complexity-worst-40-remainder-60/v1";
 
 function complexityDetails(facts: SourceFacts | null) {
@@ -35,35 +38,44 @@ function measurements(facts: SourceFacts | null) {
   population: { types: 0, members: facts?.functions.length ?? 0 } };
 }
 
-export function pythonEvidence(facts: SourceFacts | null, subject: Evidence["subject"], ids: { runId: string; auditId: string }, error?: string, duplication: PythonDuplication | null = null, coverage: PythonCoverage | null = null): Evidence {
+export function pythonEvidence(facts: SourceFacts | null, subject: Evidence["subject"], ids: { runId: string; auditId: string }, error?: string, duplication: PythonDuplication | null = null, coverage: PythonCoverage | null = null, decomposition: PythonDecomposition | null = null): Evidence {
+  return buildEvidence(currentProfile, facts, subject, ids, error, duplication, coverage, decomposition);
+}
+
+function buildEvidence(profile: typeof currentProfile, facts: SourceFacts | null, subject: Evidence["subject"], ids: { runId: string; auditId: string }, error: string | undefined, duplication: PythonDuplication | null, coverage: PythonCoverage | null, decomposition: PythonDecomposition | null): Evidence {
   if (facts) validateSourceFacts(facts);
   if (facts && duplication) validateDuplication(duplication, facts, subject, ids);
   if (facts && coverage) validateCoverage(coverage, facts, subject, ids);
-  const complete = facts?.status === "complete" && duplication?.status === "complete" && coverage?.status === "complete" && !error;
+  if (facts && decomposition) validateDecomposition(decomposition, facts, subject, ids);
+  const complete = facts?.status === "complete" && duplication?.status === "complete" && coverage?.status === "complete" && (!profile.decomposition || decomposition?.status === "complete") && !error;
   const dimensions = Object.fromEntries(dimensionKeys.map(key => [key, {
     status: "skipped", basis: "Not measured by the experimental Python analyzer.", findings: [],
     scope: { id: `python/${key}/unsupported`, coverage: "unsupported", includes: [], excludes: [key] }
   }])) as unknown as Record<typeof dimensionKeys[number], Dimension>;
   dimensions.codeQuality = {
     status: complete ? "skipped" : "failed",
-    basis: complete ? "Complexity, duplication and optional coverage/CRAP review evidence; all unscored. Complexity preview is experimental. Missing coverage is unavailable."
+    basis: complete ? profile.decomposition
+      ? "Complexity, owned statements, block nesting, duplication and optional coverage/CRAP review evidence; all unscored. Missing coverage and lambda decomposition are unavailable."
+      : "Complexity, duplication and optional coverage/CRAP review evidence; all unscored. Complexity preview is experimental. Missing coverage is unavailable."
       : "Python analysis incomplete; partial measurements are diagnostic only.",
-    scope: { id: "python/owned-function-complexity-v2", coverage: "partial", includes: ["selected-function-complexity", "exact-function-body-duplication", "optional-line-coverage-crap-review"],
-      excludes: ["calibrated-dimension-score", "decomposition", "runtime-performance", "semantic-validation"] },
+    scope: { id: "python/owned-function-complexity-v2", coverage: "partial", includes: ["selected-function-complexity", "exact-function-body-duplication", "optional-line-coverage-crap-review", ...(profile.decomposition ? ["owned-function-statements", "function-block-nesting"] : [])],
+      excludes: ["calibrated-dimension-score", ...(profile.decomposition ? [] : ["decomposition"]), "runtime-performance", "semantic-validation"] },
     findings: complete ? [...reviewFindings(facts), ...duplicationFindings(duplication!)] : [],
-    duplication, coverageReview: coverage,
+    duplication, coverageReview: coverage, ...(profile.decomposition ? { decomposition } : {}),
     sourceFacts: facts, experimentalPreview: complete ? complexityDetails(facts) : complexityDetails(null),
     populationNotes: "Units are observed Python files; members are selected implementation bodies. Types are not measured (the required types field is a placeholder zero). Pruned directories do not enumerate unseen files."
   };
   return { schemaVersion: 3, generatedAtUtc: new Date().toISOString(),
-    tool: { name: "CodeMetrics.AI.Python", version: pythonVersion, ecosystem: "python" }, subject,
+    tool: { name: "CodeMetrics.AI.Python", version: profile.version, ecosystem: "python" }, subject,
     ...measurements(facts), dimensions,
-    analysis: { ...ids, status: complete ? "complete" : "incomplete", ruleset: pythonRuleset, calibration: "uncalibrated",
-      configurationFingerprint: hash(JSON.stringify([pythonRuleset, facts?.producer, facts?.measurementPolicy, facts?.selection?.configurationFingerprint, duplication?.configurationFingerprint, coverage?.configurationFingerprint])),
+    analysis: { ...ids, status: complete ? "complete" : "incomplete", ruleset: profile.ruleset, calibration: "uncalibrated",
+      configurationFingerprint: hash(JSON.stringify([profile.ruleset, facts?.producer, facts?.measurementPolicy, facts?.selection?.configurationFingerprint, duplication?.configurationFingerprint, coverage?.configurationFingerprint, ...(profile.decomposition ? [decomposition?.configurationFingerprint] : [])])),
       diagnostics: [...(facts?.diagnostics ?? []).map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
         ...(duplication?.diagnostics ?? []).filter(item => !facts?.diagnostics.some(other => isDeepStrictEqual(item, other)))
           .map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
         ...(coverage?.diagnostics ?? []).filter(item => !facts?.diagnostics.some(other => isDeepStrictEqual(item, other)))
+          .map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
+        ...(decomposition?.diagnostics ?? []).filter(item => !facts?.diagnostics.some(other => isDeepStrictEqual(item, other)))
           .map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
         ...(error ? [{ kind: "pythonExecution", message: error }] : [])], suppressions: [] }
   };
@@ -72,19 +84,23 @@ export function pythonEvidence(facts: SourceFacts | null, subject: Evidence["sub
 /** Validate the experimental extension as well as the shared v3 envelope. */
 export function validatePythonEvidence(evidence: Evidence) {
   if (evidence.tool.ecosystem !== "python") return;
-  if (evidence.analysis.ruleset !== pythonRuleset) {
-    if (evidence.tool.version === pythonVersion || evidence.dimensions.codeQuality.coverageReview !== undefined)
-      throw new Error("Python coverage evidence requires its recorded supported ruleset.");
-    return; // Historical producers without this extension retain their original contract.
+  const profile = [currentProfile, coverageProfile].find(item => item.ruleset === evidence.analysis.ruleset);
+  if (!profile) {
+    if ([pythonVersion, coverageProfile.version].includes(evidence.tool.version) || evidence.dimensions.codeQuality.coverageReview !== undefined || evidence.dimensions.codeQuality.decomposition !== undefined)
+      throw new Error("Python review evidence requires its recorded supported ruleset.");
+    return; // Historical producers without these extensions retain their original contract.
   }
+  if (!profile.decomposition && Object.hasOwn(evidence.dimensions.codeQuality, "decomposition"))
+    throw new Error("Historical Python coverage evidence cannot contain decomposition measurements.");
   if (!evidence.analysis.runId || !evidence.analysis.auditId || evidence.analysis.calibration !== "uncalibrated" ||
-      evidence.tool.version !== pythonVersion || evidence.tool.name !== "CodeMetrics.AI.Python")
+      evidence.tool.version !== profile.version || evidence.tool.name !== "CodeMetrics.AI.Python")
     throw new Error("Python evidence requires invocation IDs and experimental provenance.");
   if (Object.values(evidence.dimensions).some(item => item.status === "scored")) throw new Error("Experimental Python dimensions cannot be scored.");
   const facts = evidence.dimensions.codeQuality.sourceFacts as SourceFacts | null;
   const duplication = evidence.dimensions.codeQuality.duplication as PythonDuplication | null;
   const coverage = evidence.dimensions.codeQuality.coverageReview as PythonCoverage | null;
-  if (facts === null && (duplication !== null || coverage !== null)) throw new Error("Python measurements require source facts.");
+  const decomposition = profile.decomposition ? evidence.dimensions.codeQuality.decomposition as PythonDecomposition | null : null;
+  if (facts === null && (duplication !== null || coverage !== null || decomposition !== null)) throw new Error("Python measurements require source facts.");
   if (facts !== null) {
     validateSourceFacts(facts);
     if (facts.language !== "python" || facts.schemaVersion !== 2 || facts.producer.version !== "0.4.0-experimental" ||
@@ -94,12 +110,13 @@ export function validatePythonEvidence(evidence: Evidence) {
       throw new Error("Unexpected Python source-facts producer or version.");
     validateDuplication(duplication, facts, evidence.subject, { runId: evidence.analysis.runId, auditId: evidence.analysis.auditId });
     validateCoverage(coverage, facts, evidence.subject, { runId: evidence.analysis.runId, auditId: evidence.analysis.auditId });
+    if (profile.decomposition) validateDecomposition(decomposition, facts, evidence.subject, { runId: evidence.analysis.runId, auditId: evidence.analysis.auditId });
   }
-  if (evidence.analysis.status === "complete" && (facts?.status !== "complete" || duplication?.status !== "complete" || coverage?.status !== "complete")) throw new Error("Complete Python evidence requires complete measurements.");
-  if (evidence.analysis.status === "incomplete" && facts?.status === "complete" && duplication?.status === "complete" && coverage?.status === "complete") throw new Error("Incomplete Python evidence must identify an incomplete measurement.");
+  if (evidence.analysis.status === "complete" && (facts?.status !== "complete" || duplication?.status !== "complete" || coverage?.status !== "complete" || (profile.decomposition && decomposition?.status !== "complete"))) throw new Error("Complete Python evidence requires complete measurements.");
+  if (evidence.analysis.status === "incomplete" && facts?.status === "complete" && duplication?.status === "complete" && coverage?.status === "complete" && (!profile.decomposition || decomposition?.status === "complete")) throw new Error("Incomplete Python evidence must identify an incomplete measurement.");
   if (evidence.analysis.status === "incomplete" && !evidence.analysis.diagnostics.length) throw new Error("Incomplete Python evidence requires diagnostics.");
-  const expected = pythonEvidence(facts, evidence.subject, { runId: evidence.analysis.runId, auditId: evidence.analysis.auditId },
-    evidence.analysis.status === "incomplete" ? "Validation placeholder" : undefined, duplication, coverage);
+  const expected = buildEvidence(profile, facts, evidence.subject, { runId: evidence.analysis.runId, auditId: evidence.analysis.auditId },
+    evidence.analysis.status === "incomplete" ? "Validation placeholder" : undefined, duplication, coverage, decomposition);
   for (const key of ["filters", "population", "dimensions"] as const)
     if (!isDeepStrictEqual(evidence[key], expected[key])) throw new Error(`Python ${key} do not match measured facts and experimental policy.`);
   if (evidence.analysis.configurationFingerprint !== expected.analysis.configurationFingerprint)

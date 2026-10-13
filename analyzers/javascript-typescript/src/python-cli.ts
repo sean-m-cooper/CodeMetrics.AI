@@ -17,7 +17,7 @@ try {
     help: { type: "boolean", short: "h" }, version: { type: "boolean" }
   } });
   if (values.help) console.log([
-    "codemetrics-python — experimental Python 3.12 complexity, duplication, and coverage evidence (Node 20+)",
+    "codemetrics-python — experimental Python 3.12 complexity, decomposition, duplication, and coverage evidence (Node 20+)",
     "--project <directory|pyproject.toml|file.py> --scorecard-output <new-evidence.json>",
     "--python <absolute Python 3.12 interpreter path> (default: py -3.12 on Windows; python3 elsewhere)",
     "--include <pattern> --exclude <pattern> --test-path <pattern> --production-path <pattern> (repeatable)",

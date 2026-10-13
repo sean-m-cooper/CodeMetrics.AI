@@ -18,13 +18,13 @@ codemetrics-evidence --input evidence.json --inspect-output inspection.json
 
 For repository development, invoke `node analyzers/javascript-typescript/dist/python-cli.js` after `npm run build --prefix analyzers/javascript-typescript`. Entry points can be directories, `pyproject.toml`, `.py`, or `.pyi` files. A manifest selects its directory without executing or interpreting build configuration. Paths in findings are relative to the selected directory, or a selected file's parent. Windows uses `py -3.12`; other platforms use `python3`. Pass `--python` with an absolute Python 3.12 executable path to override. The interpreter runs isolated from project startup hooks and imports only the packaged analyzer and standard library. Target code is never imported or executed.
 
-`--scorecard-output` is required and must name a new `.json` file. Existing files are never overwritten. `--run-id` and `--audit-id` accept caller-supplied UUIDs; otherwise fresh IDs are generated. A complete selection exits 0 even when empty; parser/runtime/read/duplication failures exit 2 with incomplete evidence where the entry point and output are valid. Invalid CLI paths/options can fail before evidence is written. No previous output is reused.
+`--scorecard-output` is required and must name a new `.json` file. Existing files are never overwritten. `--run-id` and `--audit-id` accept caller-supplied UUIDs; otherwise fresh IDs are generated. A complete selection exits 0 even when empty; parser/runtime/read/review failures exit 2 with incomplete evidence where the entry point and output are valid. Invalid CLI paths/options can fail before evidence is written. No previous output is reused.
 
 The evidence embeds facts at `dimensions.codeQuality.sourceFacts`. Its `experimentalPreview` contains the shared result and policy, not a dimension `score`. `codeQuality.duplication` contains exact-body review groups and explicit exclusions under the same run/audit IDs. `codeQuality.coverageReview` contains optional line-coverage/CRAP evidence, with missing, conditional, and source-bound observations kept distinct. One informational finding is emitted per duplicate group, with every occurrence in its observations. Code Quality is skipped pending calibration (failed on incomplete analysis); the other eight dimensions are unsupported. CC ≥ 10 produces informational review findings. `population.members` counts selected implementations; the schema-required `types: 0` is explicitly unmeasured, not an absence-of-classes claim. Filters count observed files; pruned directories do not imply enumerated file counts.
 
 The shared validator checks the v3 envelope and embedded facts, recomputes the preview, and rejects promoted dimension scores, inconsistent populations, and mismatched expected run IDs. Incomplete results have no usable preview or findings. Historical imports remain historical. Score comparisons/gates are disabled for this experimental policy; informational SARIF export is supported. Optional exploratory comparison through the shared CLI is marked incompatible and cannot gate or produce score deltas.
 
-The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's packaged adapter version is `0.5.0-experimental`, independently of the enclosing npm version and unchanged source-facts producer `0.4.0-experimental`.
+The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's packaged adapter version is `0.6.0-experimental`, independently of the enclosing npm version and unchanged source-facts producer `0.4.0-experimental`.
 
 ## Optional coverage review and explicit collection
 
@@ -32,7 +32,7 @@ The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON through `co
 
 ## Raw source-facts workflow
 
-The standalone [decomposition reviewer](DECOMPOSITION.md) measures owned statements and block nesting as separate unscored evidence. Its first corpus study covers Requests, Starlette, HTTPie, and Django. It is not yet embedded in the npm adapter or the skill.
+The packaged [decomposition reviewer](DECOMPOSITION.md) measures owned statements and block nesting as separate unscored evidence. Its first corpus study covers Requests, Starlette, HTTPie, and Django. It is embedded at `dimensions.codeQuality.decomposition` and presented by the skill without grades or automatic extraction recommendations.
 
 From the repository root (Python 3.12 required):
 
@@ -71,7 +71,7 @@ Syntax parsing is not semantic validation or compilation. Missing coverage, main
 
 ## Population policy: `python/source-selection-v1`
 
-Python emits **source-facts v2** with a machine-readable selection inventory and per-function population. JS/TS continues to emit v1 facts internally; its scoring is unchanged. The source-facts producer remains `0.4.0-experimental`; the packaged coverage-enabled wrapper is `0.5.0-experimental`.
+Python emits **source-facts v2** with a machine-readable selection inventory and per-function population. JS/TS continues to emit v1 facts internally; its scoring is unchanged. The source-facts producer remains `0.4.0-experimental`; the packaged decomposition-enabled wrapper is `0.6.0-experimental`.
 
 By default, the preview measures production **candidates**, not a verified installed-package or reachable-code population. The following rules make that selection inspectable:
 
