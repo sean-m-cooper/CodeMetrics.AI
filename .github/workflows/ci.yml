@@ -77,7 +77,11 @@ jobs:
           python-version: '3.12'
       - run: npm ci --prefix analyzers/javascript-typescript
       - run: npm run build --prefix analyzers/javascript-typescript
-      - name: Verify Python measurement and failure behavior
+      - name: Install coverage for authored collection fixtures
+        # Only the explicit collection tests execute authored fixture code.
+        # The analyzer itself continues to parse target source without imports.
+        run: python -m pip install coverage==7.6.1
+      - name: Test Python measurement, coverage collection, and failure behavior
         run: python -m unittest discover -s analyzers/python/tests -v
       - name: Verify adapter contract with both real producers
         run: node --test shared/source-facts/conformance.test.mjs

@@ -1,0 +1,285 @@
+{
+  "artifactKind": "python-coverage-provenance-validation",
+  "date": "2026-10-12",
+  "project": "Requests",
+  "repository": "https://github.com/psf/requests",
+  "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+  "sourceSelection": [
+    "src/requests/**"
+  ],
+  "testSelection": [
+    "tests/test_utils.py",
+    "tests/test_structures.py",
+    "tests/test_hooks.py"
+  ],
+  "testResult": {
+    "passed": 255,
+    "skipped": 1,
+    "warnings": 6,
+    "exitCode": 0
+  },
+  "coverageVersion": "7.6.1",
+  "pythonVersion": "3.12.10",
+  "collectionId": "45404943-bcab-4092-8a28-12dd2f2244fb",
+  "reviewRunId": "43134e5b-8d1c-46e1-9951-6ef0eb09f28a",
+  "sourceSnapshotSha256": "6ea0d25821cc50e8c3c6d2224bb0cf7e64b3e713b5d5c68044b0d05ed303c539",
+  "summary": {
+    "selectedFunctions": 246,
+    "conditionalEstimates": 0,
+    "unavailableFunctions": 8,
+    "unavailableReasons": {
+      "body-shares-definition-line": 1,
+      "file-not-in-report": 3,
+      "nested-definition": 4
+    },
+    "matchedFiles": 18,
+    "unmatchedReportFiles": [
+      "setup.py",
+      "tests/__init__.py",
+      "tests/compat.py",
+      "tests/conftest.py",
+      "tests/test_adapters.py",
+      "tests/test_help.py",
+      "tests/test_hooks.py",
+      "tests/test_lowlevel.py",
+      "tests/test_packages.py",
+      "tests/test_requests.py",
+      "tests/test_structures.py",
+      "tests/test_testserver.py",
+      "tests/test_utils.py",
+      "tests/testserver/__init__.py",
+      "tests/testserver/server.py",
+      "tests/utils.py"
+    ],
+    "sourceBoundEstimates": 238
+  },
+  "examples": [
+    {
+      "file": "src/requests/utils.py",
+      "member": "get_netrc_auth",
+      "line": 231,
+      "complexity": 16,
+      "coverage": {
+        "status": "reported-source-matched",
+        "basis": "executable-line",
+        "coveredLines": 21,
+        "executableLines": 30,
+        "executedLines": [
+          236,
+          239,
+          240,
+          241,
+          245,
+          246,
+          248,
+          250,
+          251,
+          252,
+          253,
+          254,
+          257,
+          260,
+          261,
+          263,
+          266,
+          267,
+          268,
+          270,
+          271
+        ],
+        "missingLines": [
+          237,
+          243,
+          258,
+          264,
+          272,
+          275,
+          276,
+          279,
+          280
+        ],
+        "excludedLines": [],
+        "fraction": 0.7
+      },
+      "crapEstimate": {
+        "value": 22.912,
+        "disposition": "review-only",
+        "basis": "line-coverage-proxy",
+        "formula": "CC^2 * (1 - coveredLines / executableLines)^3 + CC"
+      }
+    },
+    {
+      "file": "src/requests/utils.py",
+      "member": "super_len",
+      "line": 160,
+      "complexity": 16,
+      "coverage": {
+        "status": "reported-source-matched",
+        "basis": "executable-line",
+        "coveredLines": 30,
+        "executableLines": 32,
+        "executedLines": [
+          161,
+          162,
+          164,
+          167,
+          169,
+          170,
+          172,
+          173,
+          175,
+          176,
+          177,
+          178,
+          182,
+          184,
+          188,
+          189,
+          201,
+          202,
+          203,
+          204,
+          209,
+          210,
+          212,
+          214,
+          216,
+          217,
+          221,
+          225,
+          226,
+          228
+        ],
+        "missingLines": [
+          222,
+          223
+        ],
+        "excludedLines": [],
+        "fraction": 0.9375
+      },
+      "crapEstimate": {
+        "value": 16.0625,
+        "disposition": "review-only",
+        "basis": "line-coverage-proxy",
+        "formula": "CC^2 * (1 - coveredLines / executableLines)^3 + CC"
+      }
+    },
+    {
+      "file": "src/requests/utils.py",
+      "member": "guess_json_utf",
+      "line": 1008,
+      "complexity": 11,
+      "coverage": {
+        "status": "reported-source-matched",
+        "basis": "executable-line",
+        "coveredLines": 21,
+        "executableLines": 21,
+        "executedLines": [
+          1015,
+          1016,
+          1017,
+          1018,
+          1019,
+          1020,
+          1021,
+          1022,
+          1023,
+          1024,
+          1025,
+          1026,
+          1027,
+          1028,
+          1029,
+          1031,
+          1032,
+          1033,
+          1034,
+          1035,
+          1037
+        ],
+        "missingLines": [],
+        "excludedLines": [],
+        "fraction": 1.0
+      },
+      "crapEstimate": {
+        "value": 11.0,
+        "disposition": "review-only",
+        "basis": "line-coverage-proxy",
+        "formula": "CC^2 * (1 - coveredLines / executableLines)^3 + CC"
+      }
+    },
+    {
+      "file": "src/requests/utils.py",
+      "member": "get_unicode_from_response",
+      "line": 633,
+      "complexity": 6,
+      "coverage": {
+        "status": "reported-source-matched",
+        "basis": "executable-line",
+        "coveredLines": 0,
+        "executableLines": 14,
+        "executedLines": [],
+        "missingLines": [
+          645,
+          653,
+          654,
+          656,
+          659,
+          661,
+          662,
+          663,
+          664,
+          665,
+          668,
+          669,
+          670,
+          671
+        ],
+        "excludedLines": [],
+        "fraction": 0.0
+      },
+      "crapEstimate": {
+        "value": 42.0,
+        "disposition": "review-only",
+        "basis": "line-coverage-proxy",
+        "formula": "CC^2 * (1 - coveredLines / executableLines)^3 + CC"
+      }
+    }
+  ],
+  "substitutedReportRejected": true,
+  "rejectionDiagnostics": [
+    {
+      "code": "coverage-review",
+      "message": "Coverage report differs from the collected report."
+    }
+  ],
+  "sourceBinding": "matched-pre-post-snapshots",
+  "fullArtifacts": "TestResults/python-coverage-requests-2026-10-12",
+  "artifactSha256": {
+    "coverage.json": "60a47618f8f2f6708cb536f854a9788196867639f582b4e9ab4c8b05fd59ad4f",
+    "provenance.json": "d62551ea3c9b46e6eb9eaa705e30598401c8b8a3644065f3f35f365d27458dca",
+    "review.json": "4771bfec47d0c94e9045da7520e145414e961a8c1e6c4d5a15f31d99d5efdc4e",
+    "substitution-rejection.json": "49cf1b2a2836f78637b6d9d2f12ffe5d66c51f7bdfd8a5b9202fd460350d41e7",
+    "tests.log": "cab43b761319ca6b2695f8f421eeac1bda103c719deb30421b511326136d3369",
+    "environment.txt": "26ee667565deba2834b07259cbccb71c034d485c19cb8abd8484afbff0124aef"
+  },
+  "environment": [
+    "certifi==2026.7.22",
+    "charset-normalizer==3.5.2",
+    "colorama==0.4.6",
+    "coverage==7.6.1",
+    "idna==3.20",
+    "iniconfig==2.3.1",
+    "packaging==26.3",
+    "pluggy==1.6.0",
+    "pytest==8.3.3",
+    "-e git+https://github.com/psf/requests.git@611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60#egg=requests",
+    "urllib3==2.8.0"
+  ],
+  "limitations": [
+    "Only three test modules executed; not a full Requests coverage assessment.",
+    "Selected source bound by matching pre/post snapshots and current review, not an immutable filesystem.",
+    "Unsigned local receipt does not prove test quality or prevent deliberate joint falsification.",
+    "CRAP uses line coverage, remains review-only, and does not change any dimension score."
+  ]
+}

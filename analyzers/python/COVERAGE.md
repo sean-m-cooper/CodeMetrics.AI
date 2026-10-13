@@ -1,6 +1,6 @@
 # Experimental Python coverage and CRAP review
 
-This offline first pass imports an existing coverage.py JSON report and produces per-function **conditional review evidence**. It does not run tests, install target dependencies, or execute target code. It is not yet bundled in `codemetrics-python` or consumed by the scorecard skill. Source-facts v2, packaged adapter versions, complexity previews, and all nine unscored Python dimensions remain unchanged.
+The offline reviewer imports a coverage.py JSON report and produces per-function review evidence. Without a collection receipt, estimates remain **conditional**. The separate, explicit collector now runs a caller-selected test module and binds its newly generated report to source observations before and after execution. Neither command installs dependencies. This workflow is not yet bundled in `codemetrics-python` or consumed by the scorecard skill. Source-facts v2, packaged adapter versions, complexity previews, and all nine unscored Python dimensions remain unchanged.
 
 ```powershell
 # Run from the CodeMetrics.AI checkout; Python 3.12 is required.
@@ -10,6 +10,29 @@ py -3.12 analyzers/python/coverage_review.py E:/repos/my-project --include 'src/
 The target is a directory or Python source file. A file uses its parent as the root. Coverage file keys must be relative to this exact root. Generate reports from that root with your existing coverage workflow; do not move a report from another checkout and assume it still matches. Both `/` and Windows `\` separators are accepted, with case-sensitive exact path matching. Absolute paths and parent traversal are rejected. There is no basename or suffix matching. Extra report files are listed in `summary.unmatchedReportFiles`; selected files absent from the report stay unavailable.
 
 The CLI accepts the source analyzer's include/exclude and population flags, plus optional UUID `--run-id` and `--audit-id`. Output must be a new `.json` file with an existing parent. Without `--coverage-json`, it emits explicit unavailable coverage for each function. A specified but missing or malformed report is a failure, not an absent optional measurement.
+
+## Collect new coverage with source provenance
+
+Use Python 3.12 with coverage.py and the project's test dependencies already installed in an isolated environment. Validation uses `coverage==7.6.1`. The collector requires a project directory, an explicit new output directory outside that project with an existing parent, and an interpreter path. It executes pytest by default; `--module` selects another Python test module. Arguments after `--` belong to that module.
+
+```powershell
+py -3.12 analyzers/python/coverage_collect.py E:/repos/my-project --include 'src/**' --python E:/temp/my-project-tests/Scripts/python.exe --output-directory E:/temp/my-project-coverage-001 -- -q tests
+py -3.12 analyzers/python/coverage_review.py E:/repos/my-project --include 'src/**' --coverage-json E:/temp/my-project-coverage-001/coverage.json --collection-manifest E:/temp/my-project-coverage-001/provenance.json --output TestResults/my-project-review.json
+```
+
+This is an explicit **test execution** workflow. The source analyzer and offline reviewer still never import or execute target code. Collector policy `python/coverage-collection-v1`:
+
+1. Inventories and hashes selected source before invoking tests.
+2. Creates new coverage data in a separate process with a unique bytecode cache, avoiding reuse of stale target bytecode. It never combines or binds pre-existing coverage data.
+3. Runs the test module from the project root and records its command, exit status, Python/coverage versions, and output log. The default timeout is 1,800 seconds; `--timeout` must be positive and finite. A timeout terminates the collector's child process tree and records failure.
+4. Generates fresh branch-enabled coverage JSON, then repeats the source snapshot. Selected file additions, removals, content changes, or population changes invalidate the collection. Ignored cache-directory creation does not.
+5. Writes `provenance.json` with a collection UUID, start/end timestamps, source snapshot digests, selection rules/inventory, and the exact JSON report digest. Failed tests, missing tooling, failed reporting, source drift, and timeout leave an incomplete receipt that cannot authenticate review results.
+
+The controlled coverage configuration sets `branch=True`, `config_file=False`, and source to the selected project root. Project coverage configuration and inherited `COVERAGE_*`/`PYTHON*` variables are not used. Pytest's automatic third-party plugin loading and inherited `PYTEST_ADDOPTS` are disabled to avoid competing coverage sessions; required plugins can be explicitly passed with `-p`. Project pytest configuration still applies. This first collector measures a **single process**; worker/subprocess coverage aggregation is unsupported. Coverage's version-specific default exclusions and inline pragmas still apply and remain visible in the report.
+
+The offline reviewer accepts `--collection-manifest` only with a report. It checks successful completion, runtime/configuration, root, source policy/parser, exact report hash, and current selected source against both recorded snapshots. Any mismatch makes the entire review incomplete with no estimates; it never silently falls back to an unverified import. A valid binding is labeled `matched-pre-post-snapshots`, with freshness `source-matched`. `collectionProvenance.collectionId` identifies the test collection; new review run/audit IDs identify only the later review. No timestamp is refreshed to imply new tests.
+
+Bound rows use `coverage.status: reported-source-matched` and `crapEstimate.disposition: review-only`; unbound rows retain `reported-unverified` and `conditional-review-only`. Summary counts separate `sourceBoundEstimates` from `conditionalEstimates`. The report schema is now 2, producer `0.2.0-experimental`; existing schema-1 files remain historical output. The line measurement policy and arithmetic are unchanged.
 
 ## What is measured
 
@@ -38,18 +61,21 @@ The [original CRAP proposal](https://www.artima.com/weblogs/viewpost.jsp?thread=
 
 ## Provenance and failure boundaries
 
-**coverage.py JSON does not bind its observations to source hashes.** Every imported report therefore has `sourceBinding: unverified` and `freshness: unverified`. Every numeric estimate has `disposition: conditional-review-only`. A parseable timestamp, a matching filename, or a new review run ID cannot establish current coverage. Even unchanged line counts cannot detect a same-size source edit. The importer also cannot prove that automated assertions, rather than manual execution, produced the report.
+**coverage.py JSON does not bind its observations to source hashes.** Imports without a valid collection receipt therefore retain `sourceBinding: unverified`, `freshness: unverified`, and conditional estimates. A parseable timestamp, a matching filename, or a new review run ID cannot establish current coverage. Even unchanged line counts cannot detect a same-size source edit. The importer also cannot prove that automated assertions, rather than manual execution, produced an arbitrary report.
 
-The artifact records the exact report's SHA-256, reported timestamp/version/format, fresh review identities, current source hashes, parser and complexity policy, and selection fingerprint. Source rereads must match the current population pass. These checks establish what inputs were reviewed and consistency between current reads; they do not authenticate the historical test run. A collection-time provenance workflow is needed before promoting this evidence to verified current coverage.
+The artifact records the exact report's SHA-256, reported timestamp/version/format, fresh review identities, current source hashes, parser and complexity policy, and selection fingerprint. Source rereads must match the current population pass. Source hashes use the existing decoded-text, normalized-newline convention; report hashes cover raw bytes. Optional collection provenance binds these inputs to the recorded test invocation through matching source observations.
+
+Receipts are local and unsigned. They protect against accidental stale source/report reuse, not deliberate joint falsification of a report and receipt. Pre/post snapshots cannot detect source edits reverted during execution and are not an immutable filesystem. Binding covers selected source, not unselected tests, dependency/environment changes, or test assertion quality. `source-matched` means the selected source still matches that historical collection; it does not claim a recent test run or current runtime behavior. No coverage or CRAP measurement proves correctness.
 
 `status: complete` means the offline import and analysis completed, not that coverage is fresh, complete, or usable for scoring. A parse/read failure, duplicate or conflicting JSON/path/line data, unsupported format, selected-file line beyond the current source, source drift during analysis, or resource-limit breach makes the report incomplete. Incomplete output has diagnostics, no function results, and no summary. Exit codes are 0 for complete and 2 for failure. Resource budgets are 32 MiB of report JSON, 10,000 report files, 100,000 selected functions, and the existing source-selection budgets.
 
 ## Verification and next step
 
-The [authored fixture](tests/fixtures/coverage/README.md) includes a real coverage.py 7.6.1 format-3 report generated on Python 3.12, including the never-called one-line function trap. Tests also cover format-2 field compatibility, formula boundaries, absent reports/files, exclusions, source selection, exact paths, stale-shaped inputs, malformed input, current-source drift, fresh IDs, and output preservation. Tests consume the frozen report without installing coverage.py or executing fixture code.
+The [authored fixture](tests/fixtures/coverage/README.md) includes a real coverage.py 7.6.1 format-3 report generated on Python 3.12, including the never-called one-line function trap. Offline tests cover format-2 field compatibility, formula boundaries, absent reports/files, exclusions, source selection, exact paths, malformed input, source drift, fresh IDs, and output preservation. Collection tests add same-size edits, report substitution, source additions/deletions, failed receipts, parser/selection mismatch, cache creation, and output reuse. Three integration tests execute only authored fixtures, covering a successful integer-enum exit, failures, mutation, and process timeout. CI installs coverage.py for these tests; without it, those three tests explicitly skip.
 
 ```powershell
-py -3.12 -m unittest discover -s analyzers/python/tests -v
+# In a Python 3.12 environment with coverage==7.6.1 installed:
+python -m unittest discover -s analyzers/python/tests -v
 ```
 
-Next: establish collection-time provenance and review real test-generated coverage on a small pinned corpus before packaging this evidence or considering calibration. No coverage percentages or CRAP results are inferred for Requests, Starlette, HTTPie, or Django from source alone.
+The [Requests validation](../../shared/scorecard-schema/calibration-runs/python-coverage-provenance-2026-10-12.md) exercised the collector against a pinned real checkout: 255 tests passed, one skipped, and 238 function estimates were source-bound. This was a three-module test slice, not a full Requests test-coverage assessment. The substituted real report was rejected. Next: broaden test-suite and platform validation before packaging; no dimension-score calibration is implied.

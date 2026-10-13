@@ -28,7 +28,7 @@ The CLI accepts the same selection flags described below. In the skill helper, p
 
 ## Offline coverage review
 
-The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON and maps executable body lines to current function complexity. Missing or ambiguous coverage stays unavailable. CRAP estimates are conditional because the imported report has no source hashes; they do not affect scores. This first pass is a standalone development tool, not yet part of the packaged CLI or skill.
+The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON and maps executable body lines to current function complexity. Missing or ambiguous coverage stays unavailable. The separate, explicit collector runs a chosen test module and binds a newly generated report to before/after source hashes. The reviewer rejects stale source or substituted reports when provenance is supplied; ordinary imports remain conditional. Both paths are unscored standalone development tools, not yet part of the packaged CLI or skill.
 
 ## Raw source-facts workflow
 

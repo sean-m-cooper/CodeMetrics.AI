@@ -13,6 +13,7 @@ import sys
 import uuid
 
 from duplication import digest, read_verified
+import coverage_provenance
 import source_facts
 
 
@@ -188,15 +189,15 @@ def collect(root, facts, coverage, supplied):
     return rows, summary
 
 
-def analyze(target, *, coverage_json=None, run_id=None, audit_id=None, **selection):
+def analyze(target, *, coverage_json=None, collection_manifest=None, run_id=None, audit_id=None, **selection):
     facts = source_facts.analyze(target, **selection)
     target = Path(target).absolute()
     root = target if target.is_dir() else target.parent
     configuration = {"policy": POLICY, "selectionFingerprint": facts["selection"]["configurationFingerprint"],
                      "complexityPolicy": facts["measurementPolicy"], "parserVersion": facts["producer"]["parserVersion"],
                      "maxReportBytes": MAX_REPORT_BYTES, "maxOwners": MAX_OWNERS}
-    report = {"schemaVersion": 1, "artifactKind": "experimental-python-coverage-review",
-              "producer": {"name": "codemetrics-ai/python-coverage-review", "version": "0.1.0-experimental"},
+    report = {"schemaVersion": 2, "artifactKind": "experimental-python-coverage-review",
+              "producer": {"name": "codemetrics-ai/python-coverage-review", "version": "0.2.0-experimental"},
               "generatedAtUtc": datetime.now(timezone.utc).isoformat(),
               "runId": str(uuid.UUID(run_id)) if run_id else str(uuid.uuid4()),
               "auditId": str(uuid.UUID(audit_id)) if audit_id else str(uuid.uuid4()),
@@ -204,14 +205,28 @@ def analyze(target, *, coverage_json=None, run_id=None, audit_id=None, **selecti
               "configurationFingerprint": digest(json.dumps(configuration, sort_keys=True, separators=(",", ":"))),
               "status": facts["status"], "subject": {"root": str(root), "entryPoint": str(target)},
               "sourceFactsProducer": facts["producer"], "selection": facts["selection"],
-              "coverageInput": None, "diagnostics": list(facts["diagnostics"]),
-              "scope": "Conditional line-coverage CRAP estimates, not scores or defect predictions. Coverage source binding and freshness are unverified; current source hashes and new run IDs do not authenticate historical coverage. Line coverage is not basis-path coverage or test effectiveness.",
+              "coverageInput": None, "collectionProvenance": None, "diagnostics": list(facts["diagnostics"]),
+              "scope": "Line-coverage CRAP review estimates, not scores or defect predictions. Imports without collection provenance have unverified source binding and freshness. New review IDs never authenticate historical coverage. Line coverage is not basis-path coverage or test effectiveness.",
               "functions": [], "summary": None}
     if facts["status"] != "complete":
         return report
     try:
         coverage, report["coverageInput"] = load_coverage(coverage_json)
-        report["functions"], report["summary"] = collect(root, facts, coverage, coverage_json is not None)
+        if collection_manifest is not None:
+            report["collectionProvenance"] = coverage_provenance.validate(
+                collection_manifest, root, facts, report["coverageInput"],
+                lambda raw: json.loads(raw, object_pairs_hook=unique_object, parse_constant=invalid_constant))
+        rows, summary = collect(root, facts, coverage, coverage_json is not None)
+        summary["sourceBoundEstimates"] = 0
+        if report["collectionProvenance"] is not None:
+            report["coverageInput"].update(sourceBinding="matched-pre-post-snapshots", freshness="source-matched")
+            for row in rows:
+                if row["crapEstimate"] is not None:
+                    row["coverage"]["status"] = "reported-source-matched"
+                    row["crapEstimate"]["disposition"] = "review-only"
+            summary["sourceBoundEstimates"] = summary["conditionalEstimates"]
+            summary["conditionalEstimates"] = 0
+        report["functions"], report["summary"] = rows, summary
     except (OSError, SyntaxError, UnicodeError, ValueError, RecursionError) as error:
         report["status"] = "incomplete"
         report["diagnostics"].append({"code": "coverage-review", "message": str(error)})
@@ -222,6 +237,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("target", help="Python file or directory; same selection as source_facts.py")
     parser.add_argument("--coverage-json", type=Path, help="coverage.py JSON with paths relative to the selected root")
+    parser.add_argument("--collection-manifest", type=Path, help="Validate collection-time report/source binding; mismatch fails closed")
     parser.add_argument("--run-id")
     parser.add_argument("--audit-id")
     parser.add_argument("--output", type=Path, help="New .json file; never overwrite previous results")
@@ -231,7 +247,7 @@ def main():
         parser.add_argument(f"--{option}", action="store_true")
     args = parser.parse_args()
     try:
-        report = analyze(args.target, coverage_json=args.coverage_json, run_id=args.run_id, audit_id=args.audit_id,
+        report = analyze(args.target, coverage_json=args.coverage_json, collection_manifest=args.collection_manifest, run_id=args.run_id, audit_id=args.audit_id,
                          include=args.include, exclude=args.exclude, test_paths=args.test_path, production_paths=args.production_path,
                          include_tests=args.include_tests, include_generated=args.include_generated, include_support=args.include_support)
         payload = json.dumps(report, indent=2, ensure_ascii=True) + "\n"

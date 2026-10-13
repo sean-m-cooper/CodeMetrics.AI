@@ -17,7 +17,7 @@ analyzers/python/
 
 ## Current Outputs
 
-The standalone [coverage and CRAP review](../../analyzers/python/COVERAGE.md) imports coverage.py JSON for conditional per-function estimates. It distinguishes missing coverage from explicitly uncovered lines and withholds ambiguous attribution. Coverage source binding remains unverified; this offline first pass is not packaged, skill-integrated, or scored.
+The standalone [coverage and CRAP review](../../analyzers/python/COVERAGE.md) imports coverage.py JSON for per-function estimates. It distinguishes missing coverage from explicitly uncovered lines and withholds ambiguous attribution. An explicit collector now executes a caller-selected test module and binds new coverage to before/after source snapshots. The reviewer rejects supplied provenance that no longer matches; imports without provenance remain conditional. This workflow has been validated on a three-module Requests test slice and remains outside the package, skill, and dimension scores.
 
 The [duplication review](../../analyzers/python/DUPLICATION.md) adds exact whole-body review leads, with a five-statement default minimum and explicit exclusions. It is now embedded in the development packaged CLI evidence and presented by the scorecard skill; it assigns no score.
 
