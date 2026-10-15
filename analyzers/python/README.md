@@ -36,6 +36,8 @@ The packaged [exception-handler reviewer](ERROR_HANDLING.md) records handler bod
 
 The packaged [exception-context reviewer](ERROR_HANDLING_CONTEXT.md) adds surrounding try/else/finally structure, nearby statements and prose, and narrowly recognized source patterns with an explicit unresolved category. It preserves the original handler observations and all scores. The adapter embeds context at `dimensions.errorHandling.contextReview`; the skill reports recognized shapes and unresolved cases without grading them.
 
+The standalone [raise/chaining reviewer](ERROR_HANDLING_TRANSFERS.md) records owned raise expressions and causes, including explicit `from None`, and adds conservative one-statement patterns. It preserves existing context and scoring contracts; this extension is not yet packaged or consumed by the skill. Error Handling stays unscored.
+
 The packaged [decomposition reviewer](DECOMPOSITION.md) measures owned statements and block nesting as separate unscored evidence. Its first corpus study covers Requests, Starlette, HTTPie, and Django. It is embedded at `dimensions.codeQuality.decomposition` and presented by the skill without grades or automatic extraction recommendations.
 
 From the repository root (Python 3.12 required):
