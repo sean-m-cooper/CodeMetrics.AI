@@ -50,7 +50,7 @@ Source drift, malformed source, missing/changed owners, changed handler observat
 
 Summary counts separate recognized shapes, unresolved handlers, patterns, and populations. Reason counts can overlap; they are not a partition. No handled/unhandled rate, deduction, defect grade, or automatic refactoring recommendation is derived. The [pinned corpus study](../../shared/scorecard-schema/calibration-runs/python-error-context-2026-10-15.md) records observed patterns, conservative exclusions, and source-reviewed examples.
 
-The standalone [raise/chaining extension](ERROR_HANDLING_TRANSFERS.md) adds owned raise/cause metadata and conservative patterns in a separate report. It embeds this v1 report unchanged; it does not retroactively reclassify packaged 0.9.0 evidence.
+The packaged [raise/chaining extension](ERROR_HANDLING_TRANSFERS.md) adds owned raise/cause metadata and conservative patterns at `dimensions.errorHandling.transferReview` in adapter 0.10.0. It embeds this v1 report unchanged; it does not retroactively reclassify historical 0.9.0 evidence.
 
 ## Packaged validation and historical reports
 

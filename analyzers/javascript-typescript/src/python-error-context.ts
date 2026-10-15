@@ -39,7 +39,7 @@ const patterns = ["locally-documented-no-op", "direct-literal-fallback-return", 
 const reasons = ["exception-group-semantics", "enclosing-finally", "enclosing-context-manager", "nested-handler", "import-exception-binding-unresolved", "no-supported-local-shape"];
 
 // Match Python json.dumps(sort_keys=True, ensure_ascii=True, separators=(",", ":")) for this integer/string contract.
-function fingerprint(value: unknown) {
+export function fingerprint(value: unknown) {
   const json = JSON.stringify(value, (_key, item) => item !== null && typeof item === "object" && !Array.isArray(item)
     ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) : item);
   return hash(json.replace(/[\u007f-\uffff]/g, character => `\\u${character.charCodeAt(0).toString(16).padStart(4, "0")}`));

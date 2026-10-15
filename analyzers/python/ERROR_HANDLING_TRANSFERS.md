@@ -1,13 +1,13 @@
 # Experimental Python raise and chaining evidence
 
-This standalone reviewer extends the existing [exception context](ERROR_HANDLING_CONTEXT.md) with owned `raise` statements and four conservative local patterns. **Error Handling remains unscored.** Method Complexity, the packaged 0.9.0 contract, and existing context classifications are unchanged.
+This reviewer extends the existing [exception context](ERROR_HANDLING_CONTEXT.md) with owned `raise` statements and four conservative local patterns. **Error Handling remains unscored.** Method Complexity, historical 0.9.0 reports, and existing context classifications are unchanged.
 
 ```powershell
 py -3.12 analyzers/python/error_handling_transfers.py E:/repos/my-project --include 'src/**' --output TestResults/exception-transfers.json
 py -3.12 analyzers/python/error_handling_transfers_corpus.py --repos E:/repos --output TestResults/exception-transfers-corpus-new
 ```
 
-Python 3.12 and its standard library are sufficient. Target code is parsed, never imported or executed. The entry point is a Python source file or directory; pass a manifest's directory rather than the manifest. Existing selection flags and optional UUID run/audit IDs are supported. Output must be a new `.json` file with an existing parent; omission writes to stdout. Complete results, including empty selections, return 0. Incomplete analysis or invalid invocation returns 2. This extension is not yet bundled into the npm adapter or consumed by the skill.
+Python 3.12 and its standard library are sufficient. Target code is parsed, never imported or executed. The entry point is a Python source file or directory; pass a manifest's directory rather than the manifest. Existing selection flags and optional UUID run/audit IDs are supported. Output must be a new `.json` file with an existing parent; omission writes to stdout. Complete results, including empty selections, return 0. Incomplete analysis or invalid invocation returns 2. Development adapter **0.10.0** embeds the report at `dimensions.errorHandling.transferReview` under ruleset `python-2026-10-15-exception-transfers-review-v1`. The npm archive ships this producer and guide, and the skill reports its evidence without grading it. Use an explicit local archive until publication; published npm 0.5.0 lacks this Python workflow.
 
 ## Policy: `python/exception-raise-chaining-v1`
 
@@ -52,3 +52,11 @@ The report embeds the unchanged context report and shares its run/audit IDs. It 
 Source drift, changed context/provenance, parse errors, or budget failures withhold all new rows and the summary. Embedded prior reports are diagnostic only on an incomplete run. These checks detect internal/source inconsistencies; they do not authenticate edited artifacts or promise an immutable filesystem.
 
 The [pinned corpus study](../../shared/scorecard-schema/calibration-runs/python-error-transfers-2026-10-15.md) records reviewed positive cases and deliberate exclusions. Neither pattern counts nor unresolved counts become a score, deduction, gate, handled/unhandled rate, defect claim, or automatic refactoring requirement.
+
+## Packaged validation and compatibility
+
+The shared validator checks matching invocation IDs, the embedded context report, context-row digest, configuration, one-to-one handler identities, original classifications, bounded expression/container metadata, raise identities and locations, the projection to original owned raises, extended classification constraints, and summary accounting. It does not independently reparse source or authenticate external edits; handler-name spelling and expression metadata are producer observations, not resolved bindings.
+
+Missing, inconsistent, or incomplete required transfer evidence makes a 0.10.0 combined run incomplete and withholds all scores and findings. Complete transfer evidence adds no findings, deductions, or gates. Error Handling remains skipped without a score, including empty populations. Method Complexity remains the only scored dimension in a partial assessment of 1/9 dimensions.
+
+Historical 0.9.0 reports remain valid without transfer evidence. Absence means unavailable observations, not zero raises; do not append fabricated measurements. Supported score comparisons still require matching versions, rulesets, and configurations. A packaging upgrade does not indicate a code improvement.

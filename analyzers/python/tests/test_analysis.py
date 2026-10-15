@@ -13,9 +13,26 @@ import duplication
 import decomposition
 import error_handling
 import error_handling_context
+import error_handling_transfers
 
 
 class AnalysisTests(unittest.TestCase):
+    def test_transfer_failure_propagates_without_mutating_prior_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            Path(directory, "work.py").write_text("def work():\n    try: call()\n    except Missing as error: raise New() from error\n")
+            argv = ["analysis.py", directory, "--run-id", "11111111-1111-4111-8111-111111111111", "--audit-id", "22222222-2222-4222-8222-222222222222"]
+            with patch.object(sys, "argv", argv), patch.object(error_handling_transfers, "read_verified", side_effect=ValueError("Source drift")), contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(analysis.main(), 2)
+            result = json.loads(output.getvalue())
+            for key in ("sourceFacts", "duplication", "coverageReview", "decomposition", "errorHandlingReview", "errorHandlingContext"):
+                self.assertEqual(result[key]["status"], "complete")
+            report = result["errorHandlingTransfers"]
+            self.assertEqual(report["contextReview"], result["errorHandlingContext"])
+            self.assertEqual(report["status"], "incomplete")
+            self.assertEqual(report["handlers"], [])
+            self.assertIsNone(report["summary"])
+            self.assertEqual(report["diagnostics"][0]["code"], "exception-transfer-analysis")
+
     def test_context_failure_withholds_context_without_mutating_base_measurements(self):
         with tempfile.TemporaryDirectory() as directory:
             Path(directory, "work.py").write_text("def work():\n    try: call()\n    except Missing: return None\n")
