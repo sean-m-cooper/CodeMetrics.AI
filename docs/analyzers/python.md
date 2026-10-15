@@ -17,6 +17,8 @@ analyzers/python/
 
 ## Current Outputs
 
+The standalone [handler call/return reviewer](../../analyzers/python/ERROR_HANDLING_OPERATIONS.md) inventories unresolved handler shapes and records owned calls, returned expressions, and conservative call/return patterns. Its pinned corpus validation preserves earlier observations and complexity inputs. It remains unscored and is not yet part of the packaged 0.10.0 contract.
+
 The packaged [exception-context reviewer](../../analyzers/python/ERROR_HANDLING_CONTEXT.md) adds bounded lexical context and conservative import/fallback/rethrow patterns linked to the existing handler IDs. Uncertain behavior stays unresolved, with no Error Handling score or deductions. It is embedded at `dimensions.errorHandling.contextReview` and presented by the skill without a handling-success rate.
 
 The packaged [raise/chaining reviewer](../../analyzers/python/ERROR_HANDLING_TRANSFERS.md) adds owned exception-expression/cause syntax and conservative one-raise handler patterns. Its corpus study preserves the packaged context and Method Complexity measurements. This extension remains unscored and is embedded at `dimensions.errorHandling.transferReview` for skill reporting.

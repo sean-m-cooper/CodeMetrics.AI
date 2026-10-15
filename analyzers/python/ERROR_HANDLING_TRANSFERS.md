@@ -41,6 +41,8 @@ Rebinding followed by a raise, logging followed by a raise, conditional dispatch
 
 ## Interpretation boundaries
 
+The subsequent standalone [call/return reviewer](ERROR_HANDLING_OPERATIONS.md) records operations inside these handlers and adds narrow call-sequence and return shapes while preserving this report unchanged. Its extensions do not alter the packaged 0.10.0 contract or introduce a score.
+
 The [Python 3.12 language reference](https://docs.python.org/3.12/reference/simple_stmts.html#the-raise-statement) distinguishes bare re-raising, raising an expression, explicit causes, and `from None`. An omitted `from` does not establish that causal context was lost: Python also supports implicit exception context. `from None` explicitly suppresses the automatic display of that context; it does not justify a defect finding or a claim that the exception history has been erased.
 
 Do not transplant a .NET `throw ex` penalty to `raise error`. Do not grade explicit versus implicit chaining, infer business intent from names, treat the absence of `from` as an error, or reward a recognized shape as correct handling. A translation candidate is a source-review description, not a resolved behavioral classification. Documentation is preserved through the embedded context report without judging its adequacy.
