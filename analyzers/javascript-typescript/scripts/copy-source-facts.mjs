@@ -13,6 +13,6 @@ for (const name of ['arithmetic', 'contract', 'population']) {
 
 const python = new URL('../dist/python/', import.meta.url);
 mkdirSync(python, { recursive: true });
-for (const file of ['source_facts.py', 'source_selection.py', 'duplication.py', 'analysis.py', 'decomposition.py', 'DECOMPOSITION.md', 'error_handling.py', 'ERROR_HANDLING.md', 'error_handling_context.py', 'ERROR_HANDLING_CONTEXT.md', 'error_handling_transfers.py', 'ERROR_HANDLING_TRANSFERS.md', 'METHOD_COMPLEXITY.md', 'coverage_review.py',
+for (const file of ['source_facts.py', 'source_selection.py', 'duplication.py', 'analysis.py', 'decomposition.py', 'DECOMPOSITION.md', 'error_handling.py', 'ERROR_HANDLING.md', 'error_handling_context.py', 'ERROR_HANDLING_CONTEXT.md', 'error_handling_transfers.py', 'ERROR_HANDLING_TRANSFERS.md', 'error_handling_operations.py', 'ERROR_HANDLING_OPERATIONS.md', 'METHOD_COMPLEXITY.md', 'coverage_review.py',
   'coverage_provenance.py', 'coverage_collect.py', 'coverage_worker.py', 'README.md', 'DUPLICATION.md', 'COVERAGE.md'])
   copyFileSync(new URL(`../../python/${file}`, import.meta.url), new URL(file, python));

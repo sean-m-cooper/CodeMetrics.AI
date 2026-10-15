@@ -1,0 +1,3449 @@
+{
+  "date": "2026-10-15",
+  "adapterVersion": "0.11.0",
+  "ruleset": "python-2026-10-15-exception-operations-review-v1",
+  "archiveSha256": "8b6d852487ba0221b9b881703a079156d70f2bc0c48919f42dcefce64ae795f0",
+  "results": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "runId": "9ca0b12a-3ac6-4f61-875a-8fe74959fef4",
+      "auditId": "9ca0b12a-3ac6-4f61-875a-8fe74959fef4",
+      "selectedFunctions": 246,
+      "methodComplexityScore": 7,
+      "handlers": {
+        "handlers": 66,
+        "byClassification": {
+          "documented-no-op": 2,
+          "other-body": 25,
+          "terminal-loop-control": 1,
+          "terminal-raise": 21,
+          "terminal-return": 13,
+          "undocumented-no-op": 4
+        },
+        "functionsWithHandlers": 34,
+        "byOwnerKind": {
+          "function": 55,
+          "module": 11
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "byClassification": {
+              "documented-no-op": 2,
+              "other-body": 25,
+              "terminal-loop-control": 1,
+              "terminal-raise": 21,
+              "terminal-return": 13,
+              "undocumented-no-op": 4
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 66,
+        "recognizedShapes": 17,
+        "unresolved": 49,
+        "byPattern": {
+          "direct-literal-fallback-return": 10,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 2
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 1,
+          "no-supported-local-shape": 48
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "recognizedShapes": 17,
+            "unresolved": 49,
+            "byPattern": {
+              "direct-literal-fallback-return": 10,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 2
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 1,
+              "no-supported-local-shape": 48
+            }
+          }
+        }
+      },
+      "transfers": {
+        "handlers": 66,
+        "recognizedShapes": 36,
+        "unresolved": 30,
+        "byPattern": {
+          "direct-literal-fallback-return": 10,
+          "direct-symbol-or-call-raise": 19,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 2
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 1,
+          "no-supported-local-shape": 29
+        },
+        "raiseStatements": 30,
+        "handlersWithRaises": 23,
+        "newlyRecognizedShapes": 19,
+        "byExceptionSyntax": {
+          "absent": 3,
+          "call": 26,
+          "name": 1
+        },
+        "handlerNameRaiseSyntax": 0,
+        "handlerNameCauseSyntax": 0,
+        "byCauseSyntax": {
+          "absent": 30
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "recognizedShapes": 36,
+            "unresolved": 30,
+            "byPattern": {
+              "direct-literal-fallback-return": 10,
+              "direct-symbol-or-call-raise": 19,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 2
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 1,
+              "no-supported-local-shape": 29
+            },
+            "raiseStatements": 30,
+            "handlersWithRaises": 23,
+            "newlyRecognizedShapes": 19,
+            "byExceptionSyntax": {
+              "absent": 3,
+              "call": 26,
+              "name": 1
+            },
+            "handlerNameRaiseSyntax": 0,
+            "handlerNameCauseSyntax": 0,
+            "byCauseSyntax": {
+              "absent": 30
+            }
+          }
+        }
+      },
+      "operations": {
+        "handlers": 66,
+        "recognizedShapes": 43,
+        "unresolved": 23,
+        "byPattern": {
+          "direct-call-statement-sequence": 3,
+          "direct-calls-then-bare-raise": 1,
+          "direct-literal-fallback-return": 10,
+          "direct-symbol-or-call-raise": 19,
+          "direct-symbol-or-call-return": 3,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 2
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 1,
+          "no-supported-local-shape": 22
+        },
+        "callExpressions": 42,
+        "returnStatements": 13,
+        "handlersWithCalls": 28,
+        "handlersWithReturns": 13,
+        "loggingNameSyntaxCalls": 1,
+        "immediatelyAwaitedCalls": 0,
+        "byReturnExpression": {
+          "absent": 1,
+          "attribute": 1,
+          "call": 1,
+          "name": 1,
+          "other": 9
+        },
+        "newlyRecognizedShapes": 7,
+        "inputUnresolvedInventory": {
+          "handlers": 30,
+          "singleStatement": 27,
+          "multiStatement": 3,
+          "withCalls": 10,
+          "withReturns": 3,
+          "withLoggingNameSyntax": 1,
+          "byReason": {
+            "enclosing-context-manager": 1,
+            "no-supported-local-shape": 29
+          },
+          "suiteShapes": [
+            {
+              "kinds": [
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 11
+            },
+            {
+              "kinds": [
+                "Pass"
+              ],
+              "truncated": false,
+              "handlers": 4
+            },
+            {
+              "kinds": [
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Break"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "FunctionDef"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "If",
+                "If",
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Import"
+              ],
+              "truncated": false,
+              "handlers": 1
+            }
+          ]
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "recognizedShapes": 43,
+            "unresolved": 23,
+            "byPattern": {
+              "direct-call-statement-sequence": 3,
+              "direct-calls-then-bare-raise": 1,
+              "direct-literal-fallback-return": 10,
+              "direct-symbol-or-call-raise": 19,
+              "direct-symbol-or-call-return": 3,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 2
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 1,
+              "no-supported-local-shape": 22
+            },
+            "callExpressions": 42,
+            "returnStatements": 13,
+            "handlersWithCalls": 28,
+            "handlersWithReturns": 13,
+            "loggingNameSyntaxCalls": 1,
+            "immediatelyAwaitedCalls": 0,
+            "byReturnExpression": {
+              "absent": 1,
+              "attribute": 1,
+              "call": 1,
+              "name": 1,
+              "other": 9
+            },
+            "newlyRecognizedShapes": 7,
+            "inputUnresolvedInventory": {
+              "handlers": 30,
+              "singleStatement": 27,
+              "multiStatement": 3,
+              "withCalls": 10,
+              "withReturns": 3,
+              "withLoggingNameSyntax": 1,
+              "byReason": {
+                "enclosing-context-manager": 1,
+                "no-supported-local-shape": 29
+              },
+              "suiteShapes": [
+                {
+                  "kinds": [
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 11
+                },
+                {
+                  "kinds": [
+                    "Pass"
+                  ],
+                  "truncated": false,
+                  "handlers": 4
+                },
+                {
+                  "kinds": [
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Break"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "FunctionDef"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "If",
+                    "If",
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Import"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneOperationReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-operations-package-2026-10-15/requests-evidence.json",
+      "evidenceSha256": "36c5a7ae4e50122ba2c495edda91cb0fb715e453b20ef18281446610f67c38e2"
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "runId": "12003121-b17b-4ef7-b7b2-5577570a27a0",
+      "auditId": "12003121-b17b-4ef7-b7b2-5577570a27a0",
+      "selectedFunctions": 508,
+      "methodComplexityScore": 7.1,
+      "handlers": {
+        "handlers": 62,
+        "byClassification": {
+          "other-body": 14,
+          "terminal-loop-control": 3,
+          "terminal-raise": 26,
+          "terminal-return": 10,
+          "undocumented-no-op": 9
+        },
+        "functionsWithHandlers": 45,
+        "byOwnerKind": {
+          "function": 53,
+          "module": 9
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "byClassification": {
+              "other-body": 14,
+              "terminal-loop-control": 3,
+              "terminal-raise": 26,
+              "terminal-return": 10,
+              "undocumented-no-op": 9
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 62,
+        "recognizedShapes": 5,
+        "unresolved": 57,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "guarded-import-literal-default": 1,
+          "no-op-then-literal-return": 1
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "enclosing-finally": 4,
+          "nested-handler": 1,
+          "no-supported-local-shape": 51
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "recognizedShapes": 5,
+            "unresolved": 57,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "guarded-import-literal-default": 1,
+              "no-op-then-literal-return": 1
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "enclosing-finally": 4,
+              "nested-handler": 1,
+              "no-supported-local-shape": 51
+            }
+          }
+        }
+      },
+      "transfers": {
+        "handlers": 62,
+        "recognizedShapes": 17,
+        "unresolved": 45,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "direct-raise-from-handler-name": 1,
+          "direct-raise-from-none": 1,
+          "direct-symbol-or-call-raise": 10,
+          "guarded-import-literal-default": 1,
+          "no-op-then-literal-return": 1
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "enclosing-finally": 4,
+          "nested-handler": 1,
+          "no-supported-local-shape": 39
+        },
+        "raiseStatements": 36,
+        "handlersWithRaises": 29,
+        "newlyRecognizedShapes": 12,
+        "byExceptionSyntax": {
+          "absent": 5,
+          "call": 21,
+          "name": 10
+        },
+        "handlerNameRaiseSyntax": 7,
+        "handlerNameCauseSyntax": 3,
+        "byCauseSyntax": {
+          "absent": 29,
+          "name": 3,
+          "none": 2,
+          "other": 2
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "recognizedShapes": 17,
+            "unresolved": 45,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "direct-raise-from-handler-name": 1,
+              "direct-raise-from-none": 1,
+              "direct-symbol-or-call-raise": 10,
+              "guarded-import-literal-default": 1,
+              "no-op-then-literal-return": 1
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "enclosing-finally": 4,
+              "nested-handler": 1,
+              "no-supported-local-shape": 39
+            },
+            "raiseStatements": 36,
+            "handlersWithRaises": 29,
+            "newlyRecognizedShapes": 12,
+            "byExceptionSyntax": {
+              "absent": 5,
+              "call": 21,
+              "name": 10
+            },
+            "handlerNameRaiseSyntax": 7,
+            "handlerNameCauseSyntax": 3,
+            "byCauseSyntax": {
+              "absent": 29,
+              "name": 3,
+              "none": 2,
+              "other": 2
+            }
+          }
+        }
+      },
+      "operations": {
+        "handlers": 62,
+        "recognizedShapes": 18,
+        "unresolved": 44,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "direct-raise-from-handler-name": 1,
+          "direct-raise-from-none": 1,
+          "direct-symbol-or-call-raise": 10,
+          "direct-symbol-or-call-return": 1,
+          "guarded-import-literal-default": 1,
+          "no-op-then-literal-return": 1
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "enclosing-finally": 4,
+          "nested-handler": 1,
+          "no-supported-local-shape": 38
+        },
+        "callExpressions": 59,
+        "returnStatements": 10,
+        "handlersWithCalls": 33,
+        "handlersWithReturns": 10,
+        "loggingNameSyntaxCalls": 1,
+        "immediatelyAwaitedCalls": 15,
+        "byReturnExpression": {
+          "absent": 2,
+          "call": 1,
+          "name": 1,
+          "none": 2,
+          "other": 4
+        },
+        "newlyRecognizedShapes": 1,
+        "inputUnresolvedInventory": {
+          "handlers": 45,
+          "singleStatement": 23,
+          "multiStatement": 22,
+          "withCalls": 22,
+          "withReturns": 7,
+          "withLoggingNameSyntax": 1,
+          "byReason": {
+            "enclosing-context-manager": 2,
+            "enclosing-finally": 4,
+            "nested-handler": 1,
+            "no-supported-local-shape": 39
+          },
+          "suiteShapes": [
+            {
+              "kinds": [
+                "Pass"
+              ],
+              "truncated": false,
+              "handlers": 8
+            },
+            {
+              "kinds": [
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 6
+            },
+            {
+              "kinds": [
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 4
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "Continue"
+              ],
+              "truncated": false,
+              "handlers": 2
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 2
+            },
+            {
+              "kinds": [
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 2
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Expr",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "If",
+                "If",
+                "If",
+                "If",
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Break"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "For",
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "Assign",
+                "Assign",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "Assign",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Import",
+                "ImportFrom",
+                "ImportFrom"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "ImportFrom"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Try"
+              ],
+              "truncated": false,
+              "handlers": 1
+            }
+          ]
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "recognizedShapes": 18,
+            "unresolved": 44,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "direct-raise-from-handler-name": 1,
+              "direct-raise-from-none": 1,
+              "direct-symbol-or-call-raise": 10,
+              "direct-symbol-or-call-return": 1,
+              "guarded-import-literal-default": 1,
+              "no-op-then-literal-return": 1
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "enclosing-finally": 4,
+              "nested-handler": 1,
+              "no-supported-local-shape": 38
+            },
+            "callExpressions": 59,
+            "returnStatements": 10,
+            "handlersWithCalls": 33,
+            "handlersWithReturns": 10,
+            "loggingNameSyntaxCalls": 1,
+            "immediatelyAwaitedCalls": 15,
+            "byReturnExpression": {
+              "absent": 2,
+              "call": 1,
+              "name": 1,
+              "none": 2,
+              "other": 4
+            },
+            "newlyRecognizedShapes": 1,
+            "inputUnresolvedInventory": {
+              "handlers": 45,
+              "singleStatement": 23,
+              "multiStatement": 22,
+              "withCalls": 22,
+              "withReturns": 7,
+              "withLoggingNameSyntax": 1,
+              "byReason": {
+                "enclosing-context-manager": 2,
+                "enclosing-finally": 4,
+                "nested-handler": 1,
+                "no-supported-local-shape": 39
+              },
+              "suiteShapes": [
+                {
+                  "kinds": [
+                    "Pass"
+                  ],
+                  "truncated": false,
+                  "handlers": 8
+                },
+                {
+                  "kinds": [
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 6
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 4
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "Continue"
+                  ],
+                  "truncated": false,
+                  "handlers": 2
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 2
+                },
+                {
+                  "kinds": [
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 2
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Expr",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "If",
+                    "If",
+                    "If",
+                    "If",
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Break"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "For",
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Assign",
+                    "Assign",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Assign",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Import",
+                    "ImportFrom",
+                    "ImportFrom"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "ImportFrom"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Try"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneOperationReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-operations-package-2026-10-15/starlette-evidence.json",
+      "evidenceSha256": "4e0102f555150d2aef63f7b8d63606f79822b93e4cb569687c11598f85bf2ba4"
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "runId": "38e164d6-7fb3-4a05-8ce4-453f6a896bb9",
+      "auditId": "38e164d6-7fb3-4a05-8ce4-453f6a896bb9",
+      "selectedFunctions": 464,
+      "methodComplexityScore": 6.8,
+      "handlers": {
+        "handlers": 69,
+        "byClassification": {
+          "documented-no-op": 5,
+          "other-body": 29,
+          "terminal-loop-control": 3,
+          "terminal-raise": 16,
+          "terminal-return": 10,
+          "undocumented-no-op": 6
+        },
+        "functionsWithHandlers": 48,
+        "byOwnerKind": {
+          "class-body": 1,
+          "function": 66,
+          "module": 2
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "byClassification": {
+              "documented-no-op": 5,
+              "other-body": 29,
+              "terminal-loop-control": 3,
+              "terminal-raise": 16,
+              "terminal-return": 10,
+              "undocumented-no-op": 6
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 69,
+        "recognizedShapes": 9,
+        "unresolved": 60,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "guarded-import-literal-default": 1,
+          "locally-documented-no-op": 5
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "no-supported-local-shape": 58
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "recognizedShapes": 9,
+            "unresolved": 60,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "guarded-import-literal-default": 1,
+              "locally-documented-no-op": 5
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "no-supported-local-shape": 58
+            }
+          }
+        }
+      },
+      "transfers": {
+        "handlers": 69,
+        "recognizedShapes": 22,
+        "unresolved": 47,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "direct-raise-from-handler-name": 3,
+          "direct-symbol-or-call-raise": 10,
+          "guarded-import-literal-default": 1,
+          "locally-documented-no-op": 5
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "no-supported-local-shape": 45
+        },
+        "raiseStatements": 26,
+        "handlersWithRaises": 25,
+        "newlyRecognizedShapes": 13,
+        "byExceptionSyntax": {
+          "absent": 11,
+          "call": 15
+        },
+        "handlerNameRaiseSyntax": 0,
+        "handlerNameCauseSyntax": 3,
+        "byCauseSyntax": {
+          "absent": 23,
+          "name": 3
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "recognizedShapes": 22,
+            "unresolved": 47,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "direct-raise-from-handler-name": 3,
+              "direct-symbol-or-call-raise": 10,
+              "guarded-import-literal-default": 1,
+              "locally-documented-no-op": 5
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "no-supported-local-shape": 45
+            },
+            "raiseStatements": 26,
+            "handlersWithRaises": 25,
+            "newlyRecognizedShapes": 13,
+            "byExceptionSyntax": {
+              "absent": 11,
+              "call": 15
+            },
+            "handlerNameRaiseSyntax": 0,
+            "handlerNameCauseSyntax": 3,
+            "byCauseSyntax": {
+              "absent": 23,
+              "name": 3
+            }
+          }
+        }
+      },
+      "operations": {
+        "handlers": 69,
+        "recognizedShapes": 31,
+        "unresolved": 38,
+        "byPattern": {
+          "direct-call-statement-sequence": 4,
+          "direct-calls-then-bare-raise": 1,
+          "direct-literal-fallback-return": 3,
+          "direct-raise-from-handler-name": 3,
+          "direct-symbol-or-call-raise": 10,
+          "direct-symbol-or-call-return": 4,
+          "guarded-import-literal-default": 1,
+          "locally-documented-no-op": 5
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "no-supported-local-shape": 36
+        },
+        "callExpressions": 44,
+        "returnStatements": 10,
+        "handlersWithCalls": 36,
+        "handlersWithReturns": 10,
+        "loggingNameSyntaxCalls": 3,
+        "immediatelyAwaitedCalls": 0,
+        "byReturnExpression": {
+          "attribute": 2,
+          "call": 2,
+          "name": 1,
+          "none": 1,
+          "other": 4
+        },
+        "newlyRecognizedShapes": 9,
+        "inputUnresolvedInventory": {
+          "handlers": 47,
+          "singleStatement": 30,
+          "multiStatement": 17,
+          "withCalls": 23,
+          "withReturns": 7,
+          "withLoggingNameSyntax": 3,
+          "byReason": {
+            "enclosing-context-manager": 2,
+            "no-supported-local-shape": 45
+          },
+          "suiteShapes": [
+            {
+              "kinds": [
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 7
+            },
+            {
+              "kinds": [
+                "Pass"
+              ],
+              "truncated": false,
+              "handlers": 6
+            },
+            {
+              "kinds": [
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 6
+            },
+            {
+              "kinds": [
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 4
+            },
+            {
+              "kinds": [
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "Expr",
+                "If",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "If",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 2
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "If",
+                "Expr",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Break"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "ClassDef"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Continue"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Continue"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "ImportFrom",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            }
+          ]
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "recognizedShapes": 31,
+            "unresolved": 38,
+            "byPattern": {
+              "direct-call-statement-sequence": 4,
+              "direct-calls-then-bare-raise": 1,
+              "direct-literal-fallback-return": 3,
+              "direct-raise-from-handler-name": 3,
+              "direct-symbol-or-call-raise": 10,
+              "direct-symbol-or-call-return": 4,
+              "guarded-import-literal-default": 1,
+              "locally-documented-no-op": 5
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "no-supported-local-shape": 36
+            },
+            "callExpressions": 44,
+            "returnStatements": 10,
+            "handlersWithCalls": 36,
+            "handlersWithReturns": 10,
+            "loggingNameSyntaxCalls": 3,
+            "immediatelyAwaitedCalls": 0,
+            "byReturnExpression": {
+              "attribute": 2,
+              "call": 2,
+              "name": 1,
+              "none": 1,
+              "other": 4
+            },
+            "newlyRecognizedShapes": 9,
+            "inputUnresolvedInventory": {
+              "handlers": 47,
+              "singleStatement": 30,
+              "multiStatement": 17,
+              "withCalls": 23,
+              "withReturns": 7,
+              "withLoggingNameSyntax": 3,
+              "byReason": {
+                "enclosing-context-manager": 2,
+                "no-supported-local-shape": 45
+              },
+              "suiteShapes": [
+                {
+                  "kinds": [
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 7
+                },
+                {
+                  "kinds": [
+                    "Pass"
+                  ],
+                  "truncated": false,
+                  "handlers": 6
+                },
+                {
+                  "kinds": [
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 6
+                },
+                {
+                  "kinds": [
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 4
+                },
+                {
+                  "kinds": [
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "If",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 2
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "If",
+                    "Expr",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Break"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "ClassDef"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Continue"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Continue"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "ImportFrom",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneOperationReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-operations-package-2026-10-15/httpie-evidence.json",
+      "evidenceSha256": "5d3727e17365a87ff54bf2c0242923bdaca5a8a707c400e5dc5f5551be58eb7e"
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "runId": "132d6e4e-a527-48de-b688-e6072742b3a6",
+      "auditId": "132d6e4e-a527-48de-b688-e6072742b3a6",
+      "selectedFunctions": 9748,
+      "methodComplexityScore": 5.6,
+      "handlers": {
+        "handlers": 1267,
+        "byClassification": {
+          "documented-no-op": 41,
+          "other-body": 422,
+          "terminal-loop-control": 60,
+          "terminal-raise": 338,
+          "terminal-return": 255,
+          "undocumented-no-op": 151
+        },
+        "functionsWithHandlers": 940,
+        "byOwnerKind": {
+          "function": 1246,
+          "module": 21
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "byClassification": {
+              "documented-no-op": 41,
+              "other-body": 422,
+              "terminal-loop-control": 60,
+              "terminal-raise": 338,
+              "terminal-return": 255,
+              "undocumented-no-op": 151
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 1267,
+        "recognizedShapes": 162,
+        "unresolved": 1105,
+        "byPattern": {
+          "direct-bare-rethrow": 6,
+          "direct-literal-fallback-return": 107,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 41,
+          "no-op-then-literal-return": 3
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 32,
+          "enclosing-finally": 18,
+          "exception-group-semantics": 1,
+          "import-exception-binding-unresolved": 1,
+          "nested-handler": 39,
+          "no-supported-local-shape": 1024
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "recognizedShapes": 162,
+            "unresolved": 1105,
+            "byPattern": {
+              "direct-bare-rethrow": 6,
+              "direct-literal-fallback-return": 107,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 41,
+              "no-op-then-literal-return": 3
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 32,
+              "enclosing-finally": 18,
+              "exception-group-semantics": 1,
+              "import-exception-binding-unresolved": 1,
+              "nested-handler": 39,
+              "no-supported-local-shape": 1024
+            }
+          }
+        }
+      },
+      "transfers": {
+        "handlers": 1267,
+        "recognizedShapes": 413,
+        "unresolved": 854,
+        "byPattern": {
+          "direct-bare-rethrow": 6,
+          "direct-literal-fallback-return": 107,
+          "direct-raise-from-handler-name": 44,
+          "direct-raise-from-none": 7,
+          "direct-symbol-or-call-raise": 200,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 41,
+          "no-op-then-literal-return": 3
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 32,
+          "enclosing-finally": 18,
+          "exception-group-semantics": 1,
+          "import-exception-binding-unresolved": 1,
+          "nested-handler": 39,
+          "no-supported-local-shape": 772,
+          "raise-expression-or-cause-unresolved": 1
+        },
+        "raiseStatements": 439,
+        "handlersWithRaises": 412,
+        "newlyRecognizedShapes": 251,
+        "byExceptionSyntax": {
+          "absent": 103,
+          "call": 310,
+          "name": 24,
+          "other": 2
+        },
+        "handlerNameRaiseSyntax": 5,
+        "handlerNameCauseSyntax": 57,
+        "byCauseSyntax": {
+          "absent": 372,
+          "name": 59,
+          "none": 8
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "recognizedShapes": 413,
+            "unresolved": 854,
+            "byPattern": {
+              "direct-bare-rethrow": 6,
+              "direct-literal-fallback-return": 107,
+              "direct-raise-from-handler-name": 44,
+              "direct-raise-from-none": 7,
+              "direct-symbol-or-call-raise": 200,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 41,
+              "no-op-then-literal-return": 3
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 32,
+              "enclosing-finally": 18,
+              "exception-group-semantics": 1,
+              "import-exception-binding-unresolved": 1,
+              "nested-handler": 39,
+              "no-supported-local-shape": 772,
+              "raise-expression-or-cause-unresolved": 1
+            },
+            "raiseStatements": 439,
+            "handlersWithRaises": 412,
+            "newlyRecognizedShapes": 251,
+            "byExceptionSyntax": {
+              "absent": 103,
+              "call": 310,
+              "name": 24,
+              "other": 2
+            },
+            "handlerNameRaiseSyntax": 5,
+            "handlerNameCauseSyntax": 57,
+            "byCauseSyntax": {
+              "absent": 372,
+              "name": 59,
+              "none": 8
+            }
+          }
+        }
+      },
+      "operations": {
+        "handlers": 1267,
+        "recognizedShapes": 550,
+        "unresolved": 717,
+        "byPattern": {
+          "direct-bare-rethrow": 6,
+          "direct-call-statement-sequence": 69,
+          "direct-calls-then-bare-raise": 7,
+          "direct-literal-fallback-return": 107,
+          "direct-raise-from-handler-name": 44,
+          "direct-raise-from-none": 7,
+          "direct-symbol-or-call-raise": 200,
+          "direct-symbol-or-call-return": 61,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 41,
+          "no-op-then-literal-return": 3
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 32,
+          "enclosing-finally": 18,
+          "exception-group-semantics": 1,
+          "import-exception-binding-unresolved": 1,
+          "nested-handler": 39,
+          "no-supported-local-shape": 635,
+          "raise-expression-or-cause-unresolved": 1
+        },
+        "callExpressions": 1179,
+        "returnStatements": 295,
+        "handlersWithCalls": 666,
+        "handlersWithReturns": 288,
+        "loggingNameSyntaxCalls": 60,
+        "immediatelyAwaitedCalls": 12,
+        "byReturnExpression": {
+          "absent": 19,
+          "attribute": 5,
+          "call": 60,
+          "name": 46,
+          "none": 34,
+          "other": 131
+        },
+        "newlyRecognizedShapes": 137,
+        "inputUnresolvedInventory": {
+          "handlers": 854,
+          "singleStatement": 616,
+          "multiStatement": 238,
+          "withCalls": 421,
+          "withReturns": 181,
+          "withLoggingNameSyntax": 49,
+          "byReason": {
+            "enclosing-context-manager": 32,
+            "enclosing-finally": 18,
+            "exception-group-semantics": 1,
+            "import-exception-binding-unresolved": 1,
+            "nested-handler": 39,
+            "no-supported-local-shape": 772,
+            "raise-expression-or-cause-unresolved": 1
+          },
+          "suiteShapes": [
+            {
+              "kinds": [
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 161
+            },
+            {
+              "kinds": [
+                "Pass"
+              ],
+              "truncated": false,
+              "handlers": 148
+            },
+            {
+              "kinds": [
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 108
+            },
+            {
+              "kinds": [
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 61
+            },
+            {
+              "kinds": [
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 51
+            },
+            {
+              "kinds": [
+                "Continue"
+              ],
+              "truncated": false,
+              "handlers": 36
+            },
+            {
+              "kinds": [
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 26
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 23
+            },
+            {
+              "kinds": [
+                "Try"
+              ],
+              "truncated": false,
+              "handlers": 19
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 18
+            },
+            {
+              "kinds": [
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 16
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 13
+            },
+            {
+              "kinds": [
+                "If",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 12
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 11
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 11
+            },
+            {
+              "kinds": [
+                "Break"
+              ],
+              "truncated": false,
+              "handlers": 9
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 8
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 7
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 7
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 5
+            },
+            {
+              "kinds": [
+                "If",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 5
+            },
+            {
+              "kinds": [
+                "If",
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 5
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 4
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Continue"
+              ],
+              "truncated": false,
+              "handlers": 4
+            },
+            {
+              "kinds": [
+                "If",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 4
+            },
+            {
+              "kinds": [
+                "If",
+                "Continue"
+              ],
+              "truncated": false,
+              "handlers": 4
+            },
+            {
+              "kinds": [
+                "Try",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 4
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Break"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "AugAssign"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "If",
+                "Try"
+              ],
+              "truncated": false,
+              "handlers": 3
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 2
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 2
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Break"
+              ],
+              "truncated": false,
+              "handlers": 2
+            },
+            {
+              "kinds": [
+                "If",
+                "Expr",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 2
+            },
+            {
+              "kinds": [
+                "If",
+                "If",
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 2
+            },
+            {
+              "kinds": [
+                "Import"
+              ],
+              "truncated": false,
+              "handlers": 2
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "Assign",
+                "Assign",
+                "Assign",
+                "For"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "Assign",
+                "Assign",
+                "Expr",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "Assign",
+                "Assign",
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "Expr",
+                "Continue"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "Expr",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "If",
+                "If",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "If",
+                "If",
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Assign",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "AugAssign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Expr",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Expr",
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "For",
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "For",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "FunctionDef",
+                "FunctionDef"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "Assign",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "If",
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "If",
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Try"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Assign",
+                "Try",
+                "Expr",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Assign",
+                "Expr",
+                "Expr",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Assign",
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "AsyncFunctionDef",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "AugAssign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Expr",
+                "Continue"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "Expr",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "For"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Expr",
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "For",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "Assign",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "Assign",
+                "Expr",
+                "If",
+                "Expr",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "Assign",
+                "FunctionDef",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "Assign",
+                "Try"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "Assign",
+                "Try",
+                "If",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "Expr",
+                "For"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "Expr",
+                "If",
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "For",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "If",
+                "Expr"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "If",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "If",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "If",
+                "With"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Import",
+                "Assign",
+                "If"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Import",
+                "Raise"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "ImportFrom"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "ImportFrom",
+                "ImportFrom",
+                "ImportFrom",
+                "Assign",
+                "ClassDef",
+                "FunctionDef",
+                "Assign",
+                "FunctionDef",
+                "Assign",
+                "ClassDef"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Try",
+                "Assign",
+                "Assign",
+                "Assign",
+                "Assign",
+                "Assign",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "Try",
+                "Assign",
+                "Assign",
+                "Return"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "With"
+              ],
+              "truncated": false,
+              "handlers": 1
+            },
+            {
+              "kinds": [
+                "With",
+                "Assign"
+              ],
+              "truncated": false,
+              "handlers": 1
+            }
+          ]
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "recognizedShapes": 550,
+            "unresolved": 717,
+            "byPattern": {
+              "direct-bare-rethrow": 6,
+              "direct-call-statement-sequence": 69,
+              "direct-calls-then-bare-raise": 7,
+              "direct-literal-fallback-return": 107,
+              "direct-raise-from-handler-name": 44,
+              "direct-raise-from-none": 7,
+              "direct-symbol-or-call-raise": 200,
+              "direct-symbol-or-call-return": 61,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 41,
+              "no-op-then-literal-return": 3
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 32,
+              "enclosing-finally": 18,
+              "exception-group-semantics": 1,
+              "import-exception-binding-unresolved": 1,
+              "nested-handler": 39,
+              "no-supported-local-shape": 635,
+              "raise-expression-or-cause-unresolved": 1
+            },
+            "callExpressions": 1179,
+            "returnStatements": 295,
+            "handlersWithCalls": 666,
+            "handlersWithReturns": 288,
+            "loggingNameSyntaxCalls": 60,
+            "immediatelyAwaitedCalls": 12,
+            "byReturnExpression": {
+              "absent": 19,
+              "attribute": 5,
+              "call": 60,
+              "name": 46,
+              "none": 34,
+              "other": 131
+            },
+            "newlyRecognizedShapes": 137,
+            "inputUnresolvedInventory": {
+              "handlers": 854,
+              "singleStatement": 616,
+              "multiStatement": 238,
+              "withCalls": 421,
+              "withReturns": 181,
+              "withLoggingNameSyntax": 49,
+              "byReason": {
+                "enclosing-context-manager": 32,
+                "enclosing-finally": 18,
+                "exception-group-semantics": 1,
+                "import-exception-binding-unresolved": 1,
+                "nested-handler": 39,
+                "no-supported-local-shape": 772,
+                "raise-expression-or-cause-unresolved": 1
+              },
+              "suiteShapes": [
+                {
+                  "kinds": [
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 161
+                },
+                {
+                  "kinds": [
+                    "Pass"
+                  ],
+                  "truncated": false,
+                  "handlers": 148
+                },
+                {
+                  "kinds": [
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 108
+                },
+                {
+                  "kinds": [
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 61
+                },
+                {
+                  "kinds": [
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 51
+                },
+                {
+                  "kinds": [
+                    "Continue"
+                  ],
+                  "truncated": false,
+                  "handlers": 36
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 26
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 23
+                },
+                {
+                  "kinds": [
+                    "Try"
+                  ],
+                  "truncated": false,
+                  "handlers": 19
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 18
+                },
+                {
+                  "kinds": [
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 16
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 13
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 12
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 11
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 11
+                },
+                {
+                  "kinds": [
+                    "Break"
+                  ],
+                  "truncated": false,
+                  "handlers": 9
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 8
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 7
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 7
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 5
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 5
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 5
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 4
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Continue"
+                  ],
+                  "truncated": false,
+                  "handlers": 4
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 4
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Continue"
+                  ],
+                  "truncated": false,
+                  "handlers": 4
+                },
+                {
+                  "kinds": [
+                    "Try",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 4
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Break"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "AugAssign"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Try"
+                  ],
+                  "truncated": false,
+                  "handlers": 3
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 2
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 2
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Break"
+                  ],
+                  "truncated": false,
+                  "handlers": 2
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Expr",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 2
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "If",
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 2
+                },
+                {
+                  "kinds": [
+                    "Import"
+                  ],
+                  "truncated": false,
+                  "handlers": 2
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "Assign",
+                    "Assign",
+                    "Assign",
+                    "For"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "Assign",
+                    "Assign",
+                    "Expr",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "Assign",
+                    "Assign",
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "Expr",
+                    "Continue"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "Expr",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "If",
+                    "If",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "If",
+                    "If",
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Assign",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "AugAssign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Expr",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Expr",
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "For",
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "For",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "FunctionDef",
+                    "FunctionDef"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "Assign",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "If",
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "If",
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Try"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Assign",
+                    "Try",
+                    "Expr",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Assign",
+                    "Expr",
+                    "Expr",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Assign",
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "AsyncFunctionDef",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "AugAssign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Expr",
+                    "Continue"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "Expr",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "For"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Expr",
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "For",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Assign",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Assign",
+                    "Expr",
+                    "If",
+                    "Expr",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Assign",
+                    "FunctionDef",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Assign",
+                    "Try"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Assign",
+                    "Try",
+                    "If",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Expr",
+                    "For"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "Expr",
+                    "If",
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "For",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "If",
+                    "Expr"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "If",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "If",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "If",
+                    "With"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Import",
+                    "Assign",
+                    "If"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Import",
+                    "Raise"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "ImportFrom"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "ImportFrom",
+                    "ImportFrom",
+                    "ImportFrom",
+                    "Assign",
+                    "ClassDef",
+                    "FunctionDef",
+                    "Assign",
+                    "FunctionDef",
+                    "Assign",
+                    "ClassDef"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Try",
+                    "Assign",
+                    "Assign",
+                    "Assign",
+                    "Assign",
+                    "Assign",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "Try",
+                    "Assign",
+                    "Assign",
+                    "Return"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "With"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                },
+                {
+                  "kinds": [
+                    "With",
+                    "Assign"
+                  ],
+                  "truncated": false,
+                  "handlers": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneOperationReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-operations-package-2026-10-15/django-evidence.json",
+      "evidenceSha256": "5f92239eab154ab8ac8418c69d77bbdf7f35d7749c19699390ee863d1a216cc2"
+    }
+  ],
+  "checkpoint": "54ca6f0",
+  "archive": "TestResults/python-error-operations-package-2026-10-15/codemetrics-ai-0.5.0.tgz",
+  "checks": {
+    "pythonTestsPassed": 140,
+    "focusedOperationTestsIncluded": 14,
+    "sharedConformanceTestsPassed": 7,
+    "javascriptTypescriptTestsPassedAcrossRuns": 256,
+    "installedPythonEvidenceTestsPassed": 35,
+    "skillIntegrationSupportingHarnessChecksPassedAcrossRuns": 34,
+    "pythonIntegrationSubtestsIncluded": 17,
+    "skillStructuralValidation": "passed",
+    "packagedProducerAndGuideBytesMatchSource": true,
+    "matchedPackagedFiles": 22,
+    "archiveExcludesPythonBytecode": true,
+    "reportingFixture": "analyzer-generated, inspector-validated, offline harness only; no live-model evaluation",
+    "verificationRetries": [
+      "JS/TS: initial full run passed 255/256; one unchanged async test timed out at 5 seconds. Isolated retry passed in 3.54 seconds without timeout changes.",
+      "Skill: initial runtime/catalog checks passed, but coverage collection used an interpreter without coverage.py. All 18 Python integration checks including the parent passed when rerun with the existing coverage-enabled interpreter."
+    ]
+  },
+  "operationIdentityCorrection": {
+    "producerVersion": "0.2.0-experimental",
+    "change": "Operation IDs include start and end line/column. Distinct nested calls can share a starting position.",
+    "previousRepeatedStartOperations": {
+      "requests": 0,
+      "starlette": 1,
+      "httpie": 0,
+      "django": 26
+    },
+    "countsClassificationsAndOtherMetadataUnchanged": true,
+    "correctedStandaloneReports": "TestResults/python-error-operations-2026-10-15-extents",
+    "correctedStandaloneImplementationSha256": "0552ddc4f4dd4c798e22a8ea0c48b2b60e16a99063f21efe6f1b2df927824a8e"
+  },
+  "releaseState": "Local development archive; not pushed or published. Error Handling unscored; Method Complexity remains the only scored Python dimension."
+}

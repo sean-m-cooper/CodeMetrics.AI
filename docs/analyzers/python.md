@@ -17,7 +17,7 @@ analyzers/python/
 
 ## Current Outputs
 
-The standalone [handler call/return reviewer](../../analyzers/python/ERROR_HANDLING_OPERATIONS.md) inventories unresolved handler shapes and records owned calls, returned expressions, and conservative call/return patterns. Its pinned corpus validation preserves earlier observations and complexity inputs. It remains unscored and is not yet part of the packaged 0.10.0 contract.
+The packaged [handler call/return reviewer](../../analyzers/python/ERROR_HANDLING_OPERATIONS.md) inventories unresolved handler shapes and records owned calls, returned expressions, and conservative call/return patterns. Its pinned corpus validation preserves earlier observations and complexity inputs. It remains unscored and is embedded at `dimensions.errorHandling.operationReview` in adapter 0.11.0.
 
 The packaged [exception-context reviewer](../../analyzers/python/ERROR_HANDLING_CONTEXT.md) adds bounded lexical context and conservative import/fallback/rethrow patterns linked to the existing handler IDs. Uncertain behavior stays unresolved, with no Error Handling score or deductions. It is embedded at `dimensions.errorHandling.contextReview` and presented by the skill without a handling-success rate.
 
@@ -35,7 +35,7 @@ See the [Python adapter guide](../../analyzers/python/README.md) for commands, d
 
 The adapter now classifies file populations and declaration-only bodies, records selection provenance in source-facts v2, and has pinned regression selections for Requests, Starlette, HTTPie, and Django. Path rules are explicit conventions with customer overrides; they do not claim complete runtime reachability or semantic resolution.
 
-The development npm package includes `codemetrics-python`, which runs the Python 3.12 parser and shared engine and emits evidence v3 with embedded source facts and review evidence. The code-scorecard skill routes Python manifests, explicit files, and directories through the packaged CLI, validates current run/audit identities, and records failed attempts. This integration requires an explicitly supplied local npm archive until publication; the adapter is `0.10.0`, with the unchanged source-facts producer `0.4.0-experimental`.
+The development npm package includes `codemetrics-python`, which runs the Python 3.12 parser and shared engine and emits evidence v3 with embedded source facts and review evidence. The code-scorecard skill routes Python manifests, explicit files, and directories through the packaged CLI, validates current run/audit identities, and records failed attempts. This integration requires an explicitly supplied local npm archive until publication; the adapter is `0.11.0`, with the unchanged source-facts producer `0.4.0-experimental`.
 
 [Method Complexity](../../analyzers/python/METHOD_COMPLEXITY.md) is Python's first supported scored dimension. It uses selected production implementations, the accepted CC ladder, and one-worst 40% / remainder-mean 60% weighting with decimal half-up rounding. The other eight dimensions and all decomposition, duplication, and coverage/CRAP observations remain unscored. Empty populations are unavailable; incomplete runs provide diagnostics only. A reported aggregate is explicitly a partial assessment with 1/9 dimensions scored. Matching supported policies can compare scores; historical previews cannot. No cross-language score equivalence is claimed.
 

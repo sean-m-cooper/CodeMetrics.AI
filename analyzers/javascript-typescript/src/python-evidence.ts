@@ -8,17 +8,19 @@ import { validateCoverage, type PythonCoverage } from "./python-coverage.js";
 import { validateDecomposition, type PythonDecomposition } from "./python-decomposition.js";
 import { validateErrorHandling, errorHandlingPolicy, type PythonErrorHandling } from "./python-error-handling.js";
 import { validateErrorContext, type PythonErrorContext } from "./python-error-context.js";
+import { validateOperations, type PythonOperations } from "./python-error-operations.js";
 import { validateTransfers, type PythonTransfers } from "./python-error-transfers.js";
 import { scoreMethodComplexity, pythonCalibration } from "./python-complexity.js";
 
-export const pythonVersion = "0.10.0";
-export const pythonRuleset = "python-2026-10-15-exception-transfers-review-v1";
-const currentProfile = { version: pythonVersion, ruleset: pythonRuleset, decomposition: true, scored: true, errorHandling: true, context: true, transfers: true };
-const contextProfile = { version: "0.9.0", ruleset: "python-2026-10-15-exception-context-review-v1", decomposition: true, scored: true, errorHandling: true, context: true, transfers: false };
-const handlerProfile = { version: "0.8.0", ruleset: "python-2026-10-15-error-handling-review-v1", decomposition: true, scored: true, errorHandling: true, context: false, transfers: false };
-const complexityProfile = { version: "0.7.0", ruleset: "python-2026-10-13-method-complexity-v1", decomposition: true, scored: true, errorHandling: false, context: false, transfers: false };
-const decompositionProfile = { version: "0.6.0-experimental", ruleset: "python-2026-10-13-decomposition-preview", decomposition: true, scored: false, errorHandling: false, context: false, transfers: false };
-const coverageProfile = { version: "0.5.0-experimental", ruleset: "python-2026-10-12-coverage-preview", decomposition: false, scored: false, errorHandling: false, context: false, transfers: false };
+export const pythonVersion = "0.11.0";
+export const pythonRuleset = "python-2026-10-15-exception-operations-review-v1";
+const currentProfile = { version: pythonVersion, ruleset: pythonRuleset, decomposition: true, scored: true, errorHandling: true, context: true, transfers: true, operations: true };
+const transferProfile = { version: "0.10.0", ruleset: "python-2026-10-15-exception-transfers-review-v1", decomposition: true, scored: true, errorHandling: true, context: true, transfers: true, operations: false };
+const contextProfile = { version: "0.9.0", ruleset: "python-2026-10-15-exception-context-review-v1", decomposition: true, scored: true, errorHandling: true, context: true, transfers: false, operations: false };
+const handlerProfile = { version: "0.8.0", ruleset: "python-2026-10-15-error-handling-review-v1", decomposition: true, scored: true, errorHandling: true, context: false, transfers: false, operations: false };
+const complexityProfile = { version: "0.7.0", ruleset: "python-2026-10-13-method-complexity-v1", decomposition: true, scored: true, errorHandling: false, context: false, transfers: false, operations: false };
+const decompositionProfile = { version: "0.6.0-experimental", ruleset: "python-2026-10-13-decomposition-preview", decomposition: true, scored: false, errorHandling: false, context: false, transfers: false, operations: false };
+const coverageProfile = { version: "0.5.0-experimental", ruleset: "python-2026-10-12-coverage-preview", decomposition: false, scored: false, errorHandling: false, context: false, transfers: false, operations: false };
 const previewPolicy = "experimental/shared-complexity-worst-40-remainder-60/v1";
 
 function complexityDetails(facts: SourceFacts | null) {
@@ -46,11 +48,11 @@ function measurements(facts: SourceFacts | null) {
   population: { types: 0, members: facts?.functions.length ?? 0 } };
 }
 
-export function pythonEvidence(facts: SourceFacts | null, subject: Evidence["subject"], ids: { runId: string; auditId: string }, error?: string, duplication: PythonDuplication | null = null, coverage: PythonCoverage | null = null, decomposition: PythonDecomposition | null = null, errorHandling: PythonErrorHandling | null = null, context: PythonErrorContext | null = null, transfers: PythonTransfers | null = null): Evidence {
-  return buildEvidence(currentProfile, facts, subject, ids, error, duplication, coverage, decomposition, errorHandling, context, transfers);
+export function pythonEvidence(facts: SourceFacts | null, subject: Evidence["subject"], ids: { runId: string; auditId: string }, error?: string, duplication: PythonDuplication | null = null, coverage: PythonCoverage | null = null, decomposition: PythonDecomposition | null = null, errorHandling: PythonErrorHandling | null = null, context: PythonErrorContext | null = null, transfers: PythonTransfers | null = null, operations: PythonOperations | null = null): Evidence {
+  return buildEvidence(currentProfile, facts, subject, ids, error, duplication, coverage, decomposition, errorHandling, context, transfers, operations);
 }
 
-function buildEvidence(profile: typeof currentProfile, facts: SourceFacts | null, subject: Evidence["subject"], ids: { runId: string; auditId: string }, error: string | undefined, duplication: PythonDuplication | null, coverage: PythonCoverage | null, decomposition: PythonDecomposition | null, errorHandling: PythonErrorHandling | null, context: PythonErrorContext | null, transfers: PythonTransfers | null): Evidence {
+function buildEvidence(profile: typeof currentProfile, facts: SourceFacts | null, subject: Evidence["subject"], ids: { runId: string; auditId: string }, error: string | undefined, duplication: PythonDuplication | null, coverage: PythonCoverage | null, decomposition: PythonDecomposition | null, errorHandling: PythonErrorHandling | null, context: PythonErrorContext | null, transfers: PythonTransfers | null, operations: PythonOperations | null): Evidence {
   if (facts) validateSourceFacts(facts);
   if (facts && duplication) validateDuplication(duplication, facts, subject, ids);
   if (facts && coverage) validateCoverage(coverage, facts, subject, ids);
@@ -58,7 +60,8 @@ function buildEvidence(profile: typeof currentProfile, facts: SourceFacts | null
   if (facts && errorHandling) validateErrorHandling(errorHandling, facts, subject, ids);
   if (context && errorHandling) validateErrorContext(context, errorHandling);
   if (transfers && context) validateTransfers(transfers, context);
-  const complete = facts?.status === "complete" && duplication?.status === "complete" && coverage?.status === "complete" && (!profile.decomposition || decomposition?.status === "complete") && (!profile.errorHandling || errorHandling?.status === "complete") && (!profile.context || context?.status === "complete") && (!profile.transfers || transfers?.status === "complete") && !error;
+  if (operations && transfers) validateOperations(operations, transfers);
+  const complete = facts?.status === "complete" && duplication?.status === "complete" && coverage?.status === "complete" && (!profile.decomposition || decomposition?.status === "complete") && (!profile.errorHandling || errorHandling?.status === "complete") && (!profile.context || context?.status === "complete") && (!profile.transfers || transfers?.status === "complete") && (!profile.operations || operations?.status === "complete") && !error;
   const dimensions = Object.fromEntries(dimensionKeys.map(key => [key, {
     status: "skipped", basis: profile.scored ? "Not measured by this Python analyzer." : "Not measured by the experimental Python analyzer.", findings: [],
     scope: { id: `python/${key}/unsupported`, coverage: "unsupported", includes: [], excludes: [key] }
@@ -81,15 +84,15 @@ function buildEvidence(profile: typeof currentProfile, facts: SourceFacts | null
     status: complete ? "skipped" : "failed", basis: complete
       ? "Exception-handler syntax and local documentation are review evidence only; no handling-quality score."
       : "Python analysis incomplete; handler observations are diagnostic only.",
-    scope: { id: errorHandlingPolicy, coverage: "partial", includes: ["selected-exception-suites", "module-and-class-body-handlers", "local-no-op-documentation", ...(profile.context ? ["bounded-lexical-context", "conservative-handler-patterns"] : []), ...(profile.transfers ? ["owned-raise-cause-syntax", "conservative-raise-patterns"] : [])],
+    scope: { id: errorHandlingPolicy, coverage: "partial", includes: ["selected-exception-suites", "module-and-class-body-handlers", "local-no-op-documentation", ...(profile.context ? ["bounded-lexical-context", "conservative-handler-patterns"] : []), ...(profile.transfers ? ["owned-raise-cause-syntax", "conservative-raise-patterns"] : []), ...(profile.operations ? ["owned-call-return-syntax", "unresolved-suite-inventory"] : [])],
       excludes: ["calibrated-dimension-score", "resolved-exception-types", "business-correctness", "context-manager-suppression", "path-completeness"] },
-    findings: [], review: errorHandling, ...(profile.context ? { contextReview: context } : {}), ...(profile.transfers ? { transferReview: transfers } : {})
+    findings: [], review: errorHandling, ...(profile.context ? { contextReview: context } : {}), ...(profile.transfers ? { transferReview: transfers } : {}), ...(profile.operations ? { operationReview: operations } : {})
   };
   return { schemaVersion: 3, generatedAtUtc: new Date().toISOString(),
     tool: { name: "CodeMetrics.AI.Python", version: profile.version, ecosystem: "python" }, subject,
     ...measurements(facts), dimensions,
     analysis: { ...ids, status: complete ? "complete" : "incomplete", ruleset: profile.ruleset, calibration: profile.scored ? pythonCalibration : "uncalibrated",
-      configurationFingerprint: hash(JSON.stringify([profile.ruleset, facts?.producer, facts?.measurementPolicy, facts?.selection?.configurationFingerprint, duplication?.configurationFingerprint, coverage?.configurationFingerprint, ...(profile.decomposition ? [decomposition?.configurationFingerprint] : []), ...(profile.errorHandling ? [errorHandling?.configurationFingerprint] : []), ...(profile.context ? [context?.configurationFingerprint] : []), ...(profile.transfers ? [transfers?.configurationFingerprint] : [])])),
+      configurationFingerprint: hash(JSON.stringify([profile.ruleset, facts?.producer, facts?.measurementPolicy, facts?.selection?.configurationFingerprint, duplication?.configurationFingerprint, coverage?.configurationFingerprint, ...(profile.decomposition ? [decomposition?.configurationFingerprint] : []), ...(profile.errorHandling ? [errorHandling?.configurationFingerprint] : []), ...(profile.context ? [context?.configurationFingerprint] : []), ...(profile.transfers ? [transfers?.configurationFingerprint] : []), ...(profile.operations ? [operations?.configurationFingerprint] : [])])),
       diagnostics: [...(facts?.diagnostics ?? []).map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
         ...(duplication?.diagnostics ?? []).filter(item => !facts?.diagnostics.some(other => isDeepStrictEqual(item, other)))
           .map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
@@ -103,6 +106,8 @@ function buildEvidence(profile: typeof currentProfile, facts: SourceFacts | null
           .map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
         ...(transfers?.diagnostics ?? []).filter(item => !facts?.diagnostics.some(other => isDeepStrictEqual(item, other)))
           .map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
+        ...(operations?.diagnostics ?? []).filter(item => !facts?.diagnostics.some(other => isDeepStrictEqual(item, other)))
+          .map(item => ({ kind: item.code, message: item.message, ...(item.file ? { project: item.file } : {}) })),
         ...(error ? [{ kind: "pythonExecution", message: error }] : [])], suppressions: [] }
   };
 }
@@ -110,13 +115,15 @@ function buildEvidence(profile: typeof currentProfile, facts: SourceFacts | null
 /** Validate supported scoring and historical review contracts within the shared v3 envelope. */
 export function validatePythonEvidence(evidence: Evidence) {
   if (evidence.tool.ecosystem !== "python") return;
-  const profile = [currentProfile, contextProfile, handlerProfile, complexityProfile, decompositionProfile, coverageProfile].find(item => item.ruleset === evidence.analysis.ruleset);
+  const profile = [currentProfile, transferProfile, contextProfile, handlerProfile, complexityProfile, decompositionProfile, coverageProfile].find(item => item.ruleset === evidence.analysis.ruleset);
   if (!profile) {
-    if ([pythonVersion, contextProfile.version, handlerProfile.version, complexityProfile.version, decompositionProfile.version, coverageProfile.version].includes(evidence.tool.version) || evidence.dimensions.codeQuality.coverageReview !== undefined || evidence.dimensions.codeQuality.decomposition !== undefined ||
-        evidence.dimensions.errorHandling.transferReview !== undefined || evidence.dimensions.errorHandling.contextReview !== undefined || evidence.dimensions.errorHandling.review !== undefined || evidence.dimensions.codeQuality.methodComplexity !== undefined || Object.values(evidence.dimensions).some(item => item.status === "scored"))
+    if ([pythonVersion, transferProfile.version, contextProfile.version, handlerProfile.version, complexityProfile.version, decompositionProfile.version, coverageProfile.version].includes(evidence.tool.version) || evidence.dimensions.codeQuality.coverageReview !== undefined || evidence.dimensions.codeQuality.decomposition !== undefined ||
+        evidence.dimensions.errorHandling.operationReview !== undefined || evidence.dimensions.errorHandling.transferReview !== undefined || evidence.dimensions.errorHandling.contextReview !== undefined || evidence.dimensions.errorHandling.review !== undefined || evidence.dimensions.codeQuality.methodComplexity !== undefined || Object.values(evidence.dimensions).some(item => item.status === "scored"))
       throw new Error("Python review evidence requires its recorded supported ruleset.");
     return; // Historical producers without these extensions retain their original contract.
   }
+  if (!profile.operations && Object.hasOwn(evidence.dimensions.errorHandling, "operationReview"))
+    throw new Error("Historical Python evidence cannot contain call/return measurements.");
   if (!profile.transfers && Object.hasOwn(evidence.dimensions.errorHandling, "transferReview"))
     throw new Error("Historical Python evidence cannot contain raise/chaining measurements.");
   if (!profile.context && Object.hasOwn(evidence.dimensions.errorHandling, "contextReview"))
@@ -136,7 +143,8 @@ export function validatePythonEvidence(evidence: Evidence) {
   const errorHandling = profile.errorHandling ? evidence.dimensions.errorHandling.review as PythonErrorHandling | null : null;
   const context = profile.context ? evidence.dimensions.errorHandling.contextReview as PythonErrorContext | null : null;
   const transfers = profile.transfers ? evidence.dimensions.errorHandling.transferReview as PythonTransfers | null : null;
-  if (facts === null && (duplication !== null || coverage !== null || decomposition !== null || errorHandling !== null || context !== null || transfers !== null)) throw new Error("Python measurements require source facts.");
+  const operations = profile.operations ? evidence.dimensions.errorHandling.operationReview as PythonOperations | null : null;
+  if (facts === null && (duplication !== null || coverage !== null || decomposition !== null || errorHandling !== null || context !== null || transfers !== null || operations !== null)) throw new Error("Python measurements require source facts.");
   if (facts !== null) {
     validateSourceFacts(facts);
     if (facts.language !== "python" || facts.schemaVersion !== 2 || facts.producer.version !== "0.4.0-experimental" ||
@@ -150,12 +158,13 @@ export function validatePythonEvidence(evidence: Evidence) {
     if (profile.errorHandling) validateErrorHandling(errorHandling, facts, evidence.subject, { runId: evidence.analysis.runId, auditId: evidence.analysis.auditId });
     if (profile.context) validateErrorContext(context, errorHandling!);
     if (profile.transfers) validateTransfers(transfers, context!);
+    if (profile.operations) validateOperations(operations, transfers!);
   }
-  if (evidence.analysis.status === "complete" && (facts?.status !== "complete" || duplication?.status !== "complete" || coverage?.status !== "complete" || (profile.decomposition && decomposition?.status !== "complete") || (profile.errorHandling && errorHandling?.status !== "complete") || (profile.context && context?.status !== "complete") || (profile.transfers && transfers?.status !== "complete"))) throw new Error("Complete Python evidence requires complete measurements.");
-  if (evidence.analysis.status === "incomplete" && facts?.status === "complete" && duplication?.status === "complete" && coverage?.status === "complete" && (!profile.decomposition || decomposition?.status === "complete") && (!profile.errorHandling || errorHandling?.status === "complete") && (!profile.context || context?.status === "complete") && (!profile.transfers || transfers?.status === "complete")) throw new Error("Incomplete Python evidence must identify an incomplete measurement.");
+  if (evidence.analysis.status === "complete" && (facts?.status !== "complete" || duplication?.status !== "complete" || coverage?.status !== "complete" || (profile.decomposition && decomposition?.status !== "complete") || (profile.errorHandling && errorHandling?.status !== "complete") || (profile.context && context?.status !== "complete") || (profile.transfers && transfers?.status !== "complete") || (profile.operations && operations?.status !== "complete"))) throw new Error("Complete Python evidence requires complete measurements.");
+  if (evidence.analysis.status === "incomplete" && facts?.status === "complete" && duplication?.status === "complete" && coverage?.status === "complete" && (!profile.decomposition || decomposition?.status === "complete") && (!profile.errorHandling || errorHandling?.status === "complete") && (!profile.context || context?.status === "complete") && (!profile.transfers || transfers?.status === "complete") && (!profile.operations || operations?.status === "complete")) throw new Error("Incomplete Python evidence must identify an incomplete measurement.");
   if (evidence.analysis.status === "incomplete" && !evidence.analysis.diagnostics.length) throw new Error("Incomplete Python evidence requires diagnostics.");
   const expected = buildEvidence(profile, facts, evidence.subject, { runId: evidence.analysis.runId, auditId: evidence.analysis.auditId },
-    evidence.analysis.status === "incomplete" ? "Validation placeholder" : undefined, duplication, coverage, decomposition, errorHandling, context, transfers);
+    evidence.analysis.status === "incomplete" ? "Validation placeholder" : undefined, duplication, coverage, decomposition, errorHandling, context, transfers, operations);
   for (const key of ["filters", "population", "dimensions"] as const)
     if (!isDeepStrictEqual(evidence[key], expected[key])) throw new Error(`Python ${key} do not match measured facts and experimental policy.`);
   if (evidence.analysis.configurationFingerprint !== expected.analysis.configurationFingerprint)
@@ -164,6 +173,6 @@ export function validatePythonEvidence(evidence: Evidence) {
 
 /** Historical previews and unavailable populations cannot participate in score comparisons. */
 export function supportsPythonComparison(evidence: Evidence) {
-  return [currentProfile, contextProfile, handlerProfile, complexityProfile].some(profile => evidence.tool.version === profile.version && evidence.analysis.ruleset === profile.ruleset) &&
+  return [currentProfile, transferProfile, contextProfile, handlerProfile, complexityProfile].some(profile => evidence.tool.version === profile.version && evidence.analysis.ruleset === profile.ruleset) &&
     evidence.analysis.calibration === pythonCalibration && evidence.dimensions.codeQuality.status === "scored";
 }

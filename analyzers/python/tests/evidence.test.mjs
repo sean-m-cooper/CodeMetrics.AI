@@ -40,6 +40,14 @@ function fixture(t) {
   return { directory, root, write, run, inspect };
 }
 
+function incompleteOperations(evidence, transfers = evidence.dimensions.errorHandling.transferReview) {
+  const report = structuredClone(evidence.dimensions.errorHandling.operationReview);
+  Object.assign(report, { transferReview: transfers, status: 'incomplete', handlers: [], summary: null,
+    diagnostics: transfers.diagnostics.length ? transfers.diagnostics : [{code:'exception-operation-analysis', message:'Call/return source changed.'}] });
+  if (!transfers.handlers.length) report.transferRowsSha256 = createHash('sha256').update('[]').digest('hex');
+  return report;
+}
+
 function incompleteTransfers(evidence, context = evidence.dimensions.errorHandling.contextReview) {
   const report = structuredClone(evidence.dimensions.errorHandling.transferReview);
   Object.assign(report, { contextReview: context, status: 'incomplete', handlers: [], summary: null,
@@ -47,6 +55,94 @@ function incompleteTransfers(evidence, context = evidence.dimensions.errorHandli
   if (!context.contexts.length) report.contextRowsSha256 = createHash('sha256').update('[]').digest('hex');
   return report;
 }
+
+test('call/return packaging validates syntax, inventory, and preserved unscored context', t => {
+  const f = fixture(t);
+  f.write('work.py', ['logger.exception(error)\n        raise', 'return recover(error)', 'notify(error)\n        cleanup()',
+    'if ready: return recover(error)', 'error = other\n        logger.warning(error)', 'raise Wrapped() from error',
+    'return None'].map((body, i) => `def f${i}():\n    try: work()\n    except Error as error:\n        ${body}\n`).join('\n'));
+  f.write('tests/test_work.py', 'try: work()\nexcept* Error: recover()\n');
+  const { evidence, output } = f.run(['--include-tests']);
+  const d = evidence.dimensions.errorHandling, r = d.operationReview;
+  assertOnlyMethodComplexity(evidence); assert.equal(d.score, undefined); assert.deepEqual(d.findings, []);
+  assert.deepEqual(r.transferReview, d.transferReview);
+  assert.equal(r.runId, evidence.analysis.runId); assert.equal(r.auditId, evidence.analysis.auditId);
+  assert.equal(r.summary.handlers, 8); assert.equal(r.summary.callExpressions, 8); assert.equal(r.summary.returnStatements, 3);
+  assert.equal(r.summary.recognizedShapes, 5); assert.equal(r.summary.newlyRecognizedShapes, 3);
+  assert.equal(r.summary.inputUnresolvedInventory.handlers, 6);
+  assert.equal(r.summary.inputUnresolvedInventory.multiStatement, 3);
+  assert.equal(r.summary.populations.test.unresolved, 1);
+  f.inspect(output);
+  const called = r => r.handlers.find(row => row.classification.pattern === 'direct-calls-then-bare-raise');
+  const returned = r => r.handlers.find(row => row.classification.pattern === 'direct-symbol-or-call-return');
+  for (const mutate of [
+    r => { r.runId = '33333333-3333-4333-8333-333333333333'; },
+    r => { r.transferRowsSha256 = '0'.repeat(64); },
+    r => { r.transferReview.handlers[0].line++; },
+    r => { r.configuration.loggingNames.pop(); },
+    r => { r.handlers.pop(); }, r => { r.handlers[1] = r.handlers[0]; },
+    r => { called(r).sourceSha256 = '0'.repeat(64); }, r => { called(r).suite.statementCount++; },
+    r => { called(r).calls[0].id = '0'.repeat(64); }, r => { called(r).calls[0].endColumn++; },
+    r => { called(r).calls[0].loggingNameSyntax = null; }, r => { called(r).calls[0].immediatelyAwaited = true; },
+    r => { called(r).calls[0].directStatement = false; }, r => { called(r).calls[0].starredArguments = 100; },
+    r => { called(r).calls[0].containsNamedExpression = true; }, r => { called(r).calls[0].ancestorsTruncated = true; },
+    r => { called(r).calls.pop(); }, r => { called(r).calls[0].callee.matchesHandlerNameSyntax = true; },
+    r => { returned(r).returns[0].direct = false; }, r => { returned(r).returns[0].awaitedExpression = returned(r).returns[0].expression; },
+    r => { called(r).classification.pattern = 'proven-logging'; }, r => { called(r).originalClassification.pattern = 'safe'; },
+    r => { r.summary.callExpressions++; }, r => { r.summary.inputUnresolvedInventory.multiStatement++; },
+    r => { r.summary.inputUnresolvedInventory.suiteShapes[0].handlers++; },
+    r => { r.summary.populations.production.recognizedShapes++; }, r => { r.score = 10; }, r => { r.status = 'incomplete'; }
+  ]) {
+    const copy = structuredClone(evidence); mutate(copy.dimensions.errorHandling.operationReview);
+    assert.throws(() => validateEvidence(copy), String(mutate));
+  }
+  const missing = structuredClone(evidence); delete missing.dimensions.errorHandling.operationReview; assert.throws(() => validateEvidence(missing));
+});
+
+test('call/return extents preserve nested calls, Unicode, await, ownership and bounded previews', t => {
+  const f = fixture(t);
+  f.write('work.py', 'async def café():\n    try: work()\n    except Error as é:\n        await logger.error(é)\n        return await dépôt.récupérer(é)\n' +
+    'def nested():\n    try: work()\n    except Error:\n        result = (later(x) for x in values)\n        def hidden(): return hidden_call()\n        return factory()()()\n' +
+    'try: work()\nexcept Error:\n' + '    notify()\n'.repeat(40) + '    raise\n' +
+    'try: work()\nexcept Error:\n' + '    '.repeat(1) + 'notify(\n        inner()\n    )\n' +
+    'def parenthesized():\n    try: work()\n    except Error:\n        (\n            logger.error("🐍")\n        )\n');
+  const { evidence, output } = f.run(); const r = evidence.dimensions.errorHandling.operationReview;
+  assert.equal(r.summary.immediatelyAwaitedCalls, 2);
+  const asyncRow = r.handlers.find(row => row.owner.member === 'café');
+  assert.equal(asyncRow.returns[0].awaitedExpression.symbol, 'dépôt.récupérer'); assert.equal(asyncRow.classification.status, 'unresolved');
+  const nested = r.handlers.find(row => row.owner.member === 'nested');
+  const repeated = nested.calls.filter(call => call.callee.symbol === 'factory' || call.callee.kind === 'call');
+  assert.equal(repeated.length, 3); assert.equal(new Set(repeated.map(call => call.id)).size, 3);
+  assert.ok(nested.calls.some(call => call.ancestors.some(a => a.kind === 'GeneratorExp')));
+  assert.ok(r.handlers.every(row => row.calls.every(call => call.callee.symbol !== 'hidden_call')));
+  assert.ok(r.handlers.some(row => row.suite.truncated && row.classification.pattern === 'direct-calls-then-bare-raise'));
+  f.inspect(output);
+});
+
+test('operation-only failure with complete prior measurements withholds scores', async t => {
+  const f = fixture(t); f.write('work.py', 'def work():\n    try: call()\n    except Missing: return recover()\n');
+  const current = f.run().evidence, cq = current.dimensions.codeQuality, d = current.dimensions.errorHandling;
+  const report = incompleteOperations(current);
+  const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, d.review, d.contextReview, d.transferReview, report);
+  validateEvidence(failed); assert.equal(failed.analysis.status, 'incomplete');
+  assert.ok(Object.values(failed.dimensions).every(item => item.score === undefined && !item.findings.length));
+  const output = path.join(f.directory, 'operation-failed.json'); fs.writeFileSync(output, JSON.stringify(failed)); f.inspect(output, [], 2);
+  const malformed = structuredClone(failed); malformed.dimensions.errorHandling.operationReview.handlers = d.operationReview.handlers;
+  assert.throws(() => validateEvidence(malformed));
+});
+
+test('saved 0.10 reports retain their own contract without invented call/return evidence', t => {
+  const old = JSON.parse(fs.readFileSync(new URL('fixtures/python-v010.json', import.meta.url)));
+  validateEvidence(old); assertOnlyMethodComplexity(old); assert.equal(old.tool.version, '0.10.0');
+  assert.equal(old.dimensions.errorHandling.operationReview, undefined);
+  const f = fixture(t), output = path.join(f.directory, 'historical.json'); fs.writeFileSync(output, JSON.stringify(old));
+  f.inspect(output, ['--baseline', output, '--max-score-drop', '0']);
+  for (const mutate of [e => { e.dimensions.errorHandling.operationReview = null; }, e => { e.tool.version = '0.11.0'; }]) {
+    const copy = structuredClone(old); mutate(copy); assert.throws(() => validateEvidence(copy));
+  }
+  f.write('work.py', 'def work(): return None\n'); f.inspect(f.run().output, ['--baseline', output], 2);
+});
 
 test('raise/chaining evidence preserves syntax, prior context and unscored disposition', t => {
   const f = fixture(t);
@@ -128,7 +224,7 @@ test('transfer-only failure with complete previous evidence withholds every scor
   const current = f.run().evidence, cq = current.dimensions.codeQuality, d = current.dimensions.errorHandling;
   const report = incompleteTransfers(current);
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, d.review, d.contextReview, report);
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, d.review, d.contextReview, report, incompleteOperations(current, report));
   validateEvidence(failed); assert.equal(failed.analysis.status, 'incomplete');
   assert.ok(Object.values(failed.dimensions).every(item => item.score === undefined && !item.findings.length));
   const output = path.join(f.directory, 'transfer-failed.json'); fs.writeFileSync(output, JSON.stringify(failed)); f.inspect(output, [], 2);
@@ -243,7 +339,7 @@ test('context-only failure with complete base measurements withholds scores and 
   Object.assign(context, { status: 'incomplete', contexts: [], summary: null,
     diagnostics: [{code:'exception-context-analysis', message:'Source changed during context analysis.'}] });
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, current.dimensions.errorHandling.review, context, incompleteTransfers(current, context));
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, current.dimensions.errorHandling.review, context, incompleteTransfers(current, context), incompleteOperations(current, incompleteTransfers(current, context)));
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete'); assert.equal(failed.dimensions.errorHandling.status, 'failed');
   assert.ok(Object.values(failed.dimensions).every(d => d.score === undefined && !d.findings.length));
@@ -313,13 +409,13 @@ test('handler evidence preserves context, populations and unscored disposition',
 test('handler failure with otherwise complete evidence withholds the score and all findings', async t => {
   const f = fixture(t); f.write('work.py', 'def work():\n    try: call()\n    except: pass\n');
   const current = f.run().evidence, cq = current.dimensions.codeQuality;
-  const review = structuredClone(current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview, current.dimensions.errorHandling.transferReview);
+  const review = structuredClone(current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview, current.dimensions.errorHandling.transferReview, current.dimensions.errorHandling.operationReview);
   review.status = 'incomplete'; review.handlers = []; review.summary = null;
   review.diagnostics = [{ code: 'error-handling-analysis', message: 'Source changed during handler analysis.' }];
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
   const context = structuredClone(current.dimensions.errorHandling.contextReview);
   Object.assign(context, { handlerReview: review, handlerRowsSha256: createHash('sha256').update('[]').digest('hex'), status: 'incomplete', contexts: [], summary: null, diagnostics: review.diagnostics });
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, review, context, incompleteTransfers(current, context));
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, review, context, incompleteTransfers(current, context), incompleteOperations(current, incompleteTransfers(current, context)));
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
   assert.equal(failed.dimensions.errorHandling.status, 'failed');
@@ -390,11 +486,11 @@ test('installed match policy preserves guards and structural alternatives with v
 `);
   const { output, evidence } = f.run();
   const facts = evidence.dimensions.codeQuality.sourceFacts;
-  assert.equal(evidence.tool.version, '0.10.0');
+  assert.equal(evidence.tool.version, '0.11.0');
   assert.equal(facts.producer.version, '0.4.0-experimental');
   assert.equal(facts.measurementPolicy, 'python/owned-function-complexity-v2');
   assert.equal(evidence.dimensions.codeQuality.scope.id, evidence.dimensions.codeQuality.methodComplexity.scoringPolicy);
-  assert.equal(evidence.analysis.ruleset, 'python-2026-10-15-exception-transfers-review-v1');
+  assert.equal(evidence.analysis.ruleset, 'python-2026-10-15-exception-operations-review-v1');
   const complexity = facts.functions[0].complexity;
   assert.equal(complexity.value, 7);
   assert.equal(complexity.decisions.matchAlternatives, 1);
@@ -544,7 +640,7 @@ test('duplication failure with complete complexity still withholds the score and
   report.status = 'incomplete'; report.summary = null; report.excludedFunctions = [];
   report.diagnostics = [{ code: 'duplication-analysis', message: 'Selected source changed after population measurement.' }];
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report, current.dimensions.codeQuality.coverageReview, current.dimensions.codeQuality.decomposition, current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview, current.dimensions.errorHandling.transferReview);
+  const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report, current.dimensions.codeQuality.coverageReview, current.dimensions.codeQuality.decomposition, current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview, current.dimensions.errorHandling.transferReview, current.dimensions.errorHandling.operationReview);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
   assert.equal(failed.dimensions.codeQuality.methodComplexity.population, null);
@@ -706,7 +802,7 @@ test('decomposition failure with complete other measurements withholds the combi
   report.status = 'incomplete'; report.summary = null; report.functions = [];
   report.diagnostics = [{ code: 'decomposition-analysis', message: 'Selected source changed during measurement.' }];
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, report, current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview, current.dimensions.errorHandling.transferReview);
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, report, current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview, current.dimensions.errorHandling.transferReview, current.dimensions.errorHandling.operationReview);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
   assert.equal(failed.dimensions.codeQuality.methodComplexity.population, null);

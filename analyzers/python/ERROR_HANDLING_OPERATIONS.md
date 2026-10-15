@@ -1,6 +1,6 @@
 # Experimental Python handler calls and returns
 
-This standalone pass inventories the handlers left unresolved by the [raise/chaining reviewer](ERROR_HANDLING_TRANSFERS.md), records owned call and return-expression syntax, and recognizes three additional local shapes. **Error Handling remains unscored.** There are no findings, deductions, gates, handling-success rates, or automatic refactoring recommendations. Method Complexity and the packaged 0.10.0 contract are unchanged.
+This reviewer inventories the handlers left unresolved by the [raise/chaining reviewer](ERROR_HANDLING_TRANSFERS.md), records owned call and return-expression syntax, and recognizes three additional local shapes. **Error Handling remains unscored.** There are no findings, deductions, gates, handling-success rates, or automatic refactoring recommendations. Method Complexity and historical 0.10.0 reports are unchanged.
 
 ```powershell
 py -3.12 analyzers/python/error_handling_operations.py E:/repos/my-project --include 'src/**' --output TestResults/handler-operations.json
@@ -13,7 +13,7 @@ Python 3.12 and its standard library are sufficient. Sources are parsed, never i
 
 Rows retain handler identity, source hash, population, owner, original transfer classification, and extended classification. The report embeds the unchanged transfer review and hashes its rows. Calls and returns follow the original ownership policy: nested functions, lambdas, class bodies, and nested handlers cannot credit the enclosing handler. This also excludes definition headers/defaults/decorators from that parent's observations, even when Python might evaluate them immediately. Independently selected handlers in nested scopes keep their own rows.
 
-Each call records a stable file/line/column identity, ending line, callee-expression description, argument counts, named-expression presence, and whether it is a direct expression statement or immediately under `await`. A callee description is syntax, not a resolved target: the outer call in `factory()()` has a call-expression receiver and is not a simple symbol invocation. Nested calls are separate AST observations; source ordering is not evaluation order. Literal argument contents are omitted.
+Each call records a stable identity including file, start line/column, and end line/column, callee-expression description, argument counts, named-expression presence, and whether it is a direct expression statement or immediately under `await`. A callee description is syntax, not a resolved target: the outer call in `factory()()` has a call-expression receiver and is not a simple symbol invocation. Nested calls are separate AST observations; source ordering is not evaluation order. Literal argument contents are omitted.
 
 The optional `loggingNameSyntax` field matches the final segment of a bounded simple callee path against `debug`, `info`, `warning`, `warn`, `error`, `exception`, `critical`, `fatal`, and `log`. This is only a spelling hint. It includes `warnings.warn` and unrelated methods with those names, and misses custom names such as `log_error`. It does not establish logging, severity, diagnostic quality, or handling. No binding or import resolution is performed.
 
@@ -45,4 +45,10 @@ The pass regenerates the supplied transfer report against current source/facts, 
 
 These checks detect internal/source inconsistencies; they do not authenticate externally edited reports or guarantee an immutable filesystem. The [pinned corpus study](../../shared/scorecard-schema/calibration-runs/python-error-operations-2026-10-15.md) records inventory, reviewed examples, preserved measurements, and counterexamples. Examples were deliberately selected, not randomly sampled; their review is not an accuracy estimate.
 
-This milestone is standalone. A subsequent versioned packaging and skill update is required before the combined CLI can emit these observations. Do not inject them into historical 0.10.0 artifacts or treat their absence as zero calls/returns. Error Handling remains unscored throughout.
+Development adapter **0.11.0** embeds this report at `dimensions.errorHandling.operationReview` under ruleset `python-2026-10-15-exception-operations-review-v1`. The archive ships this producer and guide; use an explicit local archive until publication. The skill presents syntax and unresolved inventory without grading handling. Do not inject them into historical 0.10.0 artifacts or treat their absence as zero calls/returns. Error Handling remains unscored throughout.
+
+## Packaged validation
+
+Producer `0.2.0-experimental` uses full source extents in operation identities so nested calls such as `factory()()` remain distinct even when their starts coincide. This corrects the standalone prototype's start-only IDs without changing counts or classifications. Equal-start calls remain ordered outermost first, matching AST traversal; ordering is not a runtime sequence.
+
+The shared validator checks embedded transfer equality and digest, invocation/source/handler identities, suite previews, operation extents and IDs, expression/ancestor/argument metadata, original call/return projections, conservative classifications, and recomputed summary/inventory counts. These are internal consistency checks, not independent source remeasurement, binding resolution, or authentication. Missing, inconsistent, or incomplete required operation evidence makes a new combined run incomplete and withholds scores and findings. Do not strip the extension to recover a score. Historical 0.10.0 reports retain their own contract, with unavailable operation evidence rather than zero calls/returns; cross-version comparisons remain incompatible.

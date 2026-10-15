@@ -41,7 +41,7 @@ Rebinding followed by a raise, logging followed by a raise, conditional dispatch
 
 ## Interpretation boundaries
 
-The subsequent standalone [call/return reviewer](ERROR_HANDLING_OPERATIONS.md) records operations inside these handlers and adds narrow call-sequence and return shapes while preserving this report unchanged. Its extensions do not alter the packaged 0.10.0 contract or introduce a score.
+The subsequent packaged [call/return reviewer](ERROR_HANDLING_OPERATIONS.md) records operations inside these handlers and adds narrow call-sequence and return shapes while preserving this report unchanged. Adapter 0.11.0 embeds that extension separately, preserving historical 0.10.0 reports without introducing a score.
 
 The [Python 3.12 language reference](https://docs.python.org/3.12/reference/simple_stmts.html#the-raise-statement) distinguishes bare re-raising, raising an expression, explicit causes, and `from None`. An omitted `from` does not establish that causal context was lost: Python also supports implicit exception context. `from None` explicitly suppresses the automatic display of that context; it does not justify a defect finding or a claim that the exception history has been erased.
 

@@ -8,6 +8,7 @@ import { pythonEvidence } from "./python-evidence.js";
 import { validateDuplication, type PythonDuplication } from "./python-duplication.js";
 import { validateCoverage, type PythonCoverage } from "./python-coverage.js";
 
+import { validateOperations, type PythonOperations } from "./python-error-operations.js";
 import { validateTransfers, type PythonTransfers } from "./python-error-transfers.js";
 import { validateErrorContext, type PythonErrorContext } from "./python-error-context.js";
 import { validateErrorHandling, type PythonErrorHandling } from "./python-error-handling.js";
@@ -43,6 +44,7 @@ export function analyzePython(options: PythonOptions) {
     for (const item of items ?? []) args.push(`--${flag}`, item);
   for (const [flag, enabled] of [["include-tests", options.includeTests], ["include-generated", options.includeGenerated], ["include-support", options.includeSupport]] as const)
     if (enabled) args.push(`--${flag}`);
+  let operations: PythonOperations | null = null;
   let transfers: PythonTransfers | null = null;
   let context: PythonErrorContext | null = null;
   let errorHandling: PythonErrorHandling | null = null;
@@ -68,6 +70,8 @@ export function analyzePython(options: PythonOptions) {
     validateErrorHandling(parsed.errorHandlingReview, parsed.sourceFacts, subject, ids);
     validateErrorContext(parsed.errorHandlingContext, parsed.errorHandlingReview);
     validateTransfers(parsed.errorHandlingTransfers, parsed.errorHandlingContext);
+    validateOperations(parsed.errorHandlingOperations, parsed.errorHandlingTransfers);
+    operations = parsed.errorHandlingOperations;
     transfers = parsed.errorHandlingTransfers;
     context = parsed.errorHandlingContext;
     errorHandling = parsed.errorHandlingReview;
@@ -75,7 +79,7 @@ export function analyzePython(options: PythonOptions) {
     facts = parsed.sourceFacts;
     duplication = parsed.duplication;
     coverage = parsed.coverageReview;
-    if ((result.status === 0) !== (facts!.status === "complete" && duplication!.status === "complete" && coverage!.status === "complete" && decomposition!.status === "complete" && errorHandling!.status === "complete" && context!.status === "complete" && transfers!.status === "complete")) throw new Error("Python exit status and facts disagree.");
-  } catch (failure) { transfers = null; context = null; errorHandling = null; facts = null; decomposition = null; duplication = null; coverage = null; error = failure instanceof Error ? failure.message : String(failure); }
-  return pythonEvidence(facts, subject, ids, error, duplication, coverage, decomposition, errorHandling, context, transfers);
+    if ((result.status === 0) !== (facts!.status === "complete" && duplication!.status === "complete" && coverage!.status === "complete" && decomposition!.status === "complete" && errorHandling!.status === "complete" && context!.status === "complete" && transfers!.status === "complete" && operations!.status === "complete")) throw new Error("Python exit status and facts disagree.");
+  } catch (failure) { operations = null; transfers = null; context = null; errorHandling = null; facts = null; decomposition = null; duplication = null; coverage = null; error = failure instanceof Error ? failure.message : String(failure); }
+  return pythonEvidence(facts, subject, ids, error, duplication, coverage, decomposition, errorHandling, context, transfers, operations);
 }

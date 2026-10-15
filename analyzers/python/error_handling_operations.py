@@ -28,8 +28,8 @@ def owned_operations(handler, parents, file):
             if isinstance(parent, (ast.stmt, ast.expr)):
                 ancestors.append({"kind": type(parent).__name__, "line": parent.lineno})
             parent = parents[parent]
-        return {"id": digest(f"{file}|{node.lineno}|{node.col_offset}|{type(node).__name__}"),
-                "line": node.lineno, "column": node.col_offset, "endLine": node.end_lineno,
+        return {"id": digest(f"{file}|{node.lineno}|{node.col_offset}|{node.end_lineno}|{node.end_col_offset}|{type(node).__name__}"),
+                "line": node.lineno, "column": node.col_offset, "endLine": node.end_lineno, "endColumn": node.end_col_offset,
                 "ancestors": ancestors[:MAX_ANCESTORS], "ancestorsTruncated": len(ancestors) > MAX_ANCESTORS}
 
     def visit(node):
@@ -139,7 +139,7 @@ def review(target, facts, base):
                      "maxSymbolCharacters": transfers.MAX_PATH_CHARACTERS, "maxSymbolAttributes": transfers.MAX_SYMBOL_ATTRIBUTES,
                      "loggingNames": sorted(LOGGING_NAMES)}
     report = {"schemaVersion": 1, "artifactKind": "experimental-python-exception-operation-review",
-              "producer": {"name": "codemetrics-ai/python-exception-operations", "version": "0.1.0-experimental"},
+              "producer": {"name": "codemetrics-ai/python-exception-operations", "version": "0.2.0-experimental"},
               "generatedAtUtc": datetime.now(timezone.utc).isoformat(), "runId": base["runId"], "auditId": base["auditId"],
               "policy": POLICY, "configuration": configuration, "configurationFingerprint": context.fingerprint(configuration),
               "transferReview": base, "transferRowsSha256": context.fingerprint(base["handlers"]),

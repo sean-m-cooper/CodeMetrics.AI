@@ -14,9 +14,25 @@ import decomposition
 import error_handling
 import error_handling_context
 import error_handling_transfers
+import error_handling_operations
 
 
 class AnalysisTests(unittest.TestCase):
+    def test_operation_failure_withholds_only_new_rows_and_fails_combined_run(self):
+        with tempfile.TemporaryDirectory() as directory:
+            Path(directory, "work.py").write_text("def work():\n    try: call()\n    except Missing: return recover()\n", encoding="utf-8")
+            argv = ["analysis.py", directory, "--run-id", "11111111-1111-4111-8111-111111111111", "--audit-id", "22222222-2222-4222-8222-222222222222"]
+            with patch.object(sys, "argv", argv), patch.object(error_handling_operations, "read_verified", side_effect=ValueError("Source drift")), contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(analysis.main(), 2)
+            result = json.loads(output.getvalue())
+            for key in ("sourceFacts", "duplication", "coverageReview", "decomposition", "errorHandlingReview", "errorHandlingContext", "errorHandlingTransfers"):
+                self.assertEqual(result[key]["status"], "complete")
+            report = result["errorHandlingOperations"]
+            self.assertEqual(report["transferReview"], result["errorHandlingTransfers"])
+            self.assertEqual(report["status"], "incomplete")
+            self.assertEqual(report["handlers"], [])
+            self.assertIsNone(report["summary"])
+
     def test_transfer_failure_propagates_without_mutating_prior_evidence(self):
         with tempfile.TemporaryDirectory() as directory:
             Path(directory, "work.py").write_text("def work():\n    try: call()\n    except Missing as error: raise New() from error\n")

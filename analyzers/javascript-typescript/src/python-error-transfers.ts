@@ -4,7 +4,7 @@ import { fingerprint, type PythonErrorContext } from "./python-error-context.js"
 
 const policy = "python/exception-raise-chaining-v1";
 type Context = PythonErrorContext["contexts"][number];
-interface Expression { kind: string; astKind: string | null; symbol: string | null; matchesHandlerNameSyntax: boolean }
+export interface Expression { kind: string; astKind: string | null; symbol: string | null; matchesHandlerNameSyntax: boolean }
 interface Raise {
   id: string; line: number; column: number; endLine: number; direct: boolean; exception: Expression; cause: Expression;
   containsNamedExpression: boolean; containers: { kind: string; line: number }[]; containersTruncated: boolean;
@@ -26,7 +26,7 @@ function keys(value: unknown, names: string[]) {
 const integer = (value: unknown): value is number => Number.isSafeInteger(value) && (value as number) >= 0;
 const nonempty = (value: unknown): value is string => typeof value === "string" && value.trim().length > 0;
 const name = (value: unknown): value is string => typeof value === "string" && /^[_\p{ID_Start}][_\p{ID_Continue}]*$/u.test(value);
-function expression(value: Expression, handlerName: string | null) {
+export function expression(value: Expression, handlerName: string | null) {
   keys(value, ["kind", "astKind", "symbol", "matchesHandlerNameSyntax"]);
   requireValue(["absent", "none", "name", "attribute", "call", "other"].includes(value.kind) && typeof value.matchesHandlerNameSyntax === "boolean", "invalid expression kind");
   const expected = { absent: null, none: "Constant", name: "Name", attribute: "Attribute", call: "Call" };

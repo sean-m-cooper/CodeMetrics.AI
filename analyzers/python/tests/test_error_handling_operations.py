@@ -127,6 +127,14 @@ class OperationTests(unittest.TestCase):
         unicode_row = self.report('def f():\n    try: work()\n    except Error as erreur: return dépôt.récupérer(erreur)\n')['handlers'][0]
         self.assertEqual(unicode_row['returns'][0]['expression']['symbol'], 'dépôt.récupérer')
 
+    def test_nested_calls_with_same_start_have_distinct_extent_identities(self):
+        row = self.report('def f():\n    try: work()\n    except Error: return factory()()()\n')['handlers'][0]
+        calls = row['calls']
+        self.assertEqual(len(calls), 3)
+        self.assertEqual(len({(call['line'], call['column']) for call in calls}), 1)
+        self.assertEqual(len({call['id'] for call in calls}), 3)
+        self.assertEqual([call['endColumn'] for call in calls], sorted([call['endColumn'] for call in calls], reverse=True))
+
     def test_bounds_are_explicit_and_do_not_truncate_population(self):
         source = 'try: work()\nexcept Error:\n' + ''.join('    '*(i+1)+'if ready:\n' for i in range(40)) + '    '*41+'recover()\n'
         call = self.report(source)['handlers'][0]['calls'][0]
