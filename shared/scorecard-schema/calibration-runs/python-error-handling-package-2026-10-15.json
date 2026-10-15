@@ -1,0 +1,192 @@
+{
+  "date": "2026-10-15",
+  "adapterVersion": "0.8.0",
+  "ruleset": "python-2026-10-15-error-handling-review-v1",
+  "results": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "runId": "479250bc-07ed-4392-9382-fdb5a4afa866",
+      "auditId": "479250bc-07ed-4392-9382-fdb5a4afa866",
+      "selectedFunctions": 246,
+      "methodComplexityScore": 7,
+      "handlers": {
+        "handlers": 66,
+        "byClassification": {
+          "documented-no-op": 2,
+          "other-body": 25,
+          "terminal-loop-control": 1,
+          "terminal-raise": 21,
+          "terminal-return": 13,
+          "undocumented-no-op": 4
+        },
+        "functionsWithHandlers": 34,
+        "byOwnerKind": {
+          "function": 55,
+          "module": 11
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "byClassification": {
+              "documented-no-op": 2,
+              "other-body": 25,
+              "terminal-loop-control": 1,
+              "terminal-raise": 21,
+              "terminal-return": 13,
+              "undocumented-no-op": 4
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneHandlerReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-handling-package-2026-10-15/requests-evidence.json",
+      "evidenceSha256": "87d35cf881b3bb69730e115e3fc84fc417f54cd24840ffb42e23cb7c4c3b18ef"
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "runId": "bce7d226-7d22-4c5e-a9f0-3d6dac0f1f5b",
+      "auditId": "bce7d226-7d22-4c5e-a9f0-3d6dac0f1f5b",
+      "selectedFunctions": 508,
+      "methodComplexityScore": 7.1,
+      "handlers": {
+        "handlers": 62,
+        "byClassification": {
+          "other-body": 14,
+          "terminal-loop-control": 3,
+          "terminal-raise": 26,
+          "terminal-return": 10,
+          "undocumented-no-op": 9
+        },
+        "functionsWithHandlers": 45,
+        "byOwnerKind": {
+          "function": 53,
+          "module": 9
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "byClassification": {
+              "other-body": 14,
+              "terminal-loop-control": 3,
+              "terminal-raise": 26,
+              "terminal-return": 10,
+              "undocumented-no-op": 9
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneHandlerReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-handling-package-2026-10-15/starlette-evidence.json",
+      "evidenceSha256": "2a35c9b2817ec9dcfdff418b61aeda3595708a858f0d49ecb6efd74f75930f21"
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "runId": "e27ee689-0db3-48eb-8390-72a669b0ac3d",
+      "auditId": "e27ee689-0db3-48eb-8390-72a669b0ac3d",
+      "selectedFunctions": 464,
+      "methodComplexityScore": 6.8,
+      "handlers": {
+        "handlers": 69,
+        "byClassification": {
+          "documented-no-op": 5,
+          "other-body": 29,
+          "terminal-loop-control": 3,
+          "terminal-raise": 16,
+          "terminal-return": 10,
+          "undocumented-no-op": 6
+        },
+        "functionsWithHandlers": 48,
+        "byOwnerKind": {
+          "class-body": 1,
+          "function": 66,
+          "module": 2
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "byClassification": {
+              "documented-no-op": 5,
+              "other-body": 29,
+              "terminal-loop-control": 3,
+              "terminal-raise": 16,
+              "terminal-return": 10,
+              "undocumented-no-op": 6
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneHandlerReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-handling-package-2026-10-15/httpie-evidence.json",
+      "evidenceSha256": "45448729a8bc2f8ce3d2180cae125fb792115c70f8928b7c266ed612f6aaa6de"
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "runId": "8166835a-0f6a-4505-9f27-71f898442daf",
+      "auditId": "8166835a-0f6a-4505-9f27-71f898442daf",
+      "selectedFunctions": 9748,
+      "methodComplexityScore": 5.6,
+      "handlers": {
+        "handlers": 1267,
+        "byClassification": {
+          "documented-no-op": 41,
+          "other-body": 422,
+          "terminal-loop-control": 60,
+          "terminal-raise": 338,
+          "terminal-return": 255,
+          "undocumented-no-op": 151
+        },
+        "functionsWithHandlers": 940,
+        "byOwnerKind": {
+          "function": 1246,
+          "module": 21
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "byClassification": {
+              "documented-no-op": 41,
+              "other-body": 422,
+              "terminal-loop-control": 60,
+              "terminal-raise": 338,
+              "terminal-return": 255,
+              "undocumented-no-op": 151
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneHandlerReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-handling-package-2026-10-15/django-evidence.json",
+      "evidenceSha256": "4ec612d0ce845858e453b3534be84766aa30fa8c1cc04074b4c2a23e13c6746a"
+    }
+  ],
+  "checkpoint": "48c1697",
+  "archive": "TestResults/python-error-handling-package-2026-10-15-verified/codemetrics-ai-0.5.0.tgz",
+  "fullTestArchiveSha256": "31c3a5b7ff9037b5498292be7d0799c59347ffa2d6578ba577ffa8c5588d2728",
+  "archiveSha256": "bdd8284608e04ad3b76f4d0f11376e4774329939e1a9ee9c66d4cd57aede07ea",
+  "checks": {
+    "pythonTestsPassed": 94,
+    "sharedTestsPassed": 9,
+    "javascriptTypescriptTestsPassed": 256,
+    "installedPythonEvidenceTestsPassed": 23,
+    "skillIntegrationSupportingHarnessChecksPassed": 31,
+    "pythonIntegrationSubtestsIncluded": 14,
+    "skillStructuralValidation": "passed",
+    "finalArchiveRuntimeFilesByteIdenticalToFullTestArchive": true,
+    "finalArchiveOnlyChange": "README.md version/scope description",
+    "finalInstalledSmoke": "generated and validated",
+    "reportingFixture": "analyzer-generated, inspector-validated, offline harness only; no live-model evaluation"
+  },
+  "releaseState": "Local development archive; not pushed or published. Method Complexity remains the only scored Python dimension."
+}

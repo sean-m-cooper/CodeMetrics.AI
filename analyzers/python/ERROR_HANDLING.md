@@ -1,13 +1,15 @@
 # Experimental Python exception-handler evidence
 
-This standalone reviewer records exception-handler syntax and local documentation without importing or executing target code. It assigns **no score, deduction, gate, defect classification, or handling-success rate**. Python's packaged Error Handling dimension remains unavailable; Method Complexity remains its only scored dimension.
+This source-only reviewer records exception-handler syntax and local documentation without importing or executing target code. It assigns **no score, deduction, gate, defect classification, or handling-success rate**. Python's packaged Error Handling dimension remains unavailable; Method Complexity remains its only scored dimension.
 
 ```powershell
 py -3.12 analyzers/python/error_handling.py E:/repos/my-project --include 'src/**' --output TestResults/handlers.json
 py -3.12 analyzers/python/error_handling_corpus.py --repos E:/repos --output TestResults/python-handlers-new
 ```
 
-Python 3.12 is required. The CLI accepts a directory or Python source file, with the same selection/population flags as `source_facts.py`. Pass a manifest's containing directory rather than the manifest itself. Output must be a new `.json` file with an existing parent; omission writes to stdout. Caller-supplied UUID `--run-id` and `--audit-id` are preserved, otherwise fresh IDs are generated. Exit 0 means complete, including an empty selection; exit 2 means incomplete analysis or invalid invocation. This producer and its report are **not yet bundled into the npm adapter or consumed by the scorecard skill**.
+Python 3.12 is required. The CLI accepts a directory or Python source file, with the same selection/population flags as `source_facts.py`. Pass a manifest's containing directory rather than the manifest itself. Output must be a new `.json` file with an existing parent; omission writes to stdout. Caller-supplied UUID `--run-id` and `--audit-id` are preserved, otherwise fresh IDs are generated. Exit 0 means complete, including an empty selection; exit 2 means incomplete analysis or invalid invocation. The development `codemetrics-python` adapter **0.8.0** embeds this report at `dimensions.errorHandling.review` under ruleset `python-2026-10-15-error-handling-review-v1`. The npm archive includes the producer and this policy document. The companion skill reports the evidence without assigning an Error Handling score. Use an explicit local archive until publication; published npm 0.5.0 lacks this workflow.
+
+The packaged path analyzes handlers automatically from the same source facts and run/audit IDs as the other measurements. The validator checks matching provenance, source digests, owner identities, unique handler IDs, annotation/classification consistency, owned-transfer fields, and recomputed category/population summaries. It does not independently reparse source or prove that an externally edited report retained every handler. Malformed, missing, or incomplete handler evidence fails the combined run and withholds its Method Complexity score and all findings. Empty complete reports contain zero handlers without implying excellent handling. Historical 0.7.0 evidence remains valid with its original score and no invented handler observations; 0.5/0.6 previews retain their original contracts. Cross-version comparison is not enabled.
 
 ## Policy: `python/exception-handler-observations-v1`
 
@@ -40,4 +42,4 @@ Source reads verify the selected hashes and existing path/size boundaries. Repea
 
 Exception types and calls are not resolved. A spelling such as `Exception` does not prove the built-in type is referenced. Context-manager suppression, `__exit__`/`__aexit__`, API contracts, logging effectiveness, retries, cancellation policy, and business correctness are outside scope. No .NET `throw ex` rule is transplanted to Python's `raise exc`.
 
-The [first pinned corpus review](../../shared/scorecard-schema/calibration-runs/python-error-handling-2026-10-13.md) demonstrates why no-op counts require context before any future calibration or packaging work.
+The [first pinned corpus review](../../shared/scorecard-schema/calibration-runs/python-error-handling-2026-10-13.md) demonstrates why no-op counts require context before any future calibration. The [packaged validation record](../../shared/scorecard-schema/calibration-runs/python-error-handling-package-2026-10-15.md) records installed-package and skill verification.

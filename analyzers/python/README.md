@@ -24,7 +24,7 @@ The evidence embeds facts at `dimensions.codeQuality.sourceFacts`. Its `methodCo
 
 The shared validator checks the v3 envelope and embedded facts, recomputes the score and contributions, and rejects invented dimension scores, inconsistent populations, and mismatched expected run IDs. Incomplete results have no usable score or findings. Historical imports remain historical. Matching supported versions, policies, selections, and scopes can compare Method Complexity and apply score-drop gates. Historical previews, empty eligible populations, and incomplete evidence cannot gate. Informational SARIF export is supported.
 
-The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's packaged adapter version is `0.7.0`, independently of the enclosing npm version and unchanged source-facts producer `0.4.0-experimental`.
+The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's packaged adapter version is `0.8.0`, independently of the enclosing npm version and unchanged source-facts producer `0.4.0-experimental`.
 
 ## Optional coverage review and explicit collection
 
@@ -32,7 +32,7 @@ The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON through `co
 
 ## Raw source-facts workflow
 
-The standalone [exception-handler reviewer](ERROR_HANDLING.md) records handler bodies, local documentation, and owned control-transfer syntax without scores. Its first pinned corpus study includes import probes, deliberate fallback paths, and framework exception dispatch. This evidence is not yet packaged or consumed by the skill; Python's Error Handling dimension remains unavailable.
+The packaged [exception-handler reviewer](ERROR_HANDLING.md) records handler bodies, local documentation, and owned control-transfer syntax without scores. Its first pinned corpus study includes import probes, deliberate fallback paths, and framework exception dispatch. The adapter embeds it at `dimensions.errorHandling.review`, and the skill presents category counts and source context. Python's Error Handling dimension remains unavailable as a score.
 
 The packaged [decomposition reviewer](DECOMPOSITION.md) measures owned statements and block nesting as separate unscored evidence. Its first corpus study covers Requests, Starlette, HTTPie, and Django. It is embedded at `dimensions.codeQuality.decomposition` and presented by the skill without grades or automatic extraction recommendations.
 
@@ -73,7 +73,7 @@ Syntax parsing is not semantic validation or compilation. Missing coverage, main
 
 ## Population policy: `python/source-selection-v1`
 
-Python emits **source-facts v2** with a machine-readable selection inventory and per-function population. JS/TS continues to emit v1 facts internally; its scoring is unchanged. The source-facts producer remains `0.4.0-experimental`; the packaged scoring wrapper is `0.7.0`.
+Python emits **source-facts v2** with a machine-readable selection inventory and per-function population. JS/TS continues to emit v1 facts internally; its scoring is unchanged. The source-facts producer remains `0.4.0-experimental`; the packaged scoring wrapper is `0.8.0`.
 
 The scored population comprises selected production **candidates**, not a verified installed-package or reachable-code population. The following rules make that selection inspectable:
 

@@ -1,6 +1,6 @@
 # Python Method Complexity policy
 
-Accepted product baseline, 2026-10-13. Adapter **0.7.0** scores `dimensions.codeQuality`, displayed as **Method Complexity**, using policy `python/method-complexity-worst-40-remainder-60/v1` and ruleset `python-2026-10-13-method-complexity-v1`. Evidence uses `calibration: baseline`. The other eight dimensions remain unavailable.
+Accepted product baseline, 2026-10-13. Adapter **0.7.0** scores `dimensions.codeQuality`, displayed as **Method Complexity**, using policy `python/method-complexity-worst-40-remainder-60/v1` and ruleset `python-2026-10-13-method-complexity-v1`. Evidence uses `calibration: baseline`. The other eight dimensions remain unavailable. Adapter **0.8.0** retains this scoring policy and measurements, adding unscored exception-handler evidence under ruleset `python-2026-10-15-error-handling-review-v1`. Historical 0.7.0 evidence retains its original contract; cross-version comparisons are not enabled.
 
 ## What is scored
 
@@ -28,7 +28,7 @@ These are deliberate coaching/product decisions: 10 is exceptional and 8 is a pr
 
 `codeQuality.methodComplexity` records policy, selected/eligible counts, excluded population counts, the aggregate, and contributions with function IDs, individual scores, rational weights, and weighted losses. `codeQuality.scoringDecision` records the selected policy and finding attribution. CC ≥ 10 findings remain informational review leads; production complexity findings reference aggregate inputs and are not additional deductions. Included nonproduction findings do not contribute to the score.
 
-Owned statements, block nesting, exact-body duplication, coverage, and CRAP stay separate **unscored review evidence**. A lambda can have measured CC while decomposition or coverage is unavailable. Missing optional coverage does not lower the score. Malformed or stale supplied review evidence, or any incomplete combined analysis, withholds the score and findings rather than returning partial success.
+Owned statements, block nesting, exact-body duplication, coverage, CRAP, and exception-handler observations stay separate **unscored review evidence**. A lambda can have measured CC while decomposition or coverage is unavailable. Missing optional coverage does not lower the score. Malformed or stale supplied review evidence, or any incomplete combined analysis, withholds the score and findings rather than returning partial success.
 
 The scorecard has **1/9 dimensions scored** when a nonempty production population is available. Any reported aggregate equals Method Complexity and must be labeled **partial assessment, 1/9 dimensions scored**. It is not an overall codebase-health grade. No Python/.NET/JS score equivalence is established.
 

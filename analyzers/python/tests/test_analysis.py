@@ -11,9 +11,26 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import analysis
 import duplication
 import decomposition
+import error_handling
 
 
 class AnalysisTests(unittest.TestCase):
+    def test_handler_failure_propagates_with_complete_other_measurements(self):
+        with tempfile.TemporaryDirectory() as directory:
+            Path(directory, "work.py").write_text("try: call()\nexcept: pass\n")
+            argv = ["analysis.py", directory, "--run-id", "11111111-1111-4111-8111-111111111111", "--audit-id", "22222222-2222-4222-8222-222222222222"]
+            with patch.object(sys, "argv", argv), patch.object(error_handling, "MAX_HANDLERS", 0), contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(analysis.main(), 2)
+            result = json.loads(output.getvalue())
+            for key in ("sourceFacts", "duplication", "coverageReview", "decomposition"):
+                self.assertEqual(result[key]["status"], "complete")
+            report = result["errorHandlingReview"]
+            self.assertEqual(report["runId"], argv[3])
+            self.assertEqual(report["selection"], result["sourceFacts"]["selection"])
+            self.assertEqual(report["status"], "incomplete")
+            self.assertEqual(report["handlers"], [])
+            self.assertIsNone(report["summary"])
+
     def test_combined_measurements_share_population_and_propagate_duplication_failure(self):
         with tempfile.TemporaryDirectory() as directory:
             Path(directory, "work.py").write_text("def work(x):\n    a = x\n    a += 1\n    a += 2\n    a += 3\n    return a\n")
