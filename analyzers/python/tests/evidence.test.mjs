@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -38,6 +39,123 @@ function fixture(t) {
   };
   return { directory, root, write, run, inspect };
 }
+
+test('context packaging preserves bounded syntax, Unicode documentation and conservative classifications', t => {
+  const f = fixture(t);
+  f.write('work.py', `try: import optional
+except ImportError: pass
+try: from another import feature
+except (ImportError, ModuleNotFoundError): feature = None
+def fallback():
+    """Café handling 🐍."""
+    try: call()
+    except Missing: return None
+    except Other: raise
+def after():
+    try: call()
+    except Missing: pass
+    return False
+try: call()
+except Missing:
+    # Café fallback 🐍 is intentional.
+    pass
+with resource():
+    try: call()
+    except Missing: raise
+try: call()
+except* Missing: raise
+def finalized():
+    try: call()
+    except Missing: return None
+    finally: cleanup()
+`);
+  f.write('tests/test_work.py', 'try: exercise()\nexcept Missing: pass\n');
+  const { evidence, output } = f.run(['--include-tests']);
+  const d = evidence.dimensions.errorHandling, r = d.contextReview;
+  assertOnlyMethodComplexity(evidence);
+  assert.deepEqual(r.handlerReview, d.review);
+  assert.equal(r.summary.handlers, 10);
+  assert.equal(r.summary.recognizedShapes, 6); assert.equal(r.summary.unresolved, 4);
+  assert.equal(r.summary.populations.test.handlers, 1);
+  assert.equal(Object.keys(r.summary.byPattern).length, 6);
+  assert.ok(r.contexts.some(row => row.surroundingDocumentation.items.some(item => item.text.includes('🐍'))));
+  assert.ok(r.contexts.every(row => row.disposition === 'review-only'));
+  assert.equal(r.runId, evidence.analysis.runId); assert.equal(r.auditId, evidence.analysis.auditId);
+  f.inspect(output);
+  for (const mutate of [
+    r => { r.runId = '33333333-3333-4333-8333-333333333333'; },
+    r => { r.handlerRowsSha256 = '0'.repeat(64); },
+    r => { r.handlerReview.handlers[0].line++; },
+    r => { r.contexts.pop(); },
+    r => { r.contexts[1] = r.contexts[0]; },
+    r => { r.contexts[0].sourceSha256 = '0'.repeat(64); },
+    r => { r.contexts[0].owner.kind = 'function'; },
+    r => { r.contexts[0].population = 'generated'; },
+    r => { r.contexts[0].tryStatement.handlerLines = []; },
+    r => { r.contexts[0].tryStatement.body.statementCount++; },
+    r => { r.contexts[0].handlerBody.statements[0].endLine = 999; },
+    r => { r.contexts[0].followingInSameSuite.truncated = !r.contexts[0].followingInSameSuite.truncated; },
+    r => { r.contexts[0].classification.pattern = 'safe-optional-import'; },
+    r => { r.contexts[0].classification.evidenceLines = [999]; },
+    r => { r.contexts.find(row => row.classification.status === 'unresolved').classification.unresolvedReasons = []; },
+    r => { r.contexts.find(row => row.classification.pattern === 'direct-literal-fallback-return').enclosingConstructs.push({kind:'With', line:1}); },
+    r => { r.contexts.find(row => row.surroundingDocumentation.items.length).surroundingDocumentation.items[0].text = 'x'.repeat(2001); },
+    r => { r.summary.recognizedShapes++; },
+    r => { r.summary.populations.production.handlers++; },
+    r => { r.configuration.maxFollowingStatements++; },
+    r => { r.status = 'incomplete'; },
+    r => { r.score = 10; }
+  ]) {
+    const copy = structuredClone(evidence); mutate(copy.dimensions.errorHandling.contextReview);
+    assert.throws(() => validateEvidence(copy), String(mutate));
+  }
+  const missing = structuredClone(evidence); delete missing.dimensions.errorHandling.contextReview;
+  assert.throws(() => validateEvidence(missing));
+});
+
+test('context truncation and import binding veto survive packaging', t => {
+  const f = fixture(t);
+  f.write('work.py', 'def shadow(ImportError): return 1\ntry: import optional\nexcept ImportError: pass\n' +
+    'def large():\n    """' + '🐍'.repeat(2005) + '"""\n    try:\n' + '        call()\n'.repeat(40) +
+    '    except Missing:\n' + '        call()\n'.repeat(40) + '    call()\n'.repeat(5));
+  const { evidence, output } = f.run(), r = evidence.dimensions.errorHandling.contextReview;
+  assert.deepEqual(r.contexts[0].classification.unresolvedReasons, ['import-exception-binding-unresolved']);
+  const row = r.contexts[1];
+  assert.equal(row.tryStatement.body.statementCount, 40); assert.equal(row.tryStatement.body.statements.length, 32);
+  assert.equal(row.handlerBody.truncated, true); assert.equal(row.followingInSameSuite.statements.length, 3);
+  assert.equal(row.followingInSameSuite.truncated, true); assert.equal(row.surroundingDocumentation.truncated, true);
+  assert.equal([...row.surroundingDocumentation.items[0].text].length, 2000);
+  f.inspect(output);
+});
+
+test('context-only failure with complete base measurements withholds scores and findings', async t => {
+  const f = fixture(t); f.write('work.py', 'def work():\n    try: call()\n    except Missing: return None\n');
+  const current = f.run().evidence, cq = current.dimensions.codeQuality;
+  const context = structuredClone(current.dimensions.errorHandling.contextReview);
+  Object.assign(context, { status: 'incomplete', contexts: [], summary: null,
+    diagnostics: [{code:'exception-context-analysis', message:'Source changed during context analysis.'}] });
+  const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, current.dimensions.errorHandling.review, context);
+  validateEvidence(failed);
+  assert.equal(failed.analysis.status, 'incomplete'); assert.equal(failed.dimensions.errorHandling.status, 'failed');
+  assert.ok(Object.values(failed.dimensions).every(d => d.score === undefined && !d.findings.length));
+  const output = path.join(f.directory, 'context-failed.json'); fs.writeFileSync(output, JSON.stringify(failed));
+  f.inspect(output, [], 2);
+});
+
+test('saved 0.8 handler evidence remains valid without fabricated context', t => {
+  // Generated by the archived, installed 0.8.0 adapter before the context package build.
+  const historical = JSON.parse(fs.readFileSync(new URL('fixtures/python-v08.json', import.meta.url)));
+  validateEvidence(historical); assertOnlyMethodComplexity(historical);
+  assert.equal(historical.tool.version, '0.8.0'); assert.equal(historical.dimensions.errorHandling.contextReview, undefined);
+  const f = fixture(t), output = path.join(f.directory, 'historical.json'); fs.writeFileSync(output, JSON.stringify(historical));
+  f.inspect(output, ['--baseline', output, '--max-score-drop', '0']);
+  for (const mutate of [e => { e.dimensions.errorHandling.contextReview = null; }, e => { e.tool.version = '0.9.0'; }]) {
+    const copy = structuredClone(historical); mutate(copy); assert.throws(() => validateEvidence(copy));
+  }
+  f.write('work.py', 'def work(): return None\n');
+  f.inspect(f.run().output, ['--baseline', output], 2);
+});
 
 test('handler evidence preserves context, populations and unscored disposition', t => {
   const f = fixture(t);
@@ -87,11 +205,13 @@ test('handler evidence preserves context, populations and unscored disposition',
 test('handler failure with otherwise complete evidence withholds the score and all findings', async t => {
   const f = fixture(t); f.write('work.py', 'def work():\n    try: call()\n    except: pass\n');
   const current = f.run().evidence, cq = current.dimensions.codeQuality;
-  const review = structuredClone(current.dimensions.errorHandling.review);
+  const review = structuredClone(current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview);
   review.status = 'incomplete'; review.handlers = []; review.summary = null;
   review.diagnostics = [{ code: 'error-handling-analysis', message: 'Source changed during handler analysis.' }];
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, review);
+  const context = structuredClone(current.dimensions.errorHandling.contextReview);
+  Object.assign(context, { handlerReview: review, handlerRowsSha256: createHash('sha256').update('[]').digest('hex'), status: 'incomplete', contexts: [], summary: null, diagnostics: review.diagnostics });
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, review, context);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
   assert.equal(failed.dimensions.errorHandling.status, 'failed');
@@ -162,11 +282,11 @@ test('installed match policy preserves guards and structural alternatives with v
 `);
   const { output, evidence } = f.run();
   const facts = evidence.dimensions.codeQuality.sourceFacts;
-  assert.equal(evidence.tool.version, '0.8.0');
+  assert.equal(evidence.tool.version, '0.9.0');
   assert.equal(facts.producer.version, '0.4.0-experimental');
   assert.equal(facts.measurementPolicy, 'python/owned-function-complexity-v2');
   assert.equal(evidence.dimensions.codeQuality.scope.id, evidence.dimensions.codeQuality.methodComplexity.scoringPolicy);
-  assert.equal(evidence.analysis.ruleset, 'python-2026-10-15-error-handling-review-v1');
+  assert.equal(evidence.analysis.ruleset, 'python-2026-10-15-exception-context-review-v1');
   const complexity = facts.functions[0].complexity;
   assert.equal(complexity.value, 7);
   assert.equal(complexity.decisions.matchAlternatives, 1);
@@ -316,7 +436,7 @@ test('duplication failure with complete complexity still withholds the score and
   report.status = 'incomplete'; report.summary = null; report.excludedFunctions = [];
   report.diagnostics = [{ code: 'duplication-analysis', message: 'Selected source changed after population measurement.' }];
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report, current.dimensions.codeQuality.coverageReview, current.dimensions.codeQuality.decomposition, current.dimensions.errorHandling.review);
+  const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report, current.dimensions.codeQuality.coverageReview, current.dimensions.codeQuality.decomposition, current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
   assert.equal(failed.dimensions.codeQuality.methodComplexity.population, null);
@@ -478,7 +598,7 @@ test('decomposition failure with complete other measurements withholds the combi
   report.status = 'incomplete'; report.summary = null; report.functions = [];
   report.diagnostics = [{ code: 'decomposition-analysis', message: 'Selected source changed during measurement.' }];
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, report, current.dimensions.errorHandling.review);
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, report, current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
   assert.equal(failed.dimensions.codeQuality.methodComplexity.population, null);

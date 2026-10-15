@@ -4,6 +4,7 @@ import argparse
 import json
 
 import error_handling
+import error_handling_context
 import decomposition
 import duplication
 import coverage_review
@@ -30,8 +31,9 @@ def main():
                                      run_id=args.run_id, audit_id=args.audit_id)
     bodies = decomposition.review(args.target, facts, run_id=args.run_id, audit_id=args.audit_id)
     handlers = error_handling.review(args.target, facts, run_id=args.run_id, audit_id=args.audit_id)
-    print(json.dumps({"sourceFacts": facts, "duplication": duplicates, "coverageReview": coverage, "decomposition": bodies, "errorHandlingReview": handlers}, ensure_ascii=True))
-    return 0 if facts["status"] == duplicates["status"] == coverage["status"] == bodies["status"] == handlers["status"] == "complete" else 2
+    context = error_handling_context.review(args.target, facts, handlers)
+    print(json.dumps({"sourceFacts": facts, "duplication": duplicates, "coverageReview": coverage, "decomposition": bodies, "errorHandlingReview": handlers, "errorHandlingContext": context}, ensure_ascii=True))
+    return 0 if facts["status"] == duplicates["status"] == coverage["status"] == bodies["status"] == handlers["status"] == context["status"] == "complete" else 2
 
 
 if __name__ == "__main__":

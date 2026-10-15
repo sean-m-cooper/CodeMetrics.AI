@@ -19,7 +19,8 @@ try {
   const install = path.join(temporary, 'isolated install'); fs.mkdirSync(install);
   run([npm, 'install', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund', path.join(temporary, archive.filename)], install);
   const packageRoot = path.join(install, 'node_modules/codemetrics-ai');
-  for (const file of ['source_facts.py', 'source_selection.py', 'duplication.py', 'analysis.py', 'decomposition.py', 'DECOMPOSITION.md', 'METHOD_COMPLEXITY.md', 'coverage_review.py',
+  for (const file of ['source_facts.py', 'source_selection.py', 'duplication.py', 'analysis.py', 'decomposition.py', 'DECOMPOSITION.md', 'METHOD_COMPLEXITY.md',
+    'error_handling.py', 'ERROR_HANDLING.md', 'error_handling_context.py', 'ERROR_HANDLING_CONTEXT.md', 'coverage_review.py',
     'coverage_provenance.py', 'coverage_collect.py', 'coverage_worker.py', 'COVERAGE.md'])
     assert.deepEqual(fs.readFileSync(path.join(packageRoot, 'dist/python', file)), fs.readFileSync(new URL(file, import.meta.url)));
   assert.equal(JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'))).bin['codemetrics-python'], './dist/python-cli.js');

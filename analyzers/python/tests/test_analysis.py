@@ -12,9 +12,26 @@ import analysis
 import duplication
 import decomposition
 import error_handling
+import error_handling_context
 
 
 class AnalysisTests(unittest.TestCase):
+    def test_context_failure_withholds_context_without_mutating_base_measurements(self):
+        with tempfile.TemporaryDirectory() as directory:
+            Path(directory, "work.py").write_text("def work():\n    try: call()\n    except Missing: return None\n")
+            argv = ["analysis.py", directory, "--run-id", "11111111-1111-4111-8111-111111111111", "--audit-id", "22222222-2222-4222-8222-222222222222"]
+            with patch.object(sys, "argv", argv), patch.object(error_handling_context, "read_verified", side_effect=ValueError("Source drift")), contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(analysis.main(), 2)
+            result = json.loads(output.getvalue())
+            for key in ("sourceFacts", "duplication", "coverageReview", "decomposition", "errorHandlingReview"):
+                self.assertEqual(result[key]["status"], "complete")
+            context = result["errorHandlingContext"]
+            self.assertEqual(context["handlerReview"], result["errorHandlingReview"])
+            self.assertEqual(context["status"], "incomplete")
+            self.assertEqual(context["contexts"], [])
+            self.assertIsNone(context["summary"])
+            self.assertEqual(context["diagnostics"][0]["code"], "exception-context-analysis")
+
     def test_handler_failure_propagates_with_complete_other_measurements(self):
         with tempfile.TemporaryDirectory() as directory:
             Path(directory, "work.py").write_text("try: call()\nexcept: pass\n")

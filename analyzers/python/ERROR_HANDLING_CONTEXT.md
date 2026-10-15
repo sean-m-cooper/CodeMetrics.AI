@@ -1,13 +1,13 @@
 # Experimental Python exception context
 
-This standalone reviewer adds bounded lexical context and conservative syntactic patterns to the existing [handler observations](ERROR_HANDLING.md). **Error Handling stays unscored.** Recognized patterns are not proof of correct handling, and unresolved handlers are not defects. Method Complexity and the packaged 0.8.0 evidence contract are unchanged.
+This reviewer adds bounded lexical context and conservative syntactic patterns to the existing [handler observations](ERROR_HANDLING.md). **Error Handling stays unscored.** Recognized patterns are not proof of correct handling, and unresolved handlers are not defects. Method Complexity is unchanged; historical 0.8.0 reports retain their original contract.
 
 ```powershell
 py -3.12 analyzers/python/error_handling_context.py E:/repos/my-project --include 'src/**' --output TestResults/handler-context.json
 py -3.12 analyzers/python/error_handling_context_corpus.py --repos E:/repos --output TestResults/handler-context-corpus-new
 ```
 
-Python 3.12 and its standard library are sufficient; target code is never imported or executed. The CLI accepts a source file or directory and the existing selection flags. Pass a manifest's directory rather than the manifest itself. Output must be a new `.json` file with an existing parent; omission writes to stdout. Supplied UUID run/audit IDs are preserved, otherwise generated. Complete, including empty, returns 0; incomplete analysis or invalid invocation returns 2. This context extension is not yet packaged or consumed by the scorecard skill.
+Python 3.12 and its standard library are sufficient; target code is never imported or executed. The CLI accepts a source file or directory and the existing selection flags. Pass a manifest's directory rather than the manifest itself. Output must be a new `.json` file with an existing parent; omission writes to stdout. Supplied UUID run/audit IDs are preserved, otherwise generated. Complete, including empty, returns 0; incomplete analysis or invalid invocation returns 2. The development adapter **0.9.0** embeds the report at `dimensions.errorHandling.contextReview` under ruleset `python-2026-10-15-exception-context-review-v1`. The local npm archive includes this producer and guide, and the companion skill presents the evidence. Published npm 0.5.0 lacks this workflow; supply an explicit local archive.
 
 ## Policy: `python/exception-context-patterns-v1`
 
@@ -49,3 +49,11 @@ The context report embeds the unchanged original handler review, shares its run/
 Source drift, malformed source, missing/changed owners, changed handler observations, or a budget failure withholds all context rows and the summary. The embedded base review is diagnostic context on a failed run, not permission to claim fresh usable results. These checks are source-consistency checks rather than authentication of externally edited artifacts or immutable-filesystem guarantees.
 
 Summary counts separate recognized shapes, unresolved handlers, patterns, and populations. Reason counts can overlap; they are not a partition. No handled/unhandled rate, deduction, defect grade, or automatic refactoring recommendation is derived. The [pinned corpus study](../../shared/scorecard-schema/calibration-runs/python-error-context-2026-10-15.md) records observed patterns, conservative exclusions, and source-reviewed examples.
+
+## Packaged validation and historical reports
+
+The packaged analyzer measures the selected source population once and passes its handler report to this context pass. The shared validator checks matching invocation IDs, the embedded base report, handler-row digest, configuration, one-to-one handler identities, source locations, bounded-suite accounting, pattern constraints, and summary counts. This verifies internal consistency, not authenticity or independent AST remeasurement. In particular, the artifact does not carry full import binding analysis; that check belongs to the source producer.
+
+A missing, inconsistent, or incomplete required context report makes the entire 0.9.0 run incomplete, with no Method Complexity score or findings available. Complete context adds no findings, score, deduction, or gate. Error Handling remains `skipped` without a score; an empty handler population remains unscored. Only Method Complexity may contribute to a partial assessment of 1/9 dimensions.
+
+Saved 0.8.0 reports remain valid without context evidence. Absence in older reports means unavailable context, not zero patterns. Do not append synthetic context or change their provenance. Comparisons require matching supported versions and rulesets; a context packaging upgrade does not establish a code improvement.

@@ -1,6 +1,6 @@
 # Python Method Complexity policy
 
-Accepted product baseline, 2026-10-13. Adapter **0.7.0** scores `dimensions.codeQuality`, displayed as **Method Complexity**, using policy `python/method-complexity-worst-40-remainder-60/v1` and ruleset `python-2026-10-13-method-complexity-v1`. Evidence uses `calibration: baseline`. The other eight dimensions remain unavailable. Adapter **0.8.0** retains this scoring policy and measurements, adding unscored exception-handler evidence under ruleset `python-2026-10-15-error-handling-review-v1`. Historical 0.7.0 evidence retains its original contract; cross-version comparisons are not enabled.
+Accepted product baseline, 2026-10-13. Adapter **0.7.0** scores `dimensions.codeQuality`, displayed as **Method Complexity**, using policy `python/method-complexity-worst-40-remainder-60/v1` and ruleset `python-2026-10-13-method-complexity-v1`. Evidence uses `calibration: baseline`. The other eight dimensions remain unavailable. Adapter **0.8.0** retains this scoring policy and measurements, adding unscored exception-handler evidence under ruleset `python-2026-10-15-error-handling-review-v1`. Adapter **0.9.0** adds unscored context evidence under ruleset `python-2026-10-15-exception-context-review-v1`, with the same Method Complexity policy and measurements. Historical 0.7.0 and 0.8.0 evidence retain their original contracts; cross-version comparisons are not enabled.
 
 ## What is scored
 
