@@ -17,6 +17,8 @@ analyzers/python/
 
 ## Current Outputs
 
+The standalone [exception-context reviewer](../../analyzers/python/ERROR_HANDLING_CONTEXT.md) adds bounded lexical context and conservative import/fallback/rethrow patterns linked to the existing handler IDs. Uncertain behavior stays unresolved, with no Error Handling score or deductions. This context extension is not yet part of packaged evidence or skill reporting.
+
 The packaged [exception-handler reviewer](../../analyzers/python/ERROR_HANDLING.md) classifies selected `except`/`except*` suites, preserves local documentation, and records owned control-transfer syntax. Its [first corpus review](../../shared/scorecard-schema/calibration-runs/python-error-handling-2026-10-13.md) shows why no-op counts alone cannot justify deductions. It is embedded at `dimensions.errorHandling.review` and presented by the skill; Error Handling remains unscored.
 
 The packaged [decomposition reviewer](../../analyzers/python/DECOMPOSITION.md) reports owned statement counts and maximum block nesting without scores. Its first pinned corpus study keeps size and nesting separate, excludes nested-body double counting, and documents long low-CC registration/initialization routines that caution against automatic length penalties. The npm adapter embeds it at `dimensions.codeQuality.decomposition`; the skill reports separate size/nesting distributions and review candidates without deductions.

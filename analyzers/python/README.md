@@ -34,6 +34,8 @@ The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON through `co
 
 The packaged [exception-handler reviewer](ERROR_HANDLING.md) records handler bodies, local documentation, and owned control-transfer syntax without scores. Its first pinned corpus study includes import probes, deliberate fallback paths, and framework exception dispatch. The adapter embeds it at `dimensions.errorHandling.review`, and the skill presents category counts and source context. Python's Error Handling dimension remains unavailable as a score.
 
+The standalone [exception-context reviewer](ERROR_HANDLING_CONTEXT.md) adds surrounding try/else/finally structure, nearby statements and prose, and narrowly recognized source patterns with an explicit unresolved category. It preserves the packaged handler contract and all scores; the context extension is not yet bundled or consumed by the skill.
+
 The packaged [decomposition reviewer](DECOMPOSITION.md) measures owned statements and block nesting as separate unscored evidence. Its first corpus study covers Requests, Starlette, HTTPie, and Django. It is embedded at `dimensions.codeQuality.decomposition` and presented by the skill without grades or automatic extraction recommendations.
 
 From the repository root (Python 3.12 required):
