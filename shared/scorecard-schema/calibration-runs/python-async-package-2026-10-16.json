@@ -1,0 +1,188 @@
+{
+  "date": "2026-10-16",
+  "adapterVersion": "0.12.0",
+  "ruleset": "python-2026-10-16-async-usage-review-v1",
+  "archive": "TestResults\\python-async-package-2026-10-16\\codemetrics-ai-0.5.0.tgz",
+  "archiveSha256": "62f751a7fa798a89ddbc725054311972c607e4ec718808eb266f839816211507",
+  "results": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "runId": "9cd39687-f56e-4e5c-9077-9877818fde65",
+      "auditId": "64d50747-a987-4e66-a369-fb2deddc37f5",
+      "methodComplexityScore": 7,
+      "asyncSummary": {
+        "selectedFunctions": 246,
+        "asyncFunctions": 0,
+        "excludedSynchronousFunctions": 246,
+        "availability": "unavailable",
+        "asyncBodyCallExpressions": null,
+        "asyncBodyCallCategories": null,
+        "deferredGeneratorCallExpressions": null,
+        "functionsWithBlockingCandidates": null,
+        "populations": {
+          "production": {
+            "selectedFunctions": 246,
+            "asyncFunctions": 0,
+            "excludedSynchronousFunctions": 246,
+            "availability": "unavailable",
+            "asyncBodyCallExpressions": null,
+            "asyncBodyCallCategories": null,
+            "deferredGeneratorCallExpressions": null,
+            "functionsWithBlockingCandidates": null
+          }
+        }
+      },
+      "unchangedCodeQualityAndErrorHandling": true,
+      "matchedStandaloneAsyncReport": false,
+      "crossVersionRejected": true,
+      "evidence": "TestResults/python-async-package-2026-10-16/requests-evidence.json",
+      "evidenceSha256": "84c3a93450ba90938ebdc930ce747b6f7132546589841732261437d674310c0b"
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "runId": "5c86948d-cbe6-469f-8908-09839977956a",
+      "auditId": "5314c36b-3053-486a-8b14-44495db3a46f",
+      "methodComplexityScore": 7.1,
+      "asyncSummary": {
+        "selectedFunctions": 508,
+        "asyncFunctions": 135,
+        "excludedSynchronousFunctions": 373,
+        "availability": "available",
+        "asyncBodyCallExpressions": 717,
+        "asyncBodyCallCategories": {
+          "offload-call": 11,
+          "other-import-call": 121,
+          "unresolved-call": 585
+        },
+        "deferredGeneratorCallExpressions": 2,
+        "functionsWithBlockingCandidates": 0,
+        "populations": {
+          "production": {
+            "selectedFunctions": 508,
+            "asyncFunctions": 135,
+            "excludedSynchronousFunctions": 373,
+            "availability": "available",
+            "asyncBodyCallExpressions": 717,
+            "asyncBodyCallCategories": {
+              "offload-call": 11,
+              "other-import-call": 121,
+              "unresolved-call": 585
+            },
+            "deferredGeneratorCallExpressions": 2,
+            "functionsWithBlockingCandidates": 0
+          }
+        }
+      },
+      "unchangedCodeQualityAndErrorHandling": true,
+      "matchedStandaloneAsyncReport": true,
+      "crossVersionRejected": true,
+      "evidence": "TestResults/python-async-package-2026-10-16/starlette-evidence.json",
+      "evidenceSha256": "9b683d59e9b33dc787beafd198a4abb8ba0cd8effe5acad977fa322058e76ba4"
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "runId": "a1149c7e-f176-4b47-868e-fcd3d20f0448",
+      "auditId": "7c50b73a-8645-4a97-bcaa-aadcf76cdbd7",
+      "methodComplexityScore": 6.8,
+      "asyncSummary": {
+        "selectedFunctions": 464,
+        "asyncFunctions": 0,
+        "excludedSynchronousFunctions": 464,
+        "availability": "unavailable",
+        "asyncBodyCallExpressions": null,
+        "asyncBodyCallCategories": null,
+        "deferredGeneratorCallExpressions": null,
+        "functionsWithBlockingCandidates": null,
+        "populations": {
+          "production": {
+            "selectedFunctions": 464,
+            "asyncFunctions": 0,
+            "excludedSynchronousFunctions": 464,
+            "availability": "unavailable",
+            "asyncBodyCallExpressions": null,
+            "asyncBodyCallCategories": null,
+            "deferredGeneratorCallExpressions": null,
+            "functionsWithBlockingCandidates": null
+          }
+        }
+      },
+      "unchangedCodeQualityAndErrorHandling": true,
+      "matchedStandaloneAsyncReport": false,
+      "crossVersionRejected": true,
+      "evidence": "TestResults/python-async-package-2026-10-16/httpie-evidence.json",
+      "evidenceSha256": "96721427cd2de5f91271dc7196ea70bd75c83f85a4f0eba278422c25b7995235"
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "runId": "4bb10b26-388c-4252-9522-b56d9e9ed850",
+      "auditId": "3abbb45e-b984-45ba-bff6-b01d73a1ee82",
+      "methodComplexityScore": 5.6,
+      "asyncSummary": {
+        "selectedFunctions": 9748,
+        "asyncFunctions": 266,
+        "excludedSynchronousFunctions": 9482,
+        "availability": "available",
+        "asyncBodyCallExpressions": 818,
+        "asyncBodyCallCategories": {
+          "offload-wrapped-invocation": 40,
+          "offload-wrapper-construction": 42,
+          "other-import-call": 92,
+          "unresolved-call": 644
+        },
+        "deferredGeneratorCallExpressions": 6,
+        "functionsWithBlockingCandidates": 0,
+        "populations": {
+          "production": {
+            "selectedFunctions": 9748,
+            "asyncFunctions": 266,
+            "excludedSynchronousFunctions": 9482,
+            "availability": "available",
+            "asyncBodyCallExpressions": 818,
+            "asyncBodyCallCategories": {
+              "offload-wrapped-invocation": 40,
+              "offload-wrapper-construction": 42,
+              "other-import-call": 92,
+              "unresolved-call": 644
+            },
+            "deferredGeneratorCallExpressions": 6,
+            "functionsWithBlockingCandidates": 0
+          }
+        }
+      },
+      "unchangedCodeQualityAndErrorHandling": true,
+      "matchedStandaloneAsyncReport": true,
+      "crossVersionRejected": true,
+      "evidence": "TestResults/python-async-package-2026-10-16/django-evidence.json",
+      "evidenceSha256": "51f2efdc5e14873502135a81afea199c71e879ed87999b95c5044c028b5c7986"
+    }
+  ],
+  "standaloneCheckpoint": "70153d4",
+  "bundledPythonFiles": 25,
+  "pythonTests": {
+    "passed": 164,
+    "skipped": 0
+  },
+  "installedEvidenceTests": {
+    "passed": 41,
+    "skipped": 0
+  },
+  "sharedConformanceTests": {
+    "passed": 7,
+    "skipped": 0
+  },
+  "skillIntegrationAndSupportingChecks": {
+    "passed": 35,
+    "skipped": 0
+  },
+  "reportingEvaluation": "Fresh helper-generated fixture; offline harness validation only, no live-model report or judgment",
+  "javascriptTests": {
+    "passed": 256,
+    "testFiles": 15,
+    "skipped": 0,
+    "log": "TestResults/python-async-package-2026-10-16/javascript-tests.log"
+  }
+}

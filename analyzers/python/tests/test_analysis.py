@@ -15,9 +15,27 @@ import error_handling
 import error_handling_context
 import error_handling_transfers
 import error_handling_operations
+import async_usage
 
 
 class AnalysisTests(unittest.TestCase):
+    def test_async_failure_fails_combined_run_with_prior_measurements_complete(self):
+        with tempfile.TemporaryDirectory() as directory:
+            Path(directory, "work.py").write_text("import time\nasync def work():\n    time.sleep(1)\n", encoding="utf-8")
+            argv = ["analysis.py", directory, "--run-id", "11111111-1111-4111-8111-111111111111", "--audit-id", "22222222-2222-4222-8222-222222222222"]
+            with patch.object(sys, "argv", argv), patch.object(async_usage, "read_verified", side_effect=ValueError("Source drift")), contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(analysis.main(), 2)
+            result = json.loads(output.getvalue())
+            for key in ("sourceFacts", "duplication", "coverageReview", "decomposition", "errorHandlingReview", "errorHandlingContext", "errorHandlingTransfers", "errorHandlingOperations"):
+                self.assertEqual(result[key]["status"], "complete")
+            report = result["asyncUsageReview"]
+            self.assertEqual(report["status"], "incomplete")
+            self.assertEqual(report["runId"], argv[3])
+            self.assertEqual(report["auditId"], argv[5])
+            self.assertEqual(report["selection"], result["sourceFacts"]["selection"])
+            self.assertEqual(report["functions"], [])
+            self.assertIsNone(report["summary"])
+
     def test_operation_failure_withholds_only_new_rows_and_fails_combined_run(self):
         with tempfile.TemporaryDirectory() as directory:
             Path(directory, "work.py").write_text("def work():\n    try: call()\n    except Missing: return recover()\n", encoding="utf-8")
