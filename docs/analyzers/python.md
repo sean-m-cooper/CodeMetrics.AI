@@ -17,6 +17,8 @@ analyzers/python/
 
 ## Current Outputs
 
+The standalone [Async/Blocking Usage reviewer](../../analyzers/python/ASYNC_USAGE.md) records async-owner populations, conservative import-matched blocking candidates, explicit thread-helper syntax, and separate deferred-generator observations. Starlette/Django corpus checks preserve existing Method Complexity and error-handling evidence. Async/Blocking Usage and Error Handling remain unscored. This first pass is not yet embedded in adapter 0.11.0 or exposed by the skill.
+
 The packaged [handler call/return reviewer](../../analyzers/python/ERROR_HANDLING_OPERATIONS.md) inventories unresolved handler shapes and records owned calls, returned expressions, and conservative call/return patterns. Its pinned corpus validation preserves earlier observations and complexity inputs. It remains unscored and is embedded at `dimensions.errorHandling.operationReview` in adapter 0.11.0.
 
 The packaged [exception-context reviewer](../../analyzers/python/ERROR_HANDLING_CONTEXT.md) adds bounded lexical context and conservative import/fallback/rethrow patterns linked to the existing handler IDs. Uncertain behavior stays unresolved, with no Error Handling score or deductions. It is embedded at `dimensions.errorHandling.contextReview` and presented by the skill without a handling-success rate.

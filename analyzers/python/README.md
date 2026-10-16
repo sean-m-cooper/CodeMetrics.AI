@@ -134,3 +134,5 @@ node analyzers/python/package-smoke.mjs
 Collection integration checks require coverage.py 7.6.1 in a Python 3.12 environment. Set `CODEMETRICS_COVERAGE_PYTHON` to that interpreter for Node/package tests if the default interpreter does not have it. Coverage.py is not needed for ordinary source analysis or coverage import.
 
 The packaged [call/return reviewer](ERROR_HANDLING_OPERATIONS.md) adds owned operation syntax and an input unresolved-suite inventory at `dimensions.errorHandling.operationReview`. These observations stay unscored and do not prove logging, recovery, or runtime execution.
+
+The standalone [Async/Blocking Usage reviewer](ASYNC_USAGE.md) adds async-body populations, conservative blocking-call candidates, thread-helper syntax, and explicit unresolved/deferred evidence. Its pinned Starlette/Django study preserves existing scores and handler observations. It is not yet packaged; Async/Blocking Usage and Error Handling remain unscored.
