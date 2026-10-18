@@ -136,3 +136,5 @@ Collection integration checks require coverage.py 7.6.1 in a Python 3.12 environ
 The packaged [call/return reviewer](ERROR_HANDLING_OPERATIONS.md) adds owned operation syntax and an input unresolved-suite inventory at `dimensions.errorHandling.operationReview`. These observations stay unscored and do not prove logging, recovery, or runtime execution.
 
 The packaged [Async/Blocking Usage reviewer](ASYNC_USAGE.md) adds async-body populations, conservative blocking-call candidates, thread-helper syntax, and explicit unresolved/deferred evidence. Its pinned Starlette/Django study preserves existing scores and handler observations. It is embedded at `dimensions.performanceAsync.review` in adapter 0.12.0; Async/Blocking Usage and Error Handling remain unscored.
+
+The standalone [async call-context reviewer](ASYNC_CONTEXT.md) adds reason/shape inventories and conservative local callback/stored-wrapper source links. It preserves the original async rows and scores; this additional report is not yet packaged or consumed by the skill. Async/Blocking Usage and Error Handling remain unscored.
