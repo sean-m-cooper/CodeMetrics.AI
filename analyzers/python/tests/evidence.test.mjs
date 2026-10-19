@@ -40,6 +40,14 @@ function fixture(t) {
   return { directory, root, write, run, inspect };
 }
 
+function incompleteAsyncContext(evidence, base = evidence.dimensions.performanceAsync.review) {
+  const report = structuredClone(evidence.dimensions.performanceAsync.contextReview);
+  Object.assign(report, {status: 'incomplete', functions: [], summary: null,
+    diagnostics: [{code:'async-context-analysis', message:'Context source changed.'}]});
+  if (!base.functions.length) report.asyncRowsSha256 = createHash('sha256').update('[]').digest('hex');
+  return report;
+}
+
 function incompleteOperations(evidence, transfers = evidence.dimensions.errorHandling.transferReview) {
   const report = structuredClone(evidence.dimensions.errorHandling.operationReview);
   Object.assign(report, { transferReview: transfers, status: 'incomplete', handlers: [], summary: null,
@@ -47,6 +55,110 @@ function incompleteOperations(evidence, transfers = evidence.dimensions.errorHan
   if (!transfers.handlers.length) report.transferRowsSha256 = createHash('sha256').update('[]').digest('hex');
   return report;
 }
+
+test('async context packaging preserves links, inventory and unscored boundaries', t => {
+  const f = fixture(t);
+  f.write('work.py', `from asgiref.sync import sync_to_async as wrap
+import asyncio
+def local(value):
+    return value + 1
+async def work(items, client):
+    wrapped = wrap(local)
+    await wrapped(1)
+    await wrapped(2)
+    await asyncio.to_thread(local)
+    await asyncio.to_thread(local(3))
+    await wrap(local)(4)
+    client.wait()
+    deferred = (wrapped(x) for x in items)
+    return local(5)
+`);
+  f.write('tests/test_async.py', 'async def test_work():\n    missing()\n');
+  const {evidence, output} = f.run(['--include-tests']);
+  assertOnlyMethodComplexity(evidence);
+  const d = evidence.dimensions.performanceAsync, r = d.contextReview;
+  assert.equal(d.status, 'skipped'); assert.equal(d.score, undefined); assert.deepEqual(d.findings, []);
+  assert.equal(evidence.dimensions.errorHandling.status, 'skipped');
+  assert.equal(r.runId, evidence.analysis.runId); assert.equal(r.auditId, evidence.analysis.auditId);
+  assert.deepEqual(r.selection, d.review.selection);
+  const direct = r.summary.populations.production.contexts['async-body'];
+  assert.equal(direct.storedWrapperInvocationLinks, 2);
+  assert.equal(direct.localCalleeLinks, 2);
+  assert.equal(direct.localCallbackReferenceLinks, 6);
+  assert.equal(r.summary.populations.test.contexts['async-body'].callExpressions, 1);
+  assert.equal(r.summary.contexts['deferred-generator-body'].storedWrapperInvocationLinks, 0);
+  const linked = r.functions.flatMap(row => row.calls).filter(call => call.storedWrapper?.status === 'stored-wrapper-syntax');
+  assert.equal(new Set(linked.map(call => call.storedWrapper.definition.constructionCallId)).size, 1);
+  assert.equal(direct.unresolvedInventory.reduce((sum, group) => sum + group.callExpressions, 0), direct.unresolvedImportCallExpressions);
+  f.inspect(output);
+});
+
+test('async context rejects stale provenance, forged links and corrupted inventory', t => {
+  const f = fixture(t);
+  f.write('work.py', 'from asgiref.sync import sync_to_async as wrap\ndef local(x):\n    return x + 1\nasync def work():\n    wrapped = wrap(local)\n    await wrapped(1)\n    local(2)\n');
+  const original = f.run().evidence;
+  const owner = r => r.functions.find(row => row.status === 'observed');
+  const stored = r => owner(r).calls.find(call => call.storedWrapper?.status === 'stored-wrapper-syntax');
+  const mutations = [
+    r => { r.runId = '00000000-0000-4000-8000-000000000000'; },
+    r => { r.auditId = '00000000-0000-4000-8000-000000000000'; },
+    r => { r.asyncRowsSha256 = '0'.repeat(64); },
+    r => { r.configuration.maxExamplesPerGroup = 10; },
+    r => { r.functions.reverse(); },
+    r => { owner(r).calls.reverse(); },
+    r => { owner(r).sourceSha256 = '0'.repeat(64); },
+    r => { owner(r).calls[0].callId = '0'.repeat(64); },
+    r => { owner(r).calls[0].shape = 'attribute-path'; },
+    r => { stored(r).unresolvedReason = null; },
+    r => { stored(r).executionContext = 'thread'; },
+    r => { stored(r).storedWrapper.definition.constructionCallId = '0'.repeat(64); },
+    r => { stored(r).storedWrapper.definition.assignment.endLine = 500; },
+    r => { stored(r).storedWrapper.definition.name = 'another'; },
+    r => { stored(r).storedWrapper.definition.importTarget = 'asyncio.to_thread'; },
+    r => { stored(r).callback.reference.definition.ownerId = owner(r).id; },
+    r => { stored(r).callback.reference.definition.functionKind = 'AsyncFunctionDef'; },
+    r => { stored(r).callback.reference.definition.column++; },
+    r => { stored(r).callback.evaluation = 'safe-offload'; },
+    r => { r.summary.contexts['async-body'].storedWrapperInvocationLinks++; },
+    r => { r.summary.contexts['async-body'].unresolvedInventory[0].examples[0].callId = '0'.repeat(64); },
+    r => { r.summary.contexts['async-body'].unresolvedInventory[0].callExpressions++; },
+    r => { r.functions = []; },
+    r => { r.status = 'incomplete'; },
+    r => { r.score = 10; }
+  ];
+  for (const mutate of mutations) {
+    const copy = structuredClone(original); mutate(copy.dimensions.performanceAsync.contextReview);
+    assert.throws(() => validateEvidence(copy), String(mutate));
+  }
+  for (const replacement of [null, undefined]) {
+    const copy = structuredClone(original); copy.dimensions.performanceAsync.contextReview = replacement;
+    assert.throws(() => validateEvidence(copy));
+  }
+});
+
+test('async-context-only failure withholds every score and finding', async t => {
+  const f = fixture(t); f.write('work.py', 'async def work():\n    return 1\n');
+  const current = f.run().evidence, cq = current.dimensions.codeQuality, eh = current.dimensions.errorHandling;
+  const {pythonEvidence} = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview,
+    cq.decomposition, eh.review, eh.contextReview, eh.transferReview, eh.operationReview, current.dimensions.performanceAsync.review, incompleteAsyncContext(current));
+  validateEvidence(failed); assert.equal(failed.analysis.status, 'incomplete');
+  assert.ok(Object.values(failed.dimensions).every(d => d.score === undefined && !d.findings.length));
+  const output = path.join(f.directory, 'context-failed.json'); fs.writeFileSync(output, JSON.stringify(failed));
+  f.inspect(output, [], 2);
+});
+
+test('saved 0.12 reports keep their original contract and comparison support', t => {
+  const old = JSON.parse(fs.readFileSync(new URL('fixtures/python-v012.json', import.meta.url)));
+  validateEvidence(old); assertOnlyMethodComplexity(old); assert.equal(old.tool.version, '0.12.0');
+  assert.equal(old.dimensions.performanceAsync.contextReview, undefined);
+  const f = fixture(t), output = path.join(f.directory, 'historical.json'); fs.writeFileSync(output, JSON.stringify(old));
+  f.inspect(output, ['--baseline', output, '--max-score-drop', '0']);
+  const altered = structuredClone(old); altered.dimensions.performanceAsync.contextReview = null;
+  assert.throws(() => validateEvidence(altered));
+  f.write('work.py', 'async def work():\n    return 1\n');
+  f.inspect(f.run().output, ['--baseline', output], 2);
+});
 
 function incompleteTransfers(evidence, context = evidence.dimensions.errorHandling.contextReview) {
   const report = structuredClone(evidence.dimensions.errorHandling.transferReview);
@@ -162,10 +274,10 @@ test('sync-only selections do not become a perfect async score', t => {
 test('async-only failure withholds every score and finding', async t => {
   const f = fixture(t); f.write('work.py', 'async def work():\n    return 1\n');
   const current = f.run().evidence, cq = current.dimensions.codeQuality, eh = current.dimensions.errorHandling;
-  const report = structuredClone(current.dimensions.performanceAsync.review);
+  const report = structuredClone(current.dimensions.performanceAsync.review, current.dimensions.performanceAsync.contextReview);
   Object.assign(report, {status: 'incomplete', functions: [], summary: null, diagnostics: [{code:'async-usage-analysis', message:'Source changed.'}]});
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, eh.review, eh.contextReview, eh.transferReview, eh.operationReview, report);
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, eh.review, eh.contextReview, eh.transferReview, eh.operationReview, report, incompleteAsyncContext(current, report));
   validateEvidence(failed); assert.equal(failed.analysis.status, 'incomplete');
   assert.ok(Object.values(failed.dimensions).every(d => d.score === undefined && !d.findings.length));
   const output = path.join(f.directory, 'async-failed.json'); fs.writeFileSync(output, JSON.stringify(failed));
@@ -252,7 +364,7 @@ test('operation-only failure with complete prior measurements withholds scores',
   const current = f.run().evidence, cq = current.dimensions.codeQuality, d = current.dimensions.errorHandling;
   const report = incompleteOperations(current);
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, d.review, d.contextReview, d.transferReview, report, current.dimensions.performanceAsync.review);
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, d.review, d.contextReview, d.transferReview, report, current.dimensions.performanceAsync.review, current.dimensions.performanceAsync.contextReview);
   validateEvidence(failed); assert.equal(failed.analysis.status, 'incomplete');
   assert.ok(Object.values(failed.dimensions).every(item => item.score === undefined && !item.findings.length));
   const output = path.join(f.directory, 'operation-failed.json'); fs.writeFileSync(output, JSON.stringify(failed)); f.inspect(output, [], 2);
@@ -352,7 +464,7 @@ test('transfer-only failure with complete previous evidence withholds every scor
   const current = f.run().evidence, cq = current.dimensions.codeQuality, d = current.dimensions.errorHandling;
   const report = incompleteTransfers(current);
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, d.review, d.contextReview, report, incompleteOperations(current, report), current.dimensions.performanceAsync.review);
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, d.review, d.contextReview, report, incompleteOperations(current, report), current.dimensions.performanceAsync.review, current.dimensions.performanceAsync.contextReview);
   validateEvidence(failed); assert.equal(failed.analysis.status, 'incomplete');
   assert.ok(Object.values(failed.dimensions).every(item => item.score === undefined && !item.findings.length));
   const output = path.join(f.directory, 'transfer-failed.json'); fs.writeFileSync(output, JSON.stringify(failed)); f.inspect(output, [], 2);
@@ -467,7 +579,7 @@ test('context-only failure with complete base measurements withholds scores and 
   Object.assign(context, { status: 'incomplete', contexts: [], summary: null,
     diagnostics: [{code:'exception-context-analysis', message:'Source changed during context analysis.'}] });
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, current.dimensions.errorHandling.review, context, incompleteTransfers(current, context), incompleteOperations(current, incompleteTransfers(current, context)), current.dimensions.performanceAsync.review);
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, current.dimensions.errorHandling.review, context, incompleteTransfers(current, context), incompleteOperations(current, incompleteTransfers(current, context)), current.dimensions.performanceAsync.review, current.dimensions.performanceAsync.contextReview);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete'); assert.equal(failed.dimensions.errorHandling.status, 'failed');
   assert.ok(Object.values(failed.dimensions).every(d => d.score === undefined && !d.findings.length));
@@ -543,7 +655,7 @@ test('handler failure with otherwise complete evidence withholds the score and a
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
   const context = structuredClone(current.dimensions.errorHandling.contextReview);
   Object.assign(context, { handlerReview: review, handlerRowsSha256: createHash('sha256').update('[]').digest('hex'), status: 'incomplete', contexts: [], summary: null, diagnostics: review.diagnostics });
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, review, context, incompleteTransfers(current, context), incompleteOperations(current, incompleteTransfers(current, context)), current.dimensions.performanceAsync.review);
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, cq.decomposition, review, context, incompleteTransfers(current, context), incompleteOperations(current, incompleteTransfers(current, context)), current.dimensions.performanceAsync.review, current.dimensions.performanceAsync.contextReview);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
   assert.equal(failed.dimensions.errorHandling.status, 'failed');
@@ -614,11 +726,11 @@ test('installed match policy preserves guards and structural alternatives with v
 `);
   const { output, evidence } = f.run();
   const facts = evidence.dimensions.codeQuality.sourceFacts;
-  assert.equal(evidence.tool.version, '0.12.0');
+  assert.equal(evidence.tool.version, '0.13.0');
   assert.equal(facts.producer.version, '0.4.0-experimental');
   assert.equal(facts.measurementPolicy, 'python/owned-function-complexity-v2');
   assert.equal(evidence.dimensions.codeQuality.scope.id, evidence.dimensions.codeQuality.methodComplexity.scoringPolicy);
-  assert.equal(evidence.analysis.ruleset, 'python-2026-10-16-async-usage-review-v1');
+  assert.equal(evidence.analysis.ruleset, 'python-2026-10-18-async-context-review-v1');
   const complexity = facts.functions[0].complexity;
   assert.equal(complexity.value, 7);
   assert.equal(complexity.decisions.matchAlternatives, 1);
@@ -768,7 +880,7 @@ test('duplication failure with complete complexity still withholds the score and
   report.status = 'incomplete'; report.summary = null; report.excludedFunctions = [];
   report.diagnostics = [{ code: 'duplication-analysis', message: 'Selected source changed after population measurement.' }];
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report, current.dimensions.codeQuality.coverageReview, current.dimensions.codeQuality.decomposition, current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview, current.dimensions.errorHandling.transferReview, current.dimensions.errorHandling.operationReview, current.dimensions.performanceAsync.review);
+  const failed = pythonEvidence(current.dimensions.codeQuality.sourceFacts, current.subject, current.analysis, undefined, report, current.dimensions.codeQuality.coverageReview, current.dimensions.codeQuality.decomposition, current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview, current.dimensions.errorHandling.transferReview, current.dimensions.errorHandling.operationReview, current.dimensions.performanceAsync.review, current.dimensions.performanceAsync.contextReview);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
   assert.equal(failed.dimensions.codeQuality.methodComplexity.population, null);
@@ -930,7 +1042,7 @@ test('decomposition failure with complete other measurements withholds the combi
   report.status = 'incomplete'; report.summary = null; report.functions = [];
   report.diagnostics = [{ code: 'decomposition-analysis', message: 'Selected source changed during measurement.' }];
   const { pythonEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-evidence.js')));
-  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, report, current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview, current.dimensions.errorHandling.transferReview, current.dimensions.errorHandling.operationReview, current.dimensions.performanceAsync.review);
+  const failed = pythonEvidence(cq.sourceFacts, current.subject, current.analysis, undefined, cq.duplication, cq.coverageReview, report, current.dimensions.errorHandling.review, current.dimensions.errorHandling.contextReview, current.dimensions.errorHandling.transferReview, current.dimensions.errorHandling.operationReview, current.dimensions.performanceAsync.review, current.dimensions.performanceAsync.contextReview);
   validateEvidence(failed);
   assert.equal(failed.analysis.status, 'incomplete');
   assert.equal(failed.dimensions.codeQuality.methodComplexity.population, null);

@@ -1,6 +1,6 @@
 # Python Async/Blocking Usage evidence
 
-The standalone `async_usage.py` reviewer implements `python/async-owned-calls-review-v1`, producer `0.1.0-experimental`. It records selected async-function populations, call syntax, conservative import matches, and explicit thread-helper syntax. **Async/Blocking Usage and Error Handling remain unscored.** Method Complexity is still Python's only scored dimension. Development adapter 0.12.0 embeds this report at `dimensions.performanceAsync.review` under ruleset `python-2026-10-16-async-usage-review-v1`. The npm archive ships both producers and this guide. The scorecard skill reports the evidence without deductions or an async score. Historical 0.11.0 reports retain their original contract without invented async observations.
+The standalone `async_usage.py` reviewer implements `python/async-owned-calls-review-v1`, producer `0.1.0-experimental`. It records selected async-function populations, call syntax, conservative import matches, and explicit thread-helper syntax. **Async/Blocking Usage and Error Handling remain unscored.** Method Complexity is still Python's only scored dimension. Development adapter 0.13.0 embeds this report at `dimensions.performanceAsync.review` under ruleset `python-2026-10-18-async-context-review-v1`. The npm archive ships both producers and this guide. The scorecard skill reports the evidence without deductions or an async score. Historical 0.11.0 reports retain their original contract without invented async observations.
 
 ## Run
 

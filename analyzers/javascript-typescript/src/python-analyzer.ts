@@ -1,3 +1,4 @@
+import { validateAsyncContext, type PythonAsyncContext } from "./python-async-context.js";
 import { validateAsyncUsage, type PythonAsyncUsage } from "./python-async-usage.js";
 import fs from "node:fs";
 import path from "node:path";
@@ -45,6 +46,7 @@ export function analyzePython(options: PythonOptions) {
     for (const item of items ?? []) args.push(`--${flag}`, item);
   for (const [flag, enabled] of [["include-tests", options.includeTests], ["include-generated", options.includeGenerated], ["include-support", options.includeSupport]] as const)
     if (enabled) args.push(`--${flag}`);
+  let asyncContext: PythonAsyncContext | null = null;
   let asyncReview: PythonAsyncUsage | null = null;
   let operations: PythonOperations | null = null;
   let transfers: PythonTransfers | null = null;
@@ -74,6 +76,8 @@ export function analyzePython(options: PythonOptions) {
     validateTransfers(parsed.errorHandlingTransfers, parsed.errorHandlingContext);
     validateOperations(parsed.errorHandlingOperations, parsed.errorHandlingTransfers);
     validateAsyncUsage(parsed.asyncUsageReview, parsed.sourceFacts, subject, ids, parsed.decomposition);
+    validateAsyncContext(parsed.asyncContextReview, parsed.asyncUsageReview);
+    asyncContext = parsed.asyncContextReview;
     asyncReview = parsed.asyncUsageReview;
     operations = parsed.errorHandlingOperations;
     transfers = parsed.errorHandlingTransfers;
@@ -83,7 +87,7 @@ export function analyzePython(options: PythonOptions) {
     facts = parsed.sourceFacts;
     duplication = parsed.duplication;
     coverage = parsed.coverageReview;
-    if ((result.status === 0) !== (facts!.status === "complete" && duplication!.status === "complete" && coverage!.status === "complete" && decomposition!.status === "complete" && errorHandling!.status === "complete" && context!.status === "complete" && transfers!.status === "complete" && operations!.status === "complete" && asyncReview!.status === "complete")) throw new Error("Python exit status and facts disagree.");
-  } catch (failure) { asyncReview = null; operations = null; transfers = null; context = null; errorHandling = null; facts = null; decomposition = null; duplication = null; coverage = null; error = failure instanceof Error ? failure.message : String(failure); }
-  return pythonEvidence(facts, subject, ids, error, duplication, coverage, decomposition, errorHandling, context, transfers, operations, asyncReview);
+    if ((result.status === 0) !== (facts!.status === "complete" && duplication!.status === "complete" && coverage!.status === "complete" && decomposition!.status === "complete" && errorHandling!.status === "complete" && context!.status === "complete" && transfers!.status === "complete" && operations!.status === "complete" && asyncReview!.status === "complete" && asyncContext!.status === "complete")) throw new Error("Python exit status and facts disagree.");
+  } catch (failure) { asyncContext = null; asyncReview = null; operations = null; transfers = null; context = null; errorHandling = null; facts = null; decomposition = null; duplication = null; coverage = null; error = failure instanceof Error ? failure.message : String(failure); }
+  return pythonEvidence(facts, subject, ids, error, duplication, coverage, decomposition, errorHandling, context, transfers, operations, asyncReview, asyncContext);
 }

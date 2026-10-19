@@ -1,8 +1,8 @@
 # Python async call context
 
-`async_context.py` implements the standalone policy `python/async-call-context-review-v1`. It supplements the existing [async usage report](ASYNC_USAGE.md) with an unresolved-call inventory and bounded source links. **Async/Blocking Usage and Error Handling remain unscored.** Method Complexity remains the sole scored Python dimension.
+`async_context.py` implements the policy `python/async-call-context-review-v1`. It supplements the existing [async usage report](ASYNC_USAGE.md) with an unresolved-call inventory and bounded source links. **Async/Blocking Usage and Error Handling remain unscored.** Method Complexity remains the sole scored Python dimension.
 
-This milestone does not change the packaged adapter 0.12.0, its strict evidence contract, or the companion skill. Packaging this additional report is a separate delivery step. The original async rows, categories, counts, ownership, and configuration remain unchanged.
+Development adapter 0.13.0 embeds this report at `dimensions.performanceAsync.contextReview` under ruleset `python-2026-10-18-async-context-review-v1`. The npm archive ships both producers and this guide; the companion skill presents the context without scores. Historical 0.12.0 evidence retains its original contract without invented context observations. The original async rows, categories, counts, ownership, and configuration remain unchanged.
 
 ## Run
 
