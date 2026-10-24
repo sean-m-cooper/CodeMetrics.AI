@@ -32,6 +32,8 @@ The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON through `co
 
 ## Raw source-facts workflow
 
+The standalone [callback adapter reviewer](ASYNC_ADAPTERS.md) adds `functools.partial` construction/reference context and narrow `sync_to_async` decorator links. It preserves all packaged measurements and scores. This experimental report is not yet embedded in the package or companion skill; Async/Blocking Usage and Error Handling remain unscored.
+
 The packaged [exception-handler reviewer](ERROR_HANDLING.md) records handler bodies, local documentation, and owned control-transfer syntax without scores. Its first pinned corpus study includes import probes, deliberate fallback paths, and framework exception dispatch. The adapter embeds it at `dimensions.errorHandling.review`, and the skill presents category counts and source context. Python's Error Handling dimension remains unavailable as a score.
 
 The packaged [exception-context reviewer](ERROR_HANDLING_CONTEXT.md) adds surrounding try/else/finally structure, nearby statements and prose, and narrowly recognized source patterns with an explicit unresolved category. It preserves the original handler observations and all scores. The adapter embeds context at `dimensions.errorHandling.contextReview`; the skill reports recognized shapes and unresolved cases without grading them.
