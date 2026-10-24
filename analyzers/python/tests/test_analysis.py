@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import analysis
+import async_adapters
 import duplication
 import decomposition
 import error_handling
@@ -20,6 +21,20 @@ import async_context
 
 
 class AnalysisTests(unittest.TestCase):
+    def test_adapter_failure_preserves_prior_measurements_but_fails_run(self):
+        with tempfile.TemporaryDirectory() as directory:
+            Path(directory, "work.py").write_text("async def work():\n    return 1\n")
+            argv = ["analysis.py", directory, "--run-id", "11111111-1111-4111-8111-111111111111", "--audit-id", "22222222-2222-4222-8222-222222222222"]
+            with patch.object(sys, "argv", argv), patch.object(async_adapters, "collect", side_effect=ValueError("Source drift")), contextlib.redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(analysis.main(), 2)
+            result = json.loads(output.getvalue())
+            for key, report in result.items():
+                self.assertEqual(report["status"], "incomplete" if key == "asyncAdapterReview" else "complete")
+            report = result["asyncAdapterReview"]
+            self.assertEqual(report["functions"], [])
+            self.assertIsNone(report["summary"])
+            self.assertEqual(report["runId"], argv[3])
+
     def test_async_context_failure_fails_combined_run_with_prior_async_complete(self):
         with tempfile.TemporaryDirectory() as directory:
             Path(directory, "work.py").write_text("async def work():\n    call()\n", encoding="utf-8")

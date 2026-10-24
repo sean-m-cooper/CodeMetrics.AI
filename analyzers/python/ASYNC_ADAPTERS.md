@@ -1,6 +1,6 @@
 # Python callback adapter context
 
-`async_adapters.py` implements `python/async-callback-adapters-review-v1` as a standalone experimental report. It supplements the [async context report](ASYNC_CONTEXT.md) without changing its contract or the packaged 0.13.0 adapter. Packaging and skill integration are a separate next step. **Async/Blocking Usage and Error Handling remain unscored.** Method Complexity remains Python's only scored dimension.
+`async_adapters.py` implements `python/async-callback-adapters-review-v1` as an experimental report embedded at `dimensions.performanceAsync.adapterReview` in development adapter 0.14.0, ruleset `python-2026-10-24-async-adapters-review-v1`. It supplements the [async context report](ASYNC_CONTEXT.md) without changing its original observations. The archive ships this guide and the producer; the companion skill reports the evidence without runtime claims. Historical 0.13.0 reports retain their contract without invented adapter observations. **Async/Blocking Usage and Error Handling remain unscored.** Method Complexity remains Python's only scored dimension.
 
 ```powershell
 py -3.12 analyzers/python/async_adapters.py E:/repos/example --output E:/temp/adapters.json
@@ -34,3 +34,5 @@ Every original async call keeps its ID and direct/deferred execution context. Co
 The report carries source selection, source-facts producer/policy, original async-row hash, configuration fingerprint, and matching run/audit IDs. It regenerates the input report before collection and verifies source hashes and exact owner/call measurements while collecting. Stale, inconsistent, changed, over-budget, or failed inputs produce exit 2, diagnostics, empty rows, and a null summary. These checks are not report authentication, filesystem locking, control-flow proof, or runtime identity analysis.
 
 No score, finding, deduction, gate, automatic concurrency recommendation, or judgment of developer intent is emitted.
+
+The package validator checks internal consistency against validated async/context reports: invocation and source metadata, original-row hash, ordered owners/calls, extents, construction links and repeated references, selected local definitions, decorator options, and recomputed context/population summaries. It is not independent AST remeasurement or report authentication. Incomplete required evidence makes the combined scorecard unusable; observations cannot restore a score. See the [installed-package study](../../shared/scorecard-schema/calibration-runs/python-async-adapters-package-2026-10-24.md).

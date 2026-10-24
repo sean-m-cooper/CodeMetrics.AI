@@ -6,10 +6,10 @@ import type { PythonAsyncUsage } from "./python-async-usage.js";
 export const asyncContextPolicy = "python/async-call-context-review-v1";
 type Owner = PythonAsyncUsage["functions"][number];
 type Call = NonNullable<Owner["measurement"]>["calls"][number];
-interface Extent { line: number; column: number; endLine: number; endColumn: number }
+export interface Extent { line: number; column: number; endLine: number; endColumn: number }
 interface Definition extends Extent { ownerId: string; file: string; member: string; functionKind: string }
 interface WrapperDefinition { name: string; assignment: Extent; constructionCallId: string; construction: Extent; importTarget: string }
-interface Reference { status: string; reason: string; target?: string; definition: Definition | null }
+export interface Reference { status: string; reason: string; target?: string; definition: Definition | null }
 interface Wrapper { status: string; reason: string; definition: WrapperDefinition | null }
 interface Callback { kind: string; evaluation: string; reference: Reference }
 interface ContextCall {
@@ -33,21 +33,21 @@ const contexts = ["async-body", "deferred-generator-body"];
 function requireValue(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Invalid Python async context evidence: ${message}.`);
 }
-function keys(value: unknown, names: string[]) {
+export function keys(value: unknown, names: string[]) {
   requireValue(value !== null && typeof value === "object" && !Array.isArray(value), "object required");
   requireValue(isDeepStrictEqual(Object.keys(value).sort(), [...names].sort()), "unexpected or missing fields");
 }
 const integer = (n: number) => Number.isSafeInteger(n) && n >= 0;
 const nonempty = (s: unknown): s is string => typeof s === "string" && s.trim().length > 0;
-const before = (a: Extent, b: Extent) => a.endLine < b.line || a.endLine === b.line && a.endColumn < b.column;
-const contains = (a: Extent, b: Extent) => (a.line < b.line || a.line === b.line && a.column <= b.column) &&
+export const before = (a: Extent, b: Extent) => a.endLine < b.line || a.endLine === b.line && a.endColumn < b.column;
+export const contains = (a: Extent, b: Extent) => (a.line < b.line || a.line === b.line && a.column <= b.column) &&
   (a.endLine > b.endLine || a.endLine === b.endLine && a.endColumn >= b.endColumn);
-function extent(value: Extent) {
+export function extent(value: Extent) {
   requireValue([value.line, value.column, value.endLine, value.endColumn].every(integer) && value.line > 0 &&
     (value.endLine > value.line || value.endLine === value.line && value.endColumn > value.column), "invalid extent");
 }
 
-function reference(value: Reference, spelling: string | null, target: string | null, kind: string, use: Call, owner: Owner, owners: Map<string, Owner>, bindingReason: string) {
+export function reference(value: Reference, spelling: string | null, target: string | null, kind: string, use: Call, owner: Owner, owners: Map<string, Owner>, bindingReason: string) {
   keys(value, value.status === "import-spelling" ? ["status", "reason", "target", "definition"] : ["status", "reason", "definition"]);
   if (target !== null) {
     requireValue(value.status === "import-spelling" && value.target === target && value.reason === "import-spelling-only" && value.definition === null, "callback import mismatch");
