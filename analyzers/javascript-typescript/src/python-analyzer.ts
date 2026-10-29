@@ -26,8 +26,11 @@ export interface PythonOptions {
 }
 
 export function pythonTarget(project: string) {
-  const entryPoint = path.resolve(project);
-  if (fs.lstatSync(entryPoint).isSymbolicLink()) throw new Error("Linked Python entry points are not supported.");
+  const requested = path.resolve(project);
+  if (fs.lstatSync(requested).isSymbolicLink()) throw new Error("Linked Python entry points are not supported.");
+  // Python's collection receipts expand Windows short names with Path.resolve().
+  // Normalize at collection/analysis entry, never by consulting disk when reading historical evidence.
+  const entryPoint = fs.realpathSync.native(requested);
   const directory = fs.statSync(entryPoint).isDirectory();
   const manifest = path.basename(entryPoint) === "pyproject.toml";
   if (!directory && !manifest && !/\.pyi?$/.test(entryPoint)) throw new Error("Python entry point must be a directory, pyproject.toml, .py, or .pyi file.");

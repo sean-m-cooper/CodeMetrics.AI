@@ -13,6 +13,16 @@ const reader = path.join(packageRoot, 'dist/evidence-cli.js');
 const { validateEvidence } = await import(pathToFileURL(path.join(packageRoot, 'dist/evidence-tools.js')));
 const { fingerprint } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-error-context.js')));
 const { complexityPopulation } = await import(pathToFileURL(path.join(packageRoot, 'dist/shared-source-facts/population.mjs')));
+const { pythonTarget } = await import(pathToFileURL(path.join(packageRoot, 'dist/python-analyzer.js')));
+
+test('Windows short-name entry points use the same native identity as Python collection receipts', { skip: process.platform !== 'win32' }, t => {
+  const alias = path.join(process.env.SystemDrive ?? 'C:', 'PROGRA~1');
+  if (!fs.existsSync(alias)) return t.skip('This Windows host has no Program Files short-name alias.');
+  const native = fs.realpathSync.native(alias);
+  assert.equal(pythonTarget(alias).root, native);
+  assert.equal(pythonTarget(alias).entryPoint, native);
+  assert.equal(pythonTarget(alias).target, native);
+});
 
 function assertSupportedPythonScores(evidence) {
   assert.equal(evidence.dimensions.codeQuality.status, 'scored');
@@ -27,7 +37,7 @@ function assertSupportedPythonScores(evidence) {
 }
 
 function fixture(t) {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'python evidence '));
+  const directory = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'python evidence ')));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const root = path.join(directory, 'source with spaces'); fs.mkdirSync(root);
   const write = (file, text) => { const location = path.join(root, file); fs.mkdirSync(path.dirname(location), { recursive: true }); fs.writeFileSync(location, text); };
