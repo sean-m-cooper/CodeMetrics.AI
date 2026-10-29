@@ -16,6 +16,18 @@ Released scorecard analyzers run in the package ecosystem natural to their targe
 > See the [local migration guide](docs/codetestament-migration.md) for new names,
 > installation, compatibility and validation status.
 
+## Agent skill
+
+The canonical [code-scorecard skill](skills/code-scorecard/SKILL.md) lives in this
+repository with its helpers, compatibility manifest, tests and evaluation fixtures.
+The `codetestament` plugin packages it for agent hosts; `ai_tools` references a
+pinned commit instead of maintaining another copy.
+
+See [skill installation and maintenance](docs/scorecard-skill.md) and the
+[scorecard guide](docs/code-scorecard.md). The skill retains its CC BY 4.0 license;
+analyzer code remains MIT. Public analyzer defaults stay on the verified legacy
+packages until CodeTestament packages pass publication checks.
+
 ## Analyzers
 
 | Ecosystem | Location | Package | Status |

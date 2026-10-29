@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "codetestament",
+  "version": "0.1.0",
+  "description": "Evidence-backed code scorecards for .NET, JavaScript/TypeScript, and the Python preview.",
+  "author": {
+    "name": "Sean Cooper"
+  },
+  "homepage": "https://github.com/sean-m-cooper/CodeMetrics.AI",
+  "repository": "https://github.com/sean-m-cooper/CodeMetrics.AI",
+  "license": "CC-BY-4.0",
+  "keywords": [
+    "code-quality",
+    "scorecard",
+    "static-analysis"
+  ]
+}

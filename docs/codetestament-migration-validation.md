@@ -45,8 +45,11 @@ to reproduce the comparison with explicitly selected archives.
 
 ## Remaining release work
 
-The next stage is explicit legacy/new package selection in the code-scorecard
-skill, package-aware caches and integration tests against these local archives.
+That subsequent stage is now implemented and tested locally: explicit legacy/new
+package selection, package-aware caches and installed-package integration. The
+canonical skill has moved into this repository; see the
+[skill ownership guide](scorecard-skill.md). This original checkpoint records
+producer parity; later skill validation records live under the skill evals.
 Linux execution, public registry installs, publisher authorization, SARIF upload
 stream behavior and the stable npm source boundary are not established by this
 checkpoint. Keep existing public defaults until the producer/consumer release

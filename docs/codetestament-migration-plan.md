@@ -4,6 +4,14 @@ Date: 2026-10-29
 Status: brand selected by Sean; local producer migration started on
 `codex/codetestament-migration`. See the [implementation guide](codetestament-migration.md).
 
+## Skill ownership update (2026-10-29)
+
+The canonical skill now lives in this repository at `skills/code-scorecard`.
+The package-selection and cache changes were committed in ai_tools as `3cc4cc8`
+before relocation. ai_tools becomes a pinned marketplace reference; subsequent
+skill changes, integration CI and default updates belong here. The verified
+starting point below is historical. See [the skill guide](scorecard-skill.md).
+
 ## Outcome
 
 Adopt **CodeTestament** as the product family and **CodeTestament Scorecard** as
@@ -313,7 +321,7 @@ branding can remain CodeTestament while a distribution is rolled back.
 3. Companion repo: `feat: support legacy and CodeTestament scorecard installations`
 4. `test: verify rename parity and installed-package migration`
 5. `chore: prepare CodeTestament release channels and migration documentation`
-6. After published verification, companion repo: `chore: switch tested scorecard defaults to CodeTestament`
+6. After published verification, this repo: `chore: switch tested scorecard defaults to CodeTestament`
 
 Track the stable npm backport as a distinct release commit. The exact commit split
 can follow dependencies; each consumer-default change must follow its published

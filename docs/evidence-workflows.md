@@ -29,7 +29,7 @@ Do not average ecosystem scores. JS/TS scores are uncalibrated across ecosystems
 
 ## Skill and other evidence consumers
 
-The `code-scorecard` skill in `ai_tools` is a version-aware consumer. Keep thresholds and schemas here; downstream consumers pin tested package versions and use the packaged validator. Generate a fresh run by default, validate both process exit and evidence provenance, and expose scope alongside every score. Never promote partial CSV into a replacement score after a failed analysis.
+The [code-scorecard skill](../skills/code-scorecard/SKILL.md) lives in this repository and is a version-aware consumer. The `ai_tools` marketplace references its plugin at a pinned commit. Keep thresholds and schemas here; downstream consumers pin tested package versions and use the packaged validator. Generate a fresh run by default, validate both process exit and evidence provenance, and expose scope alongside every score. Never promote partial CSV into a replacement score after a failed analysis.
 
 ### JS/TS complexity explanations
 

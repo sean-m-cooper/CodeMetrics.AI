@@ -105,8 +105,10 @@ These remain unchanged in this migration:
 
 ## Next migration stages
 
-Prepare the companion skill's explicit old/new package records and package-aware
-caches, test both sets of pins against local archives, then complete release
+The canonical skill now lives in `skills/code-scorecard` in this repository;
+`ai_tools` carries a pinned marketplace reference. Exact old/new package selection
+and isolated caches have passed local installed-package checks. See
+[skill ownership and validation](scorecard-skill.md). Complete release
 validation on Windows and Linux. Verify SARIF upload stream behavior before
 changing CI defaults. Publish and verify producers before changing skill
 defaults. Repository rename and registry deprecation follow that validation.
