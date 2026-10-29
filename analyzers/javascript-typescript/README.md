@@ -1,6 +1,6 @@
 # codemetrics-ai
 
-Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0.5.0 implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
+Deterministic source analysis for JavaScript, TypeScript, JSX and TSX, with Python support in preview 0.6.0-preview.1. The package implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
 
 Each scored dimension includes `scoringDecision`: policy inputs, executed steps, rounding and finding attribution. These are aggregate policy decisions, not independent finding deductions. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md).
 
@@ -20,9 +20,9 @@ Default output paths are `.scorecard/javascript-typescript/metrics.csv` and `.sc
 
 ## Implemented scope
 
-Development work after 0.5.0 adds unscored npm/pnpm dependency inventory and optional
+Preview 0.6.0-preview.1 adds unscored npm/pnpm dependency inventory and optional
 registry observations under ruleset `javascript-typescript-2026-10-09-dependency-evidence`.
-It requires fresh baselines. Published 0.5.0 does not include this extension yet.
+It requires fresh baselines. Stable 0.5.0 does not include this extension. Install the preview explicitly; the npm `latest` tag stays on the stable release.
 
 | Dimension | Implementation |
 |---|---|
@@ -31,7 +31,7 @@ It requires fresh baselines. Published 0.5.0 does not include this extension yet
 | performanceAsync (Async/Blocking Usage) | React hook/effect checks, standard Promise async executors, and informational async Array.forEach callbacks |
 | architecture | Module dependencies, explicit type-only separation, internal cycle groups and fan-in/out rankings; score remains unmeasured |
 | errorHandling | Contextual failure dispositions for distinct catch/Promise handler bodies; scores unexplained swallowing only with a fully assessed population |
-| dependencyManagement (development) | npm lockfile v2/v3 and pnpm v9 inventory, workspace uses, optional public-registry deprecation/update/advisory observations; no score |
+| dependencyManagement (preview) | npm lockfile v2/v3 and pnpm v9 inventory, workspace uses, optional public-registry deprecation/update/advisory observations; no score |
 | Other dimensions | Explicitly skipped |
 
 React checks run only when a source file imports React. Aliased named imports and namespace imports are recognized; local functions shadowing imports are excluded. Missing dependency arrays are advisory because running after every render can be intentional. The implementation does not claim exhaustive Rules of Hooks, dependency-array correctness, or general concurrency analysis. Source syntax errors make the run incomplete and source dimensions unscored. Semantic type errors are outside this AST-focused version's completeness check.
@@ -201,7 +201,7 @@ an assessable population. Decomposition remains unscored.
 
 ## Experimental Python command in development builds
 
-Local development archives bundle `codemetrics-python` and its Python 3.12 AST adapter, version `0.15.0`. It parses source without importing the target and produces evidence v3 with a production Method Complexity score, owned statements, block nesting, duplication, optional coverage/CRAP review evidence, and unscored exception-handler observations at `dimensions.errorHandling.review`, plus bounded lexical context and conservative patterns at `dimensions.errorHandling.contextReview`, with owned raise/cause syntax at `dimensions.errorHandling.transferReview` and owned calls/returns plus unresolved-suite inventory at `dimensions.errorHandling.operationReview`, and async-owned call evidence at `dimensions.performanceAsync.review`. `--coverage-json` imports observations; `--collection-manifest` checks their source binding. Adapter 0.15.0 also scores Async/Blocking Usage from production-owner contributions at `performanceAsync.asyncScoring`, with bounded paths at `performanceAsync.helperReview`. The other seven Python dimensions remain unavailable; decomposition, duplication, coverage/CRAP, and handler observations remain unscored. Published npm 0.5.0 does not include these commands; use the local archive described in the [Python guide](../python/README.md). Ordinary analysis/import needs only Node.js 20+ and Python 3.12. The separate `codemetrics-python-collect` command explicitly executes tests and requires a caller-supplied environment containing coverage.py and the project's test dependencies.
+Local development archives bundle `codemetrics-python` and its Python 3.12 AST adapter, version `0.15.0`. It parses source without importing the target and produces evidence v3 with a production Method Complexity score, owned statements, block nesting, duplication, optional coverage/CRAP review evidence, and unscored exception-handler observations at `dimensions.errorHandling.review`, plus bounded lexical context and conservative patterns at `dimensions.errorHandling.contextReview`, with owned raise/cause syntax at `dimensions.errorHandling.transferReview` and owned calls/returns plus unresolved-suite inventory at `dimensions.errorHandling.operationReview`, and async-owned call evidence at `dimensions.performanceAsync.review`. `--coverage-json` imports observations; `--collection-manifest` checks their source binding. Adapter 0.15.0 also scores Async/Blocking Usage from production-owner contributions at `performanceAsync.asyncScoring`, with bounded paths at `performanceAsync.helperReview`. The other seven Python dimensions remain unavailable; decomposition, duplication, coverage/CRAP, and handler observations remain unscored. Install `codemetrics-ai@0.6.0-preview.1` explicitly to use these commands; stable npm 0.5.0 does not include them. For example: `npm exec --yes --package=codemetrics-ai@0.6.0-preview.1 -- codemetrics-python --project ./pyproject.toml --scorecard-output ./python-evidence.json`. The installed package includes its Python guide at `dist/python/README.md` and scoring policy at `dist/python/ASYNC_SCORING.md`. Ordinary analysis/import needs only Node.js 20+ and Python 3.12. The separate `codemetrics-python-collect` command explicitly executes tests and requires a caller-supplied environment containing coverage.py and the project's test dependencies.
 
 Python adapter 0.13.0 also embeds unscored async call context at `dimensions.performanceAsync.contextReview`, including unresolved reason/shape inventories and bounded local callback/stored-wrapper links. The package ships `dist/python/ASYNC_CONTEXT.md`; historical 0.12.0 reports remain valid without this extension.
 

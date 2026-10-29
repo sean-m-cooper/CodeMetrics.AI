@@ -17,14 +17,14 @@ Released scorecard analyzers run in the package ecosystem natural to their targe
 |-----------|----------|---------|--------|
 | .NET / C# | `analyzers/dotnet` | `CodeMetrics.AI` NuGet global tool | Available |
 | JavaScript / TypeScript / React | `analyzers/javascript-typescript` | `codemetrics-ai` NPM package | Implemented; scores uncalibrated |
-| Python | `analyzers/python` | `codemetrics-python` in development npm bundle; Python 3.12 required | Method Complexity scoring; unscored decomposition, duplication, and coverage review with skill integration |
+| Python | `analyzers/python` | `codemetrics-python` in `codemetrics-ai@0.6.0-preview.1`; Python 3.12 required | Preview: Method Complexity and Async/Blocking Usage scoring; other evidence unscored |
 | Rust | `analyzers/rust` | Rust crate | Planned next wave |
 
 ## Shared Contract
 
 The shared scorecard contract is documented in `shared/scorecard-schema`.
 
-The experimental [language adapter contract](shared/source-facts/README.md) separates parser facts from shared scoring mechanics. The [Python adapter](analyzers/python/README.md) now embeds those facts in evidence v3 through a locally packaged CLI. It scores Method Complexity for selected production implementations and keeps other evidence unscored; it produces no CSV. Any aggregate is explicitly a partial assessment with 1/9 dimensions scored.
+The experimental [language adapter contract](shared/source-facts/README.md) separates parser facts from shared scoring mechanics. The [Python adapter](analyzers/python/README.md) now embeds those facts in evidence v3 through the preview npm CLI. It scores Method Complexity and, when eligible production async functions exist, Async/Blocking Usage. Error Handling and the other six dimensions remain unscored. It produces no CSV. Any aggregate is explicitly a partial assessment with at most 2/9 dimensions scored.
 
 Stable dimensions:
 
@@ -71,6 +71,17 @@ Version 0.5.0 adds [contextual Error Handling scoring](shared/scorecard-schema/j
 It honors documented intent and scores unexplained swallowing only when all
 observed handlers are assessable; unknown paths withhold the dimension score.
 Architecture and decomposition remain unscored.
+
+## Python preview
+
+Requires Node.js 20+ and Python 3.12. Install the exact preview without changing your project dependencies:
+
+```sh
+npm exec --yes --package=codemetrics-ai@0.6.0-preview.1 -- codemetrics-python --project ./pyproject.toml --scorecard-output ./python-evidence.json
+npm exec --yes --package=codemetrics-ai@0.6.0-preview.1 -- codemetrics-evidence --input ./python-evidence.json --inspect-output ./python-inspection.json
+```
+
+Use new output filenames for each run. The npm `preview` tag is opt-in; `latest` remains the stable release. See the [preview release notes](docs/releases/python-preview-0.6.0-preview.1.md) and [Python guide](analyzers/python/README.md) for source selection, score limits, and feedback guidance.
 
 ## Evidence and release verification
 

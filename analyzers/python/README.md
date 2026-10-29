@@ -1,8 +1,8 @@
 # CodeMetrics.AI Python Analyzer
 
-Experimental source-facts adapter for Python 3.12, using only the standard library. It parses files without importing or executing the target project. No package installation or target build is required.
+Preview source analyzer for Python 3.12, using only the standard library. It parses files without importing or executing the target project. No package installation or target build is required.
 
-This is **not a full Python scorecard**. The packaged `codemetrics-python` CLI now wraps function-complexity [source facts](../../shared/source-facts/README.md) in standard scorecard evidence v3. Method Complexity uses the accepted [complexity policy](METHOD_COMPLEXITY.md); adapter 0.15.0 also scores [Async/Blocking Usage](ASYNC_SCORING.md) when production async implementations exist. The other seven dimensions remain unavailable, including Error Handling. There is no CSV. Any aggregate is a partial assessment with the actual number of scored dimensions: at most 2/9, or 1/9 for synchronous-only code. The companion code-scorecard skill supports this workflow through an explicit local development package.
+This is **not a full Python scorecard**. The packaged `codemetrics-python` CLI now wraps function-complexity [source facts](../../shared/source-facts/README.md) in standard scorecard evidence v3. Method Complexity uses the accepted [complexity policy](METHOD_COMPLEXITY.md); adapter 0.15.0 also scores [Async/Blocking Usage](ASYNC_SCORING.md) when production async implementations exist. The other seven dimensions remain unavailable, including Error Handling. There is no CSV. Any aggregate is a partial assessment with the actual number of scored dimensions: at most 2/9, or 1/9 for synchronous-only code. The companion code-scorecard skill supports this workflow through the pinned preview npm package.
 
 ## Packaged evidence workflow
 
@@ -15,14 +15,11 @@ The standalone [behavior reviewers](BEHAVIOR_REVIEW.md) add bounded handler disp
 
 The standalone [handler-continuation extension](ERROR_HANDLING_CONTINUATIONS.md) follows explicit returns/raises after enclosing branches and links narrowly retained defaults. It preserves the original disposition evidence and remains unscored. Packaged async scoring is a separate extension.
 
-The existing `codemetrics-ai` npm package bundles the Python scripts, shared population engine, and canonical evidence validator. This delivery does not create a separate PyPI distribution. The canonical package independently recomputes the standalone async owner-rate arithmetic. Node.js 20+ and Python 3.12 are required. The development archive still reports npm version 0.5.0; published 0.5.0 does **not** contain this new command. Use a locally built archive until a coordinated release.
+The existing `codemetrics-ai` npm package bundles the Python scripts, shared population engine, and canonical evidence validator. This delivery does not create a separate PyPI distribution. The canonical package independently recomputes the standalone async owner-rate arithmetic. Node.js 20+ and Python 3.12 are required. The preview is distributed as `codemetrics-ai@0.6.0-preview.1` (npm tag `preview`), with Python adapter version `0.15.0`. Stable npm 0.5.0 does not contain Python support. There is no separate PyPI package.
 
 ```powershell
-# From the repository root, with npm dependencies already installed:
-npm pack ./analyzers/javascript-typescript --pack-destination TestResults
-# After installing that local archive into an isolated tooling directory:
-codemetrics-python --project E:/repos/my-python-project/pyproject.toml --scorecard-output evidence.json
-codemetrics-evidence --input evidence.json --inspect-output inspection.json
+npm exec --yes --package=codemetrics-ai@0.6.0-preview.1 -- codemetrics-python --project E:/repos/my-python-project/pyproject.toml --scorecard-output evidence.json
+npm exec --yes --package=codemetrics-ai@0.6.0-preview.1 -- codemetrics-evidence --input evidence.json --inspect-output inspection.json
 ```
 
 For repository development, invoke `node analyzers/javascript-typescript/dist/python-cli.js` after `npm run build --prefix analyzers/javascript-typescript`. Entry points can be directories, `pyproject.toml`, `.py`, or `.pyi` files. A manifest selects its directory without executing or interpreting build configuration. Paths in findings are relative to the selected directory, or a selected file's parent. Windows uses `py -3.12`; other platforms use `python3`. Pass `--python` with an absolute Python 3.12 executable path to override. The interpreter runs isolated from project startup hooks and imports only the packaged analyzer and standard library. Target code is never imported or executed.
