@@ -17,7 +17,7 @@ Released scorecard analyzers run in the package ecosystem natural to their targe
 |-----------|----------|---------|--------|
 | .NET / C# | `analyzers/dotnet` | `CodeMetrics.AI` NuGet global tool | Available |
 | JavaScript / TypeScript / React | `analyzers/javascript-typescript` | `codemetrics-ai` NPM package | Implemented; scores uncalibrated |
-| Python | `analyzers/python` | `codemetrics-python` in `codemetrics-ai@0.6.0-preview.1`; Python 3.12 required | Preview: Method Complexity and Async/Blocking Usage scoring; other evidence unscored |
+| Python | `analyzers/python` | `codemetrics-python` in `codemetrics-ai@0.6.0-preview.2`; Python 3.12 required | Preview: Method Complexity and Async/Blocking Usage scoring; other evidence unscored |
 | Rust | `analyzers/rust` | Rust crate | Planned next wave |
 
 ## Shared Contract
@@ -77,11 +77,11 @@ Architecture and decomposition remain unscored.
 Requires Node.js 20+ and Python 3.12. Install the exact preview without changing your project dependencies:
 
 ```sh
-npm exec --yes --package=codemetrics-ai@0.6.0-preview.1 -- codemetrics-python --project ./pyproject.toml --scorecard-output ./python-evidence.json
-npm exec --yes --package=codemetrics-ai@0.6.0-preview.1 -- codemetrics-evidence --input ./python-evidence.json --inspect-output ./python-inspection.json
+npm exec --yes --package=codemetrics-ai@0.6.0-preview.2 -- codemetrics-python --project ./pyproject.toml --scorecard-output ./python-evidence.json
+npm exec --yes --package=codemetrics-ai@0.6.0-preview.2 -- codemetrics-evidence --input ./python-evidence.json --inspect-output ./python-inspection.json
 ```
 
-Use new output filenames for each run. The npm `preview` tag is opt-in; `latest` remains the stable release. See the [preview release notes](docs/releases/python-preview-0.6.0-preview.1.md) and [Python guide](analyzers/python/README.md) for source selection, score limits, and feedback guidance.
+Use new output filenames for each run. The npm `preview` tag is opt-in; `latest` remains the stable release. See the [preview release notes](docs/releases/python-preview-0.6.0-preview.2.md) and [Python guide](analyzers/python/README.md) for source selection, score limits, and feedback guidance.
 
 ## Evidence and release verification
 

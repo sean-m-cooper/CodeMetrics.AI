@@ -15,11 +15,11 @@ The standalone [behavior reviewers](BEHAVIOR_REVIEW.md) add bounded handler disp
 
 The standalone [handler-continuation extension](ERROR_HANDLING_CONTINUATIONS.md) follows explicit returns/raises after enclosing branches and links narrowly retained defaults. It preserves the original disposition evidence and remains unscored. Packaged async scoring is a separate extension.
 
-The existing `codemetrics-ai` npm package bundles the Python scripts, shared population engine, and canonical evidence validator. This delivery does not create a separate PyPI distribution. The canonical package independently recomputes the standalone async owner-rate arithmetic. Node.js 20+ and Python 3.12 are required. The preview is distributed as `codemetrics-ai@0.6.0-preview.1` (npm tag `preview`), with Python adapter version `0.15.0`. Stable npm 0.5.0 does not contain Python support. There is no separate PyPI package.
+The existing `codemetrics-ai` npm package bundles the Python scripts, shared population engine, and canonical evidence validator. This delivery does not create a separate PyPI distribution. The canonical package independently recomputes the standalone async owner-rate arithmetic. Node.js 20+ and Python 3.12 are required. The preview is distributed as `codemetrics-ai@0.6.0-preview.2` (npm tag `preview`), with Python adapter version `0.15.0`. Stable npm 0.5.0 does not contain Python support. There is no separate PyPI package.
 
 ```powershell
-npm exec --yes --package=codemetrics-ai@0.6.0-preview.1 -- codemetrics-python --project E:/repos/my-python-project/pyproject.toml --scorecard-output evidence.json
-npm exec --yes --package=codemetrics-ai@0.6.0-preview.1 -- codemetrics-evidence --input evidence.json --inspect-output inspection.json
+npm exec --yes --package=codemetrics-ai@0.6.0-preview.2 -- codemetrics-python --project E:/repos/my-python-project/pyproject.toml --scorecard-output evidence.json
+npm exec --yes --package=codemetrics-ai@0.6.0-preview.2 -- codemetrics-evidence --input evidence.json --inspect-output inspection.json
 ```
 
 For repository development, invoke `node analyzers/javascript-typescript/dist/python-cli.js` after `npm run build --prefix analyzers/javascript-typescript`. Entry points can be directories, `pyproject.toml`, `.py`, or `.pyi` files. A manifest selects its directory without executing or interpreting build configuration. Paths in findings are relative to the selected directory, or a selected file's parent. Windows uses `py -3.12`; other platforms use `python3`. Pass `--python` with an absolute Python 3.12 executable path to override. The interpreter runs isolated from project startup hooks and imports only the packaged analyzer and standard library. Target code is never imported or executed.
