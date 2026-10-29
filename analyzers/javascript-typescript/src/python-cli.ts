@@ -17,7 +17,7 @@ try {
     help: { type: "boolean", short: "h" }, version: { type: "boolean" }
   } });
   if (values.help) console.log([
-    "codemetrics-python — Python 3.12 Method Complexity and Async/Blocking Usage scoring preview (Node 20+)",
+    "codetestament-python — Python 3.12 Method Complexity and Async/Blocking Usage scoring preview (Node 20+)",
     "--project <directory|pyproject.toml|file.py> --scorecard-output <new-evidence.json>",
     "--python <absolute Python 3.12 interpreter path> (default: py -3.12 on Windows; python3 elsewhere)",
     "--include <pattern> --exclude <pattern> --test-path <pattern> --production-path <pattern> (repeatable)",
@@ -25,7 +25,7 @@ try {
     "--coverage-json <coverage.py JSON> --collection-manifest <optional collection receipt>",
     "Coverage/CRAP is unscored. Missing coverage stays unavailable; unbound imports stay conditional. Provenance mismatches fail.",
     "Emits evidence v3 with at most 2/9 dimensions scored: Method Complexity and Async/Blocking Usage. No eligible async owners means async is unavailable. Error Handling and other dimensions remain unscored. No CSV.",
-    "Matching versions, policies, and selections can compare supported scored dimensions through codemetrics-evidence. Exact whole-body duplication is review-only, with a five-statement minimum. Zero matches does not prove no duplication.",
+    "Matching versions, policies, and selections can compare supported scored dimensions through codetestament-evidence. Exact whole-body duplication is review-only, with a five-statement minimum. Zero matches does not prove no duplication.",
     "Target code is parsed, never installed or executed. Exit 0: complete (possibly empty); 2: invalid/incomplete."
   ].join("\n"));
   else if (values.version) console.log(pythonVersion);

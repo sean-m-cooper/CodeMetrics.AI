@@ -53,7 +53,7 @@ internal static class EvidenceEnricher
         {
             version = RuleCatalog.Document.CatalogVersion,
             toolVersion = new ToolInfo().Version,
-            command = "code-metrics rules --format json",
+            command = "codetestament-dotnet rules --format json",
             rules = RuleCatalog.Document.Rules.Where(rule => rule.Dimension == dimension)
                 .Select(rule => new { rule.Code, rule.RuleId, rule.Kind }).ToArray()
         };

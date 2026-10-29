@@ -111,7 +111,7 @@ function buildEvidence(profile: typeof currentProfile, facts: SourceFacts | null
   };
   if (profile.asyncScoring) dimensions.performanceAsync = scorePythonAsync(dimensions.performanceAsync, asyncScoring, complete);
   return { schemaVersion: 3, generatedAtUtc: new Date().toISOString(),
-    tool: { name: "CodeMetrics.AI.Python", version: profile.version, ecosystem: "python" }, subject,
+    tool: { name: "CodeTestament.Python", version: profile.version, ecosystem: "python" }, subject,
     ...measurements(facts), dimensions,
     analysis: { ...ids, status: complete ? "complete" : "incomplete", ruleset: profile.ruleset, calibration: profile.scored ? pythonCalibration : "uncalibrated",
       configurationFingerprint: hash(JSON.stringify([profile.ruleset, facts?.producer, facts?.measurementPolicy, facts?.selection?.configurationFingerprint, duplication?.configurationFingerprint, coverage?.configurationFingerprint, ...(profile.decomposition ? [decomposition?.configurationFingerprint] : []), ...(profile.errorHandling ? [errorHandling?.configurationFingerprint] : []), ...(profile.context ? [context?.configurationFingerprint] : []), ...(profile.transfers ? [transfers?.configurationFingerprint] : []), ...(profile.operations ? [operations?.configurationFingerprint] : []), ...(profile.asyncUsage ? [asyncReview?.configurationFingerprint] : []), ...(profile.asyncContext ? [asyncContext?.configurationFingerprint] : []), ...(profile.asyncAdapters ? [asyncAdapters?.configurationFingerprint] : []), ...(profile.asyncScoring ? [asyncHelpers?.configurationFingerprint, asyncScoring?.configurationFingerprint] : [])])),
@@ -145,6 +145,11 @@ function buildEvidence(profile: typeof currentProfile, facts: SourceFacts | null
 export function validatePythonEvidence(evidence: Evidence) {
   if (evidence.tool.ecosystem !== "python") return;
   const profile = [currentProfile, adapterProfile, asyncContextProfile, asyncProfile, operationProfile, transferProfile, contextProfile, handlerProfile, complexityProfile, decompositionProfile, coverageProfile].find(item => item.ruleset === evidence.analysis.ruleset);
+  // The new distribution retains adapter 0.15.0's measurement contract. Earlier
+  // profiles belong exclusively to the legacy brand; nested producers stay unchanged.
+  const supportedName = evidence.tool.name === "CodeMetrics.AI.Python" ||
+    evidence.tool.name === "CodeTestament.Python" && profile === currentProfile && evidence.tool.version === pythonVersion;
+  if (!supportedName) throw new Error("Unsupported Python tool identity/profile.");
   if (!profile) {
     if ([pythonVersion, adapterProfile.version, asyncContextProfile.version, asyncProfile.version, operationProfile.version, transferProfile.version, contextProfile.version, handlerProfile.version, complexityProfile.version, decompositionProfile.version, coverageProfile.version].includes(evidence.tool.version) || evidence.dimensions.codeQuality.coverageReview !== undefined || evidence.dimensions.codeQuality.decomposition !== undefined ||
         evidence.dimensions.performanceAsync.helperReview !== undefined || evidence.dimensions.performanceAsync.asyncScoring !== undefined || evidence.dimensions.performanceAsync.adapterReview !== undefined || evidence.dimensions.performanceAsync.contextReview !== undefined || evidence.dimensions.performanceAsync.review !== undefined || evidence.dimensions.errorHandling.operationReview !== undefined || evidence.dimensions.errorHandling.transferReview !== undefined || evidence.dimensions.errorHandling.contextReview !== undefined || evidence.dimensions.errorHandling.review !== undefined || evidence.dimensions.codeQuality.methodComplexity !== undefined || Object.values(evidence.dimensions).some(item => item.status === "scored"))
@@ -170,7 +175,7 @@ export function validatePythonEvidence(evidence: Evidence) {
   if (!profile.decomposition && Object.hasOwn(evidence.dimensions.codeQuality, "decomposition"))
     throw new Error("Historical Python coverage evidence cannot contain decomposition measurements.");
   if (!evidence.analysis.runId || !evidence.analysis.auditId || evidence.analysis.calibration !== (profile.scored ? pythonCalibration : "uncalibrated") ||
-      evidence.tool.version !== profile.version || evidence.tool.name !== "CodeMetrics.AI.Python")
+      evidence.tool.version !== profile.version)
     throw new Error("Python evidence requires invocation IDs and matching versioned provenance.");
   if (Object.entries(evidence.dimensions).some(([key, item]) => item.status === "scored" && (!profile.scored || key !== "codeQuality" && !(profile.asyncScoring && key === "performanceAsync")))) throw new Error("Only supported Python Method Complexity and Async/Blocking Usage can be scored.");
   const facts = evidence.dimensions.codeQuality.sourceFacts as SourceFacts | null;

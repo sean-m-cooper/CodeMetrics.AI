@@ -30,7 +30,7 @@ public sealed class AnalysisInfo
 
 public sealed class ToolInfo
 {
-    public string Name { get; init; } = "CodeMetrics.AI";
+    public string Name { get; init; } = "CodeTestament.Scorecard";
     public string Version { get; init; } = GetPackageVersion();
     public string Ecosystem { get; init; } = "dotnet";
 

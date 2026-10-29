@@ -1,6 +1,6 @@
-# CodeMetrics.AI
+# CodeTestament
 
-CodeMetrics.AI is a suite of deterministic code analyzers that produce shared scorecard evidence for AI-assisted codebase review.
+CodeTestament is a suite of deterministic code analyzers that produce shared scorecard evidence for AI-assisted codebase review.
 
 Its goal is to guide human and AI developers toward better, more maintainable and performant code. Scores express documented product expectations and identify opportunities for improvement; they do not prove defects or replace engineering judgment. The [complexity scoring policy](shared/scorecard-schema/calibration.md#complexity-scoring-product-decision) records the accepted method-CC bands and the distinction between product decisions and their scoring implementation. Real-world usage and developer feedback should inform explicit, versioned policy revisions.
 
@@ -10,6 +10,11 @@ Released scorecard analyzers run in the package ecosystem natural to their targe
 |------|-------------|
 | `.scorecard/<ecosystem>/metrics.csv` | Raw code metrics in the shared CSV shape |
 | `.scorecard/<ecosystem>/evidence.json` | Scored evidence across stable quality dimensions |
+
+> **Brand migration in progress.** This branch builds CodeTestament locally.
+> The table and registry commands below describe the existing published packages.
+> See the [local migration guide](docs/codetestament-migration.md) for new names,
+> installation, compatibility and validation status.
 
 ## Analyzers
 

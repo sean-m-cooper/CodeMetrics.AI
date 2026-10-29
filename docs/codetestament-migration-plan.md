@@ -1,7 +1,8 @@
 # CodeTestament rename and migration plan
 
 Date: 2026-10-29
-Status: brand selected by Sean; implementation and release plan only.
+Status: brand selected by Sean; local producer migration started on
+`codex/codetestament-migration`. See the [implementation guide](codetestament-migration.md).
 
 ## Outcome
 
@@ -16,8 +17,8 @@ formulas, thresholds, populations, or supported language scope. Python stays a
 preview; Error Handling remains unscored. New analyzers, dashboards, cryptographic
 attestations, and a unified cross-language launcher are separate work.
 
-This document does not execute a repository rename, purchase a domain, publish a
-package, alter a user's project manifest, or commit the current workspace.
+The plan does not itself execute a repository rename, purchase a domain, publish
+a package, or alter a user's project manifest.
 The [name review](codetestament-name-review.md) records the completed US/public
 screen and the outstanding international and legal-clearance limits. Selecting
 the brand does not turn that research into legal clearance.

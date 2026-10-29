@@ -25,13 +25,13 @@ try {
   assert.ok(archive.files.every(file => !file.path.includes('__pycache__')));
   const install = path.join(temporary, 'isolated install'); fs.mkdirSync(install);
   run([npm, 'install', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund', path.join(temporary, archive.filename)], install);
-  const packageRoot = path.join(install, 'node_modules/codemetrics-ai');
+  const packageRoot = path.join(install, 'node_modules/codetestament');
   for (const file of ['async_scoring.py', 'async_helper_paths.py', 'review_cli.py', 'ASYNC_SCORING.md', 'BEHAVIOR_REVIEW.md', 'async_adapters.py', 'ASYNC_ADAPTERS.md', 'async_context.py', 'async_provenance.py', 'ASYNC_CONTEXT.md', 'async_usage.py', 'async_bindings.py', 'ASYNC_USAGE.md', 'source_facts.py', 'source_selection.py', 'duplication.py', 'analysis.py', 'decomposition.py', 'DECOMPOSITION.md', 'METHOD_COMPLEXITY.md',
     'error_handling.py', 'ERROR_HANDLING.md', 'error_handling_context.py', 'ERROR_HANDLING_CONTEXT.md', 'error_handling_transfers.py', 'ERROR_HANDLING_TRANSFERS.md', 'error_handling_operations.py', 'ERROR_HANDLING_OPERATIONS.md', 'coverage_review.py',
     'coverage_provenance.py', 'coverage_collect.py', 'coverage_worker.py', 'COVERAGE.md'])
     assert.deepEqual(fs.readFileSync(path.join(packageRoot, 'dist/python', file)), fs.readFileSync(new URL(file, import.meta.url)));
-  assert.equal(JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'))).bin['codemetrics-python'], './dist/python-cli.js');
-  assert.equal(JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'))).bin['codemetrics-python-collect'], './dist/python-collect-cli.js');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'))).bin['codetestament-python'], './dist/python-cli.js');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'))).bin['codetestament-python-collect'], './dist/python-collect-cli.js');
   console.log(run(['--test', fileURLToPath(new URL('tests/evidence.test.mjs', import.meta.url))], install, { CODEMETRICS_PACKAGE_ROOT: packageRoot }));
   console.log('Installed Python package smoke passed.');
 } finally { fs.rmSync(temporary, { recursive: true, force: true }); }

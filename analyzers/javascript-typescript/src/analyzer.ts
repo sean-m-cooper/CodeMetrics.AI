@@ -72,7 +72,7 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
   dimensions.codeQuality.componentDetails = { ...(dimensions.codeQuality.componentDetails as object ?? {}),
     decomposition: decompositionEvidence(decompositionModules, diagnostics.length > 0) };
   const evidence: Evidence = {
-    schemaVersion: 3, generatedAtUtc: new Date().toISOString(), tool: { name: "codemetrics-ai", version, ecosystem: "javascript-typescript" },
+    schemaVersion: 3, generatedAtUtc: new Date().toISOString(), tool: { name: "CodeTestament.JavaScript", version, ecosystem: "javascript-typescript" },
     subject: { root: discovery.repositoryRoot, entryPoint: discovery.entryPoint, name: discovery.name, variant: "source" },
     filters: { totalUnits: discovery.packages.reduce((sum,pkg) => sum + pkg.files.length, 0) + discovery.skipped.length,
       analyzedUnits: analyzedFiles, skipped: discovery.skipped },

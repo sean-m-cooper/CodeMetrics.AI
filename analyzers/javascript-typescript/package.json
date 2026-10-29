@@ -1,14 +1,14 @@
 {
-  "name": "codemetrics-ai",
-  "version": "0.6.0-preview.2",
+  "name": "codetestament",
+  "version": "0.6.0-preview.3",
   "description": "Deterministic code metrics for JavaScript and TypeScript, with Python scoring preview",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "codemetrics-ai": "./dist/cli.js",
-    "codemetrics-evidence": "./dist/evidence-cli.js",
-    "codemetrics-python": "./dist/python-cli.js",
-    "codemetrics-python-collect": "./dist/python-collect-cli.js"
+    "codetestament": "./dist/cli.js",
+    "codetestament-evidence": "./dist/evidence-cli.js",
+    "codetestament-python": "./dist/python-cli.js",
+    "codetestament-python-collect": "./dist/python-collect-cli.js"
   },
   "files": [
     "dist",

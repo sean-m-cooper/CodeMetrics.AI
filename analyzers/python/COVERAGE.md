@@ -1,12 +1,12 @@
 # Experimental Python coverage and CRAP review
 
-The reviewer imports a coverage.py JSON report and produces per-function review evidence. Without a collection receipt, estimates remain **conditional**. The separate, explicit collector runs a caller-selected test module and binds its newly generated report to source observations before and after execution. Neither command installs dependencies. The development package now embeds this workflow in `codemetrics-python` (adapter `0.7.0`) and exposes explicit test collection as `codemetrics-python-collect`. The scorecard skill imports the artifacts and reports their limitations. Source-facts v2 and its producer `0.4.0-experimental` remain unchanged. Method Complexity is scored separately; coverage/CRAP does not supply a Testing score or modify complexity. Published npm 0.5.0 does not include these commands; use a newly built local archive.
+The reviewer imports a coverage.py JSON report and produces per-function review evidence. Without a collection receipt, estimates remain **conditional**. The separate, explicit collector runs a caller-selected test module and binds its newly generated report to source observations before and after execution. Neither command installs dependencies. The development package now embeds this workflow in `codetestament-python` (adapter `0.7.0`) and exposes explicit test collection as `codetestament-python-collect`. The scorecard skill imports the artifacts and reports their limitations. Source-facts v2 and its producer `0.4.0-experimental` remain unchanged. Method Complexity is scored separately; coverage/CRAP does not supply a Testing score or modify complexity. Published npm 0.5.0 does not include these commands; use a newly built local archive.
 
 ## Packaged workflow
 
 ```powershell
-codemetrics-python --project E:/repos/my-project --include 'src/**' --coverage-json E:/temp/my-project-coverage/coverage.json --collection-manifest E:/temp/my-project-coverage/provenance.json --scorecard-output evidence.json
-codemetrics-evidence --input evidence.json --inspect-output inspection.json
+codetestament-python --project E:/repos/my-project --include 'src/**' --coverage-json E:/temp/my-project-coverage/coverage.json --collection-manifest E:/temp/my-project-coverage/provenance.json --scorecard-output evidence.json
+codetestament-evidence --input evidence.json --inspect-output inspection.json
 ```
 
 Coverage is optional. Evidence embeds the review at `dimensions.codeQuality.coverageReview`, sharing the exact source population and invocation IDs with complexity and duplication. Missing coverage produces explicit unavailable rows. Incomplete coverage makes the combined run incomplete and withholds all findings and the Method Complexity score. The shared validator checks identities, source membership/digests, line accounting, CRAP arithmetic, receipt consistency, and unavailable/conditional/source-bound summaries. It never executes tests or rereads current source when validating saved evidence; a historical evidence import retains only the binding established at generation time. Package validation is an integrity check, not cryptographic authentication of an unsigned receipt.
@@ -29,8 +29,8 @@ The CLI accepts the source analyzer's include/exclude and population flags, plus
 Use Python 3.12 with coverage.py and the project's test dependencies already installed in an isolated environment. Validation covers `coverage==7.6.1` and `coverage==7.16.1`. The collector requires a project directory, an explicit new output directory outside that project with an existing parent, and an interpreter path. It executes pytest by default; `--module` selects another Python test module. Arguments after `--` belong to that module.
 
 ```powershell
-codemetrics-python-collect E:/repos/my-project --include 'src/**' --python E:/temp/my-project-tests/Scripts/python.exe --output-directory E:/temp/my-project-coverage-001 -- -q tests
-codemetrics-python --project E:/repos/my-project --include 'src/**' --coverage-json E:/temp/my-project-coverage-001/coverage.json --collection-manifest E:/temp/my-project-coverage-001/provenance.json --scorecard-output TestResults/my-project-evidence.json
+codetestament-python-collect E:/repos/my-project --include 'src/**' --python E:/temp/my-project-tests/Scripts/python.exe --output-directory E:/temp/my-project-coverage-001 -- -q tests
+codetestament-python --project E:/repos/my-project --include 'src/**' --coverage-json E:/temp/my-project-coverage-001/coverage.json --collection-manifest E:/temp/my-project-coverage-001/provenance.json --scorecard-output TestResults/my-project-evidence.json
 ```
 
 This is an explicit **test execution** workflow. The source analyzer and offline reviewer still never import or execute target code. Collector policy `python/coverage-collection-v1`:
