@@ -7,7 +7,14 @@ import { spawnSync } from 'node:child_process';
 
 const root = fileURLToPath(new URL('../javascript-typescript/', import.meta.url));
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'python package '));
-const npm = process.env.npm_execpath ?? path.join(path.dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js');
+const npmCandidates = [process.env.npm_execpath];
+for (const directory of [path.dirname(process.execPath), ...(process.env.PATH ?? '').split(path.delimiter)]) {
+  npmCandidates.push(path.join(directory, 'node_modules/npm/bin/npm-cli.js'));
+  const executable = path.join(directory, 'npm');
+  if (fs.existsSync(executable)) npmCandidates.push(fs.realpathSync(executable));
+}
+const npm = npmCandidates.find(file => file?.endsWith('.js') && fs.existsSync(file));
+assert.ok(npm, 'Cannot locate npm-cli.js from the active Node installation or PATH.');
 function run(args, cwd, env = {}) {
   const result = spawnSync(process.execPath, args, { cwd, env: { ...process.env, ...env }, encoding: 'utf8', windowsHide: true, timeout: 300_000 });
   assert.ifError(result.error); assert.equal(result.status, 0, result.stdout + result.stderr); return result.stdout;
