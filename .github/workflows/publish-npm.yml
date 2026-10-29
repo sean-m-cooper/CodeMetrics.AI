@@ -34,7 +34,7 @@ jobs:
       - name: Publish stable or opt-in preview
         shell: bash
         run: |
-          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+          if [[ "${GITHUB_REF_NAME#js-v}" == *-* ]]; then
             npm publish --access public --tag preview
           else
             npm publish --access public --tag latest
