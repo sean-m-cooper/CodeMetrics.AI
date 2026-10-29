@@ -2,20 +2,20 @@
 
 Experimental source-facts adapter for Python 3.12, using only the standard library. It parses files without importing or executing the target project. No package installation or target build is required.
 
-This is **not a full Python scorecard**. The packaged `codemetrics-python` CLI now wraps function-complexity [source facts](../../shared/source-facts/README.md) in standard scorecard evidence v3. Method Complexity is the first scored dimension, using the accepted [Python scoring policy](METHOD_COMPLEXITY.md); the other eight dimensions remain unavailable. There is no CSV. Any aggregate is a partial assessment with 1/9 dimensions scored, equal to Method Complexity. The companion code-scorecard skill supports this workflow through an explicit local development package.
+This is **not a full Python scorecard**. The packaged `codemetrics-python` CLI now wraps function-complexity [source facts](../../shared/source-facts/README.md) in standard scorecard evidence v3. Method Complexity uses the accepted [complexity policy](METHOD_COMPLEXITY.md); adapter 0.15.0 also scores [Async/Blocking Usage](ASYNC_SCORING.md) when production async implementations exist. The other seven dimensions remain unavailable, including Error Handling. There is no CSV. Any aggregate is a partial assessment with the actual number of scored dimensions: at most 2/9, or 1/9 for synchronous-only code. The companion code-scorecard skill supports this workflow through an explicit local development package.
 
 ## Packaged evidence workflow
 
-The standalone [Async/Blocking Usage scoring study](ASYNC_SCORING.md) now applies
+The packaged [Async/Blocking Usage policy](ASYNC_SCORING.md) now applies
 the owner-rate ladder to production async implementations, preserving documented
-choices and explicit unresolved evidence. It is separate from the packaged v3
-contract, which still scores only Method Complexity. Error Handling remains unscored.
+choices and explicit unresolved evidence. Adapter 0.15.0 embeds helper paths and scoring contributions in the v3
+contract. Error Handling remains unscored.
 
-The standalone [behavior reviewers](BEHAVIOR_REVIEW.md) add bounded handler dispositions and local synchronous-helper paths for async analysis. They include a curated accuracy harness and pinned-corpus validation. Both dimensions remain unscored; these new extensions are not yet part of the packaged evidence contract.
+The standalone [behavior reviewers](BEHAVIOR_REVIEW.md) add bounded handler dispositions and local synchronous-helper paths for async analysis. They include a curated accuracy harness and pinned-corpus validation. Async helper paths and scoring now ship in 0.15.0. The standalone handler dispositions and continuation extensions are not packaged; Error Handling remains unscored.
 
-The standalone [handler-continuation extension](ERROR_HANDLING_CONTINUATIONS.md) follows explicit returns/raises after enclosing branches and links narrowly retained defaults. It preserves the original disposition evidence and keeps both dimensions unscored.
+The standalone [handler-continuation extension](ERROR_HANDLING_CONTINUATIONS.md) follows explicit returns/raises after enclosing branches and links narrowly retained defaults. It preserves the original disposition evidence and remains unscored. Packaged async scoring is a separate extension.
 
-The existing `codemetrics-ai` npm package bundles the Python scripts, shared population engine, and canonical evidence validator. This first delivery does not create a separate PyPI distribution or duplicate scoring arithmetic in Python. Node.js 20+ and Python 3.12 are required. The development archive still reports npm version 0.5.0; published 0.5.0 does **not** contain this new command. Use a locally built archive until a coordinated release.
+The existing `codemetrics-ai` npm package bundles the Python scripts, shared population engine, and canonical evidence validator. This delivery does not create a separate PyPI distribution. The canonical package independently recomputes the standalone async owner-rate arithmetic. Node.js 20+ and Python 3.12 are required. The development archive still reports npm version 0.5.0; published 0.5.0 does **not** contain this new command. Use a locally built archive until a coordinated release.
 
 ```powershell
 # From the repository root, with npm dependencies already installed:
@@ -29,11 +29,11 @@ For repository development, invoke `node analyzers/javascript-typescript/dist/py
 
 `--scorecard-output` is required and must name a new `.json` file. Existing files are never overwritten. `--run-id` and `--audit-id` accept caller-supplied UUIDs; otherwise fresh IDs are generated. A complete selection exits 0 even when empty; parser/runtime/read/review failures exit 2 with incomplete evidence where the entry point and output are valid. Invalid CLI paths/options can fail before evidence is written. No previous output is reused.
 
-The evidence embeds facts at `dimensions.codeQuality.sourceFacts`. Its `methodComplexity` contains the production population, policy, and per-function contributions supporting the dimension `score`. Historical evidence retains its original `experimentalPreview`. `codeQuality.duplication` contains exact-body review groups and explicit exclusions under the same run/audit IDs. `codeQuality.coverageReview` contains optional line-coverage/CRAP evidence, with missing, conditional, and source-bound observations kept distinct. One informational finding is emitted per duplicate group, with every occurrence in its observations. Code Quality is scored as Method Complexity when production implementations are available, skipped when none are eligible, and failed on incomplete analysis; the other eight dimensions are unsupported. CC ≥ 10 produces informational review findings. `population.members` counts selected implementations; the schema-required `types: 0` is explicitly unmeasured, not an absence-of-classes claim. Filters count observed files; pruned directories do not imply enumerated file counts.
+The evidence embeds facts at `dimensions.codeQuality.sourceFacts`. Its `methodComplexity` contains the production population, policy, and per-function contributions supporting the dimension `score`. Historical evidence retains its original `experimentalPreview`. `codeQuality.duplication` contains exact-body review groups and explicit exclusions under the same run/audit IDs. `codeQuality.coverageReview` contains optional line-coverage/CRAP evidence, with missing, conditional, and source-bound observations kept distinct. One informational finding is emitted per duplicate group, with every occurrence in its observations. Code Quality is scored as Method Complexity when production implementations are available, skipped when none are eligible, and failed on incomplete analysis; Async/Blocking Usage is scored for nonempty production async populations; the other seven dimensions are unsupported. CC ≥ 10 produces informational review findings. `population.members` counts selected implementations; the schema-required `types: 0` is explicitly unmeasured, not an absence-of-classes claim. Filters count observed files; pruned directories do not imply enumerated file counts.
 
-The shared validator checks the v3 envelope and embedded facts, recomputes the score and contributions, and rejects invented dimension scores, inconsistent populations, and mismatched expected run IDs. Incomplete results have no usable score or findings. Historical imports remain historical. Matching supported versions, policies, selections, and scopes can compare Method Complexity and apply score-drop gates. Historical previews, empty eligible populations, and incomplete evidence cannot gate. Informational SARIF export is supported.
+The shared validator checks the v3 envelope and embedded facts, recomputes the score and contributions, and rejects invented dimension scores, inconsistent populations, and mismatched expected run IDs. Incomplete results have no usable score or findings. Historical imports remain historical. Matching supported versions, policies, selections, and scopes can compare available Method Complexity and Async/Blocking Usage scores and apply score-drop gates. Historical previews, empty eligible populations, and incomplete evidence cannot gate. Informational SARIF export is supported.
 
-The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's packaged adapter version is `0.14.0`, independently of the enclosing npm version and unchanged source-facts producer `0.4.0-experimental`.
+The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's packaged adapter version is `0.15.0`, independently of the enclosing npm version and unchanged source-facts producer `0.4.0-experimental`.
 
 ## Optional coverage review and explicit collection
 
@@ -41,7 +41,7 @@ The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON through `co
 
 ## Raw source-facts workflow
 
-The packaged [callback adapter reviewer](ASYNC_ADAPTERS.md) adds `functools.partial` construction/reference context and narrow `sync_to_async` decorator links. It preserves all packaged measurements and scores. Adapter 0.14.0 embeds it at `dimensions.performanceAsync.adapterReview` for the companion skill; Async/Blocking Usage and Error Handling remain unscored.
+The packaged [callback adapter reviewer](ASYNC_ADAPTERS.md) adds `functools.partial` construction/reference context and narrow `sync_to_async` decorator links. It preserves all packaged measurements and scores. Adapter 0.14.0 embeds it at `dimensions.performanceAsync.adapterReview` for the companion skill; This report remains review evidence; adapter 0.15.0 adds the separate async score. Error Handling remains unscored.
 
 The packaged [exception-handler reviewer](ERROR_HANDLING.md) records handler bodies, local documentation, and owned control-transfer syntax without scores. Its first pinned corpus study includes import probes, deliberate fallback paths, and framework exception dispatch. The adapter embeds it at `dimensions.errorHandling.review`, and the skill presents category counts and source context. Python's Error Handling dimension remains unavailable as a score.
 
@@ -88,7 +88,7 @@ Syntax parsing is not semantic validation or compilation. Missing coverage, main
 
 ## Population policy: `python/source-selection-v1`
 
-Python emits **source-facts v2** with a machine-readable selection inventory and per-function population. JS/TS continues to emit v1 facts internally; its scoring is unchanged. The source-facts producer remains `0.4.0-experimental`; the packaged scoring wrapper is `0.14.0`.
+Python emits **source-facts v2** with a machine-readable selection inventory and per-function population. JS/TS continues to emit v1 facts internally; its scoring is unchanged. The source-facts producer remains `0.4.0-experimental`; the packaged scoring wrapper is `0.15.0`.
 
 The scored population comprises selected production **candidates**, not a verified installed-package or reachable-code population. The following rules make that selection inspectable:
 
@@ -129,7 +129,7 @@ The `TestResults` directory must exist. The reference is verified against Git be
 
 The [first corpus review](../../shared/source-facts/python-selection-2026-10-10.md) records measurements, exclusions, source context, and remaining limits.
 
-The [complexity calibration study](../../shared/scorecard-schema/python-complexity-calibration.md) reviews 20 source bodies, tests Python idioms and accepted population expectations, and supports the narrow OR-membership adjustment. The approved narrow adjustment is now implemented as measurement policy v2. The accepted Method Complexity baseline is now the first supported dimension score; other evidence remains unscored. The study report remains historical v1 evidence. In a checkout of calibration checkpoint `b6f953b`, reproduce it with `py -3.12 analyzers/python/calibration.py --repos E:/repos --output TestResults/python-calibration-new` (a new output directory is required).
+The [complexity calibration study](../../shared/scorecard-schema/python-complexity-calibration.md) reviews 20 source bodies, tests Python idioms and accepted population expectations, and supports the narrow OR-membership adjustment. The approved narrow adjustment is now implemented as measurement policy v2. The accepted Method Complexity baseline remains unchanged; adapter 0.15.0 additionally supports the narrow Async/Blocking Usage score. The study report remains historical v1 evidence. In a checkout of calibration checkpoint `b6f953b`, reproduce it with `py -3.12 analyzers/python/calibration.py --repos E:/repos --output TestResults/python-calibration-new` (a new output directory is required).
 
 ## Tests
 
@@ -146,6 +146,20 @@ Collection integration checks require coverage.py 7.6.1 in a Python 3.12 environ
 
 The packaged [call/return reviewer](ERROR_HANDLING_OPERATIONS.md) adds owned operation syntax and an input unresolved-suite inventory at `dimensions.errorHandling.operationReview`. These observations stay unscored and do not prove logging, recovery, or runtime execution.
 
-The packaged [Async/Blocking Usage reviewer](ASYNC_USAGE.md) adds async-body populations, conservative blocking-call candidates, thread-helper syntax, and explicit unresolved/deferred evidence. Its pinned Starlette/Django study preserves existing scores and handler observations. It is embedded at `dimensions.performanceAsync.review` in adapter 0.14.0; Async/Blocking Usage and Error Handling remain unscored.
+The packaged [Async/Blocking Usage reviewer](ASYNC_USAGE.md) adds async-body populations, conservative blocking-call candidates, thread-helper syntax, and explicit unresolved/deferred evidence. Its pinned Starlette/Django study preserves existing scores and handler observations. It is embedded at `dimensions.performanceAsync.review` in adapter 0.14.0; This report remains review evidence; adapter 0.15.0 adds the separate async score. Error Handling remains unscored.
 
-The packaged [async call-context reviewer](ASYNC_CONTEXT.md) adds reason/shape inventories and conservative local callback/stored-wrapper source links. It preserves the original async rows and scores; adapter 0.14.0 embeds this additional report at `dimensions.performanceAsync.contextReview` for the skill. Async/Blocking Usage and Error Handling remain unscored.
+The packaged [async call-context reviewer](ASYNC_CONTEXT.md) adds reason/shape inventories and conservative local callback/stored-wrapper source links. It preserves the original async rows and scores; adapter 0.14.0 embeds this additional report at `dimensions.performanceAsync.contextReview` for the skill. This report remains review evidence; adapter 0.15.0 adds the separate async score. Error Handling remains unscored.
+
+
+## Async scoring contract (0.15.0)
+
+Ruleset `python-2026-10-28-async-scoring-v1` embeds `performanceAsync.helperReview`
+and `performanceAsync.asyncScoring`. The canonical validator verifies report
+provenance and path/source accounting, recomputes eligible/affected owners and
+numeric bands, and builds the dimension's findings and scoring decision. These
+are consistency checks against source-derived evidence, not independent Python
+AST remeasurement or authentication. Failed required evidence withholds all scores.
+A nonempty production async population receives the partial catalogue score;
+no async owners means skipped. Unresolved paths and documented choices remain
+visible. Error Handling remains unscored. Historical 0.14.0 reports retain their
+original contract and cannot gate against 0.15.0.

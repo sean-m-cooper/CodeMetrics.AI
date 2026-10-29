@@ -6,11 +6,24 @@ blocking usage in selected production async implementations. It does not measure
 latency, throughput, appropriate concurrency, or the correctness of a business
 decision.
 
-This is an experimental scoring study, separate from packaged scorecard evidence
-v3. The development npm adapter still scores only Method Complexity. Historical
-reports, overall scores, baseline gates, and the companion skill are unchanged.
-Error Handling remains unscored. Enabling this dimension in the package requires
-a versioned contract, shared-validator support, and skill integration.
+Python adapter **0.15.0**, ruleset `python-2026-10-28-async-scoring-v1`, now packages
+this policy at `dimensions.performanceAsync`, with `helperReview` and `asyncScoring`
+reports supporting the dimension score. The standalone report keeps its study
+producer and scope; the enclosing dimension supplies the versioned scorecard
+contract. Method Complexity is unchanged; Error Handling remains unscored.
+
+The canonical validator checks identities, source/selection hashes, bounded path
+structure, root-call references, classifications and contribution accounting. It
+recomputes the owner-rate score and rejects inconsistent supplied scores. It does
+not independently reparse Python during historical import or authenticate source
+claims: a coherently rewritten source report is outside those integrity guarantees.
+Source analysis itself regenerates and verifies the measurements before scoring.
+
+Current aggregates use only available dimension scores and must be labeled partial
+assessment, at most 2/9 dimensions scored. Historical 0.14.0 and earlier evidence
+keeps its original contract. Compatible 0.15.0 runs can compare/gate; incompatible
+versions, policies, scopes and selections cannot. The npm archive remains a local
+development delivery, not a published Python release.
 
 ## Population and ladder
 

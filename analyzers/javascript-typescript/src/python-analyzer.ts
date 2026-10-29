@@ -1,3 +1,4 @@
+import { validateAsyncHelpers, validateAsyncScoring, type PythonAsyncHelpers, type PythonAsyncScoring } from "./python-async-scoring.js";
 import { validateAsyncAdapters, type PythonAsyncAdapters } from "./python-async-adapters.js";
 import { validateAsyncContext, type PythonAsyncContext } from "./python-async-context.js";
 import { validateAsyncUsage, type PythonAsyncUsage } from "./python-async-usage.js";
@@ -47,6 +48,8 @@ export function analyzePython(options: PythonOptions) {
     for (const item of items ?? []) args.push(`--${flag}`, item);
   for (const [flag, enabled] of [["include-tests", options.includeTests], ["include-generated", options.includeGenerated], ["include-support", options.includeSupport]] as const)
     if (enabled) args.push(`--${flag}`);
+  let asyncHelpers: PythonAsyncHelpers | null = null;
+  let asyncScoring: PythonAsyncScoring | null = null;
   let asyncAdapters: PythonAsyncAdapters | null = null;
   let asyncContext: PythonAsyncContext | null = null;
   let asyncReview: PythonAsyncUsage | null = null;
@@ -80,6 +83,10 @@ export function analyzePython(options: PythonOptions) {
     validateAsyncUsage(parsed.asyncUsageReview, parsed.sourceFacts, subject, ids, parsed.decomposition);
     validateAsyncContext(parsed.asyncContextReview, parsed.asyncUsageReview);
     validateAsyncAdapters(parsed.asyncAdapterReview, parsed.asyncUsageReview, parsed.asyncContextReview);
+    validateAsyncHelpers(parsed.asyncHelperReview, parsed.asyncUsageReview, parsed.asyncContextReview, parsed.asyncAdapterReview);
+    validateAsyncScoring(parsed.asyncScoring, parsed.asyncHelperReview, parsed.asyncUsageReview);
+    asyncHelpers = parsed.asyncHelperReview;
+    asyncScoring = parsed.asyncScoring;
     asyncAdapters = parsed.asyncAdapterReview;
     asyncContext = parsed.asyncContextReview;
     asyncReview = parsed.asyncUsageReview;
@@ -91,7 +98,7 @@ export function analyzePython(options: PythonOptions) {
     facts = parsed.sourceFacts;
     duplication = parsed.duplication;
     coverage = parsed.coverageReview;
-    if ((result.status === 0) !== (facts!.status === "complete" && duplication!.status === "complete" && coverage!.status === "complete" && decomposition!.status === "complete" && errorHandling!.status === "complete" && context!.status === "complete" && transfers!.status === "complete" && operations!.status === "complete" && asyncReview!.status === "complete" && asyncContext!.status === "complete" && asyncAdapters!.status === "complete")) throw new Error("Python exit status and facts disagree.");
-  } catch (failure) { asyncAdapters = null; asyncContext = null; asyncReview = null; operations = null; transfers = null; context = null; errorHandling = null; facts = null; decomposition = null; duplication = null; coverage = null; error = failure instanceof Error ? failure.message : String(failure); }
-  return pythonEvidence(facts, subject, ids, error, duplication, coverage, decomposition, errorHandling, context, transfers, operations, asyncReview, asyncContext, asyncAdapters);
+    if ((result.status === 0) !== (facts!.status === "complete" && duplication!.status === "complete" && coverage!.status === "complete" && decomposition!.status === "complete" && errorHandling!.status === "complete" && context!.status === "complete" && transfers!.status === "complete" && operations!.status === "complete" && asyncReview!.status === "complete" && asyncContext!.status === "complete" && asyncAdapters!.status === "complete" && asyncHelpers!.status === "complete" && asyncScoring!.status === "complete")) throw new Error("Python exit status and facts disagree.");
+  } catch (failure) { asyncHelpers = null; asyncScoring = null; asyncAdapters = null; asyncContext = null; asyncReview = null; operations = null; transfers = null; context = null; errorHandling = null; facts = null; decomposition = null; duplication = null; coverage = null; error = failure instanceof Error ? failure.message : String(failure); }
+  return pythonEvidence(facts, subject, ids, error, duplication, coverage, decomposition, errorHandling, context, transfers, operations, asyncReview, asyncContext, asyncAdapters, asyncHelpers, asyncScoring);
 }

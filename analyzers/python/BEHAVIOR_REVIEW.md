@@ -1,17 +1,17 @@
 # Python behavior evidence before scoring
 
-Two standalone reviewers extend the Python analyzer: handler disposition paths and bounded local async helper paths. Both **Error Handling and Async/Blocking Usage remain unscored**. These extensions are not yet in the packaged adapter or scorecard skill; their existing evidence contracts remain unchanged.
+Two review producers extend the Python analyzer: handler disposition paths and bounded local async helper paths. These raw reports remain unscored. Python adapter 0.15.0 packages the helper report and the separate [Async/Blocking Usage scoring policy](ASYNC_SCORING.md). Handler dispositions and continuations remain repository-only extensions; Error Handling remains unscored. Their review contracts are unchanged.
 
-The later [standalone async scoring study](ASYNC_SCORING.md) consumes and verifies
+The later [async scoring policy](ASYNC_SCORING.md) consumes and verifies
 these helper paths without changing this review-only contract. It calculates a
-separate, limited-catalogue owner-rate score; packaged scores and Error Handling
-remain unchanged.
+separate, limited-catalogue owner-rate score, now packaged in 0.15.0. Method
+Complexity is unchanged and Error Handling remains unscored.
 
 The subsequent [continuation extension](ERROR_HANDLING_CONTINUATIONS.md) follows bounded post-handler returns/raises through enclosing branches and records retained-default syntax, preserving this first disposition policy unchanged.
 
 ## Run
 
-Python 3.12, standard library only, from the repository root:
+Python 3.12, standard library only, from the repository root. The handler reviewer, continuation extension and corpus/accuracy scripts below are repository development tools, not installed commands; the archive includes only the helper/scoring producers and their CLI support:
 
 ```powershell
 py -3.12 analyzers/python/error_handling_dispositions.py E:/repos/project --output TestResults/dispositions.json
@@ -81,4 +81,4 @@ Both reviewers regenerate their supplied prior evidence and verify current sourc
 
 `behavior_accuracy.py` records expected versus actual classifications and candidate-detection confusion counts for 27 curated cases: 15 handler cases and 12 async cases. The suite includes deliberately introduced blocking and silent swallowing, documented choices, coroutine/generator boundaries, and corpus-inspired route, iterator, and selective-fallback counterexamples. These are regression labels, not an independent holdout, a representative accuracy estimate, or a claim of runtime correctness. Additional unit tests cover tampering, budgets, CLI output preservation, nested ownership, source drift, and provenance vetoes.
 
-No formula should use recognized-shape rates as handling-success rates or count unresolved observations as defects. Before scoring, review remaining candidates, expand independently labeled cases, and decide the explicit coverage/availability policy. Packaging and skill integration are a separate versioned milestone.
+No formula should use recognized-shape rates as handling-success rates or count unresolved observations as defects. Error Handling still requires further candidate review and a separate scoring decision. Async scoring availability, exclusions, and packaging are specified in ASYNC_SCORING.md; this helper report remains review evidence rather than a score.

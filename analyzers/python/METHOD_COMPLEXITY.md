@@ -1,5 +1,10 @@
 # Python Method Complexity policy
 
+Adapter **0.15.0** keeps this Method Complexity formula unchanged and adds the
+separate [Async/Blocking Usage score](ASYNC_SCORING.md). Current aggregates have
+at most 2/9 dimensions scored; Error Handling remains unscored. The version-specific
+1/9 descriptions below record the original complexity-only delivery.
+
 Accepted product baseline, 2026-10-13. Adapter **0.7.0** scores `dimensions.codeQuality`, displayed as **Method Complexity**, using policy `python/method-complexity-worst-40-remainder-60/v1` and ruleset `python-2026-10-13-method-complexity-v1`. Evidence uses `calibration: baseline`. The other eight dimensions remain unavailable. Adapter **0.8.0** retains this scoring policy and measurements, adding unscored exception-handler evidence under ruleset `python-2026-10-15-error-handling-review-v1`. Adapter **0.9.0** adds unscored context evidence under ruleset `python-2026-10-15-exception-context-review-v1`, with the same Method Complexity policy and measurements. Adapter **0.10.0** adds unscored raise/chaining evidence under ruleset `python-2026-10-15-exception-transfers-review-v1`, with unchanged Method Complexity. Adapter **0.11.0** adds unscored call/return evidence under ruleset `python-2026-10-15-exception-operations-review-v1`. Adapter **0.12.0** adds unscored async usage evidence under `python-2026-10-16-async-usage-review-v1`; **0.13.0** adds unscored async call context under `python-2026-10-18-async-context-review-v1`. All preserve Method Complexity. Historical reports retain their original contracts; cross-version comparisons are not enabled.
 
 ## What is scored

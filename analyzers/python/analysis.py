@@ -6,6 +6,8 @@ import json
 import async_usage
 import async_context
 import async_adapters
+import async_helper_paths
+import async_scoring
 import error_handling
 import error_handling_context
 import error_handling_transfers
@@ -42,8 +44,10 @@ def main():
     async_review = async_usage.review(args.target, facts, run_id=args.run_id, audit_id=args.audit_id)
     async_context_review = async_context.review(args.target, facts, async_review)
     async_adapter_review = async_adapters.review(args.target, facts, async_review)
-    print(json.dumps({"sourceFacts": facts, "duplication": duplicates, "coverageReview": coverage, "decomposition": bodies, "errorHandlingReview": handlers, "errorHandlingContext": context, "errorHandlingTransfers": transfers, "errorHandlingOperations": operations, "asyncUsageReview": async_review, "asyncContextReview": async_context_review, "asyncAdapterReview": async_adapter_review}, ensure_ascii=True))
-    return 0 if facts["status"] == duplicates["status"] == coverage["status"] == bodies["status"] == handlers["status"] == context["status"] == transfers["status"] == operations["status"] == async_review["status"] == async_context_review["status"] == async_adapter_review["status"] == "complete" else 2
+    async_helpers = async_helper_paths.review(args.target, facts, async_review)
+    async_score = async_scoring.review(args.target, facts, async_helpers)
+    print(json.dumps({"sourceFacts": facts, "duplication": duplicates, "coverageReview": coverage, "decomposition": bodies, "errorHandlingReview": handlers, "errorHandlingContext": context, "errorHandlingTransfers": transfers, "errorHandlingOperations": operations, "asyncUsageReview": async_review, "asyncContextReview": async_context_review, "asyncAdapterReview": async_adapter_review, "asyncHelperReview": async_helpers, "asyncScoring": async_score}, ensure_ascii=True))
+    return 0 if facts["status"] == duplicates["status"] == coverage["status"] == bodies["status"] == handlers["status"] == context["status"] == transfers["status"] == operations["status"] == async_review["status"] == async_context_review["status"] == async_adapter_review["status"] == async_helpers["status"] == async_score["status"] == "complete" else 2
 
 
 if __name__ == "__main__":
