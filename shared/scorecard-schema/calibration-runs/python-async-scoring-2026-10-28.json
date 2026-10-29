@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "auditId": "b8f1e64a-ae2c-4597-a380-2fe9a74e4403",
+  "policy": "python/async-blocking-owner-rate-v1",
+  "implementationFiles": {
+    "async_scoring.py": "881a9d7f4f973199e86ce846461b9d5de997b2ae67403db31b6275bc13f1c4d3",
+    "async_scoring_corpus.py": "189b8c9d7edf7228cf311fdca6c5737319d244f64e9a316fd9b5a947590b3b24",
+    "async_helper_paths.py": "2d83526135db6d6d4ac717a664cfa715b865decc1f00f1df5e9a6f0ce66267b4",
+    "async_adapters.py": "c7b03d58550c84cb90c65aa12972a33b1cad9364d90cf361d5f74df1c4540f50",
+    "async_provenance.py": "15f4bd7f46dcbf0fde00f68e7a228ca32900d08553be6bf7c2e25f8a6b4d0f91",
+    "async_context.py": "b9f9c389fcfa7161f8d38afff95e24493af093a39545125a6bfe9244aa4ee599",
+    "async_usage.py": "8174a9d69b04dbc4b7f23e9bf9677e54c3d9d4abebc4f6463764ababd26393b4",
+    "async_bindings.py": "479e911d0b85854951bd562a32a2c316bc51a6ce466778754ad3f78710a44852",
+    "source_facts.py": "d4b82f6ac466f95dfc028a5b5ca1fb01d9d9caee221b32f4497532f593530fe3",
+    "source_selection.py": "29343b114764d1798d7fa49b93a07c39a01ec305d525ee8f2c68ed799c83f0c5",
+    "duplication.py": "4dc2ebf097549251278b1b49cbba799b148719afae231e515a1e9c06617c041b",
+    "review_cli.py": "250a5cea94ebc22b831e7fc2610a62051b29f576c3e0411e75afba19be171cd3"
+  },
+  "implementationSha256": "5abe8ad0550d22c1ed3b2c34ca7bcafa17776a058acffbaf50853599798b5910",
+  "scope": "Standalone blocking-catalogue scores; no runtime performance assessment, packaged scores or gates changed.",
+  "samples": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "runId": "2324006f-f12e-49cf-8d53-47908bafb7c3",
+      "sourceFactsSha256": "9952ab3a4c9ece1d7ee850be3115be2835835bf3db352ea6c5cb1c81e7e6b0e4",
+      "priorHelperRowsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "scoringRowsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "summary": {
+        "availability": "unavailable",
+        "eligibleOwners": 0,
+        "affectedOwners": 0,
+        "score": null,
+        "affectedRate": null,
+        "excludedOwnersByPopulation": {},
+        "observationPathsByClassification": {},
+        "distinctScoredSourceCalls": 0,
+        "ownersWithUnresolvedPaths": 0,
+        "unresolvedPathsByReason": {}
+      },
+      "unchangedSourceFactsPriorAsyncAndHelperEvidence": true
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "runId": "bd211fc6-35b6-4ae9-baf0-54855588f826",
+      "sourceFactsSha256": "d4f5eedc3b35d7ba5a2ab98d4472730c51e6536b30f361248baff24f4394f632",
+      "priorHelperRowsSha256": "43675fc1f05d9dff2281708d5be6824486c468dc7bfb35708164645dcda4199c",
+      "scoringRowsSha256": "024e5ce7fb1bd128e9089d6b954addb6482a36bb909b955cb2c63fa544193c1b",
+      "summary": {
+        "availability": "available",
+        "eligibleOwners": 135,
+        "affectedOwners": 0,
+        "score": 10,
+        "affectedRate": {
+          "numerator": 0,
+          "denominator": 135
+        },
+        "excludedOwnersByPopulation": {},
+        "observationPathsByClassification": {},
+        "distinctScoredSourceCalls": 0,
+        "ownersWithUnresolvedPaths": 129,
+        "unresolvedPathsByReason": {
+          "async-or-unselected-callee": 5,
+          "comprehension-local-binding": 4,
+          "definition-not-before-reference": 1,
+          "dynamic-callee-expression": 46,
+          "no-local-definition": 98,
+          "non-import-or-ambiguous-binding": 341,
+          "non-name-reference": 7,
+          "not-a-direct-function-definition": 94,
+          "rebound-or-ambiguous-name": 16,
+          "reflective-or-cross-scope-binding": 1
+        }
+      },
+      "unchangedSourceFactsPriorAsyncAndHelperEvidence": true
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "runId": "3ca6bd9c-4950-4885-85ff-db9b263f207e",
+      "sourceFactsSha256": "16d2481e4086a9a1502f52b401406c139a49ef60b3ac4f8eb67c14c0c4eb5dae",
+      "priorHelperRowsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "scoringRowsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "summary": {
+        "availability": "unavailable",
+        "eligibleOwners": 0,
+        "affectedOwners": 0,
+        "score": null,
+        "affectedRate": null,
+        "excludedOwnersByPopulation": {},
+        "observationPathsByClassification": {},
+        "distinctScoredSourceCalls": 0,
+        "ownersWithUnresolvedPaths": 0,
+        "unresolvedPathsByReason": {}
+      },
+      "unchangedSourceFactsPriorAsyncAndHelperEvidence": true
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "runId": "066ed6cc-6aa2-4465-8f9f-94a1ae54762b",
+      "sourceFactsSha256": "db94aa19b8f678743d2d5cb1166a6a2a93e538ab3c176878ed2f4ce4d738eed0",
+      "priorHelperRowsSha256": "25f616d5943e5591351dff41a1299fdccb623b7c87dd031b72ecdb38eba5d9ae",
+      "scoringRowsSha256": "d3e963867714e6997b1b4b10684626f5e102874a455c45c32b5a6cf6502f94a2",
+      "summary": {
+        "availability": "available",
+        "eligibleOwners": 266,
+        "affectedOwners": 0,
+        "score": 10,
+        "affectedRate": {
+          "numerator": 0,
+          "denominator": 266
+        },
+        "excludedOwnersByPopulation": {},
+        "observationPathsByClassification": {},
+        "distinctScoredSourceCalls": 0,
+        "ownersWithUnresolvedPaths": 257,
+        "unresolvedPathsByReason": {
+          "async-or-unselected-callee": 18,
+          "comprehension-local-binding": 3,
+          "decorated-definition": 1,
+          "definition-not-before-reference": 9,
+          "dynamic-callee-expression": 86,
+          "generator-body-deferred": 2,
+          "import-spelling-only": 4,
+          "no-lexical-import": 1,
+          "no-local-definition": 120,
+          "non-import-or-ambiguous-binding": 297,
+          "non-name-reference": 65,
+          "not-a-direct-function-definition": 37,
+          "rebound-or-ambiguous-name": 10,
+          "reflective-or-cross-scope-binding": 106
+        }
+      },
+      "unchangedSourceFactsPriorAsyncAndHelperEvidence": true
+    }
+  ],
+  "validation": {
+    "pythonTestsPassed": 243,
+    "newAsyncScoringTests": 13,
+    "testLog": "TestResults/python-async-scoring-tests-final-2026-10-28.log",
+    "testFileSha256": "488d7bd54b250f9363b685a0ecfe3d9f888510b7a5b62250f4d4edeb7387995a",
+    "exactLadderBoundaryCases": 18,
+    "curatedTestsAreNotIndependentAccuracyEstimates": true,
+    "allCorpusPriorEvidencePreserved": true,
+    "packagedScorecardChanged": false,
+    "skillChanged": false,
+    "errorHandlingScored": false
+  },
+  "artifactsDirectory": "TestResults/python-async-scoring-final-2026-10-28"
+}

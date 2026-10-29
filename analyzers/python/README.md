@@ -6,6 +6,15 @@ This is **not a full Python scorecard**. The packaged `codemetrics-python` CLI n
 
 ## Packaged evidence workflow
 
+The standalone [Async/Blocking Usage scoring study](ASYNC_SCORING.md) now applies
+the owner-rate ladder to production async implementations, preserving documented
+choices and explicit unresolved evidence. It is separate from the packaged v3
+contract, which still scores only Method Complexity. Error Handling remains unscored.
+
+The standalone [behavior reviewers](BEHAVIOR_REVIEW.md) add bounded handler dispositions and local synchronous-helper paths for async analysis. They include a curated accuracy harness and pinned-corpus validation. Both dimensions remain unscored; these new extensions are not yet part of the packaged evidence contract.
+
+The standalone [handler-continuation extension](ERROR_HANDLING_CONTINUATIONS.md) follows explicit returns/raises after enclosing branches and links narrowly retained defaults. It preserves the original disposition evidence and keeps both dimensions unscored.
+
 The existing `codemetrics-ai` npm package bundles the Python scripts, shared population engine, and canonical evidence validator. This first delivery does not create a separate PyPI distribution or duplicate scoring arithmetic in Python. Node.js 20+ and Python 3.12 are required. The development archive still reports npm version 0.5.0; published 0.5.0 does **not** contain this new command. Use a locally built archive until a coordinated release.
 
 ```powershell
