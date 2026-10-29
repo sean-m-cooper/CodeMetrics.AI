@@ -1,6 +1,6 @@
 {
   "name": "codemetrics-ai",
-  "version": "0.6.0-preview.1",
+  "version": "0.6.0-preview.2",
   "description": "Deterministic code metrics for JavaScript and TypeScript, with Python scoring preview",
   "license": "MIT",
   "type": "module",
