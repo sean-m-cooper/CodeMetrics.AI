@@ -1,0 +1,2753 @@
+{
+  "generatedAtUtc": "2026-10-09T21:49:46.957Z",
+  "toolVersion": "0.5.0-dev",
+  "scope": "Selected-source npm dependency evidence; other scores remain unchanged. Feed observations are time-dependent, not a quality score.",
+  "metadataRequested": true,
+  "metadataLimit": 25,
+  "analyzerSourceSha256": "16f2fe3fc34b35dc3382034cf14c164d3f6522ad2d0af28cfccd9d7bfa7df303",
+  "samples": [
+    {
+      "id": "express",
+      "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "runId": "89dc8b8f-5d90-417e-8582-f6abf7496a54",
+      "auditId": "89dc8b8f-5d90-417e-8582-f6abf7496a54",
+      "evidenceSha256": "651b90457296041a4a9d824d65ae47f59c59a6e837ed9f9bd0d9325833c61885",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "54d4073e5d585280cb7c3979432f98c5d7f9a9b8ae468554dd5cf04b7ba4c1bc",
+      "inventoryStatus": "gaps",
+      "manifests": [
+        {
+          "file": "package.json",
+          "declarations": [
+            {
+              "requested": "accepts",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "after",
+              "range": "0.8.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "body-parser",
+              "range": "^2.3.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "connect-redis",
+              "range": "^8.0.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "content-disposition",
+              "range": "^2.0.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "content-type",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "cookie",
+              "range": "^0.7.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "cookie-parser",
+              "range": "1.4.7",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "cookie-session",
+              "range": "2.1.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "cookie-signature",
+              "range": "^1.2.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "debug",
+              "range": "^4.4.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "depd",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "ejs",
+              "range": "^3.1.10",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "encodeurl",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "escape-html",
+              "range": "^1.0.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "eslint",
+              "range": "8.47.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "etag",
+              "range": "^1.8.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "express-session",
+              "range": "^1.18.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "finalhandler",
+              "range": "^2.1.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "fresh",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "hbs",
+              "range": "4.3.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "http-errors",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "marked",
+              "range": "^15.0.3",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "merge-descriptors",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "method-override",
+              "range": "3.0.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "mime-types",
+              "range": "^3.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mocha",
+              "range": "^11.7.5",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "morgan",
+              "range": "1.12.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "nyc",
+              "range": "^17.1.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "on-finished",
+              "range": "^2.4.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "once",
+              "range": "^1.4.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "parseurl",
+              "range": "^1.3.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "pbkdf2-password",
+              "range": "1.2.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "proxy-addr",
+              "range": "^2.0.8",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "qs",
+              "range": "^6.16.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "range-parser",
+              "range": "^1.2.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "router",
+              "range": "^2.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "send",
+              "range": "^1.1.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "serve-static",
+              "range": "^2.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "statuses",
+              "range": "^2.0.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "supertest",
+              "range": "^6.3.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "type-is",
+              "range": "^2.1.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "vary",
+              "range": "^1.1.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "vhost",
+              "range": "~3.0.2",
+              "kind": "development",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "lockfiles": [],
+      "gaps": [
+        {
+          "manifest": "package.json",
+          "reason": "No npm lockfile found"
+        }
+      ],
+      "notices": [],
+      "packageVersions": 0,
+      "installations": 0,
+      "directPackageVersions": 0,
+      "productionReachable": 0,
+      "developmentReachable": 0,
+      "metadataStatus": "unavailable",
+      "availablePackages": 0,
+      "unavailablePackages": 0,
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 0,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results.",
+      "metadataCheckedAtUtc": "2026-10-09T21:49:48.669Z",
+      "advisoryResponseSha256": null,
+      "assessedObservations": []
+    },
+    {
+      "id": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "b5d125fa-19e4-4eff-a916-05bbcc135150",
+      "auditId": "b5d125fa-19e4-4eff-a916-05bbcc135150",
+      "evidenceSha256": "d184e2b09f25b11948a375a48ba7558fab64705f1bc106189b153f35db87e823",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "6e0da9993185f2efa32eb07037ba0708e6a868eba98c388dfe000287923b555d",
+      "inventoryStatus": "gaps",
+      "manifests": [
+        {
+          "file": "packages/zod/package.json",
+          "declarations": [],
+          "manager": "nub@0.8.3"
+        }
+      ],
+      "lockfiles": [],
+      "gaps": [
+        {
+          "manifest": "packages/zod/package.json",
+          "reason": "Unsupported package manager/lockfile: nub@0.8.3"
+        }
+      ],
+      "notices": [],
+      "packageVersions": 0,
+      "installations": 0,
+      "directPackageVersions": 0,
+      "productionReachable": 0,
+      "developmentReachable": 0,
+      "metadataStatus": "unavailable",
+      "availablePackages": 0,
+      "unavailablePackages": 0,
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 0,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results.",
+      "metadataCheckedAtUtc": "2026-10-09T21:49:54.675Z",
+      "advisoryResponseSha256": null,
+      "assessedObservations": []
+    },
+    {
+      "id": "tanstack-query-core",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "runId": "31913877-651b-4e74-a6e6-22d64bb3f9c9",
+      "auditId": "31913877-651b-4e74-a6e6-22d64bb3f9c9",
+      "evidenceSha256": "ee818348ec86d24d8ab007c41d8c2bb9118d48db39ccef746890f364bb5a0424",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "b8c23526a3169e45d3fb076cb3949bbdea6308ddfba6d7ed58966a711a2649e7",
+      "inventoryStatus": "gaps",
+      "manifests": [
+        {
+          "file": "packages/query-core/package.json",
+          "declarations": [
+            {
+              "requested": "@tanstack/query-test-utils",
+              "range": "workspace:*",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "typescript",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            }
+          ],
+          "manager": "pnpm@12.4.2"
+        }
+      ],
+      "lockfiles": [],
+      "gaps": [
+        {
+          "manifest": "packages/query-core/package.json",
+          "reason": "Unsupported package manager/lockfile: pnpm@12.4.2"
+        }
+      ],
+      "notices": [],
+      "packageVersions": 0,
+      "installations": 0,
+      "directPackageVersions": 0,
+      "productionReachable": 0,
+      "developmentReachable": 0,
+      "metadataStatus": "unavailable",
+      "availablePackages": 0,
+      "unavailablePackages": 0,
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 0,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results.",
+      "metadataCheckedAtUtc": "2026-10-09T21:49:56.348Z",
+      "advisoryResponseSha256": null,
+      "assessedObservations": []
+    },
+    {
+      "id": "tanstack-react-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "runId": "3b5b0266-7f55-44e2-ba62-a06ffc9468e4",
+      "auditId": "3b5b0266-7f55-44e2-ba62-a06ffc9468e4",
+      "evidenceSha256": "cf7652355787861a764aaf0fc5cd6852358ccedb750baeef9a07fa701d552701",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "7bcd4790b628134212c1f1ee7f2101432b07e5334968d31a7a979f7f1e71e9ab",
+      "inventoryStatus": "gaps",
+      "manifests": [
+        {
+          "file": "packages/react-query/package.json",
+          "declarations": [
+            {
+              "requested": "@eslint-react/eslint-plugin",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@tanstack/query-core",
+              "range": "workspace:*",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@tanstack/query-persist-client-core",
+              "range": "workspace:*",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@tanstack/query-test-utils",
+              "range": "workspace:*",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testing-library/react",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testing-library/react-render-stream",
+              "range": "^2.0.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/react",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/react-dom",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@vitejs/plugin-react",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint-plugin-react-hooks",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "react",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "react",
+              "range": "^18 || ^19",
+              "kind": "peer",
+              "optional": false
+            },
+            {
+              "requested": "react-dom",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "react-error-boundary",
+              "range": "^4.1.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "typescript",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            }
+          ],
+          "manager": "pnpm@12.4.2"
+        }
+      ],
+      "lockfiles": [],
+      "gaps": [
+        {
+          "manifest": "packages/react-query/package.json",
+          "reason": "Unsupported package manager/lockfile: pnpm@12.4.2"
+        }
+      ],
+      "notices": [],
+      "packageVersions": 0,
+      "installations": 0,
+      "directPackageVersions": 0,
+      "productionReachable": 0,
+      "developmentReachable": 0,
+      "metadataStatus": "unavailable",
+      "availablePackages": 0,
+      "unavailablePackages": 0,
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 0,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results.",
+      "metadataCheckedAtUtc": "2026-10-09T21:49:57.167Z",
+      "advisoryResponseSha256": null,
+      "assessedObservations": []
+    },
+    {
+      "id": "excalidraw-app",
+      "revision": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e",
+      "runId": "d47133dc-4f36-4f46-8e12-ae3652ea5b43",
+      "auditId": "d47133dc-4f36-4f46-8e12-ae3652ea5b43",
+      "evidenceSha256": "b4d1f696a9a7e4b0b1e7a34ce57cd794d6655435aeaf162491dbd31024d19ed4",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "b171045029e423584a6a13456736d08cbe9f9399ec615484c46b5b447f520ace",
+      "inventoryStatus": "gaps",
+      "manifests": [
+        {
+          "file": "excalidraw-app/package.json",
+          "declarations": [
+            {
+              "requested": "@excalidraw/random-username",
+              "range": "1.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@sentry/browser",
+              "range": "9.0.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "callsites",
+              "range": "4.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "firebase",
+              "range": "11.3.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "i18next-browser-languagedetector",
+              "range": "6.1.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "idb-keyval",
+              "range": "6.0.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "jotai",
+              "range": "2.11.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "react",
+              "range": "19.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "react-dom",
+              "range": "19.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "socket.io-client",
+              "range": "4.7.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "uqr",
+              "range": "0.1.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "vite-plugin-html",
+              "range": "3.2.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "vite-plugin-sitemap",
+              "range": "0.7.1",
+              "kind": "development",
+              "optional": false
+            }
+          ],
+          "manager": "yarn@1.22.22"
+        }
+      ],
+      "lockfiles": [],
+      "gaps": [
+        {
+          "manifest": "excalidraw-app/package.json",
+          "reason": "Unsupported package manager/lockfile: yarn@1.22.22"
+        }
+      ],
+      "notices": [],
+      "packageVersions": 0,
+      "installations": 0,
+      "directPackageVersions": 0,
+      "productionReachable": 0,
+      "developmentReachable": 0,
+      "metadataStatus": "unavailable",
+      "availablePackages": 0,
+      "unavailablePackages": 0,
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 0,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results.",
+      "metadataCheckedAtUtc": "2026-10-09T21:50:05.985Z",
+      "advisoryResponseSha256": null,
+      "assessedObservations": []
+    },
+    {
+      "id": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "687a6096-ec3b-4e3c-b37e-4ea152235050",
+      "auditId": "687a6096-ec3b-4e3c-b37e-4ea152235050",
+      "evidenceSha256": "6bf92ca4a09cd51d9e8d03ca10b05c34deedab318d272ade582115c46986a9ba",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "5f0542a0dcf4a7f080477692a5a5085d21fddbc1115ccc65fca4e8b30b34c0c1",
+      "inventoryStatus": "gaps",
+      "manifests": [
+        {
+          "file": "package.json",
+          "declarations": [
+            {
+              "requested": "@actions/github",
+              "range": "~9.1.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@better-auth/api-key",
+              "range": "1.6.11",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@fortawesome/fontawesome-svg-core",
+              "range": "~1.2.36",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@fortawesome/free-regular-svg-icons",
+              "range": "~5.15.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@fortawesome/free-solid-svg-icons",
+              "range": "~5.15.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@fortawesome/vue-fontawesome",
+              "range": "~3.1.3",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@grpc/grpc-js",
+              "range": "~1.8.22",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@inquirer/core",
+              "range": "~11.2.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@inquirer/prompts",
+              "range": "~8.5.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@louislam/ping",
+              "range": "~0.4.4-mod.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@playwright/test",
+              "range": "~1.61.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@popperjs/core",
+              "range": "~2.10.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/hivemq",
+              "range": "10.28.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/mariadb",
+              "range": "10.28.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/mssqlserver",
+              "range": "10.28.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/mysql",
+              "range": "11.14.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/oraclefree",
+              "range": "11.14.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/postgresql",
+              "range": "11.14.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/rabbitmq",
+              "range": "10.28.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/better-sqlite3",
+              "range": "~7.6.13",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/bootstrap",
+              "range": "~5.1.13",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/node",
+              "range": "^26.1.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/web-push",
+              "range": "^3.6.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@typescript-eslint/eslint-plugin",
+              "range": "^6.21.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@typescript-eslint/parser",
+              "range": "^6.21.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@vitejs/plugin-vue",
+              "range": "~6.0.7",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@vue/compiler-sfc",
+              "range": "~3.5.39",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@vuepic/vue-datepicker",
+              "range": "~3.4.8",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@vvo/tzdb",
+              "range": "~6.198.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "aedes",
+              "range": "~1.0.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "args-parser",
+              "range": "~1.3.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "axios",
+              "range": "~0.33.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "badge-maker",
+              "range": "~3.3.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "bcryptjs",
+              "range": "~2.4.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "better-auth",
+              "range": "~1.6.11",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "better-sqlite3",
+              "range": "~12.11.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "bootstrap",
+              "range": "5.1.3",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "chardet",
+              "range": "~1.4.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "chart.js",
+              "range": "~4.2.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "chartjs-adapter-dayjs-4",
+              "range": "~1.0.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "cheerio",
+              "range": "~1.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "chroma-js",
+              "range": "~2.4.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "command-exists",
+              "range": "~1.2.9",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "compare-versions",
+              "range": "~3.6.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "concurrently",
+              "range": "^7.6.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "country-flag-emoji-polyfill",
+              "range": "~0.1.8",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "croner",
+              "range": "~8.1.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "cronstrue",
+              "range": "~2.24.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "cross-env",
+              "range": "~7.0.3",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "dayjs",
+              "range": "~1.11.19",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "dev-null",
+              "range": "~0.1.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "dns2",
+              "range": "~2.0.5",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "dompurify",
+              "range": "~3.4.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint",
+              "range": "~8.14.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint-config-prettier",
+              "range": "^10.1.8",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint-plugin-jsdoc",
+              "range": "~46.4.6",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint-plugin-vue",
+              "range": "~8.7.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint-plugin-vue-scoped-css",
+              "range": "~2.7.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "express",
+              "range": "~4.22.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "express-basic-auth",
+              "range": "~1.2.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "express-static-gzip",
+              "range": "~2.1.8",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "favico.js",
+              "range": "~0.3.10",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "feed",
+              "range": "~4.2.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "form-data",
+              "range": "~4.0.5",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "gamedig",
+              "range": "~5.3.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "globalping",
+              "range": "~0.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "html-escaper",
+              "range": "~3.0.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "http-cookie-agent",
+              "range": "~5.0.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "http-graceful-shutdown",
+              "range": "~3.1.15",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "http-proxy-agent",
+              "range": "~7.0.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "https-proxy-agent",
+              "range": "~7.0.6",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "iconv-lite",
+              "range": "~0.6.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "is-url",
+              "range": "~1.2.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "isomorphic-ws",
+              "range": "~5.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "jsesc",
+              "range": "~3.0.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "jsonata",
+              "range": "~2.2.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "kafkajs",
+              "range": "~2.2.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "knex",
+              "range": "~3.3.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "limiter",
+              "range": "~2.1.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "liquidjs",
+              "range": "~10.29.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "marked",
+              "range": "~14.1.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mitt",
+              "range": "~3.0.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mongodb",
+              "range": "~4.17.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mqtt",
+              "range": "~4.3.8",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mssql",
+              "range": "~12.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mysql2",
+              "range": "~3.24.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "nanoid",
+              "range": "~3.3.11",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "net-snmp",
+              "range": "~3.26.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "node-cloudflared-tunnel",
+              "range": "~1.0.10",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "node-radius-utils",
+              "range": "~1.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "node-ssh",
+              "range": "~13.1.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "nodemailer",
+              "range": "~10.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "nostr-tools",
+              "range": "~2.20.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "openid-client",
+              "range": "~5.7.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "oracledb",
+              "range": "~6.10.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "password-hash",
+              "range": "~1.2.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "pg",
+              "range": "~8.11.6",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "pg-connection-string",
+              "range": "~2.6.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "playwright-core",
+              "range": "~1.61.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "postcss-html",
+              "range": "~1.8.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "postcss-rtlcss",
+              "range": "~5.7.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "postcss-scss",
+              "range": "~4.0.9",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "prettier",
+              "range": "^3.8.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "prismjs",
+              "range": "~1.30.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "prom-client",
+              "range": "~13.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "prometheus-api-metrics",
+              "range": "~3.2.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "promisify-child-process",
+              "range": "~4.1.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "protobufjs",
+              "range": "~8.8.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "qrcode",
+              "range": "~1.5.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "qs",
+              "range": "~6.16.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "radius",
+              "range": "~1.1.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "redbean-node",
+              "range": "~0.4.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "redis",
+              "range": "~5.9.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "rollup-plugin-visualizer",
+              "range": "~7.0.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "sass",
+              "range": "^1.101.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "semver",
+              "range": "~7.5.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "socket.io",
+              "range": "~4.8.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "socket.io-client",
+              "range": "~4.8.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "socks-proxy-agent",
+              "range": "~8.0.5",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "sqlstring",
+              "range": "~2.3.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "ssh2",
+              "range": "~1.17.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "ssh2-sftp-client",
+              "range": "~12.0.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "stylelint",
+              "range": "^15.11.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "stylelint-config-prettier",
+              "range": "^9.0.5",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "stylelint-config-standard",
+              "range": "~25.0.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "tar",
+              "range": "~6.2.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "tcp-ping",
+              "range": "~0.1.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "terser",
+              "range": "~5.15.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "test",
+              "range": "~3.3.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "testcontainers",
+              "range": "^11.12.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "tldts",
+              "range": "~7.0.23",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "tough-cookie",
+              "range": "~4.1.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "tsx",
+              "range": "~4.23.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "typescript",
+              "range": "~4.4.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "unlimited-timeout",
+              "range": "~0.1.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "v-pagination-3",
+              "range": "~0.1.7",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "validator",
+              "range": "~13.15.26",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "vite",
+              "range": "~8.1.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vite-plugin-compression",
+              "range": "^0.5.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue",
+              "range": "~3.5.39",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-chartjs",
+              "range": "~5.2.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-contenteditable",
+              "range": "~3.0.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-i18n",
+              "range": "~11.2.8",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-image-crop-upload",
+              "range": "~3.0.3",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-multiselect",
+              "range": "~3.0.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-prism-editor",
+              "range": "~2.0.0-alpha.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-qrcode",
+              "range": "~1.0.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-router",
+              "range": "~4.2.5",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-toastification",
+              "range": "~2.0.0-rc.5",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vuedraggable",
+              "range": "~4.1.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "wait-on",
+              "range": "^7.2.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "web-push",
+              "range": "~3.6.7",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "whatwg-url",
+              "range": "~12.0.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "ws",
+              "range": "~8.21.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "zod",
+              "range": "~4.4.3",
+              "kind": "production",
+              "optional": false
+            }
+          ],
+          "overrides": {
+            "@aws-sdk/credential-providers": "npm:useless-module@1.0.0",
+            "tedious": {
+              "@azure/identity": "npm:useless-module@1.0.0",
+              "@azure/keyvault-keys": "npm:useless-module@1.0.0"
+            },
+            "knex": "$knex"
+          },
+          "lockfile": "package-lock.json",
+          "manager": "npm"
+        }
+      ],
+      "lockfiles": [
+        {
+          "file": "package-lock.json",
+          "version": 3,
+          "sha256": "7abd7554a7e22c9a9e4be629c05c32558c8f4a3b3b52071849c764bedf696b2a"
+        }
+      ],
+      "gaps": [
+        {
+          "manifest": "package.json",
+          "reason": "Unresolved peer dependency in lockfile",
+          "dependency": "@hey-api/openapi-ts",
+          "from": "node_modules/@hey-api/client-fetch",
+          "range": "< 2"
+        }
+      ],
+      "notices": [
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/api-key",
+          "dependency": "@better-auth/utils",
+          "range": "0.4.0",
+          "version": "0.4.2",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/aedes",
+          "dependency": "aedes-persistence-level",
+          "range": "^9.1.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/aedes",
+          "dependency": "aedes-persistence-mongodb",
+          "range": "^9.3.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/aedes",
+          "dependency": "aedes-persistence-redis",
+          "range": "^11.2.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "@lynx-js/react",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "@prisma/client",
+          "range": "^5.0.0 || ^6.0.0 || ^7.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "@sveltejs/kit",
+          "range": "^2.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "@tanstack/react-start",
+          "range": "^1.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "@tanstack/solid-start",
+          "range": "^1.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "drizzle-kit",
+          "range": ">=0.31.4",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "drizzle-orm",
+          "range": "^0.45.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "mongodb",
+          "range": "^6.0.0 || ^7.0.0",
+          "version": "4.17.2",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "next",
+          "range": "^14.0.0 || ^15.0.0 || ^16.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "prisma",
+          "range": "^5.0.0 || ^6.0.0 || ^7.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "react",
+          "range": "^18.0.0 || ^19.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "react-dom",
+          "range": "^18.0.0 || ^19.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "solid-js",
+          "range": "^1.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "svelte",
+          "range": "^4.0.0 || ^5.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "vitest",
+          "range": "^2.0.0 || ^3.0.0 || ^4.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/http-cookie-agent",
+          "dependency": "deasync",
+          "range": "^0.1.26",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/http-cookie-agent",
+          "dependency": "undici",
+          "range": "^5.11.0",
+          "version": "6.28.1",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/knex",
+          "dependency": "pg-query-stream",
+          "range": "^4.14.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/mongodb",
+          "dependency": "@aws-sdk/credential-providers",
+          "range": "^3.186.0",
+          "version": "1.0.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/mongodb",
+          "dependency": "@aws-sdk/credential-providers",
+          "range": "^3.186.0",
+          "version": "1.0.0",
+          "reason": "Locked identity is useless-module; an alias/override may replace the requested package. Installation policy is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/nostr-tools",
+          "dependency": "typescript",
+          "range": ">=5.0.0",
+          "version": "4.4.4",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/pg",
+          "dependency": "pg-native",
+          "range": ">=3.0.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/rollup-plugin-visualizer",
+          "dependency": "rollup",
+          "range": "2.x || 3.x || 4.x",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/stylelint-config-prettier",
+          "dependency": "stylelint",
+          "range": ">= 11.x < 15",
+          "version": "15.11.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/stylelint-config-standard",
+          "dependency": "stylelint",
+          "range": "^14.4.0",
+          "version": "15.11.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "@vitejs/devtools",
+          "range": "^0.3.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "jiti",
+          "range": ">=1.21.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "less",
+          "range": "^4.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "sass-embedded",
+          "range": "^1.70.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "sugarss",
+          "range": "^5.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "terser",
+          "range": "^5.16.0",
+          "version": "5.15.1",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vue-qrcode",
+          "dependency": "@vue/composition-api",
+          "range": "^1.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/ws",
+          "dependency": "bufferutil",
+          "range": "^4.0.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/ws",
+          "dependency": "utf-8-validate",
+          "range": ">=5.0.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/core",
+          "dependency": "@cloudflare/workers-types",
+          "range": ">=4",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/core",
+          "dependency": "@opentelemetry/api",
+          "range": "^1.9.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/drizzle-adapter",
+          "dependency": "drizzle-orm",
+          "range": "^0.45.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/mongo-adapter",
+          "dependency": "mongodb",
+          "range": "^6.0.0 || ^7.0.0",
+          "version": "4.17.2",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/prisma-adapter",
+          "dependency": "@prisma/client",
+          "range": "^5.0.0 || ^6.0.0 || ^7.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/prisma-adapter",
+          "dependency": "prisma",
+          "range": "^5.0.0 || ^6.0.0 || ^7.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/mqtt/node_modules/ws",
+          "dependency": "bufferutil",
+          "range": "^4.0.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/mqtt/node_modules/ws",
+          "dependency": "utf-8-validate",
+          "range": "^5.0.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/tedious",
+          "dependency": "@azure/identity",
+          "range": "^4.2.1",
+          "version": "1.0.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/tedious",
+          "dependency": "@azure/identity",
+          "range": "^4.2.1",
+          "version": "1.0.0",
+          "reason": "Locked identity is useless-module; an alias/override may replace the requested package. Installation policy is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/tedious",
+          "dependency": "@azure/keyvault-keys",
+          "range": "^4.4.0",
+          "version": "1.0.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/tedious",
+          "dependency": "@azure/keyvault-keys",
+          "range": "^4.4.0",
+          "version": "1.0.0",
+          "reason": "Locked identity is useless-module; an alias/override may replace the requested package. Installation policy is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/cosmiconfig",
+          "dependency": "typescript",
+          "range": ">=4.9.5",
+          "version": "4.4.4",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/stylelint-config-recommended",
+          "dependency": "stylelint",
+          "range": "^14.4.0",
+          "version": "15.11.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vue-demi",
+          "dependency": "@vue/composition-api",
+          "range": "^1.0.0-rc.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/bare-fs",
+          "dependency": "bare-buffer",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/fdir",
+          "dependency": "picomatch",
+          "range": "^3 || ^4",
+          "version": "2.3.2",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/b4a",
+          "dependency": "react-native-b4a",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/bare-events",
+          "dependency": "bare-abort-controller",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/bare-stream",
+          "dependency": "bare-abort-controller",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/bare-stream",
+          "dependency": "bare-buffer",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        }
+      ],
+      "packageVersions": 1182,
+      "installations": 1303,
+      "directPackageVersions": 155,
+      "productionReachable": 589,
+      "developmentReachable": 786,
+      "metadataStatus": "partial",
+      "availablePackages": 25,
+      "unavailablePackages": 1157,
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 1,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results.",
+      "metadataCheckedAtUtc": "2026-10-09T21:50:14.871Z",
+      "advisoryResponseSha256": "75cf4e186f73cf725088cd0dee41d4a996173093e121f6f135f5ed1d820cb824",
+      "assessedObservations": [
+        {
+          "packageId": "43f954db71f5da02b23b220894883f10260dc7985c47cceb9cecea54dbf03cb7",
+          "name": "@actions/github",
+          "version": "9.1.1",
+          "metadata": {
+            "status": "available",
+            "sha256": "d05b8969f0544b906f009045103a17bd6722492cb9963dc5dc1d0dae870f66c7"
+          },
+          "deprecated": null,
+          "latest": "9.1.1",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~9.1.1",
+              "wanted": "9.1.1",
+              "newerWithinRange": false,
+              "latestOutsideRange": false
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "84b011b78e63cbda21dc2a91c8f613c9af6ef455bc255c908930062cd36ae2cd",
+          "name": "@better-auth/api-key",
+          "version": "1.6.11",
+          "metadata": {
+            "status": "available",
+            "sha256": "00c3c7ba2a64409e20de58d0fe19ce3957d974fb374e1b38b3a996dca5dbe655"
+          },
+          "deprecated": null,
+          "latest": "1.7.7",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "1.6.11",
+              "wanted": "1.6.11",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "1599c2d8de55c0956b7314db9921986954e790951b011e60ffa1795c8a6c7fd9",
+          "name": "@fortawesome/fontawesome-svg-core",
+          "version": "1.2.36",
+          "metadata": {
+            "status": "available",
+            "sha256": "b715e82b9eb43812a66cc8e8c7849715dda4a3ae319a060167df92bcb8e6ad0f"
+          },
+          "deprecated": null,
+          "latest": "7.3.1",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~1.2.36",
+              "wanted": "1.2.36",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": ">=6",
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "d79e91be8883307d3398e17fda5de00c12f750283383e99182ab525c31ce06f9",
+          "name": "@fortawesome/free-regular-svg-icons",
+          "version": "5.15.4",
+          "metadata": {
+            "status": "available",
+            "sha256": "e68bc1ceda3b37b60856baf72efd476461702931231b96321f6a2f0fcfc19fdc"
+          },
+          "deprecated": null,
+          "latest": "7.3.1",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~5.15.4",
+              "wanted": "5.15.4",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": ">=6",
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "ab9a6391316105e5e73c81bf9ae21bf459169477a12481a894ebcbf389c277c6",
+          "name": "@fortawesome/free-solid-svg-icons",
+          "version": "5.15.4",
+          "metadata": {
+            "status": "available",
+            "sha256": "6b6a9d569f7753692b24e586e4dca681c2faf6553fe9279024b1da35ae6dc5f3"
+          },
+          "deprecated": null,
+          "latest": "7.3.1",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~5.15.4",
+              "wanted": "5.15.4",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": ">=6",
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "ba1c89fa6316bdd7ec7fa18ed72af4027b0f4aa1b452393bbb3b0a940db0233e",
+          "name": "@fortawesome/vue-fontawesome",
+          "version": "3.1.3",
+          "metadata": {
+            "status": "available",
+            "sha256": "db206f26a1d655367d63f6dd50f906d9dcde0f71e9b4738a57f591ab8a7f5a6d"
+          },
+          "deprecated": null,
+          "latest": "3.3.3",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~3.1.3",
+              "wanted": "3.1.3",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "e54ad9edb3fdaab803080042a0a3f67b76ee10f8cd5da0b78e1d31e8d02e8788",
+          "name": "@grpc/grpc-js",
+          "version": "1.14.4",
+          "metadata": {
+            "status": "available",
+            "sha256": "ba25ea041ba069ce742cf4525102126f0a7bcc7d48133a2a922f5413994b30e9"
+          },
+          "deprecated": null,
+          "latest": "1.14.6",
+          "upgrades": [],
+          "nodeEngine": ">=12.10.0",
+          "vulnerabilities": {
+            "status": "unavailable",
+            "reason": "Malformed advisory fields"
+          }
+        },
+        {
+          "packageId": "91e0eed19d9f2d8758b1818b370ef1f053f47dc78694b7051e288e4734286d92",
+          "name": "@grpc/grpc-js",
+          "version": "1.8.22",
+          "metadata": {
+            "status": "available",
+            "sha256": "ba25ea041ba069ce742cf4525102126f0a7bcc7d48133a2a922f5413994b30e9"
+          },
+          "deprecated": null,
+          "latest": "1.14.6",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~1.8.22",
+              "wanted": "1.8.22",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": "^8.13.0 || >=10.10.0",
+          "vulnerabilities": {
+            "status": "unavailable",
+            "reason": "Malformed advisory fields"
+          }
+        },
+        {
+          "packageId": "e1338a3a712bcf49eee69a1eaffb839cad89c46e30b69401b63a2c7f4344caf0",
+          "name": "@inquirer/core",
+          "version": "11.2.1",
+          "metadata": {
+            "status": "available",
+            "sha256": "5961cbfee77d71ebfffdea3561974435d1fdca61e4e4ecbaab888be1604b08a0"
+          },
+          "deprecated": null,
+          "latest": "12.0.4",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~11.2.1",
+              "wanted": "11.2.1",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": ">=23.5.0 || ^22.13.0 || ^20.17.0",
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "c172ab25f6f1d2859b92a8e2c9f1ec1ed72eee5ded1396e3d6cfb3ea9c624f04",
+          "name": "@inquirer/core",
+          "version": "12.0.3",
+          "metadata": {
+            "status": "available",
+            "sha256": "5961cbfee77d71ebfffdea3561974435d1fdca61e4e4ecbaab888be1604b08a0"
+          },
+          "deprecated": null,
+          "latest": "12.0.4",
+          "upgrades": [],
+          "nodeEngine": ">=23.5.0 || ^22.13.0 || ^20.17.0",
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "6894d333aea3a631caae58009f94d9d22b133f4cf9650361d2fba799dd024446",
+          "name": "@inquirer/prompts",
+          "version": "8.5.2",
+          "metadata": {
+            "status": "available",
+            "sha256": "393fd166143dfe24e635165cab44a07ee46cb3b0d58aeca8cbed2ffd138daf8d"
+          },
+          "deprecated": null,
+          "latest": "8.7.3",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~8.5.2",
+              "wanted": "8.5.2",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": ">=23.5.0 || ^22.13.0 || ^20.17.0",
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "cb75670b253676b7f092b5e68b667fdde3a9da81886ab6a4df2a324db07f2777",
+          "name": "@louislam/ping",
+          "version": "0.4.4-mod.1",
+          "metadata": {
+            "status": "available",
+            "sha256": "5d9a1927af1b73fb85d943c18ba15434d85f84f8fcd3d3fca4459964267ab300"
+          },
+          "deprecated": null,
+          "latest": "0.4.4-mod.1",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~0.4.4-mod.1",
+              "wanted": "0.4.4-mod.1",
+              "newerWithinRange": false,
+              "latestOutsideRange": false
+            }
+          ],
+          "nodeEngine": ">=4.0.0",
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "caf6bc2b340353f7db859326b30b4d1bbf2edf1e8ca8cd5e0ea6467632d560a7",
+          "name": "@playwright/test",
+          "version": "1.61.1",
+          "metadata": {
+            "status": "available",
+            "sha256": "4873878d28c70378b0136cfe9200c36a25c2b0e1aa0b65afb02d1839c6d07498"
+          },
+          "deprecated": null,
+          "latest": "1.64.0",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~1.61.1",
+              "wanted": "1.61.1",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": ">=18",
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "26717f0ae77f2e5dfa9f55af70b2ee797124a2e640e9823c572a39078a6294b6",
+          "name": "@popperjs/core",
+          "version": "2.10.2",
+          "metadata": {
+            "status": "available",
+            "sha256": "95e736366fbdba72033c2f3edee1ac131e2c30ca8bce73763f7af912fbe31ff0"
+          },
+          "deprecated": null,
+          "latest": "2.11.8",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~2.10.2",
+              "wanted": "2.10.2",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "d079ad656e720776056bca0190d160c19574201ba1ff1679f4da73394498d815",
+          "name": "@testcontainers/hivemq",
+          "version": "10.28.0",
+          "metadata": {
+            "status": "available",
+            "sha256": "221cb16956fd77cf33998423dbfee8fb2bca0df9dbacd7549a0c9acaf657b5a6"
+          },
+          "deprecated": null,
+          "latest": "12.2.0",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "10.28.0",
+              "wanted": "10.28.0",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "cc54a7641861e11b6e469700bd36e50a13b4f5818d0146bee4286cac87a33d81",
+          "name": "@testcontainers/mariadb",
+          "version": "10.28.0",
+          "metadata": {
+            "status": "available",
+            "sha256": "5eff442b253497f93c8b43ec70caee9a14b23c8607c7b3251a4b8710b0fcaa2a"
+          },
+          "deprecated": null,
+          "latest": "12.2.0",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "10.28.0",
+              "wanted": "10.28.0",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "d2d1552417e6d32d32f3b8531e1bdb9e4c47e54ba50595b42b38d68a10091c0f",
+          "name": "@testcontainers/mssqlserver",
+          "version": "10.28.0",
+          "metadata": {
+            "status": "available",
+            "sha256": "f4522f05d6ff79bec40cbc75a052178388826791c09a507a47b1392bdea6ba28"
+          },
+          "deprecated": null,
+          "latest": "12.2.0",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "10.28.0",
+              "wanted": "10.28.0",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "e230d83c0070cf72c0a0cbf45e8d154a50472625e2a65ecd9b979d8c52c5515f",
+          "name": "@testcontainers/mysql",
+          "version": "11.14.0",
+          "metadata": {
+            "status": "available",
+            "sha256": "60664d4e4418973d48acd94c35748b601e96c01ed7255f05d1ab21131a1865cd"
+          },
+          "deprecated": null,
+          "latest": "12.2.0",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "11.14.0",
+              "wanted": "11.14.0",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "f1a37821187c33c11f184cebf7705b5a446fcca3a236308adc7f69259fc34894",
+          "name": "@testcontainers/oraclefree",
+          "version": "11.14.0",
+          "metadata": {
+            "status": "available",
+            "sha256": "87d2460e4be02e5a0f4a8730f0c47edefc07847270862a949cc2459be5fa36be"
+          },
+          "deprecated": null,
+          "latest": "12.2.0",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "11.14.0",
+              "wanted": "11.14.0",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "ca36d0306acfbc6c4048eb4338c3b7263ba2cfa7aa00810d38afa5b83c70e615",
+          "name": "@testcontainers/postgresql",
+          "version": "11.14.0",
+          "metadata": {
+            "status": "available",
+            "sha256": "2ff961a0d252b4604a36458b8e436f51a0ccc0e8c3f43d44fcc9b820190b0ff5"
+          },
+          "deprecated": null,
+          "latest": "12.2.0",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "11.14.0",
+              "wanted": "11.14.0",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "d020cdf1dd9f5581a6522097c29390abfdc9f57253309b227396903d37ef32e5",
+          "name": "@testcontainers/rabbitmq",
+          "version": "10.28.0",
+          "metadata": {
+            "status": "available",
+            "sha256": "37861a74ee5cf0667fb14346506b5578324d307918aff9fa8dd9dcc71dcbbaef"
+          },
+          "deprecated": null,
+          "latest": "12.2.0",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "10.28.0",
+              "wanted": "10.28.0",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "dd751f02238d20f6ae0ceb74b0c7faf74cdcd0cfd807452771c6be1a954b8dfc",
+          "name": "@types/better-sqlite3",
+          "version": "7.6.13",
+          "metadata": {
+            "status": "available",
+            "sha256": "68e0344626249c3b4ee6ee1c342a6e75024a8c42813daa47e47db05e5e3fce7e"
+          },
+          "deprecated": null,
+          "latest": "9.6.0",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~7.6.13",
+              "wanted": "7.6.13",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "80e72f1964b69ddb2019594aa477171e3244f1d715f4c7b7056b06768ba873ef",
+          "name": "@types/bootstrap",
+          "version": "5.1.13",
+          "metadata": {
+            "status": "available",
+            "sha256": "81aff6ab4bab85a8194b63ee70a488f183208bf85cbe2b765ea485b4c91d0899"
+          },
+          "deprecated": null,
+          "latest": "5.2.11",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "~5.1.13",
+              "wanted": "5.1.13",
+              "newerWithinRange": false,
+              "latestOutsideRange": true
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "e3cc4610c22c823247a929347a091313e76ee674174a01681248a7344b12f049",
+          "name": "@types/node",
+          "version": "18.19.130",
+          "metadata": {
+            "status": "available",
+            "sha256": "aa1bcf78bb62290bf6cccefe43a27358d4ed5082785978e852834474cab0137d"
+          },
+          "deprecated": null,
+          "latest": "26.6.5",
+          "upgrades": [],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "cbc83b794ac470c417deb639b458cc158ca4273b66e05abc5350bb22c99c37ab",
+          "name": "@types/node",
+          "version": "26.5.1",
+          "metadata": {
+            "status": "available",
+            "sha256": "aa1bcf78bb62290bf6cccefe43a27358d4ed5082785978e852834474cab0137d"
+          },
+          "deprecated": null,
+          "latest": "26.6.5",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "^26.1.1",
+              "wanted": "26.6.5",
+              "newerWithinRange": true,
+              "latestOutsideRange": false
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "1c3af0f5662566d4970eced0f3d8edf3c76d021a7f41bda28aa1abffbc0db2e0",
+          "name": "@types/node",
+          "version": "26.6.1",
+          "metadata": {
+            "status": "available",
+            "sha256": "aa1bcf78bb62290bf6cccefe43a27358d4ed5082785978e852834474cab0137d"
+          },
+          "deprecated": null,
+          "latest": "26.6.5",
+          "upgrades": [],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "83fd398e33d8c3177e392d09b3aa04e77b810ddbe0b9c6789e95c1ee28fac63c",
+          "name": "@types/web-push",
+          "version": "3.6.4",
+          "metadata": {
+            "status": "available",
+            "sha256": "419d302cd9f332893c390e9263b5e4bbffc6592421acdf8f1d1620fc51d03799"
+          },
+          "deprecated": null,
+          "latest": "3.6.4",
+          "upgrades": [
+            {
+              "manifest": "package.json",
+              "range": "^3.6.4",
+              "wanted": "3.6.4",
+              "newerWithinRange": false,
+              "latestOutsideRange": false
+            }
+          ],
+          "nodeEngine": null,
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "a731211a6f5c0c46d776305a0307a214dff3d74422aabac76edd3e6c4ad77955",
+          "name": "@typescript-eslint/eslint-plugin",
+          "version": "6.21.0",
+          "metadata": {
+            "status": "unavailable",
+            "reason": "Registry response exceeds size limit"
+          },
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        },
+        {
+          "packageId": "d2d8ea26af9d8694ed8083eda4cbafd88aef0b3f550aaa8943af1a975b25463f",
+          "name": "@typescript-eslint/parser",
+          "version": "6.21.0",
+          "metadata": {
+            "status": "unavailable",
+            "reason": "Registry response exceeds size limit"
+          },
+          "vulnerabilities": {
+            "status": "available",
+            "advisories": []
+          }
+        }
+      ]
+    }
+  ]
+}

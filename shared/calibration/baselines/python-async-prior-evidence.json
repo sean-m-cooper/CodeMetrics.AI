@@ -1,0 +1,26 @@
+{
+  "scope": "Corrected full-extent call identities verified against archived adapter 0.11.0 evidence hashes; original 0.1 operation hashes are historical.",
+  "sourceRecord": "shared/scorecard-schema/calibration-runs/python-error-operations-package-2026-10-15.json",
+  "samples": [
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "evidenceSha256": "4e0102f555150d2aef63f7b8d63606f79822b93e4cb569687c11598f85bf2ba4",
+      "producer": {
+        "name": "codemetrics-ai/python-exception-operations",
+        "version": "0.2.0-experimental"
+      },
+      "operationRowsSha256": "4b4c0ed9586cdb203638ea2a1eb76c76a7f07d39133c5c56dce499945f4151a2"
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "evidenceSha256": "5f92239eab154ab8ac8418c69d77bbdf7f35d7749c19699390ee863d1a216cc2",
+      "producer": {
+        "name": "codemetrics-ai/python-exception-operations",
+        "version": "0.2.0-experimental"
+      },
+      "operationRowsSha256": "0d363aa22195835cd8f2b61a0619b794a188d302bd38deefabad159240fce24e"
+    }
+  ]
+}

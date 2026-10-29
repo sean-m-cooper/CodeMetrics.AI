@@ -1,0 +1,651 @@
+{
+  "schemaVersion": 3,
+  "generatedAtUtc": "2026-10-15T13:14:31.329Z",
+  "tool": {
+    "name": "CodeMetrics.AI.Python",
+    "version": "0.7.0",
+    "ecosystem": "python"
+  },
+  "subject": {
+    "root": "E:\\repos\\CodeMetrics.AI\\TestResults\\python-error-handling-package-2026-10-15\\historical-source",
+    "entryPoint": "E:\\repos\\CodeMetrics.AI\\TestResults\\python-error-handling-package-2026-10-15\\historical-source",
+    "name": "historical-source",
+    "variant": "source"
+  },
+  "filters": {
+    "totalUnits": 1,
+    "analyzedUnits": 1,
+    "skipped": []
+  },
+  "population": {
+    "types": 0,
+    "members": 1
+  },
+  "dimensions": {
+    "codeQuality": {
+      "status": "scored",
+      "basis": "Method Complexity of selected production implementations. Decomposition, duplication and coverage/CRAP are unscored review evidence.",
+      "scope": {
+        "id": "python/method-complexity-worst-40-remainder-60/v1",
+        "coverage": "partial",
+        "includes": [
+          "selected-production-function-complexity"
+        ],
+        "excludes": [
+          "test-support-generated-scoring",
+          "decomposition-scoring",
+          "duplication-scoring",
+          "coverage-crap-scoring",
+          "runtime-performance",
+          "semantic-validation"
+        ]
+      },
+      "findings": [],
+      "duplication": {
+        "schemaVersion": 1,
+        "artifactKind": "experimental-python-duplication-review",
+        "producer": {
+          "name": "codemetrics-ai/python-duplication",
+          "version": "0.1.0-experimental"
+        },
+        "generatedAtUtc": "2026-10-15T13:14:31.298007+00:00",
+        "runId": "d8e47dec-2365-403e-a0be-74ca6e81eecf",
+        "auditId": "d8e47dec-2365-403e-a0be-74ca6e81eecf",
+        "status": "complete",
+        "policy": "python/exact-function-body-v1",
+        "configuration": {
+          "policy": "python/exact-function-body-v1",
+          "minimumStatements": 5,
+          "selectionFingerprint": "1d376bba0c4e13b51a1c1898d7200fdfb6cccdeeeef74cc2424fd0659b8d756e",
+          "parserVersion": "3.12.10",
+          "maxOwners": 100000,
+          "maxNormalizedBytes": 67108864
+        },
+        "configurationFingerprint": "8735dea6ca0bfb56f25bcc1de8b28b0edfb5085db518f66a8284606f4f351f26",
+        "subject": {
+          "root": "E:\\repos\\CodeMetrics.AI\\TestResults\\python-error-handling-package-2026-10-15\\historical-source",
+          "entryPoint": "E:\\repos\\CodeMetrics.AI\\TestResults\\python-error-handling-package-2026-10-15\\historical-source"
+        },
+        "sourceFactsProducer": {
+          "name": "codemetrics-ai/python-source-facts",
+          "version": "0.4.0-experimental",
+          "parser": "python-ast",
+          "parserVersion": "3.12.10"
+        },
+        "sourceFactsPolicy": "python/owned-function-complexity-v2",
+        "selection": {
+          "policy": "python/source-selection-v1",
+          "configurationFingerprint": "1d376bba0c4e13b51a1c1898d7200fdfb6cccdeeeef74cc2424fd0659b8d756e",
+          "options": {
+            "include": [],
+            "exclude": [],
+            "testPaths": [],
+            "productionPaths": [],
+            "includeTests": false,
+            "includeGenerated": false,
+            "includeSupport": false
+          },
+          "files": [
+            {
+              "file": "work.py",
+              "category": "production",
+              "disposition": "analyzed",
+              "reason": "production-candidate",
+              "contentSha256": "9bf8ab1b083b55afe02ac5703054fc5ad87e440c018250e41049606b8278513e"
+            }
+          ],
+          "prunedDirectories": [],
+          "excludedFunctions": []
+        },
+        "diagnostics": [],
+        "scope": "Exact whole-function AST bodies; names/literals retained; signatures, decorators, leading docstrings and locations excluded. Populations and async/sync kinds compared separately. Not semantic equivalence, partial-block detection, a duplication percentage, or a score.",
+        "groups": [],
+        "excludedFunctions": [
+          {
+            "id": "729b851b4511178828057670bc837e9f04138cbbe161bb6e70a2e793146dd0e6",
+            "file": "work.py",
+            "member": "work",
+            "line": 1,
+            "population": "production",
+            "endLine": 3,
+            "statementCount": 3,
+            "sourceSha256": "9bf8ab1b083b55afe02ac5703054fc5ad87e440c018250e41049606b8278513e",
+            "reason": "below-statement-minimum"
+          }
+        ],
+        "summary": {
+          "selectedFunctions": 1,
+          "eligibleFunctions": 0,
+          "excludedFunctions": 1,
+          "exclusionReasons": {
+            "below-statement-minimum": 1
+          },
+          "duplicateGroups": 0,
+          "matchedFunctions": 0
+        }
+      },
+      "coverageReview": {
+        "schemaVersion": 2,
+        "artifactKind": "experimental-python-coverage-review",
+        "producer": {
+          "name": "codemetrics-ai/python-coverage-review",
+          "version": "0.3.0-experimental"
+        },
+        "generatedAtUtc": "2026-10-15T13:14:31.300007+00:00",
+        "runId": "d8e47dec-2365-403e-a0be-74ca6e81eecf",
+        "auditId": "d8e47dec-2365-403e-a0be-74ca6e81eecf",
+        "policy": "python/coveragepy-line-crap-review-v1",
+        "configuration": {
+          "policy": "python/coveragepy-line-crap-review-v1",
+          "selectionFingerprint": "1d376bba0c4e13b51a1c1898d7200fdfb6cccdeeeef74cc2424fd0659b8d756e",
+          "complexityPolicy": "python/owned-function-complexity-v2",
+          "parserVersion": "3.12.10",
+          "maxReportBytes": 33554432,
+          "maxOwners": 100000
+        },
+        "configurationFingerprint": "a91ac8445336f143669529e0cd9adbbb17baa6aa07bcfcc0af6cd8bd5c0089e2",
+        "status": "complete",
+        "subject": {
+          "root": "E:\\repos\\CodeMetrics.AI\\TestResults\\python-error-handling-package-2026-10-15\\historical-source",
+          "entryPoint": "E:\\repos\\CodeMetrics.AI\\TestResults\\python-error-handling-package-2026-10-15\\historical-source"
+        },
+        "sourceFactsProducer": {
+          "name": "codemetrics-ai/python-source-facts",
+          "version": "0.4.0-experimental",
+          "parser": "python-ast",
+          "parserVersion": "3.12.10"
+        },
+        "selection": {
+          "policy": "python/source-selection-v1",
+          "configurationFingerprint": "1d376bba0c4e13b51a1c1898d7200fdfb6cccdeeeef74cc2424fd0659b8d756e",
+          "options": {
+            "include": [],
+            "exclude": [],
+            "testPaths": [],
+            "productionPaths": [],
+            "includeTests": false,
+            "includeGenerated": false,
+            "includeSupport": false
+          },
+          "files": [
+            {
+              "file": "work.py",
+              "category": "production",
+              "disposition": "analyzed",
+              "reason": "production-candidate",
+              "contentSha256": "9bf8ab1b083b55afe02ac5703054fc5ad87e440c018250e41049606b8278513e"
+            }
+          ],
+          "prunedDirectories": [],
+          "excludedFunctions": []
+        },
+        "coverageInput": null,
+        "collectionProvenance": null,
+        "diagnostics": [],
+        "scope": "Line-coverage CRAP review estimates, not scores or defect predictions. Imports without collection provenance have unverified source binding and freshness. New review IDs never authenticate historical coverage. Line coverage is not basis-path coverage or test effectiveness.",
+        "functions": [
+          {
+            "id": "729b851b4511178828057670bc837e9f04138cbbe161bb6e70a2e793146dd0e6",
+            "file": "work.py",
+            "member": "work",
+            "line": 1,
+            "population": "production",
+            "endLine": 3,
+            "complexity": 2,
+            "coverage": {
+              "status": "unavailable",
+              "reason": "coverage-not-supplied"
+            },
+            "crapEstimate": null,
+            "sourceSha256": "9bf8ab1b083b55afe02ac5703054fc5ad87e440c018250e41049606b8278513e"
+          }
+        ],
+        "summary": {
+          "selectedFunctions": 1,
+          "conditionalEstimates": 0,
+          "unavailableFunctions": 1,
+          "unavailableReasons": {
+            "coverage-not-supplied": 1
+          },
+          "matchedFiles": 0,
+          "unmatchedReportFiles": [],
+          "sourceBoundEstimates": 0
+        }
+      },
+      "decomposition": {
+        "schemaVersion": 1,
+        "artifactKind": "experimental-python-decomposition-review",
+        "producer": {
+          "name": "codemetrics-ai/python-decomposition",
+          "version": "0.1.0-experimental"
+        },
+        "generatedAtUtc": "2026-10-15T13:14:31.302037+00:00",
+        "runId": "d8e47dec-2365-403e-a0be-74ca6e81eecf",
+        "auditId": "d8e47dec-2365-403e-a0be-74ca6e81eecf",
+        "policy": "python/owned-statements-block-nesting-v1",
+        "configuration": {
+          "policy": "python/owned-statements-block-nesting-v1",
+          "selectionFingerprint": "1d376bba0c4e13b51a1c1898d7200fdfb6cccdeeeef74cc2424fd0659b8d756e",
+          "parserVersion": "3.12.10",
+          "maxOwners": 100000,
+          "quantiles": "nearest-rank",
+          "complexityPolicy": "python/owned-function-complexity-v2"
+        },
+        "configurationFingerprint": "a44f1e4ddf53ef68e4554a8128b5ae51745d192519b86a2ffbe3d635086d8a45",
+        "subject": {
+          "root": "E:\\repos\\CodeMetrics.AI\\TestResults\\python-error-handling-package-2026-10-15\\historical-source",
+          "entryPoint": "E:\\repos\\CodeMetrics.AI\\TestResults\\python-error-handling-package-2026-10-15\\historical-source"
+        },
+        "sourceFactsProducer": {
+          "name": "codemetrics-ai/python-source-facts",
+          "version": "0.4.0-experimental",
+          "parser": "python-ast",
+          "parserVersion": "3.12.10"
+        },
+        "sourceFactsPolicy": "python/owned-function-complexity-v2",
+        "selection": {
+          "policy": "python/source-selection-v1",
+          "configurationFingerprint": "1d376bba0c4e13b51a1c1898d7200fdfb6cccdeeeef74cc2424fd0659b8d756e",
+          "options": {
+            "include": [],
+            "exclude": [],
+            "testPaths": [],
+            "productionPaths": [],
+            "includeTests": false,
+            "includeGenerated": false,
+            "includeSupport": false
+          },
+          "files": [
+            {
+              "file": "work.py",
+              "category": "production",
+              "disposition": "analyzed",
+              "reason": "production-candidate",
+              "contentSha256": "9bf8ab1b083b55afe02ac5703054fc5ad87e440c018250e41049606b8278513e"
+            }
+          ],
+          "prunedDirectories": [],
+          "excludedFunctions": []
+        },
+        "status": "complete",
+        "diagnostics": [],
+        "scope": "Owned AST statements and block nesting, separately measured. Nested definitions and declaration syntax excluded. Lambdas unavailable. No expression-size measurement, score, threshold, or safe-extraction claim.",
+        "functions": [
+          {
+            "id": "729b851b4511178828057670bc837e9f04138cbbe161bb6e70a2e793146dd0e6",
+            "file": "work.py",
+            "member": "work",
+            "line": 1,
+            "population": "production",
+            "endLine": 3,
+            "sourceSha256": "9bf8ab1b083b55afe02ac5703054fc5ad87e440c018250e41049606b8278513e",
+            "functionKind": "FunctionDef",
+            "complexity": 2,
+            "disposition": "review-only",
+            "status": "measured",
+            "measurement": {
+              "ownedStatements": 3,
+              "maxBlockNesting": 1,
+              "statementKinds": {
+                "Return": 2,
+                "Try": 1
+              },
+              "excludedSyntax": {}
+            }
+          }
+        ],
+        "summary": {
+          "selectedFunctions": 1,
+          "measuredFunctions": 1,
+          "unavailableFunctions": 0,
+          "unavailableReasons": {},
+          "populations": {
+            "production": {
+              "selectedFunctions": 1,
+              "measuredFunctions": 1,
+              "unavailableFunctions": 0,
+              "ownedStatements": {
+                "count": 1,
+                "p50": 3,
+                "p90": 3,
+                "p95": 3,
+                "max": 3
+              },
+              "maxBlockNesting": {
+                "count": 1,
+                "p50": 1,
+                "p90": 1,
+                "p95": 1,
+                "max": 1
+              }
+            }
+          }
+        }
+      },
+      "sourceFacts": {
+        "schemaVersion": 2,
+        "language": "python",
+        "producer": {
+          "name": "codemetrics-ai/python-source-facts",
+          "version": "0.4.0-experimental",
+          "parser": "python-ast",
+          "parserVersion": "3.12.10"
+        },
+        "measurementPolicy": "python/owned-function-complexity-v2",
+        "status": "complete",
+        "capabilities": {
+          "functionComplexity": "available",
+          "coverage": "unsupported",
+          "maintainability": "unsupported"
+        },
+        "scope": {
+          "description": "Selected Python implementation bodies. File roles are explicit scope conventions, not runtime reachability or defect judgments. See selection inventory.",
+          "excludes": [
+            "nested-function-and-class-bodies-from-parent",
+            "decorators",
+            "class-headers",
+            "annotations",
+            "parameter-initializers",
+            "module-and-class-initializer-decisions",
+            "symlinks",
+            "directory-junctions",
+            ".git",
+            ".mypy_cache",
+            ".pytest_cache",
+            ".tox",
+            ".venv",
+            "__pycache__",
+            "build",
+            "dist",
+            "env",
+            "node_modules",
+            "venv"
+          ]
+        },
+        "diagnostics": [],
+        "functions": [
+          {
+            "id": "729b851b4511178828057670bc837e9f04138cbbe161bb6e70a2e793146dd0e6",
+            "file": "work.py",
+            "member": "work",
+            "line": 1,
+            "ownership": "exclusive-function-body",
+            "complexity": {
+              "value": 2,
+              "baseline": 1,
+              "decisions": {
+                "ifStatements": 0,
+                "loops": 0,
+                "exceptHandlers": 1,
+                "conditionalExpressions": 0,
+                "booleanOperators": 0,
+                "chainedComparisons": 0,
+                "comprehensionLoops": 0,
+                "comprehensionFilters": 0,
+                "matchCases": 0,
+                "matchGuards": 0,
+                "matchAlternatives": 0
+              }
+            },
+            "population": "production"
+          }
+        ],
+        "selection": {
+          "policy": "python/source-selection-v1",
+          "configurationFingerprint": "1d376bba0c4e13b51a1c1898d7200fdfb6cccdeeeef74cc2424fd0659b8d756e",
+          "options": {
+            "include": [],
+            "exclude": [],
+            "testPaths": [],
+            "productionPaths": [],
+            "includeTests": false,
+            "includeGenerated": false,
+            "includeSupport": false
+          },
+          "files": [
+            {
+              "file": "work.py",
+              "category": "production",
+              "disposition": "analyzed",
+              "reason": "production-candidate",
+              "contentSha256": "9bf8ab1b083b55afe02ac5703054fc5ad87e440c018250e41049606b8278513e"
+            }
+          ],
+          "prunedDirectories": [],
+          "excludedFunctions": []
+        }
+      },
+      "populationNotes": "Units are observed Python files; members are selected implementation bodies. Types are not measured (the required types field is a placeholder zero). Pruned directories do not enumerate unseen files.",
+      "score": 10,
+      "scoringDecision": {
+        "version": 1,
+        "policy": "python/method-complexity-worst-40-remainder-60/v1",
+        "operation": "firstMatch",
+        "finalScore": 10,
+        "inputs": {
+          "measurementPolicy": "python/owned-function-complexity-v2",
+          "eligibleFunctions": 1,
+          "excludedPopulations": {
+            "test": 0,
+            "support": 0,
+            "generated": 0
+          },
+          "anchors": [
+            [
+              3,
+              10
+            ],
+            [
+              5,
+              8
+            ],
+            [
+              10,
+              6
+            ],
+            [
+              20,
+              4
+            ],
+            [
+              40,
+              0
+            ]
+          ],
+          "weighting": "one-worst-40-percent/remainder-mean-60-percent; singleton-100-percent",
+          "rounding": "decimal-half-up-one-place"
+        },
+        "findingEffects": [],
+        "steps": [
+          {
+            "id": "methodComplexity",
+            "kind": "rule",
+            "condition": "nonempty selected production implementation population",
+            "matched": true,
+            "score": 10,
+            "disposition": "selected",
+            "inputs": {},
+            "findingCategories": [
+              "methodComplexityReview"
+            ]
+          }
+        ]
+      },
+      "scoring": {
+        "algorithm": "dimension-policy",
+        "finalScore": 10,
+        "aggregateScoreLoss": 0,
+        "contributionMode": "aggregate; findings are not independent deductions",
+        "observations": {
+          "population": {
+            "weakCount": 1,
+            "restCount": 0,
+            "contributions": [
+              {
+                "id": "729b851b4511178828057670bc837e9f04138cbbe161bb6e70a2e793146dd0e6",
+                "group": "weakest",
+                "individualScore": 10,
+                "weightNumerator": 1,
+                "weightDenominator": 1,
+                "weightedScoreLoss": 0
+              }
+            ],
+            "losses": {
+              "weakest": 0,
+              "remainder": 0
+            },
+            "unroundedScore": 10,
+            "score": 10
+          }
+        }
+      },
+      "methodComplexity": {
+        "status": "scored",
+        "scoringPolicy": "python/method-complexity-worst-40-remainder-60/v1",
+        "measurementPolicy": "python/owned-function-complexity-v2",
+        "comparableAcrossLanguages": false,
+        "selectedFunctions": 1,
+        "eligibleFunctions": 1,
+        "excludedPopulations": {
+          "test": 0,
+          "support": 0,
+          "generated": 0
+        },
+        "population": {
+          "weakCount": 1,
+          "restCount": 0,
+          "contributions": [
+            {
+              "id": "729b851b4511178828057670bc837e9f04138cbbe161bb6e70a2e793146dd0e6",
+              "group": "weakest",
+              "individualScore": 10,
+              "weightNumerator": 1,
+              "weightDenominator": 1,
+              "weightedScoreLoss": 0
+            }
+          ],
+          "losses": {
+            "weakest": 0,
+            "remainder": 0
+          },
+          "unroundedScore": 10,
+          "score": 10
+        }
+      }
+    },
+    "maintainability": {
+      "status": "skipped",
+      "basis": "Not measured by this Python analyzer.",
+      "findings": [],
+      "scope": {
+        "id": "python/maintainability/unsupported",
+        "coverage": "unsupported",
+        "includes": [],
+        "excludes": [
+          "maintainability"
+        ]
+      }
+    },
+    "errorHandling": {
+      "status": "skipped",
+      "basis": "Not measured by this Python analyzer.",
+      "findings": [],
+      "scope": {
+        "id": "python/errorHandling/unsupported",
+        "coverage": "unsupported",
+        "includes": [],
+        "excludes": [
+          "errorHandling"
+        ]
+      }
+    },
+    "performanceAsync": {
+      "status": "skipped",
+      "basis": "Not measured by this Python analyzer.",
+      "findings": [],
+      "scope": {
+        "id": "python/performanceAsync/unsupported",
+        "coverage": "unsupported",
+        "includes": [],
+        "excludes": [
+          "performanceAsync"
+        ]
+      }
+    },
+    "security": {
+      "status": "skipped",
+      "basis": "Not measured by this Python analyzer.",
+      "findings": [],
+      "scope": {
+        "id": "python/security/unsupported",
+        "coverage": "unsupported",
+        "includes": [],
+        "excludes": [
+          "security"
+        ]
+      }
+    },
+    "testing": {
+      "status": "skipped",
+      "basis": "Not measured by this Python analyzer.",
+      "findings": [],
+      "scope": {
+        "id": "python/testing/unsupported",
+        "coverage": "unsupported",
+        "includes": [],
+        "excludes": [
+          "testing"
+        ]
+      }
+    },
+    "documentation": {
+      "status": "skipped",
+      "basis": "Not measured by this Python analyzer.",
+      "findings": [],
+      "scope": {
+        "id": "python/documentation/unsupported",
+        "coverage": "unsupported",
+        "includes": [],
+        "excludes": [
+          "documentation"
+        ]
+      }
+    },
+    "dependencyManagement": {
+      "status": "skipped",
+      "basis": "Not measured by this Python analyzer.",
+      "findings": [],
+      "scope": {
+        "id": "python/dependencyManagement/unsupported",
+        "coverage": "unsupported",
+        "includes": [],
+        "excludes": [
+          "dependencyManagement"
+        ]
+      }
+    },
+    "architecture": {
+      "status": "skipped",
+      "basis": "Not measured by this Python analyzer.",
+      "findings": [],
+      "scope": {
+        "id": "python/architecture/unsupported",
+        "coverage": "unsupported",
+        "includes": [],
+        "excludes": [
+          "architecture"
+        ]
+      }
+    }
+  },
+  "analysis": {
+    "runId": "d8e47dec-2365-403e-a0be-74ca6e81eecf",
+    "auditId": "d8e47dec-2365-403e-a0be-74ca6e81eecf",
+    "status": "complete",
+    "ruleset": "python-2026-10-13-method-complexity-v1",
+    "calibration": "baseline",
+    "configurationFingerprint": "5f366c30b596273a6baf87c46b901a7fc38767ac41784c3e1a1bef7d0edec273",
+    "diagnostics": [],
+    "suppressions": []
+  }
+}

@@ -1,0 +1,644 @@
+{
+  "schemaVersion": 1,
+  "policy": "python/async-owned-calls-review-v1",
+  "auditId": "b1772af0-707f-48c2-bd1b-7c92b78473f2",
+  "implementationSha256": "c574174034c0f239bdfbefbaf587e1de5f96f4ed84e715d39753f3642e6ab016",
+  "scope": "Static import-matched call syntax; Async/Blocking Usage and Error Handling remain unscored.",
+  "samples": [
+    {
+      "id": "starlette",
+      "repository": "starlette",
+      "url": "https://github.com/Kludex/starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "role": "ASGI framework",
+      "include": [
+        "starlette/**"
+      ],
+      "productionPaths": [],
+      "runId": "8da38bd0-bc40-4955-ab62-e85058b88d61",
+      "configurationFingerprint": "9e3e4bb808e83f2af83b59f70e7bf2f970bb5ea18e2262ada1c67007ad4a5781",
+      "functionFactsSha256": "b2e5495c18c8532661f8d0269aab2b4413dfe192c116038807a03813c229457c",
+      "selectedSourceSha256": "2a51420a3bfbda775c692446934792dfc86b9d289056bf5a1fae501579ed9dd7",
+      "asyncRowsSha256": "50458f0f60e2f5d3c4f86f7b646ff7f66c4c1a6cc4e6e8dc150aaf626263e2b0",
+      "summary": {
+        "selectedFunctions": 508,
+        "asyncFunctions": 135,
+        "excludedSynchronousFunctions": 373,
+        "availability": "available",
+        "asyncBodyCallExpressions": 717,
+        "asyncBodyCallCategories": {
+          "offload-call": 11,
+          "other-import-call": 121,
+          "unresolved-call": 585
+        },
+        "deferredGeneratorCallExpressions": 2,
+        "functionsWithBlockingCandidates": 0,
+        "populations": {
+          "production": {
+            "selectedFunctions": 508,
+            "asyncFunctions": 135,
+            "excludedSynchronousFunctions": 373,
+            "availability": "available",
+            "asyncBodyCallExpressions": 717,
+            "asyncBodyCallCategories": {
+              "offload-call": 11,
+              "other-import-call": 121,
+              "unresolved-call": 585
+            },
+            "deferredGeneratorCallExpressions": 2,
+            "functionsWithBlockingCandidates": 0
+          }
+        }
+      },
+      "methodComplexityScore": 7.1,
+      "unchangedMethodComplexityAndErrorHandlingEvidence": true,
+      "unresolvedReasons": {
+        "comprehension-local-binding": 4,
+        "dynamic-callee-expression": 39,
+        "no-lexical-import": 95,
+        "non-import-or-ambiguous-binding": 448,
+        "reflective-or-cross-scope-binding": 1
+      },
+      "blockingCandidates": [],
+      "examples": {
+        "unresolved-call": [
+          {
+            "file": "starlette/_exception_handler.py",
+            "member": "wrap_app_handling_exceptions.wrapped_app",
+            "id": "078a66c0888b3adc172c16b8bec3076e1c71ea2579834ce76e69e7e3c951afd4",
+            "line": 42,
+            "column": 18,
+            "endLine": 42,
+            "endColumn": 45,
+            "executionContext": "async-body",
+            "category": "unresolved-call",
+            "binding": {
+              "syntax": "app",
+              "target": null,
+              "status": "unresolved",
+              "reason": "non-import-or-ambiguous-binding"
+            },
+            "directlyAwaited": true,
+            "callback": null,
+            "disposition": "review-only"
+          },
+          {
+            "file": "starlette/_exception_handler.py",
+            "member": "wrap_app_handling_exceptions.wrapped_app",
+            "id": "1d2c7532c8a790ed20f8cf8424a7c9238f62db1fafa8f873b542f56971c4f6cf",
+            "line": 46,
+            "column": 15,
+            "endLine": 46,
+            "endColumn": 45,
+            "executionContext": "async-body",
+            "category": "unresolved-call",
+            "binding": {
+              "syntax": "isinstance",
+              "target": null,
+              "status": "unresolved",
+              "reason": "no-lexical-import"
+            },
+            "directlyAwaited": false,
+            "callback": null,
+            "disposition": "review-only"
+          },
+          {
+            "file": "starlette/_exception_handler.py",
+            "member": "wrap_app_handling_exceptions.wrapped_app",
+            "id": "30511fb0a914fa8051a892d259bfbbbf572e990ba99104fea5f54323b9a976a5",
+            "line": 47,
+            "column": 26,
+            "endLine": 47,
+            "endColumn": 62,
+            "executionContext": "async-body",
+            "category": "unresolved-call",
+            "binding": {
+              "syntax": "status_handlers.get",
+              "target": null,
+              "status": "unresolved",
+              "reason": "non-import-or-ambiguous-binding"
+            },
+            "directlyAwaited": false,
+            "callback": null,
+            "disposition": "review-only"
+          }
+        ],
+        "other-import-call": [
+          {
+            "file": "starlette/_exception_handler.py",
+            "member": "wrap_app_handling_exceptions.wrapped_app",
+            "id": "19ca2d247ff79ac9dbd9da41199259dedd7e63c912bd0f69838959a4b8c0134c",
+            "line": 58,
+            "column": 15,
+            "endLine": 58,
+            "endColumn": 41,
+            "executionContext": "async-body",
+            "category": "other-import-call",
+            "binding": {
+              "syntax": "is_async_callable",
+              "target": "starlette._utils.is_async_callable",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": false,
+            "callback": null,
+            "disposition": "review-only"
+          },
+          {
+            "file": "starlette/_utils.py",
+            "member": "create_collapsing_task_group",
+            "id": "c8809383c3f34d2a0824aff198aebc4ae6c6970a6a0c7221dd64cfdfac15a6df",
+            "line": 104,
+            "column": 19,
+            "endLine": 104,
+            "endColumn": 44,
+            "executionContext": "async-body",
+            "category": "other-import-call",
+            "binding": {
+              "syntax": "anyio.create_task_group",
+              "target": "anyio.create_task_group",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": false,
+            "callback": null,
+            "disposition": "review-only"
+          },
+          {
+            "file": "starlette/authentication.py",
+            "member": "requires.decorator.async_wrapper",
+            "id": "135646d99d181c48140eb11f84bc52bd965280dcc4a8a1a8e37f783ba9d657e1",
+            "line": 71,
+            "column": 46,
+            "endLine": 71,
+            "endColumn": 83,
+            "executionContext": "async-body",
+            "category": "other-import-call",
+            "binding": {
+              "syntax": "urlencode",
+              "target": "urllib.parse.urlencode",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": false,
+            "callback": null,
+            "disposition": "review-only"
+          }
+        ],
+        "offload-call": [
+          {
+            "file": "starlette/_exception_handler.py",
+            "member": "wrap_app_handling_exceptions.wrapped_app",
+            "id": "3b5ad220ee3581ecaff185877e52ad0a07c01d418527a08fe9b190826f851f93",
+            "line": 61,
+            "column": 33,
+            "endLine": 61,
+            "endColumn": 70,
+            "executionContext": "async-body",
+            "category": "offload-call",
+            "binding": {
+              "syntax": "run_in_threadpool",
+              "target": "starlette.concurrency.run_in_threadpool",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": true,
+            "callback": {
+              "kind": "Name",
+              "binding": {
+                "syntax": "handler",
+                "target": null,
+                "status": "unresolved",
+                "reason": "non-import-or-ambiguous-binding"
+              },
+              "evaluation": "callback-expression-only"
+            },
+            "disposition": "review-only"
+          },
+          {
+            "file": "starlette/background.py",
+            "member": "BackgroundTask.__call__",
+            "id": "eb737ae038ff9203970e74ae467da30559d52628304abec70bcf0219ba514af9",
+            "line": 23,
+            "column": 18,
+            "endLine": 23,
+            "endColumn": 73,
+            "executionContext": "async-body",
+            "category": "offload-call",
+            "binding": {
+              "syntax": "run_in_threadpool",
+              "target": "starlette.concurrency.run_in_threadpool",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": true,
+            "callback": {
+              "kind": "Attribute",
+              "binding": {
+                "syntax": "self.func",
+                "target": null,
+                "status": "unresolved",
+                "reason": "non-import-or-ambiguous-binding"
+              },
+              "evaluation": "callback-expression-only"
+            },
+            "disposition": "review-only"
+          },
+          {
+            "file": "starlette/concurrency.py",
+            "member": "run_in_threadpool",
+            "id": "d0d51d990b3e8bcd0e951e343b597868f22e2c327213a2d9a9fda49f35c033cc",
+            "line": 34,
+            "column": 17,
+            "endLine": 34,
+            "endColumn": 47,
+            "executionContext": "async-body",
+            "category": "offload-call",
+            "binding": {
+              "syntax": "anyio.to_thread.run_sync",
+              "target": "anyio.to_thread.run_sync",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": true,
+            "callback": {
+              "kind": "Name",
+              "binding": {
+                "syntax": "func",
+                "target": null,
+                "status": "unresolved",
+                "reason": "non-import-or-ambiguous-binding"
+              },
+              "evaluation": "callback-expression-only"
+            },
+            "disposition": "review-only"
+          }
+        ]
+      }
+    },
+    {
+      "id": "django",
+      "repository": "django",
+      "url": "https://github.com/django/django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "role": "larger web framework",
+      "include": [
+        "django/**"
+      ],
+      "productionPaths": [
+        "django/test/**"
+      ],
+      "runId": "dcb13a3d-8bf5-4995-826d-fdd77c5c986c",
+      "configurationFingerprint": "cb49aa4af5fecc7fa974ef6ced2013f97fb2d7ca13d222ed42ca608127a87426",
+      "functionFactsSha256": "82a893dd6660923a67138b3e313310ffff9bee80c1344c56d5a4d309cf35d455",
+      "selectedSourceSha256": "2cb4a5b24cda391c3278706e0de5eb522f2d8e5458cceed6c898fdfb27b9a70f",
+      "asyncRowsSha256": "bbc54ef4007a83bbde2ec1db49d4dce72fde00cc89a0dd939df70f31d62507d6",
+      "summary": {
+        "selectedFunctions": 9748,
+        "asyncFunctions": 266,
+        "excludedSynchronousFunctions": 9482,
+        "availability": "available",
+        "asyncBodyCallExpressions": 818,
+        "asyncBodyCallCategories": {
+          "offload-wrapped-invocation": 40,
+          "offload-wrapper-construction": 42,
+          "other-import-call": 92,
+          "unresolved-call": 644
+        },
+        "deferredGeneratorCallExpressions": 6,
+        "functionsWithBlockingCandidates": 0,
+        "populations": {
+          "production": {
+            "selectedFunctions": 9748,
+            "asyncFunctions": 266,
+            "excludedSynchronousFunctions": 9482,
+            "availability": "available",
+            "asyncBodyCallExpressions": 818,
+            "asyncBodyCallCategories": {
+              "offload-wrapped-invocation": 40,
+              "offload-wrapper-construction": 42,
+              "other-import-call": 92,
+              "unresolved-call": 644
+            },
+            "deferredGeneratorCallExpressions": 6,
+            "functionsWithBlockingCandidates": 0
+          }
+        }
+      },
+      "methodComplexityScore": 5.6,
+      "unchangedMethodComplexityAndErrorHandlingEvidence": true,
+      "unresolvedReasons": {
+        "comprehension-local-binding": 3,
+        "dynamic-callee-expression": 84,
+        "no-lexical-import": 100,
+        "non-import-or-ambiguous-binding": 356,
+        "reflective-or-cross-scope-binding": 106
+      },
+      "blockingCandidates": [],
+      "examples": {
+        "unresolved-call": [
+          {
+            "file": "django/contrib/auth/__init__.py",
+            "member": "_aget_user_session_key",
+            "id": "55e69ca330d68bee4267c80f86440228382b0a9362b3d8f1eaf59106843cd3a6",
+            "line": 117,
+            "column": 24,
+            "endLine": 117,
+            "endColumn": 57,
+            "executionContext": "async-body",
+            "category": "unresolved-call",
+            "binding": {
+              "syntax": "request.session.aget",
+              "target": null,
+              "status": "unresolved",
+              "reason": "non-import-or-ambiguous-binding"
+            },
+            "directlyAwaited": true,
+            "callback": null,
+            "disposition": "review-only"
+          },
+          {
+            "file": "django/contrib/auth/__init__.py",
+            "member": "_aget_user_session_key",
+            "id": "f51ba92c3a21d8399ec4bc6d96701ad68a08390f1d86d7dd239c8c950f70b54a",
+            "line": 119,
+            "column": 14,
+            "endLine": 119,
+            "endColumn": 24,
+            "executionContext": "async-body",
+            "category": "unresolved-call",
+            "binding": {
+              "syntax": "KeyError",
+              "target": null,
+              "status": "unresolved",
+              "reason": "no-lexical-import"
+            },
+            "directlyAwaited": false,
+            "callback": null,
+            "disposition": "review-only"
+          },
+          {
+            "file": "django/contrib/auth/__init__.py",
+            "member": "_aget_user_session_key",
+            "id": "82a3c8d9a200284adeb4c8e3470b8b5c3d7687e742098223e085b7940dd35314",
+            "line": 120,
+            "column": 11,
+            "endLine": 120,
+            "endColumn": 27,
+            "executionContext": "async-body",
+            "category": "unresolved-call",
+            "binding": {
+              "syntax": "get_user_model",
+              "target": null,
+              "status": "unresolved",
+              "reason": "non-import-or-ambiguous-binding"
+            },
+            "directlyAwaited": false,
+            "callback": null,
+            "disposition": "review-only"
+          }
+        ],
+        "other-import-call": [
+          {
+            "file": "django/contrib/auth/__init__.py",
+            "member": "alogin",
+            "id": "eeaefd4abedc95942733343a784e93d2acb78f0613acc89cf1409af8c073a490",
+            "line": 208,
+            "column": 20,
+            "endLine": 211,
+            "endColumn": 13,
+            "executionContext": "async-body",
+            "category": "other-import-call",
+            "binding": {
+              "syntax": "constant_time_compare",
+              "target": "django.utils.crypto.constant_time_compare",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": false,
+            "callback": null,
+            "disposition": "review-only"
+          },
+          {
+            "file": "django/contrib/auth/__init__.py",
+            "member": "alogin",
+            "id": "37b824f7d74a02f861a950b97fc03d88bf75a77bc4d3a9257404da792763e6ce",
+            "line": 226,
+            "column": 4,
+            "endLine": 226,
+            "endColumn": 25,
+            "executionContext": "async-body",
+            "category": "other-import-call",
+            "binding": {
+              "syntax": "rotate_token",
+              "target": "django.middleware.csrf.rotate_token",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": false,
+            "callback": null,
+            "disposition": "review-only"
+          },
+          {
+            "file": "django/contrib/auth/__init__.py",
+            "member": "aget_user",
+            "id": "51e4c7839978e0714829de93026e9282e448802ad837d0b209dd0c240ec56257",
+            "line": 343,
+            "column": 44,
+            "endLine": 345,
+            "endColumn": 21,
+            "executionContext": "async-body",
+            "category": "other-import-call",
+            "binding": {
+              "syntax": "constant_time_compare",
+              "target": "django.utils.crypto.constant_time_compare",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": false,
+            "callback": null,
+            "disposition": "review-only"
+          }
+        ],
+        "offload-wrapper-construction": [
+          {
+            "file": "django/contrib/auth/__init__.py",
+            "member": "acheck_password_with_timing_attack_mitigation",
+            "id": "95d32c2550257b96f8c48bcb72ec94d94e3bcb1c776bd558b9aaac09b99ab797",
+            "line": 406,
+            "column": 14,
+            "endLine": 406,
+            "endColumn": 65,
+            "executionContext": "async-body",
+            "category": "offload-wrapper-construction",
+            "binding": {
+              "syntax": "sync_to_async",
+              "target": "asgiref.sync.sync_to_async",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": false,
+            "callback": {
+              "kind": "Name",
+              "binding": {
+                "syntax": "set_password",
+                "target": null,
+                "status": "unresolved",
+                "reason": "non-import-or-ambiguous-binding"
+              },
+              "evaluation": "callback-expression-only"
+            },
+            "disposition": "review-only"
+          },
+          {
+            "file": "django/contrib/auth/hashers.py",
+            "member": "acheck_password",
+            "id": "e86c0688255bb0f4eb39193433aabad2377dbe9fdecf8251070c5262fbeb223f",
+            "line": 91,
+            "column": 36,
+            "endLine": 94,
+            "endColumn": 5,
+            "executionContext": "async-body",
+            "category": "offload-wrapper-construction",
+            "binding": {
+              "syntax": "sync_to_async",
+              "target": "asgiref.sync.sync_to_async",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": false,
+            "callback": {
+              "kind": "Name",
+              "binding": {
+                "syntax": "verify_password",
+                "target": null,
+                "status": "unresolved",
+                "reason": "non-import-or-ambiguous-binding"
+              },
+              "evaluation": "callback-expression-only"
+            },
+            "disposition": "review-only"
+          },
+          {
+            "file": "django/contrib/sessions/backends/base.py",
+            "member": "SessionBase.aexists",
+            "id": "7cf8a942aaff44f7a2780166025fa3e3b821b4b27e2a76cee026dfcef676b397",
+            "line": 464,
+            "column": 21,
+            "endLine": 464,
+            "endColumn": 47,
+            "executionContext": "async-body",
+            "category": "offload-wrapper-construction",
+            "binding": {
+              "syntax": "sync_to_async",
+              "target": "asgiref.sync.sync_to_async",
+              "status": "import-matched",
+              "reason": "import-spelling-only"
+            },
+            "directlyAwaited": false,
+            "callback": {
+              "kind": "Attribute",
+              "binding": {
+                "syntax": "self.exists",
+                "target": null,
+                "status": "unresolved",
+                "reason": "non-import-or-ambiguous-binding"
+              },
+              "evaluation": "callback-expression-only"
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "offload-wrapped-invocation": [
+          {
+            "file": "django/contrib/auth/__init__.py",
+            "member": "acheck_password_with_timing_attack_mitigation",
+            "id": "d8752c4ad45b9035eea7ab6c13112d89d7bda96d1085f72b12cbbc626b6ac76a",
+            "line": 406,
+            "column": 14,
+            "endLine": 406,
+            "endColumn": 75,
+            "executionContext": "async-body",
+            "category": "offload-wrapped-invocation",
+            "binding": {
+              "syntax": "sync_to_async",
+              "target": "asgiref.sync.sync_to_async",
+              "status": "import-matched",
+              "reason": "immediate-import-matched-wrapper-syntax"
+            },
+            "directlyAwaited": true,
+            "callback": {
+              "kind": "Name",
+              "binding": {
+                "syntax": "set_password",
+                "target": null,
+                "status": "unresolved",
+                "reason": "non-import-or-ambiguous-binding"
+              },
+              "evaluation": "callback-expression-only"
+            },
+            "disposition": "review-only"
+          },
+          {
+            "file": "django/contrib/auth/hashers.py",
+            "member": "acheck_password",
+            "id": "7d1d161708aed3e8bff2879246b5b68fa04e64e9a895a8cf0449cd14ce698f70",
+            "line": 91,
+            "column": 36,
+            "endLine": 94,
+            "endColumn": 45,
+            "executionContext": "async-body",
+            "category": "offload-wrapped-invocation",
+            "binding": {
+              "syntax": "sync_to_async",
+              "target": "asgiref.sync.sync_to_async",
+              "status": "import-matched",
+              "reason": "immediate-import-matched-wrapper-syntax"
+            },
+            "directlyAwaited": true,
+            "callback": {
+              "kind": "Name",
+              "binding": {
+                "syntax": "verify_password",
+                "target": null,
+                "status": "unresolved",
+                "reason": "non-import-or-ambiguous-binding"
+              },
+              "evaluation": "callback-expression-only"
+            },
+            "disposition": "review-only"
+          },
+          {
+            "file": "django/contrib/sessions/backends/base.py",
+            "member": "SessionBase.aexists",
+            "id": "49713529a31d4b81732fa08417092b8d3848bcb35de67e1bf8de4f59c7d815ee",
+            "line": 464,
+            "column": 21,
+            "endLine": 464,
+            "endColumn": 60,
+            "executionContext": "async-body",
+            "category": "offload-wrapped-invocation",
+            "binding": {
+              "syntax": "sync_to_async",
+              "target": "asgiref.sync.sync_to_async",
+              "status": "import-matched",
+              "reason": "immediate-import-matched-wrapper-syntax"
+            },
+            "directlyAwaited": true,
+            "callback": {
+              "kind": "Attribute",
+              "binding": {
+                "syntax": "self.exists",
+                "target": null,
+                "status": "unresolved",
+                "reason": "non-import-or-ambiguous-binding"
+              },
+              "evaluation": "callback-expression-only"
+            },
+            "disposition": "review-only"
+          }
+        ]
+      }
+    }
+  ]
+}

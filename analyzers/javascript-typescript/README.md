@@ -1,6 +1,6 @@
 # codemetrics-ai
 
-Deterministic source analysis for JavaScript, TypeScript, JSX and TSX. Version 0.5.0 implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
+Deterministic source analysis for JavaScript, TypeScript, JSX and TSX, with Python support in preview 0.6.0-preview.1. The package implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
 
 Each scored dimension includes `scoringDecision`: policy inputs, executed steps, rounding and finding attribution. These are aggregate policy decisions, not independent finding deductions. See [the decision contract](../../shared/scorecard-schema/scoring-decisions.md).
 
@@ -20,6 +20,10 @@ Default output paths are `.scorecard/javascript-typescript/metrics.csv` and `.sc
 
 ## Implemented scope
 
+Preview 0.6.0-preview.1 adds unscored npm/pnpm dependency inventory and optional
+registry observations under ruleset `javascript-typescript-2026-10-09-dependency-evidence`.
+It requires fresh baselines. Stable 0.5.0 does not include this extension. Install the preview explicitly; the npm `latest` tag stays on the stable release.
+
 | Dimension | Implementation |
 |---|---|
 | codeQuality (Method Complexity) | 40% one worst function score + 60% mean remaining; owned CC findings above 10. Decomposition has descriptive size/distribution evidence and no score. |
@@ -27,6 +31,7 @@ Default output paths are `.scorecard/javascript-typescript/metrics.csv` and `.sc
 | performanceAsync (Async/Blocking Usage) | React hook/effect checks, standard Promise async executors, and informational async Array.forEach callbacks |
 | architecture | Module dependencies, explicit type-only separation, internal cycle groups and fan-in/out rankings; score remains unmeasured |
 | errorHandling | Contextual failure dispositions for distinct catch/Promise handler bodies; scores unexplained swallowing only with a fully assessed population |
+| dependencyManagement (preview) | npm lockfile v2/v3 and pnpm v9 inventory, workspace uses, optional public-registry deprecation/update/advisory observations; no score |
 | Other dimensions | Explicitly skipped |
 
 React checks run only when a source file imports React. Aliased named imports and namespace imports are recognized; local functions shadowing imports are excluded. Missing dependency arrays are advisory because running after every render can be intentional. The implementation does not claim exhaustive Rules of Hooks, dependency-array correctness, or general concurrency analysis. Source syntax errors make the run incomplete and source dimensions unscored. Semantic type errors are outside this AST-focused version's completeness check.
@@ -63,6 +68,23 @@ Coverage distinguishes `internal`, `external`, `builtin`, `outOfScope`, `unavail
 Cycles are strongly connected groups of resolved internal value/mixed dependencies; repeated imports count once toward fan-in/out. Cycles are informational review leads and carry no score penalty. Dynamic-literal imports and CommonJS calls can be conditional or deferred; a cycle does not establish an initialization failure. Top-ten fan-in/out lists are observations, with no invented defect cutoff. Re-export-only modules are marked for barrel-file context.
 
 Architecture retains `status: skipped` and no score until calibration. Other measured dimensions remain usable when this diagnostic graph has resolution gaps. Source parse failures retain partial graph evidence with `status: failed` and the existing incomplete-analysis exit. Schema v3 is unchanged; the new scope/ruleset requires fresh baselines. See the [graph contract](../../shared/scorecard-schema/javascript-typescript-module-graph.md).
+
+## Dependency observations (development)
+
+Inventory supports npm lockfiles v2/v3 and pnpm v9, including pnpm 12 environment/project documents, catalogs, workspace links, aliases, and peer snapshots. The project graph is selected; environment tooling is explicitly excluded. Peer variants retain locations without multiplying package/version counts. Older pnpm formats and file/git/custom resolutions remain gaps. Integrity-only records do not establish public-registry provenance.
+
+Inventory is local by default. `--dependency-metadata` explicitly enables bounded
+public npm registry metadata and bulk advisory queries. It never installs target
+dependencies or runs their scripts. Unsupported package managers, stale locks,
+private/unknown sources, and failed queries are exposed as coverage gaps.
+Optional peers and locked range differences remain contextual notices. Duplicate
+installations retain their locations without creating independent penalties.
+
+Deprecation, `wanted` updates within direct declared ranges, `latest` releases,
+and advisories are separate observations. Exact pins and newer major versions do
+not establish neglect; advisory presence does not establish runtime reachability.
+The dimension remains unscored. See the [dependency policy](../../shared/scorecard-schema/javascript-typescript-dependency-policy.md)
+for counting, limits, availability, and calibration boundaries.
 
 ## Discovery
 
@@ -176,3 +198,11 @@ Uptime Kuma rerun. Numerical experiments remain outside the analyzer and are not
 consumer scoring policies. The subsequent [contextual handler policy](../../shared/scorecard-schema/javascript-typescript-error-handling-policy.md)
 enables the agreed population formula only where bounded classification establishes
 an assessable population. Decomposition remains unscored.
+
+## Experimental Python command in development builds
+
+Local development archives bundle `codemetrics-python` and its Python 3.12 AST adapter, version `0.15.0`. It parses source without importing the target and produces evidence v3 with a production Method Complexity score, owned statements, block nesting, duplication, optional coverage/CRAP review evidence, and unscored exception-handler observations at `dimensions.errorHandling.review`, plus bounded lexical context and conservative patterns at `dimensions.errorHandling.contextReview`, with owned raise/cause syntax at `dimensions.errorHandling.transferReview` and owned calls/returns plus unresolved-suite inventory at `dimensions.errorHandling.operationReview`, and async-owned call evidence at `dimensions.performanceAsync.review`. `--coverage-json` imports observations; `--collection-manifest` checks their source binding. Adapter 0.15.0 also scores Async/Blocking Usage from production-owner contributions at `performanceAsync.asyncScoring`, with bounded paths at `performanceAsync.helperReview`. The other seven Python dimensions remain unavailable; decomposition, duplication, coverage/CRAP, and handler observations remain unscored. Install `codemetrics-ai@0.6.0-preview.1` explicitly to use these commands; stable npm 0.5.0 does not include them. For example: `npm exec --yes --package=codemetrics-ai@0.6.0-preview.1 -- codemetrics-python --project ./pyproject.toml --scorecard-output ./python-evidence.json`. The installed package includes its Python guide at `dist/python/README.md` and scoring policy at `dist/python/ASYNC_SCORING.md`. Ordinary analysis/import needs only Node.js 20+ and Python 3.12. The separate `codemetrics-python-collect` command explicitly executes tests and requires a caller-supplied environment containing coverage.py and the project's test dependencies.
+
+Python adapter 0.13.0 also embeds unscored async call context at `dimensions.performanceAsync.contextReview`, including unresolved reason/shape inventories and bounded local callback/stored-wrapper links. The package ships `dist/python/ASYNC_CONTEXT.md`; historical 0.12.0 reports remain valid without this extension.
+
+Python adapter 0.14.0 additionally embeds unscored partial construction/reference context and narrow `sync_to_async` decorator links at `dimensions.performanceAsync.adapterReview`. The package ships `dist/python/ASYNC_ADAPTERS.md`; historical 0.13.0 evidence remains valid without this report. This adapter report itself remains unscored; 0.15.0 adds the separate async scoring contract. Error Handling remains unscored.

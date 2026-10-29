@@ -12,8 +12,10 @@ import { decompositionModule, decompositionEvidence } from "./decomposition-evid
 import { HandlerResolver } from "./handler-resolution.js";
 import { inspectErrorHandling, errorHandlingEvidence } from "./error-handling.js";
 import { FailureContracts } from "./failure-contracts.js";
+import { dependencyInventory } from "./dependency-inventory.js";
+import { dependencyEvidence } from "./dependency-evidence.js";
 
-export function analyze(options: { project?: string; tsconfig?: string; runId?: string; auditId?: string }, version: string): { evidence: Evidence; metrics: Metric[]; csv: string; inputs: string[] } {
+export function analyze(options: { project?: string; tsconfig?: string; runId?: string; auditId?: string; dependencyMetadata?: boolean }, version: string): { evidence: Evidence; metrics: Metric[]; csv: string; inputs: string[] } {
   const identity = invocationIds(options.runId, options.auditId);
   const discovery = discover(options.project, options.tsconfig);
   const dimensions = skippedDimensions();
@@ -65,6 +67,8 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
     dimensions[key] = { status: "failed", basis: "Incomplete source analysis; partial findings are unscored.", findings: dimensions[key].findings, scope: dimensions[key].scope };
   dimensions.architecture = moduleGraph.finish(diagnostics.length > 0);
   dimensions.errorHandling = errorHandlingEvidence(errorHandling, diagnostics.length > 0);
+  const dependencies=dependencyInventory(discovery.packages,discovery.repositoryRoot);
+  dimensions.dependencyManagement=dependencyEvidence(dependencies.inventory,undefined,options.dependencyMetadata?"public-registry":"offline");
   dimensions.codeQuality.componentDetails = { ...(dimensions.codeQuality.componentDetails as object ?? {}),
     decomposition: decompositionEvidence(decompositionModules, diagnostics.length > 0) };
   const evidence: Evidence = {
@@ -73,11 +77,11 @@ export function analyze(options: { project?: string; tsconfig?: string; runId?: 
     filters: { totalUnits: discovery.packages.reduce((sum,pkg) => sum + pkg.files.length, 0) + discovery.skipped.length,
       analyzedUnits: analyzedFiles, skipped: discovery.skipped },
     population: { types: new Set(metrics.map(metric => `${metric.project}|${metric.file}|${metric.type}`)).size, members: metrics.length },
-    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-10-09-handler-contracts",
-      calibration: "uncalibrated", configurationFingerprint: hash(JSON.stringify(canonicalConfiguration(discovery.packages.map(pkg => ({ name: pkg.name,
-        options: pkg.options, selection: pkg.selection })), discovery.repositoryRoot))), diagnostics, suppressions: [] }
+    dimensions, analysis: { ...identity, status: diagnostics.length ? "incomplete" : "complete", ruleset: "javascript-typescript-2026-10-09-dependency-evidence",
+      calibration: "uncalibrated", configurationFingerprint: hash(JSON.stringify(canonicalConfiguration({packages:discovery.packages.map(pkg => ({ name: pkg.name,
+        options: pkg.options, selection: pkg.selection })),dependencyMetadata:options.dependencyMetadata?"public-registry":"offline"}, discovery.repositoryRoot))), diagnostics, suppressions: [] }
   };
-  return { evidence, metrics, csv: toCsv(metrics), inputs: discovery.packages.flatMap(pkg => [pkg.entryPoint, ...pkg.files]) };
+  return { evidence, metrics, csv: toCsv(metrics), inputs: [...dependencies.inputs,...discovery.packages.flatMap(pkg => [pkg.entryPoint, ...pkg.files])] };
 }
 function canonicalConfiguration(value: unknown, root: string): unknown {
   if (typeof value === "string") return value.replaceAll("\\", "/").replace(root.replaceAll("\\", "/") + "/", "<root>/");

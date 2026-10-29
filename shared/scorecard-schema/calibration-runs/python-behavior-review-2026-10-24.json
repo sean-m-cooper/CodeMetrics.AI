@@ -1,0 +1,2333 @@
+{
+  "schemaVersion": 1,
+  "auditId": "0d081dd5-9390-403f-9a4c-409cde7ca041",
+  "policies": [
+    "python/exception-disposition-paths-review-v1",
+    "python/async-local-helper-paths-review-v1"
+  ],
+  "implementationSha256": "4271850ef6ac94bae7e8a6b8c52115405371d4fa410e093bc84eb6bf65cf652a",
+  "implementationFiles": {
+    "behavior_review_corpus.py": "d60e48f5c7755f2124bde9260776ca74d4990f29ee93fae39455037344820bb3",
+    "error_handling_dispositions.py": "99f7b0f2e3e18c1965543c7a1b03bc7c5b4fe91fe30aefdacb01c1f27e140e16",
+    "async_helper_paths.py": "2d83526135db6d6d4ac717a664cfa715b865decc1f00f1df5e9a6f0ce66267b4",
+    "review_cli.py": "250a5cea94ebc22b831e7fc2610a62051b29f576c3e0411e75afba19be171cd3",
+    "error_handling_operations.py": "0edc73451f435deaafc232bb1afe44a8917b467685c2fb4e83568a7bce5dfa5f",
+    "error_handling_transfers.py": "737475455a6ad504f73b16775d88f1de8c321594bea88c1fe37b4a37e9fc776c",
+    "error_handling_context.py": "da3784cdc42a5afea0852e1bc44e1c207718df5a31daefa1c93d2af377fd5b40",
+    "error_handling.py": "e74a8bd9433fcebf8bbda8157e1fd8f049440e2ba8cdedeafd07c1fcf90896ed",
+    "async_adapters.py": "c7b03d58550c84cb90c65aa12972a33b1cad9364d90cf361d5f74df1c4540f50",
+    "async_provenance.py": "15f4bd7f46dcbf0fde00f68e7a228ca32900d08553be6bf7c2e25f8a6b4d0f91",
+    "async_usage.py": "8174a9d69b04dbc4b7f23e9bf9677e54c3d9d4abebc4f6463764ababd26393b4",
+    "async_bindings.py": "479e911d0b85854951bd562a32a2c316bc51a6ce466778754ad3f78710a44852",
+    "source_facts.py": "d4b82f6ac466f95dfc028a5b5ca1fb01d9d9caee221b32f4497532f593530fe3",
+    "source_selection.py": "29343b114764d1798d7fa49b93a07c39a01ec305d525ee8f2c68ed799c83f0c5",
+    "duplication.py": "4dc2ebf097549251278b1b49cbba799b148719afae231e515a1e9c06617c041b"
+  },
+  "scope": "Unscored source review. Unresolved is not defective; candidate is not confirmed defect. No targets executed.",
+  "samples": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "runId": "6a02375a-6058-4c1e-8afb-011358bb3e86",
+      "functionFactsSha256": "035474879c8a57efe17b278c34c0f9b639b8cecc7149c191495f501f246840b7",
+      "selectionFingerprint": "3a42e533f6092149af8baacf0a98dcae00c52c23dd8652d491347ea969ac9540",
+      "unchangedSourceFactsAndPriorExceptionAndAsyncEvidence": true,
+      "dispositionRowsSha256": "790f0abe6037602a307bcb3c36de3f07b35e4ef3eeeedf320bef3010cfbee768",
+      "helperRowsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "handlerSummary": {
+        "handlers": 66,
+        "byClassification": {
+          "documented-suppression": 2,
+          "explicit-fallback": 18,
+          "loop-transfer": 1,
+          "propagation": 22,
+          "recovery-action": 14,
+          "unresolved": 9
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "byClassification": {
+              "documented-suppression": 2,
+              "explicit-fallback": 18,
+              "loop-transfer": 1,
+              "propagation": 22,
+              "recovery-action": 14,
+              "unresolved": 9
+            }
+          }
+        }
+      },
+      "asyncSummary": {
+        "asyncFunctions": 0,
+        "availability": "unavailable",
+        "functionsWithDirectOrHelperCandidates": null,
+        "candidatePathsByContext": {},
+        "unresolvedPathsByReason": {},
+        "candidatePaths": 0,
+        "localHelperLinks": 0,
+        "distinctBlockingSourceCalls": 0,
+        "populations": {}
+      },
+      "handlerExamples": {
+        "explicit-fallback": [
+          {
+            "handlerId": "17ce660ecfa8e2b2afd3edd8024de08cc6622618acc29dbf992928628ace0068",
+            "file": "src/requests/__init__.py",
+            "line": 51,
+            "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "classification": "explicit-fallback",
+            "reasons": [
+              "guarded-import-literal-default"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "85faab005ab2ee3b312150be9e6876599a5a74930b96d245e3ce42e7503d2511",
+            "file": "src/requests/__init__.py",
+            "line": 56,
+            "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "classification": "explicit-fallback",
+            "reasons": [
+              "guarded-import-literal-default"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "8c378318928471d5e3fe25b5c5fd5f5eef7d8db5c755cf54dfe795cb2d05d089",
+            "file": "src/requests/__init__.py",
+            "line": 103,
+            "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_check_cryptography",
+              "functionId": "52cc3c990c376c467faedae7787b21d3c3ead80a191de26dbe91cc9b275ea6b5"
+            },
+            "classification": "explicit-fallback",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "explicit-fallback",
+                "detail": "bare-return"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "recovery-action": [
+          {
+            "handlerId": "c2a7be571ea3be83306cb674f3788f9dd15cfd96ddf79de69477b6331e00a6f0",
+            "file": "src/requests/__init__.py",
+            "line": 118,
+            "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "call-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "1093d41fd3fc9c98631b8f7e1d0eceb94614f8c64a11acb4719a271950c58ea6",
+            "file": "src/requests/compat.py",
+            "line": 27,
+            "sourceSha256": "4a51c5ab07b015c298d6ea69d71502979cd3ed6b935d88e4433ce5341dacf584",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "0bbb9cc9a4ff7cd6eaf7f0bd130fec5b02aa2d04a3e9b7c5357d3e9ecf71e5f5",
+            "file": "src/requests/help.py",
+            "line": 26,
+            "sourceSha256": "e5845e93980b2e25be418fb7fe0b8e6e999fef8f84afc5a43f4546efdc24691f",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "unresolved": [
+          {
+            "handlerId": "102275775a6f599615638e06a4a17a3837d8f129b61a1d664e5b2be4a7d84590",
+            "file": "src/requests/__init__.py",
+            "line": 146,
+            "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "surrounding-rationale-needs-review"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "5291b131e8ae3dcd4ffaa79a60b37510e00557ccba30f59fadf48833cfcdea75",
+            "file": "src/requests/adapters.py",
+            "line": 64,
+            "sourceSha256": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "unsupported-FunctionDef"
+            ],
+            "paths": [
+              {
+                "outcome": "unresolved",
+                "detail": "unsupported-FunctionDef"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "3d4011f56ab2186a98daf9950b86c28d7c7a79d49ffae3125eb3d3007ad358ec",
+            "file": "src/requests/compat.py",
+            "line": 43,
+            "sourceSha256": "4a51c5ab07b015c298d6ea69d71502979cd3ed6b935d88e4433ce5341dacf584",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_resolve_char_detection",
+              "functionId": "ca492cfb6a2fba5b4cfad488c4dc894da9ceffb4ad482fba5a2f95da1602a9be"
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "surrounding-rationale-needs-review"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "propagation": [
+          {
+            "handlerId": "a69ab65f96de38aa80846d18a8c37465c50301662eb84ae3bd59d29b1fefcd50",
+            "file": "src/requests/adapters.py",
+            "line": 490,
+            "sourceSha256": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "HTTPAdapter.get_connection_with_tls_context",
+              "functionId": "6e95da07cc69bc96be95f7e940d369c1c0ae540b7d483176d397f169667d56db"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "8fb0071d41d8bce1eed9461d3460e5c05dcc6f4d60bac5d8ad660d197064f0e6",
+            "file": "src/requests/adapters.py",
+            "line": 665,
+            "sourceSha256": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "HTTPAdapter.send",
+              "functionId": "c236946b08d80fda709093ab6158d65f4af6c482e12ef5ab1d0b65ca7d8e0cf7"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "2700fdeb099854cfa1b765a00e36882e7a58b7b7fd58e2104a71370d68ae82e4",
+            "file": "src/requests/adapters.py",
+            "line": 685,
+            "sourceSha256": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "HTTPAdapter.send",
+              "functionId": "c236946b08d80fda709093ab6158d65f4af6c482e12ef5ab1d0b65ca7d8e0cf7"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "documented-suppression": [
+          {
+            "handlerId": "7ac742ecf14aed7236fef6e3f8bb87b79d86d0e6fa3d398aaf1a8ee49ec2c599",
+            "file": "src/requests/models.py",
+            "line": 1110,
+            "sourceSha256": "a3351c3c12a86bf5ed211533875350bc4791e9327a685f8c19ba54343e471e26",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "Response.json",
+              "functionId": "8ed15e672bd14028307afd48a95c058956c6755da939f18b6e3de099fd8b2994"
+            },
+            "classification": "documented-suppression",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "804ad2b514954c79bab870c7810d6f6367a2a65c9a593c0c29670f9357b7dc84",
+            "file": "src/requests/utils.py",
+            "line": 178,
+            "sourceSha256": "b879cb3f671cf1c28e8ff9b2b02151bcdb8974b4820a514cfdd1f5a038443cd2",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "super_len",
+              "functionId": "e120d668a829c06389389db448db241bf9fc6a852874edfb1025aaafaa904797"
+            },
+            "classification": "documented-suppression",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "loop-transfer": [
+          {
+            "handlerId": "abc0f987dd771d4d766cf4a199e2b800aeef2efd7e21c5b5b99e30f97ee5d6a4",
+            "file": "src/requests/utils.py",
+            "line": 992,
+            "sourceSha256": "b879cb3f671cf1c28e8ff9b2b02151bcdb8974b4820a514cfdd1f5a038443cd2",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "parse_header_links",
+              "functionId": "e10f5afc9afa927a22b1a38a821fad469cfd93d842af13e08270e10beb9a3d5e"
+            },
+            "classification": "loop-transfer",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "loop-transfer",
+                "detail": "break"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ]
+      },
+      "blockingExamples": []
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "runId": "0c0bda2d-e924-4853-8a22-adcef5384942",
+      "functionFactsSha256": "4ecf94b4e4280bf749fa7d9681b3af85f45f117d49132daa8669acc69b369d0b",
+      "selectionFingerprint": "544dbb0ea0e93df624d27de88718cb9e2be849e982c610f99fe606b2f291cbc5",
+      "unchangedSourceFactsAndPriorExceptionAndAsyncEvidence": true,
+      "dispositionRowsSha256": "9578d1689abe8f3ab1b525000db301bc03db69d4efdaf2e036b46e58b41d444c",
+      "helperRowsSha256": "43675fc1f05d9dff2281708d5be6824486c468dc7bfb35708164645dcda4199c",
+      "handlerSummary": {
+        "handlers": 62,
+        "byClassification": {
+          "explicit-fallback": 12,
+          "loop-transfer": 3,
+          "mixed-explicit-disposition": 1,
+          "propagation": 21,
+          "recovery-action": 6,
+          "unresolved": 19
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "byClassification": {
+              "explicit-fallback": 12,
+              "loop-transfer": 3,
+              "mixed-explicit-disposition": 1,
+              "propagation": 21,
+              "recovery-action": 6,
+              "unresolved": 19
+            }
+          }
+        }
+      },
+      "asyncSummary": {
+        "asyncFunctions": 135,
+        "availability": "available",
+        "functionsWithDirectOrHelperCandidates": 0,
+        "candidatePathsByContext": {},
+        "unresolvedPathsByReason": {
+          "async-or-unselected-callee": 5,
+          "comprehension-local-binding": 4,
+          "definition-not-before-reference": 1,
+          "dynamic-callee-expression": 46,
+          "no-local-definition": 98,
+          "non-import-or-ambiguous-binding": 341,
+          "non-name-reference": 7,
+          "not-a-direct-function-definition": 94,
+          "rebound-or-ambiguous-name": 16,
+          "reflective-or-cross-scope-binding": 1
+        },
+        "candidatePaths": 0,
+        "localHelperLinks": 6,
+        "distinctBlockingSourceCalls": 0,
+        "populations": {
+          "production": {
+            "asyncFunctions": 135,
+            "availability": "available",
+            "functionsWithDirectOrHelperCandidates": 0,
+            "candidatePathsByContext": {},
+            "unresolvedPathsByReason": {
+              "async-or-unselected-callee": 5,
+              "comprehension-local-binding": 4,
+              "definition-not-before-reference": 1,
+              "dynamic-callee-expression": 46,
+              "no-local-definition": 98,
+              "non-import-or-ambiguous-binding": 341,
+              "non-name-reference": 7,
+              "not-a-direct-function-definition": 94,
+              "rebound-or-ambiguous-name": 16,
+              "reflective-or-cross-scope-binding": 1
+            },
+            "candidatePaths": 0,
+            "localHelperLinks": 6,
+            "distinctBlockingSourceCalls": 0
+          }
+        }
+      },
+      "handlerExamples": {
+        "recovery-action": [
+          {
+            "handlerId": "851c5e39a5e9064379dd76e14174447d907913a71630e4dc13de741de6ffad3b",
+            "file": "starlette/_exception_handler.py",
+            "line": 28,
+            "sourceSha256": "f159bdd797d661ef712e8ff36b9890e56cab02f141bb690410973b5eb793c8e9",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "wrap_app_handling_exceptions",
+              "functionId": "f069358d0855b2a9c902d535a757c97c20d63e6f722daecbc886640cf6f560da"
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "f8305b730fd252f99789f7212b5a9d815ed6e26f8da20da3aa10ae6a67d4812b",
+            "file": "starlette/formparsers.py",
+            "line": 27,
+            "sourceSha256": "86f57a473b758a0584697a6a1cc823578d6521927b7985e7d061205f5c424175",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "e6e9bb0ed0e0d4b55e6ca20167cf755c51a83f81bf2ccf34c6cf0d146a5898ca",
+            "file": "starlette/formparsers.py",
+            "line": 259,
+            "sourceSha256": "86f57a473b758a0584697a6a1cc823578d6521927b7985e7d061205f5c424175",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "MultiPartParser.parse",
+              "functionId": "e683ee6db0a8dfc27623a0ae156e576e14ef3dfb1890ce708af2e172676ae08d"
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "mixed-explicit-disposition": [
+          {
+            "handlerId": "c32c2dfaa7a82b229a034bfdac551959c3ae390b8c3b954bd1721cf85bf9fc04",
+            "file": "starlette/_exception_handler.py",
+            "line": 43,
+            "sourceSha256": "f159bdd797d661ef712e8ff36b9890e56cab02f141bb690410973b5eb793c8e9",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "wrap_app_handling_exceptions.wrapped_app",
+              "functionId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3"
+            },
+            "classification": "mixed-explicit-disposition",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "call-action"
+              },
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              },
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "propagation": [
+          {
+            "handlerId": "aeb161f66da16e594a9945a6673c34c1a49024a232d5d17093782404c0b47b67",
+            "file": "starlette/_utils.py",
+            "line": 106,
+            "sourceSha256": "413355d540af9e719cefaa92c1ed70af338e263c375cb336644309b1d242a6f4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "create_collapsing_task_group",
+              "functionId": "cdb44d3389823338795fe9d4ae646906edeff98df3ac484885057497668deff1"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "bare-raise"
+              },
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "ef65fcba39552bc012a284dcf03b595e24bc3e4168ca4131db7c45ef681f8376",
+            "file": "starlette/concurrency.py",
+            "line": 47,
+            "sourceSha256": "3e9e245d060ef39716c58ed754db7995c62f8581d4aaec8b82e09e73b84a2a83",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_next",
+              "functionId": "bb622109c1ae8cf0ad7f8ccb53ad66cb2ee4cb4cf46946ade58aa96913fd9118"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "2888b5bfd01c49b54b3c2e8d405f47b7da313907f55e490d6fa673b75fbd7227",
+            "file": "starlette/config.py",
+            "line": 139,
+            "sourceSha256": "195c24a34a464aeb31b901cedf9b4bfcdb7f0292f47e65582f72221c76292d6e",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "Config._perform_cast",
+              "functionId": "f3779e15a45cc4c0efcbfaf1628fae2a1171f4c65fe469dbda88fe3d207889b0"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "explicit-fallback": [
+          {
+            "handlerId": "1f38d2cf5e0c083180de57134eb3de8a34fa581152f44bc5d9fb4b5d38307db6",
+            "file": "starlette/_utils.py",
+            "line": 131,
+            "sourceSha256": "413355d540af9e719cefaa92c1ed70af338e263c375cb336644309b1d242a6f4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "parse_host_header",
+              "functionId": "89313c92cfa99d4e4d0bde19a0854c205dc6e1ff4842071eb0c45ce1cc889b2b"
+            },
+            "classification": "explicit-fallback",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "explicit-fallback",
+                "detail": "return-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "d5dc048bb4344d40bae63e6cc57055016fcc862651729d34cd098e7308b91769",
+            "file": "starlette/formparsers.py",
+            "line": 52,
+            "sourceSha256": "86f57a473b758a0584697a6a1cc823578d6521927b7985e7d061205f5c424175",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_user_safe_decode",
+              "functionId": "2b0a53c4e23bfd64eccb7b6b4b89a6b5fccb20360bb5321169e6f9b8214db8a0"
+            },
+            "classification": "explicit-fallback",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "explicit-fallback",
+                "detail": "return-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "b231e03a7ca2f58f64fc6156691a45873786744d0cc2693821c343b80fd7d14e",
+            "file": "starlette/middleware/authentication.py",
+            "line": 37,
+            "sourceSha256": "f914b0c09d29224accd2ffb6229f075d5076e31b52a7b39bcd1dce7d30bcc120",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AuthenticationMiddleware.__call__",
+              "functionId": "5ea0569962b97d4806ae823c37dcaf80c90df595f8237c80ece2bffb8bdf00f7"
+            },
+            "classification": "explicit-fallback",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "explicit-fallback",
+                "detail": "bare-return"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "loop-transfer": [
+          {
+            "handlerId": "c0bd09c71b3899cb0fa57388c71a670f1af1618cf030ad951e2d6b44aa0c06e9",
+            "file": "starlette/concurrency.py",
+            "line": 58,
+            "sourceSha256": "3e9e245d060ef39716c58ed754db7995c62f8581d4aaec8b82e09e73b84a2a83",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "iterate_in_threadpool",
+              "functionId": "76615b6fe373032e03d77251141c339509e2dc7fc0d2cc34345fd35bffca6570"
+            },
+            "classification": "loop-transfer",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "loop-transfer",
+                "detail": "break"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "19b46713548ae7001e37b0e0c52a3038fc95fbdd458316494deb9c6914ce8211",
+            "file": "starlette/responses.py",
+            "line": 564,
+            "sourceSha256": "8c67ec598cf25c21216b662c2dbbc788a8d98e760cc42d2b91293c117ef0f295",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "FileResponse._parse_ranges",
+              "functionId": "13c3bf2bd7f2250b0e039a715e81f84e3eb7b4232b4f1fa70c2615ad5d0dcd26"
+            },
+            "classification": "loop-transfer",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "loop-transfer",
+                "detail": "continue"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "638e506929a19d6c845596f537780bd0329084488f4b39b1f7e39e419b768650",
+            "file": "starlette/staticfiles.py",
+            "line": 177,
+            "sourceSha256": "50f5551817d2f21097859e3918d88829ebf93b62a59647b3be76157fd3141624",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "StaticFiles.lookup_path",
+              "functionId": "fbd5dc059a968007f8672ef16d9a9972a821e80f77c3ce8223438eb507facfc3"
+            },
+            "classification": "loop-transfer",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "loop-transfer",
+                "detail": "continue"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "unresolved": [
+          {
+            "handlerId": "372c93361f3af3dacf791f898357fdb04e4bd85f7434da65dd8a5c2866978b52",
+            "file": "starlette/datastructures.py",
+            "line": 132,
+            "sourceSha256": "ceb7909d751b29d866fa97d9d190ebb10fa6aeb4457ad6aaa62b150957553c5a",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "URL.replace",
+              "functionId": "69b17d5bbfc07face7bc47bc748152402ea64a8c0e34dcb1c5410ec20b3065be"
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "surrounding-fallback-needs-review"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "4f1e4796c7532c00b751f5b7ceb0e151f4b7c3eb2c31490bb54d757eead3f447",
+            "file": "starlette/endpoints.py",
+            "line": 85,
+            "sourceSha256": "72dcd4b013129f1000865b97331cd0698598cb2e647af1d5e67dda6ea3965477",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "WebSocketEndpoint.dispatch",
+              "functionId": "0c745a68e9c3edd116008839509b17b6819886a75e5237b60eac3a441c1526f7"
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "enclosing-finally"
+            ],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "282cba9aa18687f289e6177458375951470adca456be5c467c88fe7509b55f3a",
+            "file": "starlette/formparsers.py",
+            "line": 23,
+            "sourceSha256": "86f57a473b758a0584697a6a1cc823578d6521927b7985e7d061205f5c424175",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "unsupported-Import"
+            ],
+            "paths": [
+              {
+                "outcome": "unresolved",
+                "detail": "unsupported-Import"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ]
+      },
+      "blockingExamples": []
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "runId": "5781e5ed-88c2-4bfe-a540-c7919ce85c61",
+      "functionFactsSha256": "cb55fe760ed8985febe42a61098ffc708b9a7ba7ca3df8b012463894c51a236c",
+      "selectionFingerprint": "6bd0c426bc7e8e32467e5c7958000362651a4cb02982b1d088d6c4d8a45f44e1",
+      "unchangedSourceFactsAndPriorExceptionAndAsyncEvidence": true,
+      "dispositionRowsSha256": "03681ffd20eb7e0130931863b8ea7cb8905270be5be38dc20259b7ea683c6fd3",
+      "helperRowsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "handlerSummary": {
+        "handlers": 69,
+        "byClassification": {
+          "documented-suppression": 5,
+          "explicit-fallback": 10,
+          "loop-transfer": 3,
+          "mixed-explicit-disposition": 6,
+          "propagation": 15,
+          "recovery-action": 16,
+          "unresolved": 14
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "byClassification": {
+              "documented-suppression": 5,
+              "explicit-fallback": 10,
+              "loop-transfer": 3,
+              "mixed-explicit-disposition": 6,
+              "propagation": 15,
+              "recovery-action": 16,
+              "unresolved": 14
+            }
+          }
+        }
+      },
+      "asyncSummary": {
+        "asyncFunctions": 0,
+        "availability": "unavailable",
+        "functionsWithDirectOrHelperCandidates": null,
+        "candidatePathsByContext": {},
+        "unresolvedPathsByReason": {},
+        "candidatePaths": 0,
+        "localHelperLinks": 0,
+        "distinctBlockingSourceCalls": 0,
+        "populations": {}
+      },
+      "handlerExamples": {
+        "unresolved": [
+          {
+            "handlerId": "f72a4baa91f24d354f0173f8b8ffdf3d8bd9d0a86f0f376dd7ce234cad5cafb9",
+            "file": "httpie/__main__.py",
+            "line": 10,
+            "sourceSha256": "1f4ef5eabd7995fd48cf0fdb71d2f61582f49f2daac49d97f0055aa69b005fed",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "main",
+              "functionId": "8855061ac1e8645b5123649f2a67eff7c98af92ab12cfbe0fdd813892eb64837"
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "unsupported-ImportFrom"
+            ],
+            "paths": [
+              {
+                "outcome": "unresolved",
+                "detail": "unsupported-ImportFrom"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "e09cbcc4d3ec536ea203f3ef443d2788a9ea4b2e09a978afd1878d6f5d15b9e7",
+            "file": "httpie/cli/argparser.py",
+            "line": 253,
+            "sourceSha256": "6f2408a5e917e3d0fc5ad5c725252d98022990299b1ec5182b2237749d513077",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "HTTPieArgumentParser._setup_standard_streams",
+              "functionId": "df156a52d642ddda974a33bbdca64e21fd79f112091736fb5eb5878f066d3b5d"
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "conditional-no-action-path"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              },
+              {
+                "outcome": "propagation",
+                "detail": "bare-raise"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "c4dff26f875db0caf4bb9c6b651b40fe844d5410ff2f1340f36583ea96018df4",
+            "file": "httpie/compat.py",
+            "line": 22,
+            "sourceSha256": "b6b3cb4d56108867e93e0e227637733a1e6edb2063b2e00cf5279b36ec9cabba",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "unsupported-ClassDef"
+            ],
+            "paths": [
+              {
+                "outcome": "unresolved",
+                "detail": "unsupported-ClassDef"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "propagation": [
+          {
+            "handlerId": "b94f8df8ac5def1ff14cd34336ef7959b8f223c560f686d646757b0a13e1aec1",
+            "file": "httpie/cli/argparser.py",
+            "line": 132,
+            "sourceSha256": "6f2408a5e917e3d0fc5ad5c725252d98022990299b1ec5182b2237749d513077",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "HTTPieManagerArgumentParser.parse_known_args",
+              "functionId": "c131bd3c5570d8b0bb7114ca4f4a9881b07ee16395fd57f6303ee452f9869582"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "bare-raise"
+              },
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "4dfbca2578e4caf2905fa503b459418d6d7d553cd2ef4fc0f954682352a6995a",
+            "file": "httpie/cli/argtypes.py",
+            "line": 198,
+            "sourceSha256": "de2f97a67bc7babfacf61098b7344f4c8c5f28e29216d09d1ab9c3cb45e96518",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "readable_file_arg",
+              "functionId": "d987cb58bc8fa1762127b67ab94f8e4a200aa58300f151a59506a0279eb911cf"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "823e6cec5936a45aafd54c96409415dede4e2744dc1f360f38d22df9831f9601",
+            "file": "httpie/cli/argtypes.py",
+            "line": 222,
+            "sourceSha256": "de2f97a67bc7babfacf61098b7344f4c8c5f28e29216d09d1ab9c3cb45e96518",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "parse_format_options",
+              "functionId": "f3cae27ae453d01166398baee05ca26b74a52c7f77f99136d6a91c8467fd1ac7"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "mixed-explicit-disposition": [
+          {
+            "handlerId": "41784fc42b7e996e776b00b97d0883b1ae1df305fa27f7fb636b090d754a56ff",
+            "file": "httpie/cli/argparser.py",
+            "line": 431,
+            "sourceSha256": "6f2408a5e917e3d0fc5ad5c725252d98022990299b1ec5182b2237749d513077",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "HTTPieArgumentParser._guess_method",
+              "functionId": "9194ec56eaa918f641bf03964d639cab45f7144bf6bc6836d8e294e509b45820"
+            },
+            "classification": "mixed-explicit-disposition",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "call-action"
+              },
+              {
+                "outcome": "propagation",
+                "detail": "bare-raise"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "8cdd6f9a0dc0a4dbbfd40787fa946df9967f5010d4f16e6a9305c386ff248fbd",
+            "file": "httpie/cli/argparser.py",
+            "line": 459,
+            "sourceSha256": "6f2408a5e917e3d0fc5ad5c725252d98022990299b1ec5182b2237749d513077",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "HTTPieArgumentParser._parse_items",
+              "functionId": "abb27ebc5c29f4eba1715da915a5f762846fb880f930209789ebd8f380b3cae4"
+            },
+            "classification": "mixed-explicit-disposition",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "call-action"
+              },
+              {
+                "outcome": "propagation",
+                "detail": "bare-raise"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "201969996c58a94ebdfc25e42f764bfe9ec5b793d4015b6efa63453b492440c0",
+            "file": "httpie/core.py",
+            "line": 81,
+            "sourceSha256": "12a78934cd277bdba722574319048213d417c9bc549145ca8bd851c123444d5b",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "raw_main",
+              "functionId": "d71509ead25da42d626eb2117ffe5ca8bada2d768facaef79f6bac71b929e0b4"
+            },
+            "classification": "mixed-explicit-disposition",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              },
+              {
+                "outcome": "propagation",
+                "detail": "bare-raise"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "recovery-action": [
+          {
+            "handlerId": "06857d3d0c429a97f191ec204751ea3c13b6ba1e02f645be1c252e56d315eedb",
+            "file": "httpie/cli/argtypes.py",
+            "line": 138,
+            "sourceSha256": "de2f97a67bc7babfacf61098b7344f4c8c5f28e29216d09d1ab9c3cb45e96518",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "PromptMixin._prompt_password",
+              "functionId": "9fdbf9111b24586c6fa9e6742b220e3d9b8596af0c31ed5718ab12290967d3fa"
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "call-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "01814a914567d3c1d4d0021f07f2418aca17c70b47d3b40c34ccd5586889a3b3",
+            "file": "httpie/cli/requestitems.py",
+            "line": 179,
+            "sourceSha256": "7d81370cb4133243aaca9bd9e7cf6c69844e3b2c2e899b56ac60171865323ca3",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "convert_json_value_to_form_if_needed.wrapper",
+              "functionId": "2249e840f1bb189605cad59aaa06fe097baa192b61cc135a4f608f8a7236a6c8"
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "2bd5bd789cec9401bcb14e932e35c61bdd4aef2d88798d40e830d9dacac36e6d",
+            "file": "httpie/context.py",
+            "line": 147,
+            "sourceSha256": "e4d2d6d7397158b44341570e27f693bb6e4a4ce57e245af4aef289b9d3957723",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "Environment.config",
+              "functionId": "952fc3f3c1c412f21dae6dd343b3f01532e084593cb0de7dcec854b2a917f643"
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "call-action"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "explicit-fallback": [
+          {
+            "handlerId": "6340991ab45cf4f4c09f29f514de6011053e2474c084c1dce2b3361ad4c7da8d",
+            "file": "httpie/cli/argtypes.py",
+            "line": 181,
+            "sourceSha256": "de2f97a67bc7babfacf61098b7344f4c8c5f28e29216d09d1ab9c3cb45e96518",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AuthCredentialsArgType.__call__",
+              "functionId": "1c9d2ba79f46081ead641fbaa3349093ac00f23494ac5cc04f3e1f4ef9ac2568"
+            },
+            "classification": "explicit-fallback",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "explicit-fallback",
+                "detail": "return-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "27a9727f5c94c18eb1407301fb9645c0bfdb17f21a8882d99a4567c617d575b5",
+            "file": "httpie/compat.py",
+            "line": 98,
+            "sourceSha256": "b6b3cb4d56108867e93e0e227637733a1e6edb2063b2e00cf5279b36ec9cabba",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "get_dist_name",
+              "functionId": "8805ea6643058b77f05b3c9b587730128633e3b7013a97e28d0cb6a5a3559894"
+            },
+            "classification": "explicit-fallback",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "explicit-fallback",
+                "detail": "return-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "c05a5ac5830758a4c561506389b658dfa7361bccff12d0b9ad706150d4556139",
+            "file": "httpie/context.py",
+            "line": 13,
+            "sourceSha256": "e4d2d6d7397158b44341570e27f693bb6e4a4ce57e245af4aef289b9d3957723",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "classification": "explicit-fallback",
+            "reasons": [
+              "guarded-import-literal-default"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "loop-transfer": [
+          {
+            "handlerId": "b44b134c22c3c9a4de44ff23bf6ee5bca2117ff34bdc55d7361b7677e8c9d329",
+            "file": "httpie/cli/nested_json/parse.py",
+            "line": 146,
+            "sourceSha256": "d43a909037a6f7c58d8b6e655807384cfb2ca9022cf1a20905e3357c850446e6",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "tokenize.send_buffer",
+              "functionId": "a9ee8eaa4a269dde86fe290c90dd9f0518c0074b4e1ca76fde32af4d8516d211"
+            },
+            "classification": "loop-transfer",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "loop-transfer",
+                "detail": "continue"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "33b085df2d9b2597458576b65c3ac8794a83d5e24ecb3ea0f154d5b3dc057622",
+            "file": "httpie/plugins/manager.py",
+            "line": 71,
+            "sourceSha256": "6fbf39e6b5c90977637f38e3769b78b1874e3e45dd05fd704a808f0f65beb67e",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "PluginManager.load_installed_plugins",
+              "functionId": "eb153ca9c97a4a973112cc2fc5a4aec1a566624475d34d5b048660b3ad4cd4a6"
+            },
+            "classification": "loop-transfer",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "loop-transfer",
+                "detail": "continue"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "b83043e40cb80e4d7804cd2132b184788e475841302ab4943f0518523db97f8c",
+            "file": "httpie/utils.py",
+            "line": 305,
+            "sourceSha256": "3c6b1fed010e8e895324ca03d9966e638e42418a7810b9908d9d5ceab959db86",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "is_version_greater.split_version",
+              "functionId": "542af840cd9f6769de6bab885971372ee543aa9336b069d319c5c5455f1e4849"
+            },
+            "classification": "loop-transfer",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "loop-transfer",
+                "detail": "break"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "documented-suppression": [
+          {
+            "handlerId": "5b74f2434cbac38a252a14a43281dc3698069832616d84c5e549f64bada45894",
+            "file": "httpie/downloads.py",
+            "line": 244,
+            "sourceSha256": "eea60912640e337feafa08cae05944d6c8e1a93d1a95eed48e29f2e9921bdcdf",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "Downloader.start",
+              "functionId": "08273b60b917dbf09bd89391b7eecd1150a77a4834bf188c06141eb59d443e13"
+            },
+            "classification": "documented-suppression",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "88f1056c47f5514d5190ae2381a73343d700713db9fe0fd403040658849b3755",
+            "file": "httpie/output/formatters/colors.py",
+            "line": 184,
+            "sourceSha256": "818b82191db085acab172220755c19abecf8135432350407a2b9c18f7d49e13e",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "get_lexer",
+              "functionId": "e5c7459744c41e958e8dd06b36c7dfd0085fcdabae6d49cdc9053062c10d55d5"
+            },
+            "classification": "documented-suppression",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "126587bed7434083b028b0202a923893e3b2c7b266e08a893828c5675c08a7cd",
+            "file": "httpie/output/formatters/json.py",
+            "line": 23,
+            "sourceSha256": "c3237e34043c69e6294df31d8aa6ff7fd995db151277d345a1d66d2f63b4b4b1",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "JSONFormatter.format_body",
+              "functionId": "32f76c38d444437b20d8ffccea7c1e0127689c80002f3b721e2f02da3171ac40"
+            },
+            "classification": "documented-suppression",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ]
+      },
+      "blockingExamples": []
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "runId": "50c05a30-f656-497b-937b-42b024dd0d74",
+      "functionFactsSha256": "9bbc7c6413724338f4a898ecdc6fdf62750e748f105180baded5c268d33f96ae",
+      "selectionFingerprint": "38e48233960af37b1e0104b3b9ad0c98482c84b491f7019f4c014df304100cb2",
+      "unchangedSourceFactsAndPriorExceptionAndAsyncEvidence": true,
+      "dispositionRowsSha256": "4d2a7d58f2f17f564a0187c15e3dd176600f89958ef8c2fdad382654c7b082ca",
+      "helperRowsSha256": "25f616d5943e5591351dff41a1299fdccb623b7c87dd031b72ecdb38eba5d9ae",
+      "handlerSummary": {
+        "handlers": 1267,
+        "byClassification": {
+          "documented-suppression": 41,
+          "explicit-fallback": 241,
+          "loop-transfer": 55,
+          "mixed-explicit-disposition": 46,
+          "propagation": 306,
+          "recovery-action": 277,
+          "unexplained-swallowing-candidate": 25,
+          "unresolved": 276
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "byClassification": {
+              "documented-suppression": 41,
+              "explicit-fallback": 241,
+              "loop-transfer": 55,
+              "mixed-explicit-disposition": 46,
+              "propagation": 306,
+              "recovery-action": 277,
+              "unexplained-swallowing-candidate": 25,
+              "unresolved": 276
+            }
+          }
+        }
+      },
+      "asyncSummary": {
+        "asyncFunctions": 266,
+        "availability": "available",
+        "functionsWithDirectOrHelperCandidates": 0,
+        "candidatePathsByContext": {},
+        "unresolvedPathsByReason": {
+          "async-or-unselected-callee": 18,
+          "comprehension-local-binding": 3,
+          "decorated-definition": 1,
+          "definition-not-before-reference": 9,
+          "dynamic-callee-expression": 86,
+          "generator-body-deferred": 2,
+          "import-spelling-only": 4,
+          "no-lexical-import": 1,
+          "no-local-definition": 120,
+          "non-import-or-ambiguous-binding": 297,
+          "non-name-reference": 65,
+          "not-a-direct-function-definition": 37,
+          "rebound-or-ambiguous-name": 10,
+          "reflective-or-cross-scope-binding": 106
+        },
+        "candidatePaths": 0,
+        "localHelperLinks": 22,
+        "distinctBlockingSourceCalls": 0,
+        "populations": {
+          "production": {
+            "asyncFunctions": 266,
+            "availability": "available",
+            "functionsWithDirectOrHelperCandidates": 0,
+            "candidatePathsByContext": {},
+            "unresolvedPathsByReason": {
+              "async-or-unselected-callee": 18,
+              "comprehension-local-binding": 3,
+              "decorated-definition": 1,
+              "definition-not-before-reference": 9,
+              "dynamic-callee-expression": 86,
+              "generator-body-deferred": 2,
+              "import-spelling-only": 4,
+              "no-lexical-import": 1,
+              "no-local-definition": 120,
+              "non-import-or-ambiguous-binding": 297,
+              "non-name-reference": 65,
+              "not-a-direct-function-definition": 37,
+              "rebound-or-ambiguous-name": 10,
+              "reflective-or-cross-scope-binding": 106
+            },
+            "candidatePaths": 0,
+            "localHelperLinks": 22,
+            "distinctBlockingSourceCalls": 0
+          }
+        }
+      },
+      "handlerExamples": {
+        "unresolved": [
+          {
+            "handlerId": "0d638fb2526c5c979a01eca13abd32052af55c0faad76aeaefbf86b97e50e889",
+            "file": "django/apps/config.py",
+            "line": 112,
+            "sourceSha256": "d59871b783abc119ce9ac4ff07f06eac89b3de88bcdf7d13246d2b451279f1b4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AppConfig.create",
+              "functionId": "3f3f80a2595d345e1b2648d311eac00548480b34d117f01f94eca3a51fca2e6c"
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "surrounding-rationale-needs-review"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "d756c060fae31db86724c876289b29dca3f93755d3a44ed012653882ef049d5e",
+            "file": "django/apps/config.py",
+            "line": 163,
+            "sourceSha256": "d59871b783abc119ce9ac4ff07f06eac89b3de88bcdf7d13246d2b451279f1b4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AppConfig.create",
+              "functionId": "3f3f80a2595d345e1b2648d311eac00548480b34d117f01f94eca3a51fca2e6c"
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "surrounding-rationale-needs-review"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "d2601321cc896a0afc047bf26ef51542e3f07ac4e67f1c6a1930fee988dfbca2",
+            "file": "django/apps/registry.py",
+            "line": 159,
+            "sourceSha256": "ec931677450952aad787249d5582cc3fe0cb0bdb2a9a7ee7fdd817c4263a0d66",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "Apps.get_app_config",
+              "functionId": "d49076938bb5cfbe078c2eaffba3e2c148e4b726b829e1a9b67dd07d8bfc77b2"
+            },
+            "classification": "unresolved",
+            "reasons": [
+              "unsupported-For"
+            ],
+            "paths": [
+              {
+                "outcome": "unresolved",
+                "detail": "unsupported-For"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "propagation": [
+          {
+            "handlerId": "2e3cc63b5669c1247564025c23bb814a98e6df3a48c7b6baff32b50108026cc1",
+            "file": "django/apps/config.py",
+            "line": 205,
+            "sourceSha256": "d59871b783abc119ce9ac4ff07f06eac89b3de88bcdf7d13246d2b451279f1b4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AppConfig.create",
+              "functionId": "3f3f80a2595d345e1b2648d311eac00548480b34d117f01f94eca3a51fca2e6c"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "fc864beaae1a98a8ca6fc1f61f77f7a830229af10de6ef86200d8447f0e34ee5",
+            "file": "django/apps/config.py",
+            "line": 211,
+            "sourceSha256": "d59871b783abc119ce9ac4ff07f06eac89b3de88bcdf7d13246d2b451279f1b4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AppConfig.create",
+              "functionId": "3f3f80a2595d345e1b2648d311eac00548480b34d117f01f94eca3a51fca2e6c"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "3fad01f2d7a0c0076c6e4582dae9a3dbb588e0ec694280e4bb72d77c942ef4d6",
+            "file": "django/apps/config.py",
+            "line": 236,
+            "sourceSha256": "d59871b783abc119ce9ac4ff07f06eac89b3de88bcdf7d13246d2b451279f1b4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AppConfig.get_model",
+              "functionId": "0d9634c729baa5e15d2f8630a01764bad66d661f834a2b15cd8697e51ea51f5f"
+            },
+            "classification": "propagation",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "recovery-action": [
+          {
+            "handlerId": "7ca777b4ac887b9ca01b1a1be82ae48e82791604063f5e5c32b3c378f80a85f5",
+            "file": "django/apps/registry.py",
+            "line": 423,
+            "sourceSha256": "ec931677450952aad787249d5582cc3fe0cb0bdb2a9a7ee7fdd817c4263a0d66",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "Apps.lazy_model_operation",
+              "functionId": "1885db376a7bd7aa670c1ef0a066ecf78d7559ee090a29a580c019d80507736c"
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "call-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "d25b1fed226a661136bbb77a471c55244996336578f695479cfda7f8b536d737",
+            "file": "django/contrib/admin/helpers.py",
+            "line": 279,
+            "sourceSha256": "a739b24854952ee42bfde4f44e40c5197a0404af1b6020cd4969c511530c6616",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AdminReadonlyField.contents",
+              "functionId": "485ac9fdef09c9f7e1256b14934edc403df82097562e65f3aa50e3341f0b7d97"
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "ffd9e57e7378b8362c17e5f5fa35f704547a08b36145a358cfdf7eeb7c19db02",
+            "file": "django/contrib/admin/options.py",
+            "line": 249,
+            "sourceSha256": "80963d8b0288171846ca14fbbf42b26e72ec5a9bbd310eb0e032671391917797",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "BaseModelAdmin.formfield_for_dbfield",
+              "functionId": "8215b5f56bf1d685789796fdf571a8d5df2fcba1c0cd8b7acd5541e507a16fd5"
+            },
+            "classification": "recovery-action",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "explicit-fallback": [
+          {
+            "handlerId": "e97038b4a05c337712340e5b492283b1c375d87a13cad8dbe7d9d58163f45d6f",
+            "file": "django/contrib/admin/checks.py",
+            "line": 26,
+            "sourceSha256": "e971969add6e4b868dd6b52c160d4e15a183de52782b161f6a04626b7c42a5f4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_issubclass",
+              "functionId": "adfc8e0eb330a2693f2a642232b0ba12456447248d03bb8f663c5639d5e0f416"
+            },
+            "classification": "explicit-fallback",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "explicit-fallback",
+                "detail": "return-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "ff889d164014f6b8f05a961174d82010b1c629b18fdc7b95486fd913fc8f8350",
+            "file": "django/contrib/admin/checks.py",
+            "line": 227,
+            "sourceSha256": "e971969add6e4b868dd6b52c160d4e15a183de52782b161f6a04626b7c42a5f4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "BaseModelAdminChecks._check_autocomplete_fields_item",
+              "functionId": "0aae4185c06ba3e3ad5354ae453698f1f0c0b5dbf5fbff70f02966a41ce925a7"
+            },
+            "classification": "explicit-fallback",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "explicit-fallback",
+                "detail": "return-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "605f3f8174e08ecf02c220725e8594600d0e04a6b29cd1b24e12b043734bf673",
+            "file": "django/contrib/admin/checks.py",
+            "line": 243,
+            "sourceSha256": "e971969add6e4b868dd6b52c160d4e15a183de52782b161f6a04626b7c42a5f4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "BaseModelAdminChecks._check_autocomplete_fields_item",
+              "functionId": "0aae4185c06ba3e3ad5354ae453698f1f0c0b5dbf5fbff70f02966a41ce925a7"
+            },
+            "classification": "explicit-fallback",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "explicit-fallback",
+                "detail": "return-expression"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "loop-transfer": [
+          {
+            "handlerId": "b19e205aa29fb02de46055a6ef58b6a2e570b4ea7fc090de78f084c2e6cd736a",
+            "file": "django/contrib/admin/checks.py",
+            "line": 39,
+            "sourceSha256": "e971969add6e4b868dd6b52c160d4e15a183de52782b161f6a04626b7c42a5f4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_contains_subclass",
+              "functionId": "3a0a01cd8980b929739e3f240dec81baa0eab86263a91d22c7c29471c60f4745"
+            },
+            "classification": "loop-transfer",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "loop-transfer",
+                "detail": "continue"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "06cac2451bf87be1c5e6570701931bc91536909abcc1fc5122319fb88a80b677",
+            "file": "django/contrib/admin/options.py",
+            "line": 525,
+            "sourceSha256": "80963d8b0288171846ca14fbbf42b26e72ec5a9bbd310eb0e032671391917797",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "BaseModelAdmin.lookup_allowed",
+              "functionId": "ef4700c920e1e65235300c7d31627829a8f6c04762f25d44e144f9e8113417d2"
+            },
+            "classification": "loop-transfer",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "loop-transfer",
+                "detail": "break"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "85a3ca39463ed0b49f087b0052e60f6e1fa140254d293f369fd0065c701eb6be",
+            "file": "django/contrib/admin/options.py",
+            "line": 1390,
+            "sourceSha256": "80963d8b0288171846ca14fbbf42b26e72ec5a9bbd310eb0e032671391917797",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "ModelAdmin.get_search_results",
+              "functionId": "6c19da09e26997fff0a2db8c6bc736685b84e2335799a3e50453ca3844c92d4d"
+            },
+            "classification": "loop-transfer",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "loop-transfer",
+                "detail": "continue"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "documented-suppression": [
+          {
+            "handlerId": "a5380ef8c35a50ca7ee7ebed43c83e2026242e44e1c41a79d3c1f1070cdbfb02",
+            "file": "django/contrib/admin/options.py",
+            "line": 1852,
+            "sourceSha256": "80963d8b0288171846ca14fbbf42b26e72ec5a9bbd310eb0e032671391917797",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "ModelAdmin.response_action",
+              "functionId": "c21a4fa54736079b606a73919c397f627e318a6f42b512f50be27a410102e67c"
+            },
+            "classification": "documented-suppression",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "7b89393dc328bf0cc11c880ef140de4429892a111e6639d7b6e19dddb6b78d5d",
+            "file": "django/contrib/admin/templatetags/admin_list.py",
+            "line": 235,
+            "sourceSha256": "f1fda4e7be54176dabc2256d2e001827d113869e594da620567981f402753cea",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "items_for_result",
+              "functionId": "95cf6f666d66060e410d7ce2a8bbf3b43fd32f659c4908564c7c05449a3d5895"
+            },
+            "classification": "documented-suppression",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "f87e6b522635dc49aeaf8112c8c52ac54b2c485e265f9122e08bda448d3252cb",
+            "file": "django/contrib/admindocs/views.py",
+            "line": 71,
+            "sourceSha256": "c795b8e7d25de6c0c431243ca5943e3aa59421939e60300847f2ab90f09864cb",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "TemplateTagIndexView.get_context_data",
+              "functionId": "925bb9225573f26bd1f982a8c2044a120d386e62f43a1144d40d9508400fe3e9"
+            },
+            "classification": "documented-suppression",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "mixed-explicit-disposition": [
+          {
+            "handlerId": "5717f50fc5598a4d60cc538e803a1469195bb8ff8861f9398c694469b3703236",
+            "file": "django/contrib/auth/__init__.py",
+            "line": 58,
+            "sourceSha256": "a4eda00e2c4e29178afac5c1a05b52f07b65c0c2a4582c3684eb332521b3209a",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_get_backend_from_user",
+              "functionId": "46372a83716fd338a26143a43c22e5b0831100444f5e82c0a3d50f320ca68713"
+            },
+            "classification": "mixed-explicit-disposition",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              },
+              {
+                "outcome": "propagation",
+                "detail": "raise-expression"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "81c66bf82ddf4080480af7378a83538fe4aeba88125858f8f2aa573efbdbd1fc",
+            "file": "django/contrib/auth/management/commands/createsuperuser.py",
+            "line": 186,
+            "sourceSha256": "bf81eab5118c78f6d0a32a34826273e3f77a78c8671a12688c08a6da51fbc8bb",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "Command.handle",
+              "functionId": "0115edbb30cc2b94bb07650edc8d5ed126d2f8f552195f04a5af836ed67cc1c9"
+            },
+            "classification": "mixed-explicit-disposition",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "state-update"
+              },
+              {
+                "outcome": "loop-transfer",
+                "detail": "continue"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "c47fc130d36f0be922a90d32a25536729f85ca41731d4482c731a6bd440600c9",
+            "file": "django/contrib/flatpages/middleware.py",
+            "line": 19,
+            "sourceSha256": "e10cece87532dabffef463d7502e01b13149370f6370667439e47d328cdeadd2",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "FlatpageFallbackMiddleware.process_response",
+              "functionId": "58e0b460342fd4c43e37e5d9451a164d205eef788d9b0a9667d16fa081edc978"
+            },
+            "classification": "mixed-explicit-disposition",
+            "reasons": [],
+            "paths": [
+              {
+                "outcome": "explicit-fallback",
+                "detail": "return-expression"
+              },
+              {
+                "outcome": "propagation",
+                "detail": "bare-raise"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ],
+        "unexplained-swallowing-candidate": [
+          {
+            "handlerId": "ea8183bbbc53585636639d07adfcdd991c2213930faad5294f276c3f35d15f4b",
+            "file": "django/contrib/redirects/middleware.py",
+            "line": 44,
+            "sourceSha256": "5d6c2f788384fece51b7fe8f7ebaf7b70d97df7ad88188de6f1da5f5933504bf",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "RedirectFallbackMiddleware.process_response",
+              "functionId": "07acdb9a88846a077af13dce1304357a5bc19e3e2951ac56230220f6572e8314"
+            },
+            "classification": "unexplained-swallowing-candidate",
+            "reasons": [
+              "no-local-action-or-rationale-observed"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "5a903bc889ba4e118411fde20faa2e470f539bc5c68431f6151eacc6fde625e6",
+            "file": "django/contrib/sessions/backends/db.py",
+            "line": 176,
+            "sourceSha256": "b3a44d765256c86ce232952797050dbf76cb37f83e92ed9025fc548361094265",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "SessionStore.delete",
+              "functionId": "9f5747ed01f1f8b9e613afe47974a4cd6d5ac45510e71f14637c1e44a89c58d3"
+            },
+            "classification": "unexplained-swallowing-candidate",
+            "reasons": [
+              "no-local-action-or-rationale-observed"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "88575c0ea2c55397baf84ea6fdbd41c65af46351e946d09aed37987db8c19379",
+            "file": "django/contrib/sessions/backends/db.py",
+            "line": 187,
+            "sourceSha256": "b3a44d765256c86ce232952797050dbf76cb37f83e92ed9025fc548361094265",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "SessionStore.adelete",
+              "functionId": "b4e330c6288e5e8225284720afccfbf01be2acec231f24649220a261a1a80076"
+            },
+            "classification": "unexplained-swallowing-candidate",
+            "reasons": [
+              "no-local-action-or-rationale-observed"
+            ],
+            "paths": [
+              {
+                "outcome": "fallthrough",
+                "detail": "no-action"
+              }
+            ],
+            "disposition": "review-only"
+          }
+        ]
+      },
+      "blockingExamples": []
+    }
+  ],
+  "validation": {
+    "pythonTests": 223,
+    "pythonTestLog": "TestResults/python-behavior-tests-verified-2026-10-24.log",
+    "curatedAccuracy": {
+      "schemaVersion": 1,
+      "scope": "Curated source-contract examples including corpus-inspired negatives. Not a random sample, independent holdout, runtime accuracy estimate, or scoring calibration.",
+      "passed": true,
+      "metrics": {
+        "handlers": {
+          "cases": 15,
+          "exactMatches": 15,
+          "truePositives": 2,
+          "trueNegatives": 13,
+          "falsePositives": 0,
+          "falseNegatives": 0
+        },
+        "async": {
+          "cases": 12,
+          "exactMatches": 12,
+          "truePositives": 5,
+          "trueNegatives": 7,
+          "falsePositives": 0,
+          "falseNegatives": 0
+        }
+      },
+      "cases": [
+        {
+          "case": "bare-swallow",
+          "reviewer": "handlers",
+          "sourceSha256": "99eeb6558b6f06071217693cdfd5ef7b9bf7cb94622236922f9f94ed36695e3c",
+          "expected": "unexplained-swallowing-candidate",
+          "actual": "unexplained-swallowing-candidate",
+          "matches": true,
+          "expectedCandidate": true,
+          "actualCandidate": true
+        },
+        {
+          "case": "directive-is-not-rationale",
+          "reviewer": "handlers",
+          "sourceSha256": "5ac005da7937057184ce2f7d8d94181cd025132acaebff9237d4d859fa6a3e19",
+          "expected": "unexplained-swallowing-candidate",
+          "actual": "unexplained-swallowing-candidate",
+          "matches": true,
+          "expectedCandidate": true,
+          "actualCandidate": true
+        },
+        {
+          "case": "documented-choice",
+          "reviewer": "handlers",
+          "sourceSha256": "e4179bec02cadf5f6ea4c834ca214021ae181c731bdc47456b3b8ecda8c9a1ab",
+          "expected": "documented-suppression",
+          "actual": "documented-suppression",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "conditional-propagation",
+          "reviewer": "handlers",
+          "sourceSha256": "2cee7047a7344857a743323ca9567838ff5ed07fc8d07d25b469704bf87e0b09",
+          "expected": "propagation",
+          "actual": "propagation",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "conditional-fallback",
+          "reviewer": "handlers",
+          "sourceSha256": "76f2fb1727cd7a2162f424a8d028a27e9298c5f45b445be82b116f4cb603b6f8",
+          "expected": "explicit-fallback",
+          "actual": "explicit-fallback",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "recovery-call",
+          "reviewer": "handlers",
+          "sourceSha256": "f4c2e3929c371a151eb9af74d7fe6c7007083bdbadc6ee229ee36cd37cbe0af5",
+          "expected": "recovery-action",
+          "actual": "recovery-action",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "mixed-path",
+          "reviewer": "handlers",
+          "sourceSha256": "610d7c58bf2412d894d8f5959adf08b0418b0dd551803b53f8f40235a98255ff",
+          "expected": "mixed-explicit-disposition",
+          "actual": "mixed-explicit-disposition",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "missing-branch",
+          "reviewer": "handlers",
+          "sourceSha256": "5b3a662b283742cf76b621df4ffac95d97b07ac987720e5893dc0062f1451fc4",
+          "expected": "unresolved",
+          "actual": "unresolved",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "nested-definition-is-not-recovery",
+          "reviewer": "handlers",
+          "sourceSha256": "5ef1d65ad33bef9dbef89cad97281f4db42f4b23bf0955a3cebc5f46934b1ff4",
+          "expected": "unresolved",
+          "actual": "unresolved",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "route-search",
+          "reviewer": "handlers",
+          "sourceSha256": "6bc54e8fb674df4ae2745533a835153668e93bcf87b2540fdffd74340276cecb",
+          "expected": "unresolved",
+          "actual": "unresolved",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "iterator-disconnect",
+          "reviewer": "handlers",
+          "sourceSha256": "fb55a7ffe58ba030f7061777b49e10190bda64d3c7070b50efb7a7f339fcbcae",
+          "expected": "unresolved",
+          "actual": "unresolved",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "selective-config-fallback",
+          "reviewer": "handlers",
+          "sourceSha256": "0a0fe64058500de0cdba254eb72dc2935787e0eda2d15d7812dcac6cd5851161",
+          "expected": "unresolved",
+          "actual": "unresolved",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "optional-import",
+          "reviewer": "handlers",
+          "sourceSha256": "5c690310da91ecc4bb807b4b2dca216ee546a6c4a4c1eedab775af2335601ef0",
+          "expected": "explicit-fallback",
+          "actual": "explicit-fallback",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "enclosing-finally",
+          "reviewer": "handlers",
+          "sourceSha256": "f81b33d893faf6fc562b2eb018ebdbf4140fda3dd1163c59f5dbed3606a3a208",
+          "expected": "unresolved",
+          "actual": "unresolved",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "preceding-rationale",
+          "reviewer": "handlers",
+          "sourceSha256": "b5873a17137953b72636d7d7ed9605a5c23542f7a169bf1feb73ab86165aedfc",
+          "expected": "unresolved",
+          "actual": "unresolved",
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "direct-blocking",
+          "reviewer": "async",
+          "sourceSha256": "19f2d69f69eead3cd90fffef4d0204869779fc13a33f5afef3776e04267e8690",
+          "expected": 1,
+          "actual": 1,
+          "matches": true,
+          "expectedCandidate": true,
+          "actualCandidate": true
+        },
+        {
+          "case": "helper-blocking",
+          "reviewer": "async",
+          "sourceSha256": "6acbb530ad60b3934003fc09ac8efc2af87c30553c05a4c6a7eba7d6c8b1d96e",
+          "expected": 1,
+          "actual": 1,
+          "matches": true,
+          "expectedCandidate": true,
+          "actualCandidate": true
+        },
+        {
+          "case": "offload-reference",
+          "reviewer": "async",
+          "sourceSha256": "45fcdfdd2fd2152ea379acd0249e9587a15ffa04f0fc97454c0ce824684ee4fa",
+          "expected": 0,
+          "actual": 0,
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "eager-offload-argument",
+          "reviewer": "async",
+          "sourceSha256": "6df206b77b320bc5c18ea6cbbfbd0da323814a7ef0f14e533a95c85a39abf4a0",
+          "expected": 1,
+          "actual": 1,
+          "matches": true,
+          "expectedCandidate": true,
+          "actualCandidate": true
+        },
+        {
+          "case": "deferred-generator",
+          "reviewer": "async",
+          "sourceSha256": "58888f5654d70a72e59fea969a9ea6a35106264a30cab6af1f1ed3364eadbe9f",
+          "expected": 0,
+          "actual": 0,
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "eager-generator-iterable",
+          "reviewer": "async",
+          "sourceSha256": "cc55cc91bd2e000734622f0624af78ae6fe0cf3c1e9e89b83cdf4ee2f945fb87",
+          "expected": 1,
+          "actual": 1,
+          "matches": true,
+          "expectedCandidate": true,
+          "actualCandidate": true
+        },
+        {
+          "case": "shadowed-parameter",
+          "reviewer": "async",
+          "sourceSha256": "42de7ca7e36bc45bfc04513df5da4e49ebf305075a299bb1e8a9524b5fae6081",
+          "expected": 0,
+          "actual": 0,
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "unresolved-receiver",
+          "reviewer": "async",
+          "sourceSha256": "e85dfceeb139d2b532ac2e2ce4675306ae1d32cac887d774817510796638b8d3",
+          "expected": 0,
+          "actual": 0,
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "partial-invocation",
+          "reviewer": "async",
+          "sourceSha256": "2344ff5cd107a96eb049a3d941995dc32bef91e2158c31a53c8d4f238102e4c3",
+          "expected": 1,
+          "actual": 1,
+          "matches": true,
+          "expectedCandidate": true,
+          "actualCandidate": true
+        },
+        {
+          "case": "partial-construction-only",
+          "reviewer": "async",
+          "sourceSha256": "c4a72e4a2c01f1ea3d877200a358729db65056e480b8b162e68181cce362d42d",
+          "expected": 0,
+          "actual": 0,
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "wrapper-construction-only",
+          "reviewer": "async",
+          "sourceSha256": "13c4163fa722d46e983485c28046ddcacc46b78cb74c2147688d0f0c06c0475f",
+          "expected": 0,
+          "actual": 0,
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        },
+        {
+          "case": "wrapper-invocation",
+          "reviewer": "async",
+          "sourceSha256": "1d1fb7fb9b5099abee879345c8a611f0f81044090b3e32af1744843122aec99e",
+          "expected": 0,
+          "actual": 0,
+          "matches": true,
+          "expectedCandidate": false,
+          "actualCandidate": false
+        }
+      ]
+    },
+    "packagedContractChanged": false,
+    "skillChanged": false,
+    "scoringEnabled": false
+  }
+}

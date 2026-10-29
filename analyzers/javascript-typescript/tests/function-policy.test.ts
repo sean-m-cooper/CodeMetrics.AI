@@ -178,5 +178,5 @@ describe("owned function measurements", () => {
     for (const dimension of ["codeQuality", "maintainability"] as const) {
       expect(contributions(result.evidence.dimensions[dimension])).toHaveLength(result.metrics.length);
     }
-  });
+  }, 15_000); // Whole-repository integration check; not a five-second performance budget.
 });

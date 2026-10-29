@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "policy": "python/exception-context-patterns-v1",
+  "auditId": "ecc0cf87-4a54-41d6-8ba1-d646219ae4de",
+  "implementationSha256": "93ee26a0767abff20c642737e7ba4e05623cfc192758ae3ace290dbf66ae547b",
+  "scope": "Syntactic pattern review, not error-handling scoring or business-correctness classification.",
+  "samples": [
+    {
+      "id": "requests",
+      "repository": "requests",
+      "url": "https://github.com/psf/requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "role": "HTTP client library",
+      "include": [
+        "src/requests/**"
+      ],
+      "productionPaths": [],
+      "runId": "85566e48-aaa8-4e31-9685-a4284b5e6857",
+      "configurationFingerprint": "c9f9b50e1db288226dd485a885ece6c8f948d96d298e6374434830fa479d539b",
+      "handlerRowsSha256": "991dddd078d808234a3f823b0cec0838e680119852eaa8ccb5dc1dda4d40c386",
+      "contextRowsSha256": "b0c59635144eb267b3ff63182f961f4287c6707fbd8b483124b0795c3bd7d19f",
+      "selectedSourceSha256": "2d607977215a449fd48af18dbaf908cdeaf67c08aba11fa0d06160700c19b677",
+      "functionFactsSha256": "45891e7b93660fe54c14af8d10479e357eb4b57fdee3abb688645a7c54bfc609",
+      "summary": {
+        "handlers": 66,
+        "recognizedShapes": 17,
+        "unresolved": 49,
+        "byPattern": {
+          "direct-literal-fallback-return": 10,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 2
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 1,
+          "no-supported-local-shape": 48
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "recognizedShapes": 17,
+            "unresolved": 49,
+            "byPattern": {
+              "direct-literal-fallback-return": 10,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 2
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 1,
+              "no-supported-local-shape": 48
+            }
+          }
+        }
+      },
+      "unchangedSourceFunctionsAndHandlers": true
+    },
+    {
+      "id": "starlette",
+      "repository": "starlette",
+      "url": "https://github.com/Kludex/starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "role": "ASGI framework",
+      "include": [
+        "starlette/**"
+      ],
+      "productionPaths": [],
+      "runId": "d6cf5cfa-db06-4e4a-9f89-7b5b31769e32",
+      "configurationFingerprint": "9c221b6ccdd20f060b06723a5445a4c3a2e994a087884eeaeeeabe7b06606cee",
+      "handlerRowsSha256": "23d5af275d636eaa9119aa2327e38ecd6e2e1b672a192ce686b5345b2210e17e",
+      "contextRowsSha256": "90b2d2db83b9ae32496db00c8a03a64cd5eecc7472a5bb1e8ebefd3d97c5b8e4",
+      "selectedSourceSha256": "2a51420a3bfbda775c692446934792dfc86b9d289056bf5a1fae501579ed9dd7",
+      "functionFactsSha256": "b2e5495c18c8532661f8d0269aab2b4413dfe192c116038807a03813c229457c",
+      "summary": {
+        "handlers": 62,
+        "recognizedShapes": 5,
+        "unresolved": 57,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "guarded-import-literal-default": 1,
+          "no-op-then-literal-return": 1
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "enclosing-finally": 4,
+          "nested-handler": 1,
+          "no-supported-local-shape": 51
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "recognizedShapes": 5,
+            "unresolved": 57,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "guarded-import-literal-default": 1,
+              "no-op-then-literal-return": 1
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "enclosing-finally": 4,
+              "nested-handler": 1,
+              "no-supported-local-shape": 51
+            }
+          }
+        }
+      },
+      "unchangedSourceFunctionsAndHandlers": true
+    },
+    {
+      "id": "httpie",
+      "repository": "httpie",
+      "url": "https://github.com/httpie/cli",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "role": "CLI application",
+      "include": [
+        "httpie/**"
+      ],
+      "productionPaths": [],
+      "runId": "567c707c-0def-4941-8e43-be98feb49170",
+      "configurationFingerprint": "a4a4dfa4c2916cf91b9a7b7cc65d68b2c1c5b8a26dc80ba02879740b01d95189",
+      "handlerRowsSha256": "66d3d8952b8626ebc3806d7c8db4d72148e1f721a2cce1b973c56321b808c685",
+      "contextRowsSha256": "d0d2e09767863ebc2fbcad9b710e0a3adbcb2d3ed31433c7305aec11cce1c8bc",
+      "selectedSourceSha256": "cb8ee90b048099e53b85aaee32175802082b22a7706e5c05e0d4e403d7be47a8",
+      "functionFactsSha256": "d6e571d78f49775fa2ec63b0fbec632e43fab7ac6398d0cf7e633938a0d09bbb",
+      "summary": {
+        "handlers": 69,
+        "recognizedShapes": 9,
+        "unresolved": 60,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "guarded-import-literal-default": 1,
+          "locally-documented-no-op": 5
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "no-supported-local-shape": 58
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "recognizedShapes": 9,
+            "unresolved": 60,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "guarded-import-literal-default": 1,
+              "locally-documented-no-op": 5
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "no-supported-local-shape": 58
+            }
+          }
+        }
+      },
+      "unchangedSourceFunctionsAndHandlers": true
+    },
+    {
+      "id": "django",
+      "repository": "django",
+      "url": "https://github.com/django/django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "role": "larger web framework",
+      "include": [
+        "django/**"
+      ],
+      "productionPaths": [
+        "django/test/**"
+      ],
+      "runId": "ff1d0e12-8804-45f0-844d-612e3b700cb0",
+      "configurationFingerprint": "1b91324a315e35b2104e31f5177a16827e9e64a5e2f27b50e8f30027ca51f418",
+      "handlerRowsSha256": "43851d588077e9f8e58b683cde884ccdfa16f013da69271efca87f9b7a853a33",
+      "contextRowsSha256": "6792749f384eb23e2b0d5230956a474f53c88b0ad1bc2e9045aaa31134cf4d6e",
+      "selectedSourceSha256": "2cb4a5b24cda391c3278706e0de5eb522f2d8e5458cceed6c898fdfb27b9a70f",
+      "functionFactsSha256": "82a893dd6660923a67138b3e313310ffff9bee80c1344c56d5a4d309cf35d455",
+      "summary": {
+        "handlers": 1267,
+        "recognizedShapes": 162,
+        "unresolved": 1105,
+        "byPattern": {
+          "direct-bare-rethrow": 6,
+          "direct-literal-fallback-return": 107,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 41,
+          "no-op-then-literal-return": 3
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 32,
+          "enclosing-finally": 18,
+          "exception-group-semantics": 1,
+          "import-exception-binding-unresolved": 1,
+          "nested-handler": 39,
+          "no-supported-local-shape": 1024
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "recognizedShapes": 162,
+            "unresolved": 1105,
+            "byPattern": {
+              "direct-bare-rethrow": 6,
+              "direct-literal-fallback-return": 107,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 41,
+              "no-op-then-literal-return": 3
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 32,
+              "enclosing-finally": 18,
+              "exception-group-semantics": 1,
+              "import-exception-binding-unresolved": 1,
+              "nested-handler": 39,
+              "no-supported-local-shape": 1024
+            }
+          }
+        }
+      },
+      "unchangedSourceFunctionsAndHandlers": true
+    }
+  ],
+  "date": "2026-10-15",
+  "verification": {
+    "pythonTestsPassed": 109,
+    "focusedContextTestsIncluded": 15,
+    "sharedConformanceAndCalibrationTestsPassed": 9,
+    "sourceFunctionAndBaseHandlerDigestsMatchFrozenBaselines": true,
+    "pinnedCheckoutsCleanBeforeAndAfter": true,
+    "inputReportsUnmodified": true
+  },
+  "scoringDisposition": "unscored; recognized shapes and unresolved handlers are not handling-success or defect classifications",
+  "delivery": "Standalone context extension; packaged 0.8.0 contract and scoring code unchanged",
+  "fullReports": "TestResults/python-error-context-2026-10-15-verified/"
+}

@@ -1,0 +1,525 @@
+{
+  "schemaVersion": 1,
+  "policy": "python/exact-function-body-v1",
+  "auditId": "6ea2ebf7-50b0-48ad-8a79-9b4a40b8971f",
+  "implementationSha256": "cd46ec8708703f8c4252a9a6b9d6c0c3d246140705038883281d6111f0f784ef",
+  "scope": "Offline exact-body review leads only. No scores, partial clones, or semantic equivalence claims.",
+  "samples": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "url": "https://github.com/psf/requests",
+      "runId": "5615261d-4b52-406c-a624-0313b83e32c3",
+      "configurationFingerprint": "a7fd057a30aa877ff27231c076097d69ce103488a6b13f83f8fe15e7b91b6587",
+      "configuration": {
+        "policy": "python/exact-function-body-v1",
+        "minimumStatements": 5,
+        "selectionFingerprint": "3a42e533f6092149af8baacf0a98dcae00c52c23dd8652d491347ea969ac9540",
+        "parserVersion": "3.12.10",
+        "maxOwners": 100000,
+        "maxNormalizedBytes": 67108864
+      },
+      "sourceFactsProducer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.3.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "producer": {
+        "name": "codemetrics-ai/python-duplication",
+        "version": "0.1.0-experimental"
+      },
+      "selectedSourceSha256": "2d607977215a449fd48af18dbaf908cdeaf67c08aba11fa0d06160700c19b677",
+      "summary": {
+        "selectedFunctions": 246,
+        "eligibleFunctions": 105,
+        "excludedFunctions": 141,
+        "exclusionReasons": {
+          "below-statement-minimum": 137,
+          "nested-definition": 4
+        },
+        "duplicateGroups": 0,
+        "matchedFunctions": 0
+      },
+      "groups": []
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "url": "https://github.com/Kludex/starlette",
+      "runId": "456db6e4-0882-43b6-92ca-80de852e6c45",
+      "configurationFingerprint": "6087f44440d3eaebc860c484d4f3b2afa6a4c16454bdd8e846bff3d283c3e59c",
+      "configuration": {
+        "policy": "python/exact-function-body-v1",
+        "minimumStatements": 5,
+        "selectionFingerprint": "544dbb0ea0e93df624d27de88718cb9e2be849e982c610f99fe606b2f291cbc5",
+        "parserVersion": "3.12.10",
+        "maxOwners": 100000,
+        "maxNormalizedBytes": 67108864
+      },
+      "sourceFactsProducer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.3.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "producer": {
+        "name": "codemetrics-ai/python-duplication",
+        "version": "0.1.0-experimental"
+      },
+      "selectedSourceSha256": "2a51420a3bfbda775c692446934792dfc86b9d289056bf5a1fae501579ed9dd7",
+      "summary": {
+        "selectedFunctions": 508,
+        "eligibleFunctions": 162,
+        "excludedFunctions": 346,
+        "exclusionReasons": {
+          "below-statement-minimum": 320,
+          "lambda": 1,
+          "nested-definition": 25
+        },
+        "duplicateGroups": 0,
+        "matchedFunctions": 0
+      },
+      "groups": []
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "url": "https://github.com/httpie/cli",
+      "runId": "ba8b41ba-7322-4fa2-af79-96ce1e9cf23a",
+      "configurationFingerprint": "c0d36ffaafe4cec55132e19193102bff8206a9d6c8ef8794ca90618d2df522a7",
+      "configuration": {
+        "policy": "python/exact-function-body-v1",
+        "minimumStatements": 5,
+        "selectionFingerprint": "6bd0c426bc7e8e32467e5c7958000362651a4cb02982b1d088d6c4d8a45f44e1",
+        "parserVersion": "3.12.10",
+        "maxOwners": 100000,
+        "maxNormalizedBytes": 67108864
+      },
+      "sourceFactsProducer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.3.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "producer": {
+        "name": "codemetrics-ai/python-duplication",
+        "version": "0.1.0-experimental"
+      },
+      "selectedSourceSha256": "cb8ee90b048099e53b85aaee32175802082b22a7706e5c05e0d4e403d7be47a8",
+      "summary": {
+        "selectedFunctions": 464,
+        "eligibleFunctions": 178,
+        "excludedFunctions": 286,
+        "exclusionReasons": {
+          "below-statement-minimum": 264,
+          "lambda": 4,
+          "nested-definition": 18
+        },
+        "duplicateGroups": 0,
+        "matchedFunctions": 0
+      },
+      "groups": []
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "url": "https://github.com/django/django",
+      "runId": "6cfc9455-3077-416f-a22c-d4dc8fb8badb",
+      "configurationFingerprint": "1a4c203eec78bbe130be2d898a9539708980c205fa92d1f6fb0bee33c318214c",
+      "configuration": {
+        "policy": "python/exact-function-body-v1",
+        "minimumStatements": 5,
+        "selectionFingerprint": "38e48233960af37b1e0104b3b9ad0c98482c84b491f7019f4c014df304100cb2",
+        "parserVersion": "3.12.10",
+        "maxOwners": 100000,
+        "maxNormalizedBytes": 67108864
+      },
+      "sourceFactsProducer": {
+        "name": "codemetrics-ai/python-source-facts",
+        "version": "0.3.0-experimental",
+        "parser": "python-ast",
+        "parserVersion": "3.12.10"
+      },
+      "producer": {
+        "name": "codemetrics-ai/python-duplication",
+        "version": "0.1.0-experimental"
+      },
+      "selectedSourceSha256": "2cb4a5b24cda391c3278706e0de5eb522f2d8e5458cceed6c898fdfb27b9a70f",
+      "summary": {
+        "selectedFunctions": 9748,
+        "eligibleFunctions": 3172,
+        "excludedFunctions": 6576,
+        "exclusionReasons": {
+          "below-statement-minimum": 6163,
+          "lambda": 136,
+          "nested-definition": 277
+        },
+        "duplicateGroups": 12,
+        "matchedFunctions": 24
+      },
+      "groups": [
+        {
+          "id": "1d993c6bc626d7ae3b9d45292704cd85a74e408355d3b38b6b9d9192e1120179",
+          "population": "production",
+          "functionKind": "FunctionDef",
+          "bodySha256": "759c6b9399b8bf819578729d47220a2efea98d179fc3e4a0a1524fbb27316dc9",
+          "statementCount": 7,
+          "occurrences": [
+            {
+              "id": "84bab22efeecfd74cbc733a147eebc221c3875f02930aadb1273444331151f46",
+              "file": "django/contrib/sessions/backends/db.py",
+              "member": "SessionStore.create",
+              "line": 68,
+              "population": "production",
+              "endLine": 79,
+              "statementCount": 7,
+              "sourceSha256": "b3a44d765256c86ce232952797050dbf76cb37f83e92ed9025fc548361094265"
+            },
+            {
+              "id": "b2215134a63a5a31552e888772faf462c0024ec578b4a2a74e6d0e63ba362564",
+              "file": "django/contrib/sessions/backends/file.py",
+              "member": "SessionStore.create",
+              "line": 110,
+              "population": "production",
+              "endLine": 118,
+              "statementCount": 7,
+              "sourceSha256": "74f18a642827ed8cf357e2d527bb76c7c9bc135744c461d48c5ef50864ab1de0"
+            }
+          ],
+          "disposition": "review-only"
+        },
+        {
+          "id": "2c68fc8928387c39d333d7b67839397d921a6a372507d7b3762dc41031fdc45e",
+          "population": "production",
+          "functionKind": "FunctionDef",
+          "bodySha256": "cb7ad62ac887ae3ea47abaa15671802f8fdec9338996d0b6a9580d57a3a556f2",
+          "statementCount": 7,
+          "occurrences": [
+            {
+              "id": "8ba80ab383a32b541e4ffbe4512212f4820e208ccb0cb54c630a15c4175f31b9",
+              "file": "django/db/models/constraints.py",
+              "member": "UniqueConstraint._get_condition_sql",
+              "line": 449,
+              "population": "production",
+              "endLine": 456,
+              "statementCount": 7,
+              "sourceSha256": "ab316097eb974835dcdbfb0b919652a53690ab8bdc80589bfb58cdde30e9451d"
+            },
+            {
+              "id": "c62e888c769b36095c815f22c07e90a58ad6b644daabb3feb21cde102077713c",
+              "file": "django/db/models/indexes.py",
+              "member": "Index._get_condition_sql",
+              "line": 177,
+              "population": "production",
+              "endLine": 184,
+              "statementCount": 7,
+              "sourceSha256": "484f6ca7c96126a50130e31fc2572466ea7d1dc6c7eceded0898790822661a26"
+            }
+          ],
+          "disposition": "review-only"
+        },
+        {
+          "id": "d420d34203ceef3f54d00763d718d2c742f946ce9be66e0c253d157358571050",
+          "population": "production",
+          "functionKind": "FunctionDef",
+          "bodySha256": "ab9a564ca4ae2afe961809c0515e06e0fab2edb012b0eb6ab616d22f48ac5a7c",
+          "statementCount": 7,
+          "occurrences": [
+            {
+              "id": "e323a0e483a67434a6e01157ec6bfebae76d53904017432c5ea2bca26cd09a49",
+              "file": "django/core/serializers/python.py",
+              "member": "Serializer.handle_m2m_field.queryset_iterator",
+              "line": 75,
+              "population": "production",
+              "endLine": 88,
+              "statementCount": 7,
+              "sourceSha256": "5fce4946b468e25cb82bb72dca2d36c88370d951d25758c12789bb025a809e62"
+            },
+            {
+              "id": "cc1668a73ffdee17b85b49560f26cf4c2e196ebcaf4091662c2dc89d4bad5d8a",
+              "file": "django/core/serializers/xml_serializer.py",
+              "member": "Serializer.handle_m2m_field.queryset_iterator",
+              "line": 169,
+              "population": "production",
+              "endLine": 182,
+              "statementCount": 7,
+              "sourceSha256": "d6e91a6b347c18f3cfac4d023b969aaee6e4d5a3df9c16225a60bd05275bab24"
+            }
+          ],
+          "disposition": "review-only"
+        },
+        {
+          "id": "6e8383821ee4da992d824053b04e0f3d98516989d88475b45ffc40d9bf84c8c0",
+          "population": "production",
+          "functionKind": "AsyncFunctionDef",
+          "bodySha256": "6c14ac51379ba379f2a6b05c776635ab3ce14a602ff2fb8214e18123b4299c4b",
+          "statementCount": 6,
+          "occurrences": [
+            {
+              "id": "84d069f0e01a59b68c300335d6665e9e4f30e0f6c52bd7f533b48a5480655041",
+              "file": "django/contrib/auth/models.py",
+              "member": "PermissionsMixin.ahas_perms",
+              "line": 422,
+              "population": "production",
+              "endLine": 429,
+              "statementCount": 6,
+              "sourceSha256": "fb5cc235be494dcb49c52bbcb716e5d8e741729162ca54cdd31846d90f107fb9"
+            },
+            {
+              "id": "6e6bb9b99e27538aff07af9d7e7fcae2ac190ad13a461c564cc024164a0e7075",
+              "file": "django/contrib/auth/models.py",
+              "member": "AnonymousUser.ahas_perms",
+              "line": 616,
+              "population": "production",
+              "endLine": 622,
+              "statementCount": 6,
+              "sourceSha256": "fb5cc235be494dcb49c52bbcb716e5d8e741729162ca54cdd31846d90f107fb9"
+            }
+          ],
+          "disposition": "review-only"
+        },
+        {
+          "id": "7a78a55e5869fdf547df9af6f5473af9ee3087363209c3e8ea20ca7f03d4a2bb",
+          "population": "production",
+          "functionKind": "FunctionDef",
+          "bodySha256": "f5d0084abc7c01705a7f99798878f7c4c937aa0e03ca15795f1df2df407373b7",
+          "statementCount": 6,
+          "occurrences": [
+            {
+              "id": "1925b9263c5451dfba1c2b0e0d2e57c9e81601b951d8eeb7a6b70a59fff10dce",
+              "file": "django/core/serializers/python.py",
+              "member": "Serializer.handle_m2m_field.queryset_iterator",
+              "line": 95,
+              "population": "production",
+              "endLine": 105,
+              "statementCount": 6,
+              "sourceSha256": "5fce4946b468e25cb82bb72dca2d36c88370d951d25758c12789bb025a809e62"
+            },
+            {
+              "id": "879abaf1ed759bcc68f933cf8838982f327a00e174441abf87727e1cd77dafbf",
+              "file": "django/core/serializers/xml_serializer.py",
+              "member": "Serializer.handle_m2m_field.queryset_iterator",
+              "line": 191,
+              "population": "production",
+              "endLine": 201,
+              "statementCount": 6,
+              "sourceSha256": "d6e91a6b347c18f3cfac4d023b969aaee6e4d5a3df9c16225a60bd05275bab24"
+            }
+          ],
+          "disposition": "review-only"
+        },
+        {
+          "id": "b1dffeee7d4a69cc4aeddf6991de0e44761517906c94d9c5ce3919fc5d2b2eb8",
+          "population": "production",
+          "functionKind": "FunctionDef",
+          "bodySha256": "6e84d3cbd0ff0ce3c01843ab53a1e3e2701fe22836aab57221ab9c8c5d892965",
+          "statementCount": 6,
+          "occurrences": [
+            {
+              "id": "139d3a2c6f5184e123fda17edcbadb7457daf57a3e68d11ebdf7fa6aab4aa5a0",
+              "file": "django/core/files/storage/filesystem.py",
+              "member": "FileSystemStorage.url",
+              "line": 201,
+              "population": "production",
+              "endLine": 207,
+              "statementCount": 6,
+              "sourceSha256": "58590ed08e59875f970c889188deeb1d914a56d61da7e750652fd797a631ffeb"
+            },
+            {
+              "id": "71f3eba105479f1306c815873d3fee43c2d170d9ed492c826c9677f954c1cecf",
+              "file": "django/core/files/storage/memory.py",
+              "member": "InMemoryStorage.url",
+              "line": 275,
+              "population": "production",
+              "endLine": 281,
+              "statementCount": 6,
+              "sourceSha256": "7940d107b075b9355bd5aef4cde6ac225577dd3de47c5705f5ccafcfde12e24f"
+            }
+          ],
+          "disposition": "review-only"
+        },
+        {
+          "id": "b38baebcb578340d1fe184815a79beece734676015bbe9fdb0a55fb6cec871c8",
+          "population": "production",
+          "functionKind": "FunctionDef",
+          "bodySha256": "07156a0b7d51d8c7504285c9252a18c98955858544274886b8556202c13f12e8",
+          "statementCount": 6,
+          "occurrences": [
+            {
+              "id": "85d379ca9334be67ed95bb4c21d2feba4ca402d0e8c7dccd6c0f1217a564cddc",
+              "file": "django/template/base.py",
+              "member": "Template.render",
+              "line": 169,
+              "population": "production",
+              "endLine": 177,
+              "statementCount": 6,
+              "sourceSha256": "8081c7be906f9c1598bd499d704ae5a3785d30b3ca2480fdf00c70c294ebaf3b"
+            },
+            {
+              "id": "5e35b05692dceccf322a4ce41ff49ce741fbabdac1aa98f8802890a3c9759aff",
+              "file": "django/template/base.py",
+              "member": "PartialTemplate.render",
+              "line": 340,
+              "population": "production",
+              "endLine": 347,
+              "statementCount": 6,
+              "sourceSha256": "8081c7be906f9c1598bd499d704ae5a3785d30b3ca2480fdf00c70c294ebaf3b"
+            }
+          ],
+          "disposition": "review-only"
+        },
+        {
+          "id": "4044603c366e1b8f391997a859656f6ea1662eaa973d45bdbfae35845be4716f",
+          "population": "production",
+          "functionKind": "FunctionDef",
+          "bodySha256": "2e8edebc92b45febcac8110c6caf5fb6715c582bd96be15c6e29f759fe7f5d35",
+          "statementCount": 5,
+          "occurrences": [
+            {
+              "id": "e7f372ed0726b7794b22b2e0f14d2952acefec0c619b054559de414db0f6abc9",
+              "file": "django/db/backends/mysql/client.py",
+              "member": "DatabaseClient.runshell",
+              "line": 64,
+              "population": "production",
+              "endLine": 72,
+              "statementCount": 5,
+              "sourceSha256": "229c1d23e1f9afe414a0cf19bcf5c7ca437129bdb07af714c7c1efc539ffa2d5"
+            },
+            {
+              "id": "4b2a549e05047a2a1c77525c09268d936c7f358df53073fc605208ce43538446",
+              "file": "django/db/backends/postgresql/client.py",
+              "member": "DatabaseClient.runshell",
+              "line": 56,
+              "population": "production",
+              "endLine": 64,
+              "statementCount": 5,
+              "sourceSha256": "071a623987b6873838b568cf2870c9c5af3376be92ec237d62268e8530c950ea"
+            }
+          ],
+          "disposition": "review-only"
+        },
+        {
+          "id": "68a91afcb5cfe2696c2668ae69087a24196dd03aa6e3556f47436c96ee1a9d4d",
+          "population": "production",
+          "functionKind": "FunctionDef",
+          "bodySha256": "f0a41baa03db041b01b82c593e1ec1c42d979ad20d4305c6abc9e32d7edee53d",
+          "statementCount": 5,
+          "occurrences": [
+            {
+              "id": "5a3f6e2ceda815d308e457a9273d7f30564d2840e3c545c865a33e3348244696",
+              "file": "django/db/models/fields/__init__.py",
+              "member": "DateField.__init__",
+              "line": 1479,
+              "population": "production",
+              "endLine": 1486,
+              "statementCount": 5,
+              "sourceSha256": "9ed3436cd4b17f2c8ece368acfc4f7e099bde8a9fd5eeaeaab7d9c3cd4bceb27"
+            },
+            {
+              "id": "87c263eeea71b655f066534949679fe8dc0c8d4362ef68d74c43c0d7ff8197c9",
+              "file": "django/db/models/fields/__init__.py",
+              "member": "TimeField.__init__",
+              "line": 2609,
+              "population": "production",
+              "endLine": 2616,
+              "statementCount": 5,
+              "sourceSha256": "9ed3436cd4b17f2c8ece368acfc4f7e099bde8a9fd5eeaeaab7d9c3cd4bceb27"
+            }
+          ],
+          "disposition": "review-only"
+        },
+        {
+          "id": "738860387d3282b2b992fff6b6567c7a352046886090aa68b9e02e0b2ad0abda",
+          "population": "production",
+          "functionKind": "FunctionDef",
+          "bodySha256": "4d510b4d4feaa9629ad7dab9b94309df34aeaedcc7d50d3dcb4df53f4e20d6be",
+          "statementCount": 5,
+          "occurrences": [
+            {
+              "id": "ef016ed6e941a6e03a1d04bc5113d57b804dac0e42cc0b1a0d7c9cca1ca56434",
+              "file": "django/contrib/postgres/fields/array.py",
+              "member": "ArrayField.get_placeholder_sql",
+              "line": 127,
+              "population": "production",
+              "endLine": 132,
+              "statementCount": 5,
+              "sourceSha256": "50ed5084283cc907066e545e88ea2547425141c563195f79d1f37632b25a6e94"
+            },
+            {
+              "id": "301c4f914a962a45f8e31d3a30d24927ba0957e5ae3421ccac1db169cf00286a",
+              "file": "django/contrib/postgres/fields/ranges.py",
+              "member": "RangeField.get_placeholder_sql",
+              "line": 87,
+              "population": "production",
+              "endLine": 92,
+              "statementCount": 5,
+              "sourceSha256": "48dc924ab066f9a671890d5d9bf8f6d337da48dd608837822fed44df82ac00fa"
+            }
+          ],
+          "disposition": "review-only"
+        },
+        {
+          "id": "a5b528641ad203ae6ef08703f1b9a03c945fe8f79b9d9b368c0a86c417629abb",
+          "population": "production",
+          "functionKind": "AsyncFunctionDef",
+          "bodySha256": "cf8af98afac946b78e6d8c0cc0c642d96e5040a816eee2a67b7fc6453462f1ae",
+          "statementCount": 5,
+          "occurrences": [
+            {
+              "id": "3e063264057591597071b069c93716b302d90b5f749b81111147659a9ecf4323",
+              "file": "django/dispatch/dispatcher.py",
+              "member": "Signal.send_robust.asend_and_wrap_exception",
+              "line": 373,
+              "population": "production",
+              "endLine": 379,
+              "statementCount": 5,
+              "sourceSha256": "1f6c1c36a2403914e7a39c35d7240e16e5467aa3219b13de95d069c64c65ec36"
+            },
+            {
+              "id": "42f3e15c78494a77dfa5d459a38bbb4aaac981e3d4510d714bee33e01e4877fd",
+              "file": "django/dispatch/dispatcher.py",
+              "member": "Signal.asend_robust.asend_and_wrap_exception",
+              "line": 448,
+              "population": "production",
+              "endLine": 454,
+              "statementCount": 5,
+              "sourceSha256": "1f6c1c36a2403914e7a39c35d7240e16e5467aa3219b13de95d069c64c65ec36"
+            }
+          ],
+          "disposition": "review-only"
+        },
+        {
+          "id": "f295aaeb81fcfb10a19ca7271a6462a1d4cbc0a7f56759e43a536635a8fe3e1d",
+          "population": "production",
+          "functionKind": "FunctionDef",
+          "bodySha256": "78a5539510e48f2e92ac677f30bdcfc6bae9e8604df07d664d7b5009a84d29d5",
+          "statementCount": 5,
+          "occurrences": [
+            {
+              "id": "473c1b971932b5e1b0ca596dd840f82759affa5e32acea82eb9d0d4e0a2ab1f2",
+              "file": "django/contrib/admin/options.py",
+              "member": "InlineModelAdmin.get_formset.DeleteProtectedModelForm.has_changed",
+              "line": 2867,
+              "population": "production",
+              "endLine": 2873,
+              "statementCount": 5,
+              "sourceSha256": "80963d8b0288171846ca14fbbf42b26e72ec5a9bbd310eb0e032671391917797"
+            },
+            {
+              "id": "5c39cbc26144c97283be5e44ceaf9e8d9bac08222446a6514a4e0733afb2b347",
+              "file": "django/contrib/contenttypes/admin.py",
+              "member": "GenericInlineModelAdmin.get_formset.PermissionProtectedModelForm.has_changed",
+              "line": 135,
+              "population": "production",
+              "endLine": 141,
+              "statementCount": 5,
+              "sourceSha256": "7c5e99832ae3d3a92c8806923c42126a931daff460b389e68e33026d0269afa9"
+            }
+          ],
+          "disposition": "review-only"
+        }
+      ]
+    }
+  ]
+}

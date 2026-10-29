@@ -1,19 +1,22 @@
 {
   "name": "codemetrics-ai",
-  "version": "0.5.0",
-  "description": "Deterministic code metrics and scorecard evidence for JavaScript, TypeScript, and React projects",
+  "version": "0.6.0-preview.1",
+  "description": "Deterministic code metrics for JavaScript and TypeScript, with Python scoring preview",
   "license": "MIT",
   "type": "module",
   "bin": {
     "codemetrics-ai": "./dist/cli.js",
-    "codemetrics-evidence": "./dist/evidence-cli.js"
+    "codemetrics-evidence": "./dist/evidence-cli.js",
+    "codemetrics-python": "./dist/python-cli.js",
+    "codemetrics-python-collect": "./dist/python-collect-cli.js"
   },
   "files": [
     "dist",
+    "!dist/**/__pycache__/**",
     "README.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json && node scripts/copy-schema.mjs",
+    "build": "node scripts/copy-source-facts.mjs && tsc -p tsconfig.json && node scripts/copy-schema.mjs",
     "prepack": "npm run build",
     "test": "npm run build && vitest run --maxWorkers=2",
     "test:package": "node scripts/package-smoke.mjs",
@@ -24,13 +27,19 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.29",
+    "@types/semver": "7.8.0",
     "vitest": "^3.2.2"
   },
   "dependencies": {
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
-    "typescript": "5.8.3"
+    "semver": "7.8.5",
+    "typescript": "5.8.3",
+    "yaml": "2.9.1"
   },
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts"
+  "types": "./dist/index.d.ts",
+  "imports": {
+    "#source-facts/*": "./dist/shared-source-facts/*"
+  }
 }

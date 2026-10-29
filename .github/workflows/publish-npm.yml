@@ -1,4 +1,4 @@
-name: Publish JS/TS analyzer
+name: Publish npm analyzers
 on:
   push:
     tags: ['js-v*']
@@ -16,12 +16,28 @@ jobs:
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install coverage==7.6.1
       - run: npm ci
       - name: Verify tag matches package version
         run: node -e 'if ("js-v" + require("./package.json").version !== process.env.GITHUB_REF_NAME) process.exit(1)'
       - run: npm test
       - run: npm run test:package
       - run: npm run test:architecture
-      - run: npm publish --access public
+      - name: Verify Python preview before publication
+        run: |
+          python -m unittest discover -s ../python/tests -v
+          node --test ../../shared/source-facts/conformance.test.mjs ../python/tests/calibration-policy.test.mjs
+          node ../python/package-smoke.mjs
+      - name: Publish stable or opt-in preview
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_NAME#js-v}" == *-* ]]; then
+            npm publish --access public --tag preview
+          else
+            npm publish --access public --tag latest
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

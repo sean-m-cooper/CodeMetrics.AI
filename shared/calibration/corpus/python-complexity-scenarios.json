@@ -1,0 +1,13 @@
+[
+  {"name":"exceptionally simple population","groups":[[3,100]],"expectedScore":10},
+  {"name":"one moderate function among simple functions","groups":[[10,1],[3,99]],"expectedScore":8.4},
+  {"name":"one high function","groups":[[20,1],[3,99]],"expectedScore":7.6},
+  {"name":"one severe function","groups":[[21,1],[3,99]],"expectedScore":7.5},
+  {"name":"severe function with extra trivial padding","groups":[[21,1],[3,999]],"expectedScore":7.5},
+  {"name":"one extreme function","groups":[[40,1],[3,99]],"expectedScore":6},
+  {"name":"ten high functions","groups":[[20,10],[3,90]],"expectedScore":7.3},
+  {"name":"ten extreme functions","groups":[[40,10],[3,90]],"expectedScore":5.5},
+  {"name":"uniform moderate complexity","groups":[[10,100]],"expectedScore":6},
+  {"name":"one function has full weight","groups":[[10,1]],"expectedScore":6},
+  {"name":"no functions is unavailable","groups":[],"expectedScore":null}
+]

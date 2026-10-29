@@ -62,6 +62,35 @@ jobs:
       - name: Verify architecture context and offline workspace resolution
         run: npm run test:architecture
 
+  source-facts:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        coverage: ['7.6.1', '7.16.1']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --prefix analyzers/javascript-typescript
+      - run: npm run build --prefix analyzers/javascript-typescript
+      - name: Install coverage for authored collection fixtures
+        # Only the explicit collection tests execute authored fixture code.
+        # The analyzer itself continues to parse target source without imports.
+        run: python -m pip install coverage==${{ matrix.coverage }}
+      - name: Test Python measurement, coverage collection, and failure behavior
+        run: python -m unittest discover -s analyzers/python/tests -v
+      - name: Verify adapter contract with both real producers
+        run: node --test shared/source-facts/conformance.test.mjs
+      - name: Verify Python calibration product expectations
+        run: node --test analyzers/python/tests/calibration-policy.test.mjs
+      - name: Verify installed Python CLI and evidence workflow
+        run: node analyzers/python/package-smoke.mjs
+
   calibration:
     runs-on: ubuntu-latest
     steps:

@@ -1,0 +1,788 @@
+{
+  "schemaVersion": 1,
+  "measurementPolicy": "python/owned-function-complexity-v1",
+  "selectionPolicy": "python/source-selection-v1",
+  "analyzerSourceSha256": "b0b6ddd675e6cb6f53c8087d4678fb5ffa6962e811c83b39d685aa6cd90788f5",
+  "referenceAnalyzerRevision": "e91af93",
+  "scope": "Pinned source-only production selections; no target install, build, or test execution. Previews are uncalibrated.",
+  "samples": [
+    {
+      "id": "requests",
+      "repository": "requests",
+      "url": "https://github.com/psf/requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "role": "HTTP client library",
+      "include": [
+        "src/requests/**"
+      ],
+      "productionPaths": [],
+      "configurationFingerprint": "3a42e533f6092149af8baacf0a98dcae00c52c23dd8652d491347ea969ac9540",
+      "selectedSourceSha256": "2d607977215a449fd48af18dbaf908cdeaf67c08aba11fa0d06160700c19b677",
+      "status": "complete",
+      "filesObserved": 37,
+      "filesAnalyzed": 19,
+      "excludedFileReasons": {
+        "outside-include-selection": 18
+      },
+      "implementedFunctions": 246,
+      "functionFactsSha256": "45891e7b93660fe54c14af8d10479e357eb4b57fdee3abb688645a7c54bfc609",
+      "excludedDeclarationsSha256": "ab26d77f24b381780ef4d2ffa23840c72e247f46ba98908b38632cd1be18132a",
+      "priorFunctionsInSameFiles": 268,
+      "excludedDeclarationReasons": {
+        "protocol-declaration": 2,
+        "overload-declaration": 20
+      },
+      "declarationExamples": [
+        {
+          "id": "8abc8f70d47864e93c7182fee9fcd091a3f23b3fee0a836ae4042135f5e7766a",
+          "file": "src/requests/_types.py",
+          "member": "SupportsRead.read",
+          "line": 29,
+          "reason": "protocol-declaration"
+        },
+        {
+          "id": "5023e3f00976d853274143a55ea85b5f3c34370cd87f7290900740a241ae8cc8",
+          "file": "src/requests/_types.py",
+          "member": "SupportsItems.items",
+          "line": 39,
+          "reason": "protocol-declaration"
+        },
+        {
+          "id": "18aef0c24ea5404fffa2815c11f50a2c093d6bba378c8b4ea2c2f9250a01631b",
+          "file": "src/requests/auth.py",
+          "member": "HTTPBasicAuth.__init__",
+          "line": 92,
+          "reason": "overload-declaration"
+        },
+        {
+          "id": "b751db2d686b5da00440532ab1cfa3d0a48f3c10d16d0dbf69a909b0d83a9b53",
+          "file": "src/requests/auth.py",
+          "member": "HTTPBasicAuth.__init__",
+          "line": 94,
+          "reason": "overload-declaration"
+        },
+        {
+          "id": "c7190f3d81be09986154837368073b5176171405d8b497f3c73cee6ae5cf7b35",
+          "file": "src/requests/auth.py",
+          "member": "HTTPDigestAuth.__init__",
+          "line": 137,
+          "reason": "overload-declaration"
+        },
+        {
+          "id": "3d343702d003447ab0ca59e40a5dce37549f71c8b75180abe7379f92cfee4721",
+          "file": "src/requests/auth.py",
+          "member": "HTTPDigestAuth.__init__",
+          "line": 139,
+          "reason": "overload-declaration"
+        }
+      ],
+      "unchangedComplexityForEveryRetainedOwner": true,
+      "everyPriorOwnerAccountedForOnce": true,
+      "complexityAtLeast10": 14,
+      "maxComplexity": 21,
+      "experimentalPreview": 7,
+      "priorExperimentalPreviewSameFiles": 7.1,
+      "topFunctions": [
+        {
+          "id": "d6e85c26b5ef2cd8ea58ccb2552f24591d4d036e100b6c69a4d6ed6446850d0b",
+          "file": "src/requests/models.py",
+          "member": "RequestEncodingMixin._encode_files",
+          "line": 183,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 21,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 11,
+              "loops": 3,
+              "exceptHandlers": 0,
+              "conditionalExpressions": 2,
+              "booleanOperators": 4,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "2a84dce6afbf4e3c78cf1667cf4eea10b70dd4573905df5ef4848137f3126e02",
+          "file": "src/requests/models.py",
+          "member": "PreparedRequest.prepare_body",
+          "line": 576,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 19,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 10,
+              "loops": 0,
+              "exceptHandlers": 3,
+              "conditionalExpressions": 0,
+              "booleanOperators": 5,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "4ddbade342276622c9f930acb063a6a403aa5202a41da04476e51dcf509192c3",
+          "file": "src/requests/utils.py",
+          "member": "should_bypass_proxies",
+          "line": 810,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 19,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 11,
+              "loops": 2,
+              "exceptHandlers": 1,
+              "conditionalExpressions": 0,
+              "booleanOperators": 2,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 1,
+              "comprehensionFilters": 1,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "9284eb5505dccfabf2badf35835524d8a9173cab006117c90540b0b2cad3d0d5",
+          "file": "src/requests/auth.py",
+          "member": "HTTPDigestAuth.build_digest_header",
+          "line": 157,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 19,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 15,
+              "loops": 0,
+              "exceptHandlers": 0,
+              "conditionalExpressions": 0,
+              "booleanOperators": 3,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "c236946b08d80fda709093ab6158d65f4af6c482e12ef5ab1d0b65ca7d8e0cf7",
+          "file": "src/requests/adapters.py",
+          "member": "HTTPAdapter.send",
+          "line": 634,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 19,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 10,
+              "loops": 0,
+              "exceptHandlers": 7,
+              "conditionalExpressions": 0,
+              "booleanOperators": 1,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        }
+      ]
+    },
+    {
+      "id": "starlette",
+      "repository": "starlette",
+      "url": "https://github.com/Kludex/starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "role": "ASGI framework",
+      "include": [
+        "starlette/**"
+      ],
+      "productionPaths": [],
+      "configurationFingerprint": "544dbb0ea0e93df624d27de88718cb9e2be849e982c610f99fe606b2f291cbc5",
+      "selectedSourceSha256": "2a51420a3bfbda775c692446934792dfc86b9d289056bf5a1fae501579ed9dd7",
+      "status": "complete",
+      "filesObserved": 84,
+      "filesAnalyzed": 36,
+      "excludedFileReasons": {
+        "outside-include-selection": 48
+      },
+      "implementedFunctions": 508,
+      "functionFactsSha256": "b2e5495c18c8532661f8d0269aab2b4413dfe192c116038807a03813c229457c",
+      "excludedDeclarationsSha256": "8598cca05fa005a66d40481b2457c94fd2abfee8e7d48454194bb4bd29c1aeda",
+      "priorFunctionsInSameFiles": 519,
+      "excludedDeclarationReasons": {
+        "overload-declaration": 9,
+        "protocol-declaration": 2
+      },
+      "declarationExamples": [
+        {
+          "id": "9dfc51a514ac1f6c8afa1bf544c480c16d9bf175c31295e727b9619d6e005f54",
+          "file": "starlette/_utils.py",
+          "member": "is_async_callable",
+          "line": 54,
+          "reason": "overload-declaration"
+        },
+        {
+          "id": "91622265858e08b1e6dd7ed1dbdcf5b607997f9e229f148de67f495283e8587f",
+          "file": "starlette/_utils.py",
+          "member": "is_async_callable",
+          "line": 58,
+          "reason": "overload-declaration"
+        },
+        {
+          "id": "806c907fe5da5f24e196316b97c5cec6a59c31f7e0f8cdd8a1752c89a975c9e7",
+          "file": "starlette/_utils.py",
+          "member": "SupportsAsyncClose.close",
+          "line": 77,
+          "reason": "protocol-declaration"
+        },
+        {
+          "id": "327ba8445b8df4a0b9b53ae54c31803f5901e44a1e41c01121c4b79e6e4af291",
+          "file": "starlette/config.py",
+          "member": "Config.__call__",
+          "line": 67,
+          "reason": "overload-declaration"
+        },
+        {
+          "id": "976e0cbca6675aa27d62f951bce09f4a90d7a484be66c9b34281dc801c335f3d",
+          "file": "starlette/config.py",
+          "member": "Config.__call__",
+          "line": 70,
+          "reason": "overload-declaration"
+        },
+        {
+          "id": "64ef3b4535e8821aa3190e57bfb391c7d647b563101bb8f97896afa24d2b9371",
+          "file": "starlette/config.py",
+          "member": "Config.__call__",
+          "line": 73,
+          "reason": "overload-declaration"
+        }
+      ],
+      "unchangedComplexityForEveryRetainedOwner": true,
+      "everyPriorOwnerAccountedForOnce": true,
+      "complexityAtLeast10": 22,
+      "maxComplexity": 22,
+      "experimentalPreview": 7.1,
+      "priorExperimentalPreviewSameFiles": 7.1,
+      "topFunctions": [
+        {
+          "id": "0aef057a748e39f29cdd3d4cc12d8b45513298d6965f5309768a7c7c93513e24",
+          "file": "starlette/middleware/opentelemetry.py",
+          "member": "OpenTelemetryMiddleware.__call__",
+          "line": 47,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 22,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 12,
+              "loops": 1,
+              "exceptHandlers": 1,
+              "conditionalExpressions": 3,
+              "booleanOperators": 3,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 1,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "0fdc1ee016fa713bccf205245955cf7901aa60604bb8771ddc2e0ad58fc400ed",
+          "file": "starlette/responses.py",
+          "member": "FileResponse.__call__",
+          "line": 344,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 22,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 9,
+              "loops": 1,
+              "exceptHandlers": 3,
+              "conditionalExpressions": 0,
+              "booleanOperators": 8,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "be62292eb9a86dfafc1ac39ac32c3a6cc24c009ce4ec3c0f418b779b859fa4d8",
+          "file": "starlette/middleware/gzip.py",
+          "member": "IdentityResponder.send_with_compression",
+          "line": 106,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 19,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 13,
+              "loops": 0,
+              "exceptHandlers": 0,
+              "conditionalExpressions": 0,
+              "booleanOperators": 5,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "a2fe07e64e297a883cd8c9a9c895d30c1d644bc3c96510b45edd33bc143b15f4",
+          "file": "starlette/staticfiles.py",
+          "member": "StaticFiles.get_response",
+          "line": 115,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 17,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 8,
+              "loops": 0,
+              "exceptHandlers": 3,
+              "conditionalExpressions": 0,
+              "booleanOperators": 5,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "29b15d74780fcaeb19f9ba4faf6a24e12d045903d444b5722c6400dcd1a7e5c6",
+          "file": "starlette/testclient.py",
+          "member": "_TestClientTransport.handle_request",
+          "line": 217,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 15,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 11,
+              "loops": 0,
+              "exceptHandlers": 1,
+              "conditionalExpressions": 0,
+              "booleanOperators": 0,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 2,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        }
+      ]
+    },
+    {
+      "id": "httpie",
+      "repository": "httpie",
+      "url": "https://github.com/httpie/cli",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "role": "CLI application",
+      "include": [
+        "httpie/**"
+      ],
+      "productionPaths": [],
+      "configurationFingerprint": "6bd0c426bc7e8e32467e5c7958000362651a4cb02982b1d088d6c4d8a45f44e1",
+      "selectedSourceSha256": "cb8ee90b048099e53b85aaee32175802082b22a7706e5c05e0d4e403d7be47a8",
+      "status": "complete",
+      "filesObserved": 133,
+      "filesAnalyzed": 78,
+      "excludedFileReasons": {
+        "outside-include-selection": 55
+      },
+      "implementedFunctions": 464,
+      "functionFactsSha256": "d6e571d78f49775fa2ec63b0fbec632e43fab7ac6398d0cf7e633938a0d09bbb",
+      "excludedDeclarationsSha256": "1adfaef665629a4b47eb4bb0c664981e6758d9571924510c2acca5a9499c3ea6",
+      "priorFunctionsInSameFiles": 465,
+      "excludedDeclarationReasons": {
+        "abstract-declaration": 1
+      },
+      "declarationExamples": [
+        {
+          "id": "aa7b30f8c85c3dbcee083f703b5be253bf51a6a8ca7c94330cbee06057b005d3",
+          "file": "httpie/output/streams.py",
+          "member": "BaseStream.iter_body",
+          "line": 60,
+          "reason": "abstract-declaration"
+        }
+      ],
+      "unchangedComplexityForEveryRetainedOwner": true,
+      "everyPriorOwnerAccountedForOnce": true,
+      "complexityAtLeast10": 17,
+      "maxComplexity": 26,
+      "experimentalPreview": 6.8,
+      "priorExperimentalPreviewSameFiles": 6.8,
+      "topFunctions": [
+        {
+          "id": "d71509ead25da42d626eb2117ffe5ca8bada2d768facaef79f6bac71b929e0b4",
+          "file": "httpie/core.py",
+          "member": "raw_main",
+          "line": 32,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 26,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 14,
+              "loops": 0,
+              "exceptHandlers": 9,
+              "conditionalExpressions": 0,
+              "booleanOperators": 2,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "5c93a37322cb5dadebece03c9f13fc4524021a7ad01d406be4b285353da7d1b2",
+          "file": "httpie/core.py",
+          "member": "program",
+          "line": 170,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 24,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 12,
+              "loops": 1,
+              "exceptHandlers": 0,
+              "conditionalExpressions": 0,
+              "booleanOperators": 10,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "c0d729a6c88b1cb2dd5a914f131e8c96a258f13f45b4ed9bcf6d082aed30459e",
+          "file": "httpie/cli/argparser.py",
+          "member": "HTTPieArgumentParser._process_auth",
+          "line": 282,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 24,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 13,
+              "loops": 0,
+              "exceptHandlers": 0,
+              "conditionalExpressions": 0,
+              "booleanOperators": 10,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "5c00a082ce234f62ccd989603b84946efd917be9c385e11e3ff6e11b423cb87e",
+          "file": "httpie/client.py",
+          "member": "collect_messages",
+          "line": 43,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 21,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 14,
+              "loops": 1,
+              "exceptHandlers": 0,
+              "conditionalExpressions": 0,
+              "booleanOperators": 5,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "e5c7459744c41e958e8dd06b36c7dfd0085fcdabae6d49cdc9053062c10d55d5",
+          "file": "httpie/output/formatters/colors.py",
+          "member": "get_lexer",
+          "line": 142,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 13,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 4,
+              "loops": 2,
+              "exceptHandlers": 3,
+              "conditionalExpressions": 0,
+              "booleanOperators": 3,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        }
+      ]
+    },
+    {
+      "id": "django",
+      "repository": "django",
+      "url": "https://github.com/django/django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "role": "larger web framework",
+      "include": [
+        "django/**"
+      ],
+      "productionPaths": [
+        "django/test/**"
+      ],
+      "configurationFingerprint": "38e48233960af37b1e0104b3b9ad0c98482c84b491f7019f4c014df304100cb2",
+      "selectedSourceSha256": "2cb4a5b24cda391c3278706e0de5eb522f2d8e5458cceed6c898fdfb27b9a70f",
+      "status": "complete",
+      "filesObserved": 2933,
+      "filesAnalyzed": 907,
+      "excludedFileReasons": {
+        "outside-include-selection": 2026
+      },
+      "implementedFunctions": 9748,
+      "functionFactsSha256": "592e535e112ed80b7a05dd30496988c1b374ad095bb2c64a52906d4b12ec93f1",
+      "excludedDeclarationsSha256": "393b659d8daf4f5677b25446d073c8d095f2fce445b933d919f93a1fea107bbc",
+      "priorFunctionsInSameFiles": 9749,
+      "excludedDeclarationReasons": {
+        "abstract-declaration": 1
+      },
+      "declarationExamples": [
+        {
+          "id": "29d5f94003a2e393890a1e6e49f42d3fe73e5642a5150c7b1fbae70106f8aaaf",
+          "file": "django/tasks/backends/base.py",
+          "member": "BaseTaskBackend.enqueue",
+          "line": 86,
+          "reason": "abstract-declaration"
+        }
+      ],
+      "unchangedComplexityForEveryRetainedOwner": true,
+      "everyPriorOwnerAccountedForOnce": true,
+      "complexityAtLeast10": 480,
+      "maxComplexity": 99,
+      "experimentalPreview": 5.6,
+      "priorExperimentalPreviewSameFiles": 5.6,
+      "topFunctions": [
+        {
+          "id": "00b117a7c9dbc6d77590302c929e1c06b66ab3c4609ce83caeaf1466313640ac",
+          "file": "django/db/backends/base/schema.py",
+          "member": "BaseDatabaseSchemaEditor._alter_field",
+          "line": 984,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 99,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 36,
+              "loops": 13,
+              "exceptHandlers": 0,
+              "conditionalExpressions": 0,
+              "booleanOperators": 45,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 4,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "a3a4220dafd29c68c04783bc225b9ce28810e92af4e8122b41f89e47468ef199",
+          "file": "django/db/models/base.py",
+          "member": "ModelBase.__new__",
+          "line": 105,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 74,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 35,
+              "loops": 10,
+              "exceptHandlers": 0,
+              "conditionalExpressions": 0,
+              "booleanOperators": 16,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 7,
+              "comprehensionFilters": 5,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "04302e26b1b7b8c0e54325da7165c77a3e58a41984d37ff9d68fba7ece90b49b",
+          "file": "django/core/management/commands/migrate.py",
+          "member": "Command.handle",
+          "line": 98,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 62,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 36,
+              "loops": 6,
+              "exceptHandlers": 3,
+              "conditionalExpressions": 1,
+              "booleanOperators": 4,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 8,
+              "comprehensionFilters": 3,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "7b0346224fa8cf5f21cf9ed4d8d31483ee485a8a6b73413c00234f39812ebdbb",
+          "file": "django/db/migrations/operations/models.py",
+          "member": "CreateModel.reduce",
+          "line": 151,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 58,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 25,
+              "loops": 3,
+              "exceptHandlers": 0,
+              "conditionalExpressions": 3,
+              "booleanOperators": 11,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 10,
+              "comprehensionFilters": 5,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        },
+        {
+          "id": "55eb7c0e272334e03d3f39f670aecc9166ff645f7355012b93b770c222e3c908",
+          "file": "django/db/models/sql/compiler.py",
+          "member": "SQLCompiler.as_sql",
+          "line": 776,
+          "ownership": "exclusive-function-body",
+          "complexity": {
+            "value": 53,
+            "baseline": 1,
+            "decisions": {
+              "ifStatements": 29,
+              "loops": 4,
+              "exceptHandlers": 3,
+              "conditionalExpressions": 2,
+              "booleanOperators": 14,
+              "chainedComparisons": 0,
+              "comprehensionLoops": 0,
+              "comprehensionFilters": 0,
+              "matchCases": 0,
+              "matchGuards": 0,
+              "matchAlternatives": 0
+            }
+          },
+          "population": "production"
+        }
+      ]
+    }
+  ],
+  "date": "2026-10-10",
+  "interpretation": "Experimental complexity previews only. No overall Python score, cross-language comparison, runtime-performance claim, or confirmed defect inference.",
+  "sourceReview": [
+    {
+      "sample": "requests",
+      "file": "src/requests/models.py",
+      "member": "RequestEncodingMixin._encode_files",
+      "line": 183,
+      "observation": "CC21 reflects multipart input forms, conversion guards, nested iteration and boolean defaults. Retained as a review lead; no claim that supported formats can be removed."
+    },
+    {
+      "sample": "starlette",
+      "file": "starlette/middleware/opentelemetry.py",
+      "member": "OpenTelemetryMiddleware.__call__",
+      "line": 47,
+      "observation": "CC22 includes metadata and routing branches. The nested send callback has its own body and is not charged again to the parent."
+    },
+    {
+      "sample": "httpie",
+      "file": "httpie/core.py",
+      "member": "raw_main",
+      "line": 32,
+      "observation": "CC26 includes nine exception handlers and dispatch/debug branches. Handling distinct failures is intentional behavior; CC measures control flow, not poor error handling."
+    },
+    {
+      "sample": "django",
+      "file": "django/db/backends/base/schema.py",
+      "member": "BaseDatabaseSchemaEditor._alter_field",
+      "line": 984,
+      "observation": "CC99 includes 36 if statements, 13 loops, 45 boolean increments and four comprehensions. Database capability and migration sequencing branches are real source complexity; the report does not assert a safe decomposition."
+    }
+  ]
+}

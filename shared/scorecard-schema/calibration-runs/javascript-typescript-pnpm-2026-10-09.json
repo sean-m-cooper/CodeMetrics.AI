@@ -1,0 +1,2441 @@
+{
+  "generatedAtUtc": "2026-10-09T22:14:49.779Z",
+  "toolVersion": "0.5.0-dev",
+  "scope": "Selected-source npm/pnpm dependency evidence; other scores remain unchanged. Feed observations are time-dependent, not a quality score.",
+  "metadataRequested": false,
+  "metadataLimit": 0,
+  "analyzerSourceSha256": "26747eb6fbd59b3c86c7b3295f32ee27960339b0a1bf2ee44aa98df44a75ad51",
+  "samples": [
+    {
+      "id": "express",
+      "revision": "7ef98448f8b38099ab1ded55e458538ad47a51e7",
+      "runId": "eb46a67f-d629-4a44-bd25-559710308072",
+      "auditId": "eb46a67f-d629-4a44-bd25-559710308072",
+      "evidenceSha256": "8601bc5aa0db86d95bff52f0382a96be88821ecb17323c94086417e8c3f9334d",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "816c1764c980ad6fa6817d7b5874350fe17fd5afa586ec18bf5a529d25a471bc",
+      "inventoryStatus": "gaps",
+      "manifests": [
+        {
+          "file": "package.json",
+          "declarations": [
+            {
+              "requested": "accepts",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "after",
+              "range": "0.8.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "body-parser",
+              "range": "^2.3.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "connect-redis",
+              "range": "^8.0.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "content-disposition",
+              "range": "^2.0.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "content-type",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "cookie",
+              "range": "^0.7.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "cookie-parser",
+              "range": "1.4.7",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "cookie-session",
+              "range": "2.1.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "cookie-signature",
+              "range": "^1.2.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "debug",
+              "range": "^4.4.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "depd",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "ejs",
+              "range": "^3.1.10",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "encodeurl",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "escape-html",
+              "range": "^1.0.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "eslint",
+              "range": "8.47.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "etag",
+              "range": "^1.8.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "express-session",
+              "range": "^1.18.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "finalhandler",
+              "range": "^2.1.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "fresh",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "hbs",
+              "range": "4.3.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "http-errors",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "marked",
+              "range": "^15.0.3",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "merge-descriptors",
+              "range": "^2.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "method-override",
+              "range": "3.0.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "mime-types",
+              "range": "^3.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mocha",
+              "range": "^11.7.5",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "morgan",
+              "range": "1.12.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "nyc",
+              "range": "^17.1.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "on-finished",
+              "range": "^2.4.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "once",
+              "range": "^1.4.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "parseurl",
+              "range": "^1.3.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "pbkdf2-password",
+              "range": "1.2.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "proxy-addr",
+              "range": "^2.0.8",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "qs",
+              "range": "^6.16.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "range-parser",
+              "range": "^1.2.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "router",
+              "range": "^2.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "send",
+              "range": "^1.1.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "serve-static",
+              "range": "^2.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "statuses",
+              "range": "^2.0.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "supertest",
+              "range": "^6.3.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "type-is",
+              "range": "^2.1.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "vary",
+              "range": "^1.1.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "vhost",
+              "range": "~3.0.2",
+              "kind": "development",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "lockfiles": [],
+      "configurationInputs": [],
+      "gaps": [
+        {
+          "manifest": "package.json",
+          "reason": "No npm or pnpm lockfile found"
+        }
+      ],
+      "notices": [],
+      "sourceClasses": {
+        "publicRegistry": 0,
+        "workspace": 0,
+        "otherSource": 0
+      },
+      "packageVersions": 0,
+      "installations": 0,
+      "directPackageVersions": 0,
+      "productionReachable": 0,
+      "developmentReachable": 0,
+      "metadataStatus": "notRequested",
+      "availablePackages": 0,
+      "unavailablePackages": 0,
+      "assessedObservations": [],
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 0,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results."
+    },
+    {
+      "id": "zod-v4",
+      "revision": "0b216ef674e297ebe41d8bf902262e56f8755822",
+      "runId": "7ad2f0ce-e347-448d-bfdd-7a3c17c2c2e6",
+      "auditId": "7ad2f0ce-e347-448d-bfdd-7a3c17c2c2e6",
+      "evidenceSha256": "ae6e689ae2d5ef51d15e286b022026acc75685e2fdba2bdd46c46377d8778092",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "27029fe123bd8531edba4b31072ee795576d6fa13d707a8f3340620beb637fd6",
+      "inventoryStatus": "gaps",
+      "manifests": [
+        {
+          "file": "packages/zod/package.json",
+          "declarations": [],
+          "manager": "nub@0.8.3"
+        }
+      ],
+      "lockfiles": [],
+      "configurationInputs": [],
+      "gaps": [
+        {
+          "manifest": "packages/zod/package.json",
+          "reason": "Unsupported package manager/lockfile: nub@0.8.3"
+        }
+      ],
+      "notices": [],
+      "sourceClasses": {
+        "publicRegistry": 0,
+        "workspace": 0,
+        "otherSource": 0
+      },
+      "packageVersions": 0,
+      "installations": 0,
+      "directPackageVersions": 0,
+      "productionReachable": 0,
+      "developmentReachable": 0,
+      "metadataStatus": "notRequested",
+      "availablePackages": 0,
+      "unavailablePackages": 0,
+      "assessedObservations": [],
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 0,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results."
+    },
+    {
+      "id": "tanstack-query-core",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "runId": "ee4c9a27-602f-4812-a47b-2f15413e2e6a",
+      "auditId": "ee4c9a27-602f-4812-a47b-2f15413e2e6a",
+      "evidenceSha256": "fd0cbf745caaf95fd01a9b9357b2e035b59b950604ce461511705ae941223558",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "afdf76493773ce6844eb36d9ab521fb19ff32501f2c64dd6271c545a135be763",
+      "inventoryStatus": "complete",
+      "manifests": [
+        {
+          "file": "packages/query-core/package.json",
+          "declarations": [
+            {
+              "requested": "@tanstack/query-test-utils",
+              "range": "workspace:*",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "typescript",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            }
+          ],
+          "lockfile": "pnpm-lock.yaml",
+          "manager": "pnpm",
+          "overrides": {
+            "manifest": {},
+            "workspace": {
+              "chokidar": "5.0.0",
+              "@types/react": "catalog:",
+              "@types/react-dom": "catalog:",
+              "@types/node": "^22.15.3",
+              "esbuild": "^0.28.2"
+            },
+            "lockfile": {
+              "chokidar": "5.0.0",
+              "@types/react": "^19.2.7",
+              "@types/react-dom": "^19.2.3",
+              "@types/node": "^22.15.3",
+              "esbuild": "^0.28.2"
+            }
+          }
+        }
+      ],
+      "lockfiles": [
+        {
+          "file": "pnpm-lock.yaml",
+          "version": 9,
+          "sha256": "d966b252e609a88722041c0e81fad4e62561279cc6c4f227717c3f87a3308583",
+          "projectDocument": 2,
+          "environmentDocument": "excluded"
+        }
+      ],
+      "configurationInputs": [
+        {
+          "file": "pnpm-workspace.yaml",
+          "sha256": "a81f8d6912c8174b1bec8df73393ead1da75f1571119f78786be5f9a0dac3ba0"
+        }
+      ],
+      "gaps": [],
+      "notices": [
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@edge-runtime/vm",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@opentelemetry/api",
+          "range": "^1.9.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@vitest/browser-playwright",
+          "range": "4.1.11",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@vitest/browser-preview",
+          "range": "4.1.11",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@vitest/browser-webdriverio",
+          "range": "4.1.11",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@vitest/coverage-v8",
+          "range": "4.1.11",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@vitest/ui",
+          "range": "4.1.11",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "happy-dom",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0)",
+          "dependency": "@vitejs/devtools",
+          "range": "^0.7.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0)",
+          "dependency": "less",
+          "range": "^4.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0)",
+          "dependency": "sass-embedded",
+          "range": "^1.70.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0)",
+          "dependency": "stylus",
+          "range": ">=0.54.8",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0)",
+          "dependency": "sugarss",
+          "range": "^5.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "jsdom@27.4.0(supports-color@7.2.0)",
+          "dependency": "canvas",
+          "range": "^3.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "@exodus/bytes@1.15.0",
+          "dependency": "@noble/hashes",
+          "range": "^1.8.0 || ^2.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "ws@8.20.0",
+          "dependency": "bufferutil",
+          "range": "^4.0.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/query-core/package.json",
+          "from": "ws@8.20.0",
+          "dependency": "utf-8-validate",
+          "range": ">=5.0.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        }
+      ],
+      "sourceClasses": {
+        "publicRegistry": 0,
+        "workspace": 1,
+        "otherSource": 264
+      },
+      "packageVersions": 265,
+      "installations": 265,
+      "directPackageVersions": 2,
+      "productionReachable": 0,
+      "developmentReachable": 265,
+      "metadataStatus": "notRequested",
+      "availablePackages": 0,
+      "unavailablePackages": 0,
+      "assessedObservations": [],
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 0,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results."
+    },
+    {
+      "id": "tanstack-react-query",
+      "revision": "29859ae60c8dca0a5cdbf8abccc775b655cf43e2",
+      "runId": "0bd2b490-c282-4876-b6be-67379640784f",
+      "auditId": "0bd2b490-c282-4876-b6be-67379640784f",
+      "evidenceSha256": "75a5dd33dd1edb513b420034067e9b0fa276c2fab49edcd3cd997ebd223f761f",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "974fa4a1fc139fe805dd9df702de257ba6debe4ffb4db40c7f50c7a7e743facd",
+      "inventoryStatus": "complete",
+      "manifests": [
+        {
+          "file": "packages/react-query/package.json",
+          "declarations": [
+            {
+              "requested": "@eslint-react/eslint-plugin",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@tanstack/query-core",
+              "range": "workspace:*",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@tanstack/query-persist-client-core",
+              "range": "workspace:*",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@tanstack/query-test-utils",
+              "range": "workspace:*",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testing-library/react",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testing-library/react-render-stream",
+              "range": "^2.0.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/react",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/react-dom",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@vitejs/plugin-react",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint-plugin-react-hooks",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "react",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "react",
+              "range": "^18 || ^19",
+              "kind": "peer",
+              "optional": false
+            },
+            {
+              "requested": "react-dom",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "react-error-boundary",
+              "range": "^4.1.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "typescript",
+              "range": "catalog:",
+              "kind": "development",
+              "optional": false
+            }
+          ],
+          "lockfile": "pnpm-lock.yaml",
+          "manager": "pnpm",
+          "overrides": {
+            "manifest": {},
+            "workspace": {
+              "chokidar": "5.0.0",
+              "@types/react": "catalog:",
+              "@types/react-dom": "catalog:",
+              "@types/node": "^22.15.3",
+              "esbuild": "^0.28.2"
+            },
+            "lockfile": {
+              "chokidar": "5.0.0",
+              "@types/react": "^19.2.7",
+              "@types/react-dom": "^19.2.3",
+              "@types/node": "^22.15.3",
+              "esbuild": "^0.28.2"
+            }
+          }
+        }
+      ],
+      "lockfiles": [
+        {
+          "file": "pnpm-lock.yaml",
+          "version": 9,
+          "sha256": "d966b252e609a88722041c0e81fad4e62561279cc6c4f227717c3f87a3308583",
+          "projectDocument": 2,
+          "environmentDocument": "excluded"
+        }
+      ],
+      "configurationInputs": [
+        {
+          "file": "pnpm-workspace.yaml",
+          "sha256": "a81f8d6912c8174b1bec8df73393ead1da75f1571119f78786be5f9a0dac3ba0"
+        }
+      ],
+      "gaps": [],
+      "notices": [
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "@vitejs/plugin-react@6.1.1(babel-plugin-react-compiler@1.0.0)(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@rolldown/plugin-babel",
+          "range": "^0.1.7 || ^0.2.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "@vitejs/plugin-react@6.1.1(babel-plugin-react-compiler@1.0.0)(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "oxc-transform-react",
+          "range": "^0.145.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@edge-runtime/vm",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@opentelemetry/api",
+          "range": "^1.9.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@vitest/browser-playwright",
+          "range": "4.1.11",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@vitest/browser-preview",
+          "range": "4.1.11",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@vitest/browser-webdriverio",
+          "range": "4.1.11",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@vitest/coverage-v8",
+          "range": "4.1.11",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "@vitest/ui",
+          "range": "4.1.11",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vitest@4.1.11(@types/node@22.19.15)(@vitest/coverage-istanbul@4.1.11)(jsdom@27.4.0(supports-color@7.2.0))(msw@2.12.14(@types/node@22.19.15)(typescript@6.0.3))(vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0))",
+          "dependency": "happy-dom",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "jsdom@25.0.1(supports-color@10.2.2)",
+          "dependency": "canvas",
+          "range": "^2.11.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0)",
+          "dependency": "@vitejs/devtools",
+          "range": "^0.7.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0)",
+          "dependency": "less",
+          "range": "^4.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0)",
+          "dependency": "sass-embedded",
+          "range": "^1.70.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0)",
+          "dependency": "stylus",
+          "range": ">=0.54.8",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "vite@8.3.1(@types/node@22.19.15)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.90.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.9.0)",
+          "dependency": "sugarss",
+          "range": "^5.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "jsdom@27.4.0(supports-color@7.2.0)",
+          "dependency": "canvas",
+          "range": "^3.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "ws@8.20.0",
+          "dependency": "bufferutil",
+          "range": "^4.0.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "ws@8.20.0",
+          "dependency": "utf-8-validate",
+          "range": ">=5.0.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "packages/react-query/package.json",
+          "from": "@exodus/bytes@1.15.0",
+          "dependency": "@noble/hashes",
+          "range": "^1.8.0 || ^2.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        }
+      ],
+      "sourceClasses": {
+        "publicRegistry": 0,
+        "workspace": 3,
+        "otherSource": 534
+      },
+      "packageVersions": 537,
+      "installations": 544,
+      "directPackageVersions": 14,
+      "productionReachable": 1,
+      "developmentReachable": 537,
+      "metadataStatus": "notRequested",
+      "availablePackages": 0,
+      "unavailablePackages": 0,
+      "assessedObservations": [],
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 0,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results."
+    },
+    {
+      "id": "excalidraw-app",
+      "revision": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e",
+      "runId": "62a3d3a6-d766-468d-94ab-9cf5e93bde71",
+      "auditId": "62a3d3a6-d766-468d-94ab-9cf5e93bde71",
+      "evidenceSha256": "a3cda915ecad0205e22e621075e01d57ea6ed5e1a13def753f7c3eab4518db79",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "4582b663727f766b391de3f572d18cbdfc6928a90c3cef56e02712fb84e4470c",
+      "inventoryStatus": "gaps",
+      "manifests": [
+        {
+          "file": "excalidraw-app/package.json",
+          "declarations": [
+            {
+              "requested": "@excalidraw/random-username",
+              "range": "1.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@sentry/browser",
+              "range": "9.0.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "callsites",
+              "range": "4.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "firebase",
+              "range": "11.3.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "i18next-browser-languagedetector",
+              "range": "6.1.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "idb-keyval",
+              "range": "6.0.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "jotai",
+              "range": "2.11.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "react",
+              "range": "19.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "react-dom",
+              "range": "19.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "socket.io-client",
+              "range": "4.7.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "uqr",
+              "range": "0.1.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "vite-plugin-html",
+              "range": "3.2.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "vite-plugin-sitemap",
+              "range": "0.7.1",
+              "kind": "development",
+              "optional": false
+            }
+          ],
+          "manager": "yarn@1.22.22"
+        }
+      ],
+      "lockfiles": [],
+      "configurationInputs": [],
+      "gaps": [
+        {
+          "manifest": "excalidraw-app/package.json",
+          "reason": "Unsupported package manager/lockfile: yarn@1.22.22"
+        }
+      ],
+      "notices": [],
+      "sourceClasses": {
+        "publicRegistry": 0,
+        "workspace": 0,
+        "otherSource": 0
+      },
+      "packageVersions": 0,
+      "installations": 0,
+      "directPackageVersions": 0,
+      "productionReachable": 0,
+      "developmentReachable": 0,
+      "metadataStatus": "notRequested",
+      "availablePackages": 0,
+      "unavailablePackages": 0,
+      "assessedObservations": [],
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 0,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results."
+    },
+    {
+      "id": "uptime-kuma-server",
+      "revision": "e7420f8fa546a8baa7ac4bf9d10a32545d4346e0",
+      "runId": "41d09ec2-e0a3-4066-a77e-c03bc4697189",
+      "auditId": "41d09ec2-e0a3-4066-a77e-c03bc4697189",
+      "evidenceSha256": "a25132c6b2111bee9d49313376db7579d239d311732cc437957acdb65b735bbf",
+      "ruleset": "javascript-typescript-2026-10-09-dependency-evidence",
+      "configurationFingerprint": "ce0225413cb1ce858cf9ce688e6d63461d47e9ff2a17f736b80eb3f35ab23f8e",
+      "inventoryStatus": "gaps",
+      "manifests": [
+        {
+          "file": "package.json",
+          "declarations": [
+            {
+              "requested": "@actions/github",
+              "range": "~9.1.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@better-auth/api-key",
+              "range": "1.6.11",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@fortawesome/fontawesome-svg-core",
+              "range": "~1.2.36",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@fortawesome/free-regular-svg-icons",
+              "range": "~5.15.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@fortawesome/free-solid-svg-icons",
+              "range": "~5.15.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@fortawesome/vue-fontawesome",
+              "range": "~3.1.3",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@grpc/grpc-js",
+              "range": "~1.8.22",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@inquirer/core",
+              "range": "~11.2.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@inquirer/prompts",
+              "range": "~8.5.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@louislam/ping",
+              "range": "~0.4.4-mod.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "@playwright/test",
+              "range": "~1.61.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@popperjs/core",
+              "range": "~2.10.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/hivemq",
+              "range": "10.28.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/mariadb",
+              "range": "10.28.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/mssqlserver",
+              "range": "10.28.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/mysql",
+              "range": "11.14.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/oraclefree",
+              "range": "11.14.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/postgresql",
+              "range": "11.14.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@testcontainers/rabbitmq",
+              "range": "10.28.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/better-sqlite3",
+              "range": "~7.6.13",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/bootstrap",
+              "range": "~5.1.13",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/node",
+              "range": "^26.1.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@types/web-push",
+              "range": "^3.6.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@typescript-eslint/eslint-plugin",
+              "range": "^6.21.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@typescript-eslint/parser",
+              "range": "^6.21.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@vitejs/plugin-vue",
+              "range": "~6.0.7",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@vue/compiler-sfc",
+              "range": "~3.5.39",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@vuepic/vue-datepicker",
+              "range": "~3.4.8",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "@vvo/tzdb",
+              "range": "~6.198.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "aedes",
+              "range": "~1.0.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "args-parser",
+              "range": "~1.3.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "axios",
+              "range": "~0.33.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "badge-maker",
+              "range": "~3.3.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "bcryptjs",
+              "range": "~2.4.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "better-auth",
+              "range": "~1.6.11",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "better-sqlite3",
+              "range": "~12.11.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "bootstrap",
+              "range": "5.1.3",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "chardet",
+              "range": "~1.4.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "chart.js",
+              "range": "~4.2.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "chartjs-adapter-dayjs-4",
+              "range": "~1.0.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "cheerio",
+              "range": "~1.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "chroma-js",
+              "range": "~2.4.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "command-exists",
+              "range": "~1.2.9",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "compare-versions",
+              "range": "~3.6.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "concurrently",
+              "range": "^7.6.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "country-flag-emoji-polyfill",
+              "range": "~0.1.8",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "croner",
+              "range": "~8.1.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "cronstrue",
+              "range": "~2.24.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "cross-env",
+              "range": "~7.0.3",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "dayjs",
+              "range": "~1.11.19",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "dev-null",
+              "range": "~0.1.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "dns2",
+              "range": "~2.0.5",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "dompurify",
+              "range": "~3.4.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint",
+              "range": "~8.14.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint-config-prettier",
+              "range": "^10.1.8",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint-plugin-jsdoc",
+              "range": "~46.4.6",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint-plugin-vue",
+              "range": "~8.7.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "eslint-plugin-vue-scoped-css",
+              "range": "~2.7.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "express",
+              "range": "~4.22.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "express-basic-auth",
+              "range": "~1.2.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "express-static-gzip",
+              "range": "~2.1.8",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "favico.js",
+              "range": "~0.3.10",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "feed",
+              "range": "~4.2.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "form-data",
+              "range": "~4.0.5",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "gamedig",
+              "range": "~5.3.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "globalping",
+              "range": "~0.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "html-escaper",
+              "range": "~3.0.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "http-cookie-agent",
+              "range": "~5.0.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "http-graceful-shutdown",
+              "range": "~3.1.15",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "http-proxy-agent",
+              "range": "~7.0.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "https-proxy-agent",
+              "range": "~7.0.6",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "iconv-lite",
+              "range": "~0.6.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "is-url",
+              "range": "~1.2.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "isomorphic-ws",
+              "range": "~5.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "jsesc",
+              "range": "~3.0.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "jsonata",
+              "range": "~2.2.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "kafkajs",
+              "range": "~2.2.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "knex",
+              "range": "~3.3.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "limiter",
+              "range": "~2.1.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "liquidjs",
+              "range": "~10.29.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "marked",
+              "range": "~14.1.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mitt",
+              "range": "~3.0.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mongodb",
+              "range": "~4.17.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mqtt",
+              "range": "~4.3.8",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mssql",
+              "range": "~12.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "mysql2",
+              "range": "~3.24.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "nanoid",
+              "range": "~3.3.11",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "net-snmp",
+              "range": "~3.26.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "node-cloudflared-tunnel",
+              "range": "~1.0.10",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "node-radius-utils",
+              "range": "~1.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "node-ssh",
+              "range": "~13.1.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "nodemailer",
+              "range": "~10.0.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "nostr-tools",
+              "range": "~2.20.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "openid-client",
+              "range": "~5.7.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "oracledb",
+              "range": "~6.10.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "password-hash",
+              "range": "~1.2.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "pg",
+              "range": "~8.11.6",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "pg-connection-string",
+              "range": "~2.6.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "playwright-core",
+              "range": "~1.61.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "postcss-html",
+              "range": "~1.8.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "postcss-rtlcss",
+              "range": "~5.7.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "postcss-scss",
+              "range": "~4.0.9",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "prettier",
+              "range": "^3.8.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "prismjs",
+              "range": "~1.30.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "prom-client",
+              "range": "~13.2.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "prometheus-api-metrics",
+              "range": "~3.2.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "promisify-child-process",
+              "range": "~4.1.2",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "protobufjs",
+              "range": "~8.8.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "qrcode",
+              "range": "~1.5.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "qs",
+              "range": "~6.16.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "radius",
+              "range": "~1.1.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "redbean-node",
+              "range": "~0.4.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "redis",
+              "range": "~5.9.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "rollup-plugin-visualizer",
+              "range": "~7.0.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "sass",
+              "range": "^1.101.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "semver",
+              "range": "~7.5.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "socket.io",
+              "range": "~4.8.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "socket.io-client",
+              "range": "~4.8.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "socks-proxy-agent",
+              "range": "~8.0.5",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "sqlstring",
+              "range": "~2.3.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "ssh2",
+              "range": "~1.17.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "ssh2-sftp-client",
+              "range": "~12.0.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "stylelint",
+              "range": "^15.11.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "stylelint-config-prettier",
+              "range": "^9.0.5",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "stylelint-config-standard",
+              "range": "~25.0.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "tar",
+              "range": "~6.2.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "tcp-ping",
+              "range": "~0.1.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "terser",
+              "range": "~5.15.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "test",
+              "range": "~3.3.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "testcontainers",
+              "range": "^11.12.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "tldts",
+              "range": "~7.0.23",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "tough-cookie",
+              "range": "~4.1.4",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "tsx",
+              "range": "~4.23.1",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "typescript",
+              "range": "~4.4.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "unlimited-timeout",
+              "range": "~0.1.0",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "v-pagination-3",
+              "range": "~0.1.7",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "validator",
+              "range": "~13.15.26",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "vite",
+              "range": "~8.1.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vite-plugin-compression",
+              "range": "^0.5.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue",
+              "range": "~3.5.39",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-chartjs",
+              "range": "~5.2.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-contenteditable",
+              "range": "~3.0.4",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-i18n",
+              "range": "~11.2.8",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-image-crop-upload",
+              "range": "~3.0.3",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-multiselect",
+              "range": "~3.0.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-prism-editor",
+              "range": "~2.0.0-alpha.2",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-qrcode",
+              "range": "~1.0.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-router",
+              "range": "~4.2.5",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vue-toastification",
+              "range": "~2.0.0-rc.5",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "vuedraggable",
+              "range": "~4.1.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "wait-on",
+              "range": "^7.2.0",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "web-push",
+              "range": "~3.6.7",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "whatwg-url",
+              "range": "~12.0.1",
+              "kind": "development",
+              "optional": false
+            },
+            {
+              "requested": "ws",
+              "range": "~8.21.3",
+              "kind": "production",
+              "optional": false
+            },
+            {
+              "requested": "zod",
+              "range": "~4.4.3",
+              "kind": "production",
+              "optional": false
+            }
+          ],
+          "overrides": {
+            "@aws-sdk/credential-providers": "npm:useless-module@1.0.0",
+            "tedious": {
+              "@azure/identity": "npm:useless-module@1.0.0",
+              "@azure/keyvault-keys": "npm:useless-module@1.0.0"
+            },
+            "knex": "$knex"
+          },
+          "lockfile": "package-lock.json",
+          "manager": "npm"
+        }
+      ],
+      "lockfiles": [
+        {
+          "file": "package-lock.json",
+          "version": 3,
+          "sha256": "7abd7554a7e22c9a9e4be629c05c32558c8f4a3b3b52071849c764bedf696b2a"
+        }
+      ],
+      "configurationInputs": [],
+      "gaps": [
+        {
+          "manifest": "package.json",
+          "reason": "Unresolved peer dependency in lockfile",
+          "dependency": "@hey-api/openapi-ts",
+          "from": "node_modules/@hey-api/client-fetch",
+          "range": "< 2"
+        }
+      ],
+      "notices": [
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/api-key",
+          "dependency": "@better-auth/utils",
+          "range": "0.4.0",
+          "version": "0.4.2",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/aedes",
+          "dependency": "aedes-persistence-level",
+          "range": "^9.1.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/aedes",
+          "dependency": "aedes-persistence-mongodb",
+          "range": "^9.3.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/aedes",
+          "dependency": "aedes-persistence-redis",
+          "range": "^11.2.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "@lynx-js/react",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "@prisma/client",
+          "range": "^5.0.0 || ^6.0.0 || ^7.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "@sveltejs/kit",
+          "range": "^2.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "@tanstack/react-start",
+          "range": "^1.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "@tanstack/solid-start",
+          "range": "^1.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "drizzle-kit",
+          "range": ">=0.31.4",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "drizzle-orm",
+          "range": "^0.45.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "mongodb",
+          "range": "^6.0.0 || ^7.0.0",
+          "version": "4.17.2",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "next",
+          "range": "^14.0.0 || ^15.0.0 || ^16.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "prisma",
+          "range": "^5.0.0 || ^6.0.0 || ^7.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "react",
+          "range": "^18.0.0 || ^19.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "react-dom",
+          "range": "^18.0.0 || ^19.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "solid-js",
+          "range": "^1.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "svelte",
+          "range": "^4.0.0 || ^5.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/better-auth",
+          "dependency": "vitest",
+          "range": "^2.0.0 || ^3.0.0 || ^4.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/http-cookie-agent",
+          "dependency": "deasync",
+          "range": "^0.1.26",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/http-cookie-agent",
+          "dependency": "undici",
+          "range": "^5.11.0",
+          "version": "6.28.1",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/knex",
+          "dependency": "pg-query-stream",
+          "range": "^4.14.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/mongodb",
+          "dependency": "@aws-sdk/credential-providers",
+          "range": "^3.186.0",
+          "version": "1.0.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/mongodb",
+          "dependency": "@aws-sdk/credential-providers",
+          "range": "^3.186.0",
+          "version": "1.0.0",
+          "reason": "Locked identity is useless-module; an alias/override may replace the requested package. Installation policy is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/nostr-tools",
+          "dependency": "typescript",
+          "range": ">=5.0.0",
+          "version": "4.4.4",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/pg",
+          "dependency": "pg-native",
+          "range": ">=3.0.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/rollup-plugin-visualizer",
+          "dependency": "rollup",
+          "range": "2.x || 3.x || 4.x",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/stylelint-config-prettier",
+          "dependency": "stylelint",
+          "range": ">= 11.x < 15",
+          "version": "15.11.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/stylelint-config-standard",
+          "dependency": "stylelint",
+          "range": "^14.4.0",
+          "version": "15.11.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "@vitejs/devtools",
+          "range": "^0.3.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "jiti",
+          "range": ">=1.21.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "less",
+          "range": "^4.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "sass-embedded",
+          "range": "^1.70.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "sugarss",
+          "range": "^5.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vite",
+          "dependency": "terser",
+          "range": "^5.16.0",
+          "version": "5.15.1",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vue-qrcode",
+          "dependency": "@vue/composition-api",
+          "range": "^1.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/ws",
+          "dependency": "bufferutil",
+          "range": "^4.0.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/ws",
+          "dependency": "utf-8-validate",
+          "range": ">=5.0.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/core",
+          "dependency": "@cloudflare/workers-types",
+          "range": ">=4",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/core",
+          "dependency": "@opentelemetry/api",
+          "range": "^1.9.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/drizzle-adapter",
+          "dependency": "drizzle-orm",
+          "range": "^0.45.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/mongo-adapter",
+          "dependency": "mongodb",
+          "range": "^6.0.0 || ^7.0.0",
+          "version": "4.17.2",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/prisma-adapter",
+          "dependency": "@prisma/client",
+          "range": "^5.0.0 || ^6.0.0 || ^7.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/@better-auth/prisma-adapter",
+          "dependency": "prisma",
+          "range": "^5.0.0 || ^6.0.0 || ^7.0.0",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/mqtt/node_modules/ws",
+          "dependency": "bufferutil",
+          "range": "^4.0.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/mqtt/node_modules/ws",
+          "dependency": "utf-8-validate",
+          "range": "^5.0.2",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/tedious",
+          "dependency": "@azure/identity",
+          "range": "^4.2.1",
+          "version": "1.0.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/tedious",
+          "dependency": "@azure/identity",
+          "range": "^4.2.1",
+          "version": "1.0.0",
+          "reason": "Locked identity is useless-module; an alias/override may replace the requested package. Installation policy is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/tedious",
+          "dependency": "@azure/keyvault-keys",
+          "range": "^4.4.0",
+          "version": "1.0.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/tedious",
+          "dependency": "@azure/keyvault-keys",
+          "range": "^4.4.0",
+          "version": "1.0.0",
+          "reason": "Locked identity is useless-module; an alias/override may replace the requested package. Installation policy is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/cosmiconfig",
+          "dependency": "typescript",
+          "range": ">=4.9.5",
+          "version": "4.4.4",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/stylelint-config-recommended",
+          "dependency": "stylelint",
+          "range": "^14.4.0",
+          "version": "15.11.0",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/vue-demi",
+          "dependency": "@vue/composition-api",
+          "range": "^1.0.0-rc.1",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/bare-fs",
+          "dependency": "bare-buffer",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/fdir",
+          "dependency": "picomatch",
+          "range": "^3 || ^4",
+          "version": "2.3.2",
+          "reason": "Locked version differs from requested range; overrides or peer-resolution policy may explain this. Installation validity is not assessed"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/b4a",
+          "dependency": "react-native-b4a",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/bare-events",
+          "dependency": "bare-abort-controller",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/bare-stream",
+          "dependency": "bare-abort-controller",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        },
+        {
+          "manifest": "package.json",
+          "from": "node_modules/bare-stream",
+          "dependency": "bare-buffer",
+          "range": "*",
+          "reason": "Optional dependency/peer is absent from the lockfile; no missing-package deduction"
+        }
+      ],
+      "sourceClasses": {
+        "publicRegistry": 1182,
+        "workspace": 0,
+        "otherSource": 0
+      },
+      "packageVersions": 1182,
+      "installations": 1303,
+      "directPackageVersions": 155,
+      "productionReachable": 589,
+      "developmentReachable": 786,
+      "metadataStatus": "notRequested",
+      "availablePackages": 0,
+      "unavailablePackages": 0,
+      "assessedObservations": [],
+      "deprecatedPackageVersions": 0,
+      "updatesWithinDeclaredRanges": 0,
+      "vulnerablePackageVersions": 0,
+      "score": null,
+      "unchanged": "Raw CSV and every other dimension verified equal to released 0.5.0 source results."
+    }
+  ],
+  "validation": {
+    "fullAnalyzerTestsPassed": 256,
+    "finalDependencyRegressionTestsPassed": 46,
+    "pnpmRegressionTestsPassed": 24,
+    "installedPackageSmokePassed": true,
+    "sharedCalibrationFixturesPassed": 6,
+    "otherDimensionsAndRawCsvUnchanged": true,
+    "nonPnpmInventoriesUnchanged": true,
+    "uptimeKumaGapsAndNoticesUnchanged": true,
+    "skillOfflineTestsPassed": 16,
+    "packagedSkillIntegrationTestsPassed": 15,
+    "integrationSkips": 0,
+    "quickValidatePassed": true
+  },
+  "limitations": [
+    "Dependency Management remains unscored.",
+    "Registry metadata was not requested in this rerun; zero observed metadata findings is not an absence-of-vulnerabilities claim.",
+    "pnpm environment/config tooling is explicitly excluded from the selected-project inventory.",
+    "Older pnpm formats and file/git/custom resolutions remain unsupported.",
+    "Integrity-only pnpm entries do not establish public-registry provenance."
+  ]
+}

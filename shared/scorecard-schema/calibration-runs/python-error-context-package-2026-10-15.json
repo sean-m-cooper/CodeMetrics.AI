@@ -1,0 +1,326 @@
+{
+  "date": "2026-10-15",
+  "adapterVersion": "0.9.0",
+  "ruleset": "python-2026-10-15-exception-context-review-v1",
+  "archiveSha256": "fec3f1869c4533de273fe3af338a084638570dcfbe6c08a73631718f3bc0b1a0",
+  "results": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "runId": "80e77cf0-d712-4e81-96b8-176d28a87efa",
+      "auditId": "80e77cf0-d712-4e81-96b8-176d28a87efa",
+      "selectedFunctions": 246,
+      "methodComplexityScore": 7,
+      "handlers": {
+        "handlers": 66,
+        "byClassification": {
+          "documented-no-op": 2,
+          "other-body": 25,
+          "terminal-loop-control": 1,
+          "terminal-raise": 21,
+          "terminal-return": 13,
+          "undocumented-no-op": 4
+        },
+        "functionsWithHandlers": 34,
+        "byOwnerKind": {
+          "function": 55,
+          "module": 11
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "byClassification": {
+              "documented-no-op": 2,
+              "other-body": 25,
+              "terminal-loop-control": 1,
+              "terminal-raise": 21,
+              "terminal-return": 13,
+              "undocumented-no-op": 4
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 66,
+        "recognizedShapes": 17,
+        "unresolved": 49,
+        "byPattern": {
+          "direct-literal-fallback-return": 10,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 2
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 1,
+          "no-supported-local-shape": 48
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "recognizedShapes": 17,
+            "unresolved": 49,
+            "byPattern": {
+              "direct-literal-fallback-return": 10,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 2
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 1,
+              "no-supported-local-shape": 48
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneContextReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-context-package-2026-10-15/requests-evidence.json",
+      "evidenceSha256": "929dde469a5e6661e006a91b3cefcb22d477d821bafb960feaef9a80b397ac08"
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "runId": "504d2ea6-2363-4579-978a-bee904504eb1",
+      "auditId": "504d2ea6-2363-4579-978a-bee904504eb1",
+      "selectedFunctions": 508,
+      "methodComplexityScore": 7.1,
+      "handlers": {
+        "handlers": 62,
+        "byClassification": {
+          "other-body": 14,
+          "terminal-loop-control": 3,
+          "terminal-raise": 26,
+          "terminal-return": 10,
+          "undocumented-no-op": 9
+        },
+        "functionsWithHandlers": 45,
+        "byOwnerKind": {
+          "function": 53,
+          "module": 9
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "byClassification": {
+              "other-body": 14,
+              "terminal-loop-control": 3,
+              "terminal-raise": 26,
+              "terminal-return": 10,
+              "undocumented-no-op": 9
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 62,
+        "recognizedShapes": 5,
+        "unresolved": 57,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "guarded-import-literal-default": 1,
+          "no-op-then-literal-return": 1
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "enclosing-finally": 4,
+          "nested-handler": 1,
+          "no-supported-local-shape": 51
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "recognizedShapes": 5,
+            "unresolved": 57,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "guarded-import-literal-default": 1,
+              "no-op-then-literal-return": 1
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "enclosing-finally": 4,
+              "nested-handler": 1,
+              "no-supported-local-shape": 51
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneContextReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-context-package-2026-10-15/starlette-evidence.json",
+      "evidenceSha256": "efd68520fa25e4dfa6cb3e70c6e841dc75daf96982ad29d7f023cf04e6a748cd"
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "runId": "d02fd8b1-e692-4f4f-8fc7-1356c2bf0d42",
+      "auditId": "d02fd8b1-e692-4f4f-8fc7-1356c2bf0d42",
+      "selectedFunctions": 464,
+      "methodComplexityScore": 6.8,
+      "handlers": {
+        "handlers": 69,
+        "byClassification": {
+          "documented-no-op": 5,
+          "other-body": 29,
+          "terminal-loop-control": 3,
+          "terminal-raise": 16,
+          "terminal-return": 10,
+          "undocumented-no-op": 6
+        },
+        "functionsWithHandlers": 48,
+        "byOwnerKind": {
+          "class-body": 1,
+          "function": 66,
+          "module": 2
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "byClassification": {
+              "documented-no-op": 5,
+              "other-body": 29,
+              "terminal-loop-control": 3,
+              "terminal-raise": 16,
+              "terminal-return": 10,
+              "undocumented-no-op": 6
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 69,
+        "recognizedShapes": 9,
+        "unresolved": 60,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "guarded-import-literal-default": 1,
+          "locally-documented-no-op": 5
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "no-supported-local-shape": 58
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "recognizedShapes": 9,
+            "unresolved": 60,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "guarded-import-literal-default": 1,
+              "locally-documented-no-op": 5
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "no-supported-local-shape": 58
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneContextReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-context-package-2026-10-15/httpie-evidence.json",
+      "evidenceSha256": "bf22704d9be50feebd73c549db757022f2e2a5ac131f5eb7b721627978b3a22a"
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "runId": "c423976c-969f-414c-befd-267a25a983c9",
+      "auditId": "c423976c-969f-414c-befd-267a25a983c9",
+      "selectedFunctions": 9748,
+      "methodComplexityScore": 5.6,
+      "handlers": {
+        "handlers": 1267,
+        "byClassification": {
+          "documented-no-op": 41,
+          "other-body": 422,
+          "terminal-loop-control": 60,
+          "terminal-raise": 338,
+          "terminal-return": 255,
+          "undocumented-no-op": 151
+        },
+        "functionsWithHandlers": 940,
+        "byOwnerKind": {
+          "function": 1246,
+          "module": 21
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "byClassification": {
+              "documented-no-op": 41,
+              "other-body": 422,
+              "terminal-loop-control": 60,
+              "terminal-raise": 338,
+              "terminal-return": 255,
+              "undocumented-no-op": 151
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 1267,
+        "recognizedShapes": 162,
+        "unresolved": 1105,
+        "byPattern": {
+          "direct-bare-rethrow": 6,
+          "direct-literal-fallback-return": 107,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 41,
+          "no-op-then-literal-return": 3
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 32,
+          "enclosing-finally": 18,
+          "exception-group-semantics": 1,
+          "import-exception-binding-unresolved": 1,
+          "nested-handler": 39,
+          "no-supported-local-shape": 1024
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "recognizedShapes": 162,
+            "unresolved": 1105,
+            "byPattern": {
+              "direct-bare-rethrow": 6,
+              "direct-literal-fallback-return": 107,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 41,
+              "no-op-then-literal-return": 3
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 32,
+              "enclosing-finally": 18,
+              "exception-group-semantics": 1,
+              "import-exception-binding-unresolved": 1,
+              "nested-handler": 39,
+              "no-supported-local-shape": 1024
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneContextReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-context-package-2026-10-15/django-evidence.json",
+      "evidenceSha256": "f7710374eda636ff0a9ab1fc75847095f013bec3cc68ee1c77b0985462b61dd6"
+    }
+  ],
+  "checkpoint": "fa70917",
+  "archive": "TestResults/python-error-context-package-2026-10-15/codemetrics-ai-0.5.0.tgz",
+  "checks": {
+    "pythonTestsPassed": 110,
+    "sharedTestsPassed": 9,
+    "javascriptTypescriptTestsPassed": 256,
+    "installedPythonEvidenceTestsPassed": 27,
+    "skillIntegrationSupportingHarnessChecksPassed": 32,
+    "pythonIntegrationSubtestsIncluded": 15,
+    "skillStructuralValidation": "passed",
+    "packagedProducerAndGuideBytesMatchSource": true,
+    "archiveExcludesPythonBytecode": true,
+    "reportingFixture": "analyzer-generated, inspector-validated, offline harness only; no live-model evaluation"
+  },
+  "releaseState": "Local development archive; not pushed or published. Error Handling unscored; Method Complexity remains the only scored Python dimension."
+}

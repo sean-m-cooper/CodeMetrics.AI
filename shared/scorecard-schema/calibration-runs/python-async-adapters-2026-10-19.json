@@ -1,0 +1,569 @@
+{
+  "schemaVersion": 1,
+  "policy": "python/async-callback-adapters-review-v1",
+  "auditId": "1b8f3453-6f59-435c-bd77-29bcb25413d2",
+  "implementationSha256": "23bb1ff94fe94b34581e484b5b1a4d1dcce69faa7ebc42813e65ceb360a4c06e",
+  "samples": [
+    {
+      "id": "starlette",
+      "repository": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "runId": "5c811967-bbf7-4bee-9d20-eeb091925618",
+      "functionFactsSha256": "b2e5495c18c8532661f8d0269aab2b4413dfe192c116038807a03813c229457c",
+      "selectedSourceSha256": "2a51420a3bfbda775c692446934792dfc86b9d289056bf5a1fae501579ed9dd7",
+      "asyncRowsSha256": "50458f0f60e2f5d3c4f86f7b646ff7f66c4c1a6cc4e6e8dc150aaf626263e2b0",
+      "contextRowsSha256": "36931d47fa1ca784d61e611eadd3acb04f95a244e2ec4ddab567e78ff807710f",
+      "methodComplexityScore": 7.1,
+      "configurationFingerprint": "7dbad9cc43461b3b03706c1197cbf4bfc6b97f23ce1c5e51aabfde20097c5152",
+      "adapterRowsSha256": "a12eea9223d77aa90032ae4f1fab02039416fb4dd265a4e231a6e5ba4c97a376",
+      "summary": {
+        "selectedFunctions": 508,
+        "asyncFunctions": 135,
+        "excludedSynchronousFunctions": 373,
+        "availability": "available",
+        "contexts": {
+          "async-body": {
+            "callExpressions": 717,
+            "partialConstructions": 9,
+            "partialCalleeReferences": 0,
+            "partialCallbackReferences": 0,
+            "decoratedCalleeReferences": 0,
+            "decoratedCallbackReferences": 0
+          },
+          "deferred-generator-body": {
+            "callExpressions": 2,
+            "partialConstructions": 0,
+            "partialCalleeReferences": 0,
+            "partialCallbackReferences": 0,
+            "decoratedCalleeReferences": 0,
+            "decoratedCallbackReferences": 0
+          }
+        },
+        "populations": {
+          "production": {
+            "selectedFunctions": 508,
+            "asyncFunctions": 135,
+            "excludedSynchronousFunctions": 373,
+            "availability": "available",
+            "contexts": {
+              "async-body": {
+                "callExpressions": 717,
+                "partialConstructions": 9,
+                "partialCalleeReferences": 0,
+                "partialCallbackReferences": 0,
+                "decoratedCalleeReferences": 0,
+                "decoratedCallbackReferences": 0
+              },
+              "deferred-generator-body": {
+                "callExpressions": 2,
+                "partialConstructions": 0,
+                "partialCalleeReferences": 0,
+                "partialCallbackReferences": 0,
+                "decoratedCalleeReferences": 0,
+                "decoratedCallbackReferences": 0
+              }
+            }
+          }
+        }
+      },
+      "examples": {
+        "partialConstruction": [
+          {
+            "ownerId": "be4a5990d30bb072011e0c638dc7ea28454afa260fe691ee5d888e6103897371",
+            "file": "starlette/concurrency.py",
+            "member": "run_until_first_complete",
+            "callId": "01a5d3f2df56e100f4e29bb631c9a4ed27ff5f23e454fca46be97f59b51e7a93",
+            "executionContext": "async-body",
+            "partialConstruction": {
+              "status": "partial-construction-syntax",
+              "importTarget": "functools.partial",
+              "construction": {
+                "line": 29,
+                "column": 39,
+                "endLine": 29,
+                "endColumn": 72
+              },
+              "argumentLayout": "first-positional-callback",
+              "callback": {
+                "kind": "Name",
+                "shape": "name",
+                "line": 29,
+                "column": 57,
+                "endLine": 29,
+                "endColumn": 61,
+                "reference": {
+                  "status": "unresolved",
+                  "reason": "not-a-direct-function-definition",
+                  "definition": null
+                }
+              },
+              "boundPositionalExpressions": [],
+              "keywordExpressions": [
+                {
+                  "name": null,
+                  "unpacking": true,
+                  "value": {
+                    "kind": "Name",
+                    "shape": "name",
+                    "line": 29,
+                    "column": 65,
+                    "endLine": 29,
+                    "endColumn": 71
+                  }
+                }
+              ]
+            },
+            "partialCallee": {
+              "status": "unresolved",
+              "reason": "not-a-name-or-matched-partial",
+              "definition": null
+            },
+            "decoratedCallee": {
+              "status": "unresolved",
+              "reason": "non-name-reference",
+              "definition": null
+            },
+            "callbackPartial": null,
+            "callbackDecorator": null
+          },
+          {
+            "ownerId": "733aa510a8f83fb0a80ab8bce873dcc9c78d8e653d383c39270dbed3089c5100",
+            "file": "starlette/concurrency.py",
+            "member": "run_in_threadpool",
+            "callId": "d41493b12ff64c53e7f3dc63641aa01f9acea802ff0dd2c7d8b06f35abeb91f0",
+            "executionContext": "async-body",
+            "partialConstruction": {
+              "status": "partial-construction-syntax",
+              "importTarget": "functools.partial",
+              "construction": {
+                "line": 33,
+                "column": 11,
+                "endLine": 33,
+                "endColumn": 51
+              },
+              "argumentLayout": "first-positional-callback",
+              "callback": {
+                "kind": "Name",
+                "shape": "name",
+                "line": 33,
+                "column": 29,
+                "endLine": 33,
+                "endColumn": 33,
+                "reference": {
+                  "status": "unresolved",
+                  "reason": "rebound-or-ambiguous-name",
+                  "definition": null
+                }
+              },
+              "boundPositionalExpressions": [
+                {
+                  "kind": "Starred",
+                  "shape": "other-expression",
+                  "line": 33,
+                  "column": 35,
+                  "endLine": 33,
+                  "endColumn": 40
+                }
+              ],
+              "keywordExpressions": [
+                {
+                  "name": null,
+                  "unpacking": true,
+                  "value": {
+                    "kind": "Name",
+                    "shape": "name",
+                    "line": 33,
+                    "column": 44,
+                    "endLine": 33,
+                    "endColumn": 50
+                  }
+                }
+              ]
+            },
+            "partialCallee": {
+              "status": "unresolved",
+              "reason": "not-a-name-or-matched-partial",
+              "definition": null
+            },
+            "decoratedCallee": {
+              "status": "unresolved",
+              "reason": "non-name-reference",
+              "definition": null
+            },
+            "callbackPartial": null,
+            "callbackDecorator": null
+          },
+          {
+            "ownerId": "64eb9914923e910615f15ede53109a8cdae69232990eef35de8c7f1105da4224",
+            "file": "starlette/middleware/cors.py",
+            "member": "CORSMiddleware.simple_response",
+            "callId": "95b8cd669476636715030611c60d7ef26ca11e09c8c546941a535e7839847668",
+            "executionContext": "async-body",
+            "partialConstruction": {
+              "status": "partial-construction-syntax",
+              "importTarget": "functools.partial",
+              "construction": {
+                "line": 148,
+                "column": 15,
+                "endLine": 148,
+                "endColumn": 87
+              },
+              "argumentLayout": "first-positional-callback",
+              "callback": {
+                "kind": "Attribute",
+                "shape": "attribute-path",
+                "line": 148,
+                "column": 33,
+                "endLine": 148,
+                "endColumn": 42,
+                "reference": {
+                  "status": "unresolved",
+                  "reason": "non-name-reference",
+                  "definition": null
+                }
+              },
+              "boundPositionalExpressions": [],
+              "keywordExpressions": [
+                {
+                  "name": "send",
+                  "unpacking": false,
+                  "value": {
+                    "kind": "Name",
+                    "shape": "name",
+                    "line": 148,
+                    "column": 49,
+                    "endLine": 148,
+                    "endColumn": 53
+                  }
+                },
+                {
+                  "name": "request_headers",
+                  "unpacking": false,
+                  "value": {
+                    "kind": "Name",
+                    "shape": "name",
+                    "line": 148,
+                    "column": 71,
+                    "endLine": 148,
+                    "endColumn": 86
+                  }
+                }
+              ]
+            },
+            "partialCallee": {
+              "status": "unresolved",
+              "reason": "not-a-name-or-matched-partial",
+              "definition": null
+            },
+            "decoratedCallee": {
+              "status": "unresolved",
+              "reason": "non-name-reference",
+              "definition": null
+            },
+            "callbackPartial": null,
+            "callbackDecorator": null
+          },
+          {
+            "ownerId": "1e6323d93c98b3bd620138801f59225de50b2426ae6aec4d7260211e6559b384",
+            "file": "starlette/responses.py",
+            "member": "StreamingResponse.__call__",
+            "callId": "578f8cd00958fba53ac269f825f2fb90cf474780f03e73d0217a5381bf3403d4",
+            "executionContext": "async-body",
+            "partialConstruction": {
+              "status": "partial-construction-syntax",
+              "importTarget": "functools.partial",
+              "construction": {
+                "line": 282,
+                "column": 44,
+                "endLine": 282,
+                "endColumn": 79
+              },
+              "argumentLayout": "first-positional-callback",
+              "callback": {
+                "kind": "Attribute",
+                "shape": "attribute-path",
+                "line": 282,
+                "column": 52,
+                "endLine": 282,
+                "endColumn": 72,
+                "reference": {
+                  "status": "unresolved",
+                  "reason": "non-name-reference",
+                  "definition": null
+                }
+              },
+              "boundPositionalExpressions": [
+                {
+                  "kind": "Name",
+                  "shape": "name",
+                  "line": 282,
+                  "column": 74,
+                  "endLine": 282,
+                  "endColumn": 78
+                }
+              ],
+              "keywordExpressions": []
+            },
+            "partialCallee": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "decoratedCallee": {
+              "status": "unresolved",
+              "reason": "no-direct-definition-before-reference",
+              "definition": null
+            },
+            "callbackPartial": null,
+            "callbackDecorator": null
+          },
+          {
+            "ownerId": "1e6323d93c98b3bd620138801f59225de50b2426ae6aec4d7260211e6559b384",
+            "file": "starlette/responses.py",
+            "member": "StreamingResponse.__call__",
+            "callId": "7fea604e2c856d637e0cdb3fc529ba6f4b81ff0a76d2245b81ddb87e4808e046",
+            "executionContext": "async-body",
+            "partialConstruction": {
+              "status": "partial-construction-syntax",
+              "importTarget": "functools.partial",
+              "construction": {
+                "line": 283,
+                "column": 27,
+                "endLine": 283,
+                "endColumn": 71
+              },
+              "argumentLayout": "first-positional-callback",
+              "callback": {
+                "kind": "Attribute",
+                "shape": "attribute-path",
+                "line": 283,
+                "column": 35,
+                "endLine": 283,
+                "endColumn": 61,
+                "reference": {
+                  "status": "unresolved",
+                  "reason": "non-name-reference",
+                  "definition": null
+                }
+              },
+              "boundPositionalExpressions": [
+                {
+                  "kind": "Name",
+                  "shape": "name",
+                  "line": 283,
+                  "column": 63,
+                  "endLine": 283,
+                  "endColumn": 70
+                }
+              ],
+              "keywordExpressions": []
+            },
+            "partialCallee": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "decoratedCallee": {
+              "status": "unresolved",
+              "reason": "no-direct-definition-before-reference",
+              "definition": null
+            },
+            "callbackPartial": null,
+            "callbackDecorator": null
+          }
+        ]
+      },
+      "unchangedMethodComplexityAndErrorHandlingEvidence": true,
+      "unchangedAsyncEvidence": true,
+      "unchangedContextEvidence": true
+    },
+    {
+      "id": "django",
+      "repository": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "runId": "89b6829a-f120-41ff-ac2b-b2e829efb3be",
+      "functionFactsSha256": "82a893dd6660923a67138b3e313310ffff9bee80c1344c56d5a4d309cf35d455",
+      "selectedSourceSha256": "2cb4a5b24cda391c3278706e0de5eb522f2d8e5458cceed6c898fdfb27b9a70f",
+      "asyncRowsSha256": "bbc54ef4007a83bbde2ec1db49d4dce72fde00cc89a0dd939df70f31d62507d6",
+      "contextRowsSha256": "5b96d1c87b217c254a176f06eaabdcd8fd5863ec4db48df3053f924824a1d451",
+      "methodComplexityScore": 5.6,
+      "configurationFingerprint": "868d4b8bc01b105b1361c2972a3fde1d72ae5535628ce3a69f9315c5b5d0cad2",
+      "adapterRowsSha256": "1221537178ebc6294cb36f44377eaeaf962322ebf3d4b3fefff6b025ecd0304c",
+      "summary": {
+        "selectedFunctions": 9748,
+        "asyncFunctions": 266,
+        "excludedSynchronousFunctions": 9482,
+        "availability": "available",
+        "contexts": {
+          "async-body": {
+            "callExpressions": 818,
+            "partialConstructions": 2,
+            "partialCalleeReferences": 0,
+            "partialCallbackReferences": 0,
+            "decoratedCalleeReferences": 0,
+            "decoratedCallbackReferences": 0
+          },
+          "deferred-generator-body": {
+            "callExpressions": 6,
+            "partialConstructions": 0,
+            "partialCalleeReferences": 0,
+            "partialCallbackReferences": 0,
+            "decoratedCalleeReferences": 0,
+            "decoratedCallbackReferences": 0
+          }
+        },
+        "populations": {
+          "production": {
+            "selectedFunctions": 9748,
+            "asyncFunctions": 266,
+            "excludedSynchronousFunctions": 9482,
+            "availability": "available",
+            "contexts": {
+              "async-body": {
+                "callExpressions": 818,
+                "partialConstructions": 2,
+                "partialCalleeReferences": 0,
+                "partialCallbackReferences": 0,
+                "decoratedCalleeReferences": 0,
+                "decoratedCallbackReferences": 0
+              },
+              "deferred-generator-body": {
+                "callExpressions": 6,
+                "partialConstructions": 0,
+                "partialCalleeReferences": 0,
+                "partialCallbackReferences": 0,
+                "decoratedCalleeReferences": 0,
+                "decoratedCallbackReferences": 0
+              }
+            }
+          }
+        }
+      },
+      "examples": {
+        "partialConstruction": [
+          {
+            "ownerId": "606cf57efac59da298ff4be978982f3b4faa5636363d40bb59311e4b1bf364d4",
+            "file": "django/test/client.py",
+            "member": "AsyncClient.request",
+            "callId": "1aa72ecac21f099ade8d4a175c512d9e3d4a2c1fd2486b1d19fe9dadb2089524",
+            "executionContext": "async-body",
+            "partialConstruction": {
+              "status": "partial-construction-syntax",
+              "importTarget": "functools.partial",
+              "construction": {
+                "line": 1446,
+                "column": 29,
+                "endLine": 1446,
+                "endColumn": 68
+              },
+              "argumentLayout": "first-positional-callback",
+              "callback": {
+                "kind": "Name",
+                "shape": "name",
+                "line": 1446,
+                "column": 37,
+                "endLine": 1446,
+                "endColumn": 61,
+                "reference": {
+                  "status": "local-definition",
+                  "reason": "unique-direct-lexical-definition",
+                  "definition": {
+                    "ownerId": "ca5d5dfe0d9d4567497ac4e2a76cd8ab9128f2153b5dc7e089e23ef496cca7a6",
+                    "file": "django/test/client.py",
+                    "member": "store_rendered_templates",
+                    "functionKind": "FunctionDef",
+                    "line": 267,
+                    "column": 0,
+                    "endLine": 277,
+                    "endColumn": 42
+                  }
+                }
+              },
+              "boundPositionalExpressions": [
+                {
+                  "kind": "Name",
+                  "shape": "name",
+                  "line": 1446,
+                  "column": 63,
+                  "endLine": 1446,
+                  "endColumn": 67
+                }
+              ],
+              "keywordExpressions": []
+            },
+            "partialCallee": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "decoratedCallee": {
+              "status": "unresolved",
+              "reason": "no-direct-definition-before-reference",
+              "definition": null
+            },
+            "callbackPartial": null,
+            "callbackDecorator": null
+          },
+          {
+            "ownerId": "606cf57efac59da298ff4be978982f3b4faa5636363d40bb59311e4b1bf364d4",
+            "file": "django/test/client.py",
+            "member": "AsyncClient.request",
+            "callId": "63594fd5b20ccd878321e20485f6434525a3ea28e043231cbc5c4977093de424",
+            "executionContext": "async-body",
+            "partialConstruction": {
+              "status": "partial-construction-syntax",
+              "importTarget": "functools.partial",
+              "construction": {
+                "line": 1465,
+                "column": 24,
+                "endLine": 1465,
+                "endColumn": 59
+              },
+              "argumentLayout": "first-positional-callback",
+              "callback": {
+                "kind": "Attribute",
+                "shape": "attribute-path",
+                "line": 1465,
+                "column": 32,
+                "endLine": 1465,
+                "endColumn": 48,
+                "reference": {
+                  "status": "unresolved",
+                  "reason": "non-name-reference",
+                  "definition": null
+                }
+              },
+              "boundPositionalExpressions": [
+                {
+                  "kind": "Name",
+                  "shape": "name",
+                  "line": 1465,
+                  "column": 50,
+                  "endLine": 1465,
+                  "endColumn": 58
+                }
+              ],
+              "keywordExpressions": []
+            },
+            "partialCallee": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "decoratedCallee": {
+              "status": "unresolved",
+              "reason": "no-direct-definition-before-reference",
+              "definition": null
+            },
+            "callbackPartial": null,
+            "callbackDecorator": null
+          }
+        ]
+      },
+      "unchangedMethodComplexityAndErrorHandlingEvidence": true,
+      "unchangedAsyncEvidence": true,
+      "unchangedContextEvidence": true
+    }
+  ],
+  "scope": "Syntax and bounded source links only. Async/Blocking Usage and Error Handling remain unscored."
+}

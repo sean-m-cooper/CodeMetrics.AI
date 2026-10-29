@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "policy": "python/exception-handler-observations-v1",
+  "auditId": "77e15bf9-8fe8-4f78-b098-12a4dc7f150f",
+  "implementationSha256": "43e3c3b5c8b83ade85f029571cb2fb4a5bb38a2ddbba1df9b5d9170fb2bf52e9",
+  "scope": "Review-only handler classifications and owned syntax. No target execution, handling score, failure-rate estimate, or classification of business correctness.",
+  "samples": [
+    {
+      "id": "requests",
+      "repository": "requests",
+      "url": "https://github.com/psf/requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "role": "HTTP client library",
+      "include": [
+        "src/requests/**"
+      ],
+      "productionPaths": [],
+      "runId": "77391811-ad29-4bae-9090-0e921c5a84c2",
+      "configurationFingerprint": "5ac20f2aec45ccd615d21d3ffbe91269512129d28bb210ccca34a8447db5ebb9",
+      "selectedSourceSha256": "2d607977215a449fd48af18dbaf908cdeaf67c08aba11fa0d06160700c19b677",
+      "unchangedFunctionFactsSha256": "45891e7b93660fe54c14af8d10479e357eb4b57fdee3abb688645a7c54bfc609",
+      "handlerRowsSha256": "991dddd078d808234a3f823b0cec0838e680119852eaa8ccb5dc1dda4d40c386",
+      "selectedFunctions": 246,
+      "summary": {
+        "handlers": 66,
+        "byClassification": {
+          "documented-no-op": 2,
+          "other-body": 25,
+          "terminal-loop-control": 1,
+          "terminal-raise": 21,
+          "terminal-return": 13,
+          "undocumented-no-op": 4
+        },
+        "functionsWithHandlers": 34,
+        "byOwnerKind": {
+          "function": 55,
+          "module": 11
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "byClassification": {
+              "documented-no-op": 2,
+              "other-body": 25,
+              "terminal-loop-control": 1,
+              "terminal-raise": 21,
+              "terminal-return": 13,
+              "undocumented-no-op": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "starlette",
+      "repository": "starlette",
+      "url": "https://github.com/Kludex/starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "role": "ASGI framework",
+      "include": [
+        "starlette/**"
+      ],
+      "productionPaths": [],
+      "runId": "b839ca03-d78c-4d84-94f0-384e293f8390",
+      "configurationFingerprint": "14227b1504fe4acb698ebc90c3881956ecd0bcc4afd78c7376416492aa378c59",
+      "selectedSourceSha256": "2a51420a3bfbda775c692446934792dfc86b9d289056bf5a1fae501579ed9dd7",
+      "unchangedFunctionFactsSha256": "b2e5495c18c8532661f8d0269aab2b4413dfe192c116038807a03813c229457c",
+      "handlerRowsSha256": "23d5af275d636eaa9119aa2327e38ecd6e2e1b672a192ce686b5345b2210e17e",
+      "selectedFunctions": 508,
+      "summary": {
+        "handlers": 62,
+        "byClassification": {
+          "other-body": 14,
+          "terminal-loop-control": 3,
+          "terminal-raise": 26,
+          "terminal-return": 10,
+          "undocumented-no-op": 9
+        },
+        "functionsWithHandlers": 45,
+        "byOwnerKind": {
+          "function": 53,
+          "module": 9
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "byClassification": {
+              "other-body": 14,
+              "terminal-loop-control": 3,
+              "terminal-raise": 26,
+              "terminal-return": 10,
+              "undocumented-no-op": 9
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "httpie",
+      "repository": "httpie",
+      "url": "https://github.com/httpie/cli",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "role": "CLI application",
+      "include": [
+        "httpie/**"
+      ],
+      "productionPaths": [],
+      "runId": "0ce06446-796a-4dda-bfdb-c3dcd625f8e2",
+      "configurationFingerprint": "b9dec5bdb526228db4d07867599eb9a80c49ae3fb71dd9b00162256594c56dea",
+      "selectedSourceSha256": "cb8ee90b048099e53b85aaee32175802082b22a7706e5c05e0d4e403d7be47a8",
+      "unchangedFunctionFactsSha256": "d6e571d78f49775fa2ec63b0fbec632e43fab7ac6398d0cf7e633938a0d09bbb",
+      "handlerRowsSha256": "66d3d8952b8626ebc3806d7c8db4d72148e1f721a2cce1b973c56321b808c685",
+      "selectedFunctions": 464,
+      "summary": {
+        "handlers": 69,
+        "byClassification": {
+          "documented-no-op": 5,
+          "other-body": 29,
+          "terminal-loop-control": 3,
+          "terminal-raise": 16,
+          "terminal-return": 10,
+          "undocumented-no-op": 6
+        },
+        "functionsWithHandlers": 48,
+        "byOwnerKind": {
+          "class-body": 1,
+          "function": 66,
+          "module": 2
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "byClassification": {
+              "documented-no-op": 5,
+              "other-body": 29,
+              "terminal-loop-control": 3,
+              "terminal-raise": 16,
+              "terminal-return": 10,
+              "undocumented-no-op": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "django",
+      "repository": "django",
+      "url": "https://github.com/django/django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "role": "larger web framework",
+      "include": [
+        "django/**"
+      ],
+      "productionPaths": [
+        "django/test/**"
+      ],
+      "runId": "0f468b8d-db80-4fab-861e-97f35de3ab9d",
+      "configurationFingerprint": "20f02a98947a1cc794b058a564e4a0adb722fba8ae3ba879866b31aea1989b53",
+      "selectedSourceSha256": "2cb4a5b24cda391c3278706e0de5eb522f2d8e5458cceed6c898fdfb27b9a70f",
+      "unchangedFunctionFactsSha256": "82a893dd6660923a67138b3e313310ffff9bee80c1344c56d5a4d309cf35d455",
+      "handlerRowsSha256": "43851d588077e9f8e58b683cde884ccdfa16f013da69271efca87f9b7a853a33",
+      "selectedFunctions": 9748,
+      "summary": {
+        "handlers": 1267,
+        "byClassification": {
+          "documented-no-op": 41,
+          "other-body": 422,
+          "terminal-loop-control": 60,
+          "terminal-raise": 338,
+          "terminal-return": 255,
+          "undocumented-no-op": 151
+        },
+        "functionsWithHandlers": 940,
+        "byOwnerKind": {
+          "function": 1246,
+          "module": 21
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "byClassification": {
+              "documented-no-op": 41,
+              "other-body": 422,
+              "terminal-loop-control": 60,
+              "terminal-raise": 338,
+              "terminal-return": 255,
+              "undocumented-no-op": 151
+            }
+          }
+        }
+      }
+    }
+  ],
+  "verification": {
+    "pythonTestsPassed": 93,
+    "focusedHandlerTestsIncluded": 14,
+    "sharedConformanceAndCalibrationTestsPassed": 9,
+    "pinnedCheckoutsCleanBeforeAndAfter": true,
+    "frozenSourceAndFunctionFactsMatched": true,
+    "handlerRowsAndSummariesEqualAcrossTwoRuns": true
+  },
+  "documentation": "python-error-handling-2026-10-13.md",
+  "fullReportDirectory": "TestResults/python-error-handling-2026-10-13-verified"
+}

@@ -5,6 +5,7 @@ import addFormats from "ajv-formats";
 import type { Evidence, Dimension, Finding } from "./evidence.js";
 import type { DimensionKey } from "./scorecard-contract.js";
 import { validateEvidence } from "./evidence-tools.js";
+import { supportsPythonComparison } from "./python-evidence.js";
 
 export type LegacyEvidence = Omit<Evidence, "analysis" | "dimensions"> & {
   dimensions: Record<DimensionKey, Omit<Dimension, "findings"> & {
@@ -48,7 +49,8 @@ export function inspectEvidence(file: string, expected: { ecosystem?: string; ve
   const legacy = evidence.schemaVersion === 2;
   const failed = Object.values(evidence.dimensions).some(dimension => dimension.status === "failed");
   const incomplete = !legacy && (evidence as Evidence).analysis.status !== "complete";
-  return { evidence, compatibility: { mode: legacy ? "legacy" : "native", comparisonAvailable: !legacy && !failed && !incomplete,
+  const experimental = !legacy && evidence.tool.ecosystem === "python" && !supportsPythonComparison(evidence as Evidence);
+  return { evidence, compatibility: { mode: legacy ? "legacy" : "native", comparisonAvailable: !legacy && !failed && !incomplete && !experimental,
     analysisStatus: legacy ? "unknown" : (evidence as Evidence).analysis.status,
     scopeAvailable: !legacy && Object.values(evidence.dimensions).every(dimension => dimension.scope !== undefined) },
     usable: !failed && !incomplete };

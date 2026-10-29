@@ -1,0 +1,3837 @@
+{
+  "schemaVersion": 1,
+  "policy": "python/exception-raise-chaining-v1",
+  "auditId": "31e487fb-973d-4cce-93c4-cf310ebbc204",
+  "implementationSha256": "23017b7879f12e6878f4267daaaa1ff5ba47feb6adaf4284b0d5fc8f0597f12d",
+  "scope": "Syntactic pattern review, not error-handling scoring or business-correctness classification.",
+  "samples": [
+    {
+      "id": "requests",
+      "repository": "requests",
+      "url": "https://github.com/psf/requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "role": "HTTP client library",
+      "include": [
+        "src/requests/**"
+      ],
+      "productionPaths": [],
+      "runId": "86ec74a4-e61d-4a43-a363-be2ff9e32c2a",
+      "configurationFingerprint": "abd4c7d8d213adb93a94f01216c37610875256c8074eea022e0807233877afdb",
+      "handlerRowsSha256": "991dddd078d808234a3f823b0cec0838e680119852eaa8ccb5dc1dda4d40c386",
+      "contextRowsSha256": "b0c59635144eb267b3ff63182f961f4287c6707fbd8b483124b0795c3bd7d19f",
+      "transferRowsSha256": "0ba5549dabfea17e27175114dd0e0a0cc632d531219bbbf2817b1bfd28ccaf9d",
+      "selectedSourceSha256": "2d607977215a449fd48af18dbaf908cdeaf67c08aba11fa0d06160700c19b677",
+      "functionFactsSha256": "45891e7b93660fe54c14af8d10479e357eb4b57fdee3abb688645a7c54bfc609",
+      "summary": {
+        "handlers": 66,
+        "recognizedShapes": 36,
+        "unresolved": 30,
+        "byPattern": {
+          "direct-literal-fallback-return": 10,
+          "direct-symbol-or-call-raise": 19,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 2
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 1,
+          "no-supported-local-shape": 29
+        },
+        "raiseStatements": 30,
+        "handlersWithRaises": 23,
+        "newlyRecognizedShapes": 19,
+        "byExceptionSyntax": {
+          "absent": 3,
+          "call": 26,
+          "name": 1
+        },
+        "handlerNameRaiseSyntax": 0,
+        "handlerNameCauseSyntax": 0,
+        "byCauseSyntax": {
+          "absent": 30
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "recognizedShapes": 36,
+            "unresolved": 30,
+            "byPattern": {
+              "direct-literal-fallback-return": 10,
+              "direct-symbol-or-call-raise": 19,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 2
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 1,
+              "no-supported-local-shape": 29
+            },
+            "raiseStatements": 30,
+            "handlersWithRaises": 23,
+            "newlyRecognizedShapes": 19,
+            "byExceptionSyntax": {
+              "absent": 3,
+              "call": 26,
+              "name": 1
+            },
+            "handlerNameRaiseSyntax": 0,
+            "handlerNameCauseSyntax": 0,
+            "byCauseSyntax": {
+              "absent": 30
+            }
+          }
+        }
+      },
+      "unchangedSourceFunctionsHandlersAndContexts": true,
+      "ownedRaisesMatchBaseObservations": true,
+      "examples": {
+        "direct-literal-fallback-return": [
+          {
+            "handlerId": "8c378318928471d5e3fe25b5c5fd5f5eef7d8db5c755cf54dfe795cb2d05d089",
+            "file": "src/requests/__init__.py",
+            "line": 103,
+            "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_check_cryptography",
+              "functionId": "52cc3c990c376c467faedae7787b21d3c3ead80a191de26dbe91cc9b275ea6b5"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                103,
+                104
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                103,
+                104
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "38ec8b7e2c02e11fc859565cda37118875c0a7a926c7f5c8afbe888656f8dd5e",
+            "file": "src/requests/_internal_utils.py",
+            "line": 50,
+            "sourceSha256": "4c7d8d132c9898fc7d715e473f3ac74785ddc4ab96d2c9240f87835dc6d981ff",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "unicode_is_ascii",
+              "functionId": "ff7ab0beb0c443c52236be31ae5badd7ed48027001ef733206180317ed8b3a8c"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                50,
+                51
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                50,
+                51
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "direct-symbol-or-call-raise": [
+          {
+            "handlerId": "a69ab65f96de38aa80846d18a8c37465c50301662eb84ae3bd59d29b1fefcd50",
+            "file": "src/requests/adapters.py",
+            "line": 490,
+            "sourceSha256": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "HTTPAdapter.get_connection_with_tls_context",
+              "functionId": "6e95da07cc69bc96be95f7e940d369c1c0ae540b7d483176d397f169667d56db"
+            },
+            "handlerNameSyntax": "e",
+            "raises": [
+              {
+                "line": 491,
+                "column": 12,
+                "endLine": 491,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "InvalidURL",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "f69e3ff7dad3d0a84afd321f9b58464d50f3300288de8c45ab39f100cd4cf2f9"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                490
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-symbol-or-call-raise",
+              "evidenceLines": [
+                490,
+                491
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "8fb0071d41d8bce1eed9461d3460e5c05dcc6f4d60bac5d8ad660d197064f0e6",
+            "file": "src/requests/adapters.py",
+            "line": 665,
+            "sourceSha256": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "HTTPAdapter.send",
+              "functionId": "c236946b08d80fda709093ab6158d65f4af6c482e12ef5ab1d0b65ca7d8e0cf7"
+            },
+            "handlerNameSyntax": "e",
+            "raises": [
+              {
+                "line": 666,
+                "column": 12,
+                "endLine": 666,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "InvalidURL",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "7e234f5bc57488da8980f9c3996978af18d2d1f47fe74698281857d912a53d89"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                665
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-symbol-or-call-raise",
+              "evidenceLines": [
+                665,
+                666
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "guarded-import-literal-default": [
+          {
+            "handlerId": "17ce660ecfa8e2b2afd3edd8024de08cc6622618acc29dbf992928628ace0068",
+            "file": "src/requests/__init__.py",
+            "line": 51,
+            "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                50,
+                51,
+                52
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                50,
+                51,
+                52
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "85faab005ab2ee3b312150be9e6876599a5a74930b96d245e3ce42e7503d2511",
+            "file": "src/requests/__init__.py",
+            "line": 56,
+            "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                55,
+                56,
+                57
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                55,
+                56,
+                57
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "locally-documented-no-op": [
+          {
+            "handlerId": "7ac742ecf14aed7236fef6e3f8bb87b79d86d0e6fa3d398aaf1a8ee49ec2c599",
+            "file": "src/requests/models.py",
+            "line": 1110,
+            "sourceSha256": "a3351c3c12a86bf5ed211533875350bc4791e9327a685f8c19ba54343e471e26",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "Response.json",
+              "functionId": "8ed15e672bd14028307afd48a95c058956c6755da939f18b6e3de099fd8b2994"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                1111,
+                1112,
+                1113,
+                1114
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                1111,
+                1112,
+                1113,
+                1114
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "804ad2b514954c79bab870c7810d6f6367a2a65c9a593c0c29670f9357b7dc84",
+            "file": "src/requests/utils.py",
+            "line": 178,
+            "sourceSha256": "b879cb3f671cf1c28e8ff9b2b02151bcdb8974b4820a514cfdd1f5a038443cd2",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "super_len",
+              "functionId": "e120d668a829c06389389db448db241bf9fc6a852874edfb1025aaafaa904797"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                179,
+                180,
+                181
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                179,
+                180,
+                181
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "unresolved": [
+          {
+            "handlerId": "c2a7be571ea3be83306cb674f3788f9dd15cfd96ddf79de69477b6331e00a6f0",
+            "file": "src/requests/__init__.py",
+            "line": 118,
+            "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                118
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                118
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "102275775a6f599615638e06a4a17a3837d8f129b61a1d664e5b2be4a7d84590",
+            "file": "src/requests/__init__.py",
+            "line": 146,
+            "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                146
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                146
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "disposition": "review-only"
+          }
+        ]
+      },
+      "unresolvedExamples": [
+        {
+          "handlerId": "c2a7be571ea3be83306cb674f3788f9dd15cfd96ddf79de69477b6331e00a6f0",
+          "file": "src/requests/__init__.py",
+          "line": 118,
+          "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+          "population": "production",
+          "owner": {
+            "kind": "module",
+            "member": "<module>",
+            "functionId": null
+          },
+          "handlerNameSyntax": null,
+          "raises": [],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              118
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              118
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "102275775a6f599615638e06a4a17a3837d8f129b61a1d664e5b2be4a7d84590",
+          "file": "src/requests/__init__.py",
+          "line": 146,
+          "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+          "population": "production",
+          "owner": {
+            "kind": "module",
+            "member": "<module>",
+            "functionId": null
+          },
+          "handlerNameSyntax": null,
+          "raises": [],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              146
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              146
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "5291b131e8ae3dcd4ffaa79a60b37510e00557ccba30f59fadf48833cfcdea75",
+          "file": "src/requests/adapters.py",
+          "line": 64,
+          "sourceSha256": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+          "population": "production",
+          "owner": {
+            "kind": "module",
+            "member": "<module>",
+            "functionId": null
+          },
+          "handlerNameSyntax": null,
+          "raises": [],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              64
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              64
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "327d05446fc876eb40b4fb083346d95e9a1d4e2aea63309192ec57f4212412d4",
+          "file": "src/requests/adapters.py",
+          "line": 713,
+          "sourceSha256": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "HTTPAdapter.send",
+            "functionId": "c236946b08d80fda709093ab6158d65f4af6c482e12ef5ab1d0b65ca7d8e0cf7"
+          },
+          "handlerNameSyntax": "e",
+          "raises": [
+            {
+              "line": 717,
+              "column": 20,
+              "endLine": 717,
+              "direct": false,
+              "exception": {
+                "kind": "call",
+                "astKind": "Call",
+                "symbol": "ConnectTimeout",
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [
+                {
+                  "kind": "If",
+                  "line": 716
+                },
+                {
+                  "kind": "If",
+                  "line": 714
+                }
+              ],
+              "containersTruncated": false,
+              "id": "49ebae56f2481bf44fd1400eb6cec69f682430d0b201fa584cd100359b3045d2"
+            },
+            {
+              "line": 720,
+              "column": 16,
+              "endLine": 720,
+              "direct": false,
+              "exception": {
+                "kind": "call",
+                "astKind": "Call",
+                "symbol": "RetryError",
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [
+                {
+                  "kind": "If",
+                  "line": 719
+                }
+              ],
+              "containersTruncated": false,
+              "id": "ca0a0948156a95bcfe75a5bef939f5a2306616627f57c81210c51b91e0dc215a"
+            },
+            {
+              "line": 723,
+              "column": 16,
+              "endLine": 723,
+              "direct": false,
+              "exception": {
+                "kind": "call",
+                "astKind": "Call",
+                "symbol": "ProxyError",
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [
+                {
+                  "kind": "If",
+                  "line": 722
+                }
+              ],
+              "containersTruncated": false,
+              "id": "47d9c7c04a3e45970af0302de039bfa8f45c80c57a3880a2d7ac4450ba1a4c8a"
+            },
+            {
+              "line": 727,
+              "column": 16,
+              "endLine": 727,
+              "direct": false,
+              "exception": {
+                "kind": "call",
+                "astKind": "Call",
+                "symbol": "SSLError",
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [
+                {
+                  "kind": "If",
+                  "line": 725
+                }
+              ],
+              "containersTruncated": false,
+              "id": "361cada80e272889d0fec3e78e060ca614f69cc7ebf72456d4dc8597918a0840"
+            },
+            {
+              "line": 729,
+              "column": 12,
+              "endLine": 729,
+              "direct": true,
+              "exception": {
+                "kind": "call",
+                "astKind": "Call",
+                "symbol": "ConnectionError",
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [],
+              "containersTruncated": false,
+              "id": "2bae768a1b08012257c7452616bef6d28eee09bab5a150c44556f9942937c9d8"
+            }
+          ],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              713
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              713
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        }
+      ]
+    },
+    {
+      "id": "starlette",
+      "repository": "starlette",
+      "url": "https://github.com/Kludex/starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "role": "ASGI framework",
+      "include": [
+        "starlette/**"
+      ],
+      "productionPaths": [],
+      "runId": "a6e661f0-459c-4d18-ba76-1f0f31dd4bec",
+      "configurationFingerprint": "f1bfb571add60474f9d8a2f1138e19c54b6aa6c797a9e94451c809c1195cd3e7",
+      "handlerRowsSha256": "23d5af275d636eaa9119aa2327e38ecd6e2e1b672a192ce686b5345b2210e17e",
+      "contextRowsSha256": "90b2d2db83b9ae32496db00c8a03a64cd5eecc7472a5bb1e8ebefd3d97c5b8e4",
+      "transferRowsSha256": "ed8d425b60cebb73480c057d2e6f21d31e079e54d8c1c4e4d8ee3f84c6ff2f07",
+      "selectedSourceSha256": "2a51420a3bfbda775c692446934792dfc86b9d289056bf5a1fae501579ed9dd7",
+      "functionFactsSha256": "b2e5495c18c8532661f8d0269aab2b4413dfe192c116038807a03813c229457c",
+      "summary": {
+        "handlers": 62,
+        "recognizedShapes": 17,
+        "unresolved": 45,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "direct-raise-from-handler-name": 1,
+          "direct-raise-from-none": 1,
+          "direct-symbol-or-call-raise": 10,
+          "guarded-import-literal-default": 1,
+          "no-op-then-literal-return": 1
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "enclosing-finally": 4,
+          "nested-handler": 1,
+          "no-supported-local-shape": 39
+        },
+        "raiseStatements": 36,
+        "handlersWithRaises": 29,
+        "newlyRecognizedShapes": 12,
+        "byExceptionSyntax": {
+          "absent": 5,
+          "call": 21,
+          "name": 10
+        },
+        "handlerNameRaiseSyntax": 7,
+        "handlerNameCauseSyntax": 3,
+        "byCauseSyntax": {
+          "absent": 29,
+          "name": 3,
+          "none": 2,
+          "other": 2
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "recognizedShapes": 17,
+            "unresolved": 45,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "direct-raise-from-handler-name": 1,
+              "direct-raise-from-none": 1,
+              "direct-symbol-or-call-raise": 10,
+              "guarded-import-literal-default": 1,
+              "no-op-then-literal-return": 1
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "enclosing-finally": 4,
+              "nested-handler": 1,
+              "no-supported-local-shape": 39
+            },
+            "raiseStatements": 36,
+            "handlersWithRaises": 29,
+            "newlyRecognizedShapes": 12,
+            "byExceptionSyntax": {
+              "absent": 5,
+              "call": 21,
+              "name": 10
+            },
+            "handlerNameRaiseSyntax": 7,
+            "handlerNameCauseSyntax": 3,
+            "byCauseSyntax": {
+              "absent": 29,
+              "name": 3,
+              "none": 2,
+              "other": 2
+            }
+          }
+        }
+      },
+      "unchangedSourceFunctionsHandlersAndContexts": true,
+      "ownedRaisesMatchBaseObservations": true,
+      "examples": {
+        "direct-literal-fallback-return": [
+          {
+            "handlerId": "1f38d2cf5e0c083180de57134eb3de8a34fa581152f44bc5d9fb4b5d38307db6",
+            "file": "starlette/_utils.py",
+            "line": 131,
+            "sourceSha256": "413355d540af9e719cefaa92c1ed70af338e263c375cb336644309b1d242a6f4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "parse_host_header",
+              "functionId": "89313c92cfa99d4e4d0bde19a0854c205dc6e1ff4842071eb0c45ce1cc889b2b"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                131,
+                132
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                131,
+                132
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "bac71dd0c65273721c3a0e71d82e2f3b63748b0d8559cd29e7c855eb23a7bdcc",
+            "file": "starlette/middleware/base.py",
+            "line": 135,
+            "sourceSha256": "b6a4c438b71a577574a00ed0833ca2d1cd57d55825e622472d87fc205ef7b589",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "BaseHTTPMiddleware.__call__.call_next.send_no_error",
+              "functionId": "3de4b04b07040657da8156fed09b67ba86c383b6e31f869c93adf3d1421d3540"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                135,
+                137
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                135,
+                137
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "direct-raise-from-handler-name": [
+          {
+            "handlerId": "cc330af7448d930508f9696f5725a5dc76263e95c11da9b9bc064909ed222a44",
+            "file": "starlette/templating.py",
+            "line": 27,
+            "sourceSha256": "cbe013950acd0e82cc66ce61ac7cd00536a9102043afdc0097e6ecf01964e63c",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "handlerNameSyntax": "_import_error",
+            "raises": [
+              {
+                "line": 28,
+                "column": 4,
+                "endLine": 28,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "ImportError",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "name",
+                  "astKind": "Name",
+                  "symbol": "_import_error",
+                  "matchesHandlerNameSyntax": true
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "63b5f6bc5c64ed16c45e6b33497d1dbdaa6fab154633d575e9332566b1cb2b6f"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                27
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-raise-from-handler-name",
+              "evidenceLines": [
+                27,
+                28
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "direct-raise-from-none": [
+          {
+            "handlerId": "463b75b9f2211b8bb604f6ff5c163e87db1b98a59da167c8c6be9c929093d8ed",
+            "file": "starlette/middleware/opentelemetry.py",
+            "line": 9,
+            "sourceSha256": "9403f7058bce8ee9ef9cf04af4671069947b305eb056660b6e973be7ee788702",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "handlerNameSyntax": null,
+            "raises": [
+              {
+                "line": 10,
+                "column": 4,
+                "endLine": 10,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "ImportError",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "none",
+                  "astKind": "Constant",
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "1ff4dab836dd2624efa7cf06bd30b05df4d081242a6ad4ff1be0c6d59f3ee3da"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                9
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-raise-from-none",
+              "evidenceLines": [
+                9,
+                10
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "direct-symbol-or-call-raise": [
+          {
+            "handlerId": "ef65fcba39552bc012a284dcf03b595e24bc3e4168ca4131db7c45ef681f8376",
+            "file": "starlette/concurrency.py",
+            "line": 47,
+            "sourceSha256": "3e9e245d060ef39716c58ed754db7995c62f8581d4aaec8b82e09e73b84a2a83",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_next",
+              "functionId": "bb622109c1ae8cf0ad7f8ccb53ad66cb2ee4cb4cf46946ade58aa96913fd9118"
+            },
+            "handlerNameSyntax": null,
+            "raises": [
+              {
+                "line": 48,
+                "column": 8,
+                "endLine": 48,
+                "direct": true,
+                "exception": {
+                  "kind": "name",
+                  "astKind": "Name",
+                  "symbol": "_StopIteration",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "cb1c9ea83177518920fe90134a6127cc8c91c3ccddb17ef4e9d91862d4b3fb95"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                47
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-symbol-or-call-raise",
+              "evidenceLines": [
+                47,
+                48
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "2888b5bfd01c49b54b3c2e8d405f47b7da313907f55e490d6fa673b75fbd7227",
+            "file": "starlette/config.py",
+            "line": 139,
+            "sourceSha256": "195c24a34a464aeb31b901cedf9b4bfcdb7f0292f47e65582f72221c76292d6e",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "Config._perform_cast",
+              "functionId": "f3779e15a45cc4c0efcbfaf1628fae2a1171f4c65fe469dbda88fe3d207889b0"
+            },
+            "handlerNameSyntax": null,
+            "raises": [
+              {
+                "line": 140,
+                "column": 12,
+                "endLine": 140,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "ValueError",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "d5732d6bf35996f639db168c640488135109af5c90ccd630faa0180db35aece2"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                139
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-symbol-or-call-raise",
+              "evidenceLines": [
+                139,
+                140
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "guarded-import-literal-default": [
+          {
+            "handlerId": "db6352eb1fcea93a8a2bc604e8638f48d97db05f731893f43d1c6f6e4b30c021",
+            "file": "starlette/schemas.py",
+            "line": 14,
+            "sourceSha256": "7bd2a708737528157d17c325e78c02e7922d1c4e4b112e565972d5118520a2dd",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                13,
+                14,
+                15
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                13,
+                14,
+                15
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "no-op-then-literal-return": [
+          {
+            "handlerId": "f95216a43f61ff91bcc0a207e6897f2cf4f54df08e35445448cbf8fe9207ba0d",
+            "file": "starlette/staticfiles.py",
+            "line": 228,
+            "sourceSha256": "50f5551817d2f21097859e3918d88829ebf93b62a59647b3be76157fd3141624",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "StaticFiles.is_not_modified",
+              "functionId": "f8eb3dd1dc3ec13e9b9f64b587a6d1b966aeb9265caaecaf3fa59a6ae1926404"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "no-op-then-literal-return",
+              "evidenceLines": [
+                228,
+                231
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "no-op-then-literal-return",
+              "evidenceLines": [
+                228,
+                231
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "unresolved": [
+          {
+            "handlerId": "851c5e39a5e9064379dd76e14174447d907913a71630e4dc13de741de6ffad3b",
+            "file": "starlette/_exception_handler.py",
+            "line": 28,
+            "sourceSha256": "f159bdd797d661ef712e8ff36b9890e56cab02f141bb690410973b5eb793c8e9",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "wrap_app_handling_exceptions",
+              "functionId": "f069358d0855b2a9c902d535a757c97c20d63e6f722daecbc886640cf6f560da"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                28
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                28
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "c32c2dfaa7a82b229a034bfdac551959c3ae390b8c3b954bd1721cf85bf9fc04",
+            "file": "starlette/_exception_handler.py",
+            "line": 43,
+            "sourceSha256": "f159bdd797d661ef712e8ff36b9890e56cab02f141bb690410973b5eb793c8e9",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "wrap_app_handling_exceptions.wrapped_app",
+              "functionId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3"
+            },
+            "handlerNameSyntax": "exc",
+            "raises": [
+              {
+                "line": 53,
+                "column": 16,
+                "endLine": 53,
+                "direct": false,
+                "exception": {
+                  "kind": "name",
+                  "astKind": "Name",
+                  "symbol": "exc",
+                  "matchesHandlerNameSyntax": true
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [
+                  {
+                    "kind": "If",
+                    "line": 52
+                  }
+                ],
+                "containersTruncated": false,
+                "id": "e5eac0511de9fab75b6756c91afb4c8d4f1d8827403b9b82f97881009fc72e27"
+              },
+              {
+                "line": 56,
+                "column": 16,
+                "endLine": 56,
+                "direct": false,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "RuntimeError",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "name",
+                  "astKind": "Name",
+                  "symbol": "exc",
+                  "matchesHandlerNameSyntax": true
+                },
+                "containsNamedExpression": false,
+                "containers": [
+                  {
+                    "kind": "If",
+                    "line": 55
+                  }
+                ],
+                "containersTruncated": false,
+                "id": "ba96559218ef1988336b2f951744bd7991e7df42591bd91454c2eda47738db01"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                43
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                43
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "disposition": "review-only"
+          }
+        ]
+      },
+      "unresolvedExamples": [
+        {
+          "handlerId": "851c5e39a5e9064379dd76e14174447d907913a71630e4dc13de741de6ffad3b",
+          "file": "starlette/_exception_handler.py",
+          "line": 28,
+          "sourceSha256": "f159bdd797d661ef712e8ff36b9890e56cab02f141bb690410973b5eb793c8e9",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "wrap_app_handling_exceptions",
+            "functionId": "f069358d0855b2a9c902d535a757c97c20d63e6f722daecbc886640cf6f560da"
+          },
+          "handlerNameSyntax": null,
+          "raises": [],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              28
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              28
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "c32c2dfaa7a82b229a034bfdac551959c3ae390b8c3b954bd1721cf85bf9fc04",
+          "file": "starlette/_exception_handler.py",
+          "line": 43,
+          "sourceSha256": "f159bdd797d661ef712e8ff36b9890e56cab02f141bb690410973b5eb793c8e9",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "wrap_app_handling_exceptions.wrapped_app",
+            "functionId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3"
+          },
+          "handlerNameSyntax": "exc",
+          "raises": [
+            {
+              "line": 53,
+              "column": 16,
+              "endLine": 53,
+              "direct": false,
+              "exception": {
+                "kind": "name",
+                "astKind": "Name",
+                "symbol": "exc",
+                "matchesHandlerNameSyntax": true
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [
+                {
+                  "kind": "If",
+                  "line": 52
+                }
+              ],
+              "containersTruncated": false,
+              "id": "e5eac0511de9fab75b6756c91afb4c8d4f1d8827403b9b82f97881009fc72e27"
+            },
+            {
+              "line": 56,
+              "column": 16,
+              "endLine": 56,
+              "direct": false,
+              "exception": {
+                "kind": "call",
+                "astKind": "Call",
+                "symbol": "RuntimeError",
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "name",
+                "astKind": "Name",
+                "symbol": "exc",
+                "matchesHandlerNameSyntax": true
+              },
+              "containsNamedExpression": false,
+              "containers": [
+                {
+                  "kind": "If",
+                  "line": 55
+                }
+              ],
+              "containersTruncated": false,
+              "id": "ba96559218ef1988336b2f951744bd7991e7df42591bd91454c2eda47738db01"
+            }
+          ],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              43
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              43
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "aeb161f66da16e594a9945a6673c34c1a49024a232d5d17093782404c0b47b67",
+          "file": "starlette/_utils.py",
+          "line": 106,
+          "sourceSha256": "413355d540af9e719cefaa92c1ed70af338e263c375cb336644309b1d242a6f4",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "create_collapsing_task_group",
+            "functionId": "cdb44d3389823338795fe9d4ae646906edeff98df3ac484885057497668deff1"
+          },
+          "handlerNameSyntax": "excs",
+          "raises": [
+            {
+              "line": 108,
+              "column": 12,
+              "endLine": 108,
+              "direct": false,
+              "exception": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [
+                {
+                  "kind": "If",
+                  "line": 107
+                }
+              ],
+              "containersTruncated": false,
+              "id": "b00e19ff7e8eb2cac31a4da780fdf5578f41ebbc74a60af17da4006260efd420"
+            },
+            {
+              "line": 112,
+              "column": 8,
+              "endLine": 112,
+              "direct": true,
+              "exception": {
+                "kind": "name",
+                "astKind": "Name",
+                "symbol": "exc",
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "other",
+                "astKind": "BoolOp",
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [],
+              "containersTruncated": false,
+              "id": "42c29f0a73b01d4448f482f7454bfaafdcf5230ba276eb7827571ef5d6b676d0"
+            }
+          ],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              106
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              106
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "c0bd09c71b3899cb0fa57388c71a670f1af1618cf030ad951e2d6b44aa0c06e9",
+          "file": "starlette/concurrency.py",
+          "line": 58,
+          "sourceSha256": "3e9e245d060ef39716c58ed754db7995c62f8581d4aaec8b82e09e73b84a2a83",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "iterate_in_threadpool",
+            "functionId": "76615b6fe373032e03d77251141c339509e2dc7fc0d2cc34345fd35bffca6570"
+          },
+          "handlerNameSyntax": null,
+          "raises": [],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              58
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              58
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        }
+      ]
+    },
+    {
+      "id": "httpie",
+      "repository": "httpie",
+      "url": "https://github.com/httpie/cli",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "role": "CLI application",
+      "include": [
+        "httpie/**"
+      ],
+      "productionPaths": [],
+      "runId": "892f99aa-10f2-4962-aeb9-e1230dd6c761",
+      "configurationFingerprint": "4a3f7a414183d2de00a08d7d2504256bf3ffe22b375e514360761a7d16dc48a7",
+      "handlerRowsSha256": "66d3d8952b8626ebc3806d7c8db4d72148e1f721a2cce1b973c56321b808c685",
+      "contextRowsSha256": "d0d2e09767863ebc2fbcad9b710e0a3adbcb2d3ed31433c7305aec11cce1c8bc",
+      "transferRowsSha256": "f1cb961181c9ce06ee1c58c0e1650fb7facdf0835d1935b10227dcaad534f266",
+      "selectedSourceSha256": "cb8ee90b048099e53b85aaee32175802082b22a7706e5c05e0d4e403d7be47a8",
+      "functionFactsSha256": "d6e571d78f49775fa2ec63b0fbec632e43fab7ac6398d0cf7e633938a0d09bbb",
+      "summary": {
+        "handlers": 69,
+        "recognizedShapes": 22,
+        "unresolved": 47,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "direct-raise-from-handler-name": 3,
+          "direct-symbol-or-call-raise": 10,
+          "guarded-import-literal-default": 1,
+          "locally-documented-no-op": 5
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "no-supported-local-shape": 45
+        },
+        "raiseStatements": 26,
+        "handlersWithRaises": 25,
+        "newlyRecognizedShapes": 13,
+        "byExceptionSyntax": {
+          "absent": 11,
+          "call": 15
+        },
+        "handlerNameRaiseSyntax": 0,
+        "handlerNameCauseSyntax": 3,
+        "byCauseSyntax": {
+          "absent": 23,
+          "name": 3
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "recognizedShapes": 22,
+            "unresolved": 47,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "direct-raise-from-handler-name": 3,
+              "direct-symbol-or-call-raise": 10,
+              "guarded-import-literal-default": 1,
+              "locally-documented-no-op": 5
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "no-supported-local-shape": 45
+            },
+            "raiseStatements": 26,
+            "handlersWithRaises": 25,
+            "newlyRecognizedShapes": 13,
+            "byExceptionSyntax": {
+              "absent": 11,
+              "call": 15
+            },
+            "handlerNameRaiseSyntax": 0,
+            "handlerNameCauseSyntax": 3,
+            "byCauseSyntax": {
+              "absent": 23,
+              "name": 3
+            }
+          }
+        }
+      },
+      "unchangedSourceFunctionsHandlersAndContexts": true,
+      "ownedRaisesMatchBaseObservations": true,
+      "examples": {
+        "direct-literal-fallback-return": [
+          {
+            "handlerId": "27a9727f5c94c18eb1407301fb9645c0bfdb17f21a8882d99a4567c617d575b5",
+            "file": "httpie/compat.py",
+            "line": 98,
+            "sourceSha256": "b6b3cb4d56108867e93e0e227637733a1e6edb2063b2e00cf5279b36ec9cabba",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "get_dist_name",
+              "functionId": "8805ea6643058b77f05b3c9b587730128633e3b7013a97e28d0cb6a5a3559894"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                98,
+                99
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                98,
+                99
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "1db1897c58670cab4e2da1f1f4be879e80f2fdd46c7fb4511f7a3c45d3eceea6",
+            "file": "httpie/output/ui/man_pages.py",
+            "line": 30,
+            "sourceSha256": "a0bc7bf83c06741e7b0f56f2eae629f59ebfe0c9444461bd8b2ab664aa3f02d5",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "is_available",
+              "functionId": "8e1ea2580efe46896de495f3467914a10d2ca5a30f8a46faccc63b5ac0a72eac"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                30,
+                34
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                30,
+                34
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "direct-raise-from-handler-name": [
+          {
+            "handlerId": "692fdb595fc85899e337c61f87f5129680a1a98311cb50e0160c6e1c5dcb9455",
+            "file": "httpie/cli/nested_json/parse.py",
+            "line": 186,
+            "sourceSha256": "d43a909037a6f7c58d8b6e655807384cfb2ca9022cf1a20905e3357c850446e6",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "check_escaped_int",
+              "functionId": "3a5f1ef24b3758640c76a61d84272b7788a6b440785faffbfb6c50b562a6d4f1"
+            },
+            "handlerNameSyntax": "exc",
+            "raises": [
+              {
+                "line": 187,
+                "column": 8,
+                "endLine": 187,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "ValueError",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "name",
+                  "astKind": "Name",
+                  "symbol": "exc",
+                  "matchesHandlerNameSyntax": true
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "1efe0cd79ba2dd614cd831390af8e026cf7ab548bac966f0c91853ea29128a5f"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                186
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-raise-from-handler-name",
+              "evidenceLines": [
+                186,
+                187
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "9dc360395defc6fb4300a5d5df517fef383bfd1922079d87791f5e43ebc9a24b",
+            "file": "httpie/manager/compat.py",
+            "line": 56,
+            "sourceSha256": "f3e067f51650fd9ff5263a42c82131128183e225c1390108d7a3136bf3caa386",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_run_pip_subprocess",
+              "functionId": "7e749bac6db3bda4840622ee2b70f7cc6d8ae3b86aa3f013ea2a1d9e84bd16f6"
+            },
+            "handlerNameSyntax": "error",
+            "raises": [
+              {
+                "line": 57,
+                "column": 8,
+                "endLine": 57,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "PipError",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "name",
+                  "astKind": "Name",
+                  "symbol": "error",
+                  "matchesHandlerNameSyntax": true
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "e5818996a067dded1e3aaed800c2235b6b53b282c0b655d12d8ff8f5f97d00f2"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                56
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-raise-from-handler-name",
+              "evidenceLines": [
+                56,
+                57
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "direct-symbol-or-call-raise": [
+          {
+            "handlerId": "4dfbca2578e4caf2905fa503b459418d6d7d553cd2ef4fc0f954682352a6995a",
+            "file": "httpie/cli/argtypes.py",
+            "line": 198,
+            "sourceSha256": "de2f97a67bc7babfacf61098b7344f4c8c5f28e29216d09d1ab9c3cb45e96518",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "readable_file_arg",
+              "functionId": "d987cb58bc8fa1762127b67ab94f8e4a200aa58300f151a59506a0279eb911cf"
+            },
+            "handlerNameSyntax": "ex",
+            "raises": [
+              {
+                "line": 199,
+                "column": 8,
+                "endLine": 199,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "argparse.ArgumentTypeError",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "7949de64d7330f22828894bc5a09e0ac8bf495a94cb61c89333f913a9e0c2d0f"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                198
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-symbol-or-call-raise",
+              "evidenceLines": [
+                198,
+                199
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "823e6cec5936a45aafd54c96409415dede4e2744dc1f360f38d22df9831f9601",
+            "file": "httpie/cli/argtypes.py",
+            "line": 222,
+            "sourceSha256": "de2f97a67bc7babfacf61098b7344f4c8c5f28e29216d09d1ab9c3cb45e96518",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "parse_format_options",
+              "functionId": "f3cae27ae453d01166398baee05ca26b74a52c7f77f99136d6a91c8467fd1ac7"
+            },
+            "handlerNameSyntax": null,
+            "raises": [
+              {
+                "line": 223,
+                "column": 12,
+                "endLine": 223,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "argparse.ArgumentTypeError",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "318e003263b9ad147d7061b2ee23a46cb27a24a21223183ea92945db2e348fd9"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                222
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-symbol-or-call-raise",
+              "evidenceLines": [
+                222,
+                223
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "guarded-import-literal-default": [
+          {
+            "handlerId": "c05a5ac5830758a4c561506389b658dfa7361bccff12d0b9ad706150d4556139",
+            "file": "httpie/context.py",
+            "line": 13,
+            "sourceSha256": "e4d2d6d7397158b44341570e27f693bb6e4a4ce57e245af4aef289b9d3957723",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                12,
+                13,
+                14
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                12,
+                13,
+                14
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "locally-documented-no-op": [
+          {
+            "handlerId": "5b74f2434cbac38a252a14a43281dc3698069832616d84c5e549f64bada45894",
+            "file": "httpie/downloads.py",
+            "line": 244,
+            "sourceSha256": "eea60912640e337feafa08cae05944d6c8e1a93d1a95eed48e29f2e9921bdcdf",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "Downloader.start",
+              "functionId": "08273b60b917dbf09bd89391b7eecd1150a77a4834bf188c06141eb59d443e13"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                245
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                245
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "88f1056c47f5514d5190ae2381a73343d700713db9fe0fd403040658849b3755",
+            "file": "httpie/output/formatters/colors.py",
+            "line": 184,
+            "sourceSha256": "818b82191db085acab172220755c19abecf8135432350407a2b9c18f7d49e13e",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "get_lexer",
+              "functionId": "e5c7459744c41e958e8dd06b36c7dfd0085fcdabae6d49cdc9053062c10d55d5"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                185
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                185
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "unresolved": [
+          {
+            "handlerId": "f72a4baa91f24d354f0173f8b8ffdf3d8bd9d0a86f0f376dd7ce234cad5cafb9",
+            "file": "httpie/__main__.py",
+            "line": 10,
+            "sourceSha256": "1f4ef5eabd7995fd48cf0fdb71d2f61582f49f2daac49d97f0055aa69b005fed",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "main",
+              "functionId": "8855061ac1e8645b5123649f2a67eff7c98af92ab12cfbe0fdd813892eb64837"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                10
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                10
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "b94f8df8ac5def1ff14cd34336ef7959b8f223c560f686d646757b0a13e1aec1",
+            "file": "httpie/cli/argparser.py",
+            "line": 132,
+            "sourceSha256": "6f2408a5e917e3d0fc5ad5c725252d98022990299b1ec5182b2237749d513077",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "HTTPieManagerArgumentParser.parse_known_args",
+              "functionId": "c131bd3c5570d8b0bb7114ca4f4a9881b07ee16395fd57f6303ee452f9869582"
+            },
+            "handlerNameSyntax": "exc",
+            "raises": [
+              {
+                "line": 134,
+                "column": 16,
+                "endLine": 134,
+                "direct": false,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "argparse.ArgumentError",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [
+                  {
+                    "kind": "If",
+                    "line": 133
+                  }
+                ],
+                "containersTruncated": false,
+                "id": "1d86c0326112427a584dbcb54be6dc573757379209a61898d58f8d0cdd732662"
+              },
+              {
+                "line": 135,
+                "column": 12,
+                "endLine": 135,
+                "direct": true,
+                "exception": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "2034445e2f608e971c9c422fce095266d1bf253b52efd0ee2f3f5978f0a697e4"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                132
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                132
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "disposition": "review-only"
+          }
+        ]
+      },
+      "unresolvedExamples": [
+        {
+          "handlerId": "f72a4baa91f24d354f0173f8b8ffdf3d8bd9d0a86f0f376dd7ce234cad5cafb9",
+          "file": "httpie/__main__.py",
+          "line": 10,
+          "sourceSha256": "1f4ef5eabd7995fd48cf0fdb71d2f61582f49f2daac49d97f0055aa69b005fed",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "main",
+            "functionId": "8855061ac1e8645b5123649f2a67eff7c98af92ab12cfbe0fdd813892eb64837"
+          },
+          "handlerNameSyntax": null,
+          "raises": [],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              10
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              10
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "b94f8df8ac5def1ff14cd34336ef7959b8f223c560f686d646757b0a13e1aec1",
+          "file": "httpie/cli/argparser.py",
+          "line": 132,
+          "sourceSha256": "6f2408a5e917e3d0fc5ad5c725252d98022990299b1ec5182b2237749d513077",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "HTTPieManagerArgumentParser.parse_known_args",
+            "functionId": "c131bd3c5570d8b0bb7114ca4f4a9881b07ee16395fd57f6303ee452f9869582"
+          },
+          "handlerNameSyntax": "exc",
+          "raises": [
+            {
+              "line": 134,
+              "column": 16,
+              "endLine": 134,
+              "direct": false,
+              "exception": {
+                "kind": "call",
+                "astKind": "Call",
+                "symbol": "argparse.ArgumentError",
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [
+                {
+                  "kind": "If",
+                  "line": 133
+                }
+              ],
+              "containersTruncated": false,
+              "id": "1d86c0326112427a584dbcb54be6dc573757379209a61898d58f8d0cdd732662"
+            },
+            {
+              "line": 135,
+              "column": 12,
+              "endLine": 135,
+              "direct": true,
+              "exception": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [],
+              "containersTruncated": false,
+              "id": "2034445e2f608e971c9c422fce095266d1bf253b52efd0ee2f3f5978f0a697e4"
+            }
+          ],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              132
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              132
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "e09cbcc4d3ec536ea203f3ef443d2788a9ea4b2e09a978afd1878d6f5d15b9e7",
+          "file": "httpie/cli/argparser.py",
+          "line": 253,
+          "sourceSha256": "6f2408a5e917e3d0fc5ad5c725252d98022990299b1ec5182b2237749d513077",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "HTTPieArgumentParser._setup_standard_streams",
+            "functionId": "df156a52d642ddda974a33bbdca64e21fd79f112091736fb5eb5878f066d3b5d"
+          },
+          "handlerNameSyntax": "e",
+          "raises": [
+            {
+              "line": 258,
+              "column": 20,
+              "endLine": 258,
+              "direct": false,
+              "exception": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [
+                {
+                  "kind": "If",
+                  "line": 254
+                }
+              ],
+              "containersTruncated": false,
+              "id": "e2f355965f0cbc567929768fc28bb642271ad83eaecdabf82d4c9d31052fdf70"
+            }
+          ],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              253
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              253
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "41784fc42b7e996e776b00b97d0883b1ae1df305fa27f7fb636b090d754a56ff",
+          "file": "httpie/cli/argparser.py",
+          "line": 431,
+          "sourceSha256": "6f2408a5e917e3d0fc5ad5c725252d98022990299b1ec5182b2237749d513077",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "HTTPieArgumentParser._guess_method",
+            "functionId": "9194ec56eaa918f641bf03964d639cab45f7144bf6bc6836d8e294e509b45820"
+          },
+          "handlerNameSyntax": "e",
+          "raises": [
+            {
+              "line": 433,
+              "column": 20,
+              "endLine": 433,
+              "direct": false,
+              "exception": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [
+                {
+                  "kind": "If",
+                  "line": 432
+                }
+              ],
+              "containersTruncated": false,
+              "id": "879dca4a9eccf8f44407ba1a82c99e35bec8b75ff6300e67172f68735f647123"
+            }
+          ],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              431
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              431
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        }
+      ]
+    },
+    {
+      "id": "django",
+      "repository": "django",
+      "url": "https://github.com/django/django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "role": "larger web framework",
+      "include": [
+        "django/**"
+      ],
+      "productionPaths": [
+        "django/test/**"
+      ],
+      "runId": "de17ad11-3f40-4f9d-9780-fa3441559bf1",
+      "configurationFingerprint": "b1a8d4655fcca0c2c157328227d02254817cf928a16c22255125ab93b3eed85f",
+      "handlerRowsSha256": "43851d588077e9f8e58b683cde884ccdfa16f013da69271efca87f9b7a853a33",
+      "contextRowsSha256": "6792749f384eb23e2b0d5230956a474f53c88b0ad1bc2e9045aaa31134cf4d6e",
+      "transferRowsSha256": "e6d3d28484f000127e91b8477184b0a09b5a1325bfb366616883e3dcf8081dfe",
+      "selectedSourceSha256": "2cb4a5b24cda391c3278706e0de5eb522f2d8e5458cceed6c898fdfb27b9a70f",
+      "functionFactsSha256": "82a893dd6660923a67138b3e313310ffff9bee80c1344c56d5a4d309cf35d455",
+      "summary": {
+        "handlers": 1267,
+        "recognizedShapes": 413,
+        "unresolved": 854,
+        "byPattern": {
+          "direct-bare-rethrow": 6,
+          "direct-literal-fallback-return": 107,
+          "direct-raise-from-handler-name": 44,
+          "direct-raise-from-none": 7,
+          "direct-symbol-or-call-raise": 200,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 41,
+          "no-op-then-literal-return": 3
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 32,
+          "enclosing-finally": 18,
+          "exception-group-semantics": 1,
+          "import-exception-binding-unresolved": 1,
+          "nested-handler": 39,
+          "no-supported-local-shape": 772,
+          "raise-expression-or-cause-unresolved": 1
+        },
+        "raiseStatements": 439,
+        "handlersWithRaises": 412,
+        "newlyRecognizedShapes": 251,
+        "byExceptionSyntax": {
+          "absent": 103,
+          "call": 310,
+          "name": 24,
+          "other": 2
+        },
+        "handlerNameRaiseSyntax": 5,
+        "handlerNameCauseSyntax": 57,
+        "byCauseSyntax": {
+          "absent": 372,
+          "name": 59,
+          "none": 8
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "recognizedShapes": 413,
+            "unresolved": 854,
+            "byPattern": {
+              "direct-bare-rethrow": 6,
+              "direct-literal-fallback-return": 107,
+              "direct-raise-from-handler-name": 44,
+              "direct-raise-from-none": 7,
+              "direct-symbol-or-call-raise": 200,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 41,
+              "no-op-then-literal-return": 3
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 32,
+              "enclosing-finally": 18,
+              "exception-group-semantics": 1,
+              "import-exception-binding-unresolved": 1,
+              "nested-handler": 39,
+              "no-supported-local-shape": 772,
+              "raise-expression-or-cause-unresolved": 1
+            },
+            "raiseStatements": 439,
+            "handlersWithRaises": 412,
+            "newlyRecognizedShapes": 251,
+            "byExceptionSyntax": {
+              "absent": 103,
+              "call": 310,
+              "name": 24,
+              "other": 2
+            },
+            "handlerNameRaiseSyntax": 5,
+            "handlerNameCauseSyntax": 57,
+            "byCauseSyntax": {
+              "absent": 372,
+              "name": 59,
+              "none": 8
+            }
+          }
+        }
+      },
+      "unchangedSourceFunctionsHandlersAndContexts": true,
+      "ownedRaisesMatchBaseObservations": true,
+      "examples": {
+        "direct-bare-rethrow": [
+          {
+            "handlerId": "c81d169dfe6ebd0c41905d85bd7435d3c5db09b23cb8cba443152b9088647b1d",
+            "file": "django/contrib/admin/views/main.py",
+            "line": 490,
+            "sourceSha256": "a9be697e00caf46542abbc12384e9a9a1a641e8c6a6815e4312c5542fa7fd5a8",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "ChangeList.get_queryset",
+              "functionId": "90e421ec75f516020f9963f807e9ba0b2096fb6dc4d38318942133919588234f"
+            },
+            "handlerNameSyntax": null,
+            "raises": [
+              {
+                "line": 493,
+                "column": 12,
+                "endLine": 493,
+                "direct": true,
+                "exception": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "c2738e034a6b564ce317b5008019f9356241daf9ae6cc3e762a922bb568f2221"
+              }
+            ],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "direct-bare-rethrow",
+              "evidenceLines": [
+                490,
+                493
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-bare-rethrow",
+              "evidenceLines": [
+                490,
+                493
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "324c3812bf319c14db20db1e0f097f856cde7fced82ff992e2a39455b7880674",
+            "file": "django/core/serializers/json.py",
+            "line": 78,
+            "sourceSha256": "388346801a843f8f583deb28bae6674e19041c1670e8b865a3ac6c91498b4e75",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "Deserializer._handle_object",
+              "functionId": "4916e23608f728194d1b046ab84a44b603889a00e8696a8671f225793c0a1b49"
+            },
+            "handlerNameSyntax": null,
+            "raises": [
+              {
+                "line": 79,
+                "column": 12,
+                "endLine": 79,
+                "direct": true,
+                "exception": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "5673f1147e24f3502587b8df5b51daec28032ef52bfbd451e534ff96a8d6cf36"
+              }
+            ],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "direct-bare-rethrow",
+              "evidenceLines": [
+                78,
+                79
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-bare-rethrow",
+              "evidenceLines": [
+                78,
+                79
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "direct-literal-fallback-return": [
+          {
+            "handlerId": "e97038b4a05c337712340e5b492283b1c375d87a13cad8dbe7d9d58163f45d6f",
+            "file": "django/contrib/admin/checks.py",
+            "line": 26,
+            "sourceSha256": "e971969add6e4b868dd6b52c160d4e15a183de52782b161f6a04626b7c42a5f4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_issubclass",
+              "functionId": "adfc8e0eb330a2693f2a642232b0ba12456447248d03bb8f663c5639d5e0f416"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                26,
+                27
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                26,
+                27
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "63f1254b34ebb981dfd68e4de599d5c281bbfcfb9b2467d99e9d5534a6f02d52",
+            "file": "django/contrib/admin/options.py",
+            "line": 312,
+            "sourceSha256": "80963d8b0288171846ca14fbbf42b26e72ec5a9bbd310eb0e032671391917797",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "BaseModelAdmin.get_field_queryset",
+              "functionId": "cde9df9605824dabcbd55329fa32af2e1086105471623afda80208a7fae479e9"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                312,
+                313
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-literal-fallback-return",
+              "evidenceLines": [
+                312,
+                313
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "direct-raise-from-handler-name": [
+          {
+            "handlerId": "5ad90ea937bc03b6f87808109df96dbf28ece14a570895aac985291e1b2330f2",
+            "file": "django/contrib/admin/views/autocomplete.py",
+            "line": 83,
+            "sourceSha256": "3e30bc75bdb9ce1620c0b4bfe29aba3c0a530ff6119f89ae207d00fd537b9028",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AutocompleteJsonView.process_request",
+              "functionId": "2e149a8c5698dd2058d2b8c41373598c04df8353b1e666aebb2bca25fc70c7cf"
+            },
+            "handlerNameSyntax": "e",
+            "raises": [
+              {
+                "line": 84,
+                "column": 12,
+                "endLine": 84,
+                "direct": true,
+                "exception": {
+                  "kind": "name",
+                  "astKind": "Name",
+                  "symbol": "PermissionDenied",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "name",
+                  "astKind": "Name",
+                  "symbol": "e",
+                  "matchesHandlerNameSyntax": true
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "93dd3ded4e2cfd75aba9a65b90612575cbe72462a710e6df83daf7b49c2203ef"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                83
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-raise-from-handler-name",
+              "evidenceLines": [
+                83,
+                84
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "8eca82eb08bd89619ad3e810567cd3c783d362be8c043fd3143d6abe2a3b6cfe",
+            "file": "django/contrib/admin/views/autocomplete.py",
+            "line": 89,
+            "sourceSha256": "3e30bc75bdb9ce1620c0b4bfe29aba3c0a530ff6119f89ae207d00fd537b9028",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AutocompleteJsonView.process_request",
+              "functionId": "2e149a8c5698dd2058d2b8c41373598c04df8353b1e666aebb2bca25fc70c7cf"
+            },
+            "handlerNameSyntax": "e",
+            "raises": [
+              {
+                "line": 90,
+                "column": 12,
+                "endLine": 90,
+                "direct": true,
+                "exception": {
+                  "kind": "name",
+                  "astKind": "Name",
+                  "symbol": "PermissionDenied",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "name",
+                  "astKind": "Name",
+                  "symbol": "e",
+                  "matchesHandlerNameSyntax": true
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "376fe10683abcfb712ecbcb913556588f74c031273b2b5cad4d647add28a5092"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                89
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-raise-from-handler-name",
+              "evidenceLines": [
+                89,
+                90
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "direct-raise-from-none": [
+          {
+            "handlerId": "42be9db1cc68015b15dd1c147d5c00f95adbe404339f839c7c11110ffbc796b1",
+            "file": "django/contrib/gis/geos/prototypes/io.py",
+            "line": 359,
+            "sourceSha256": "edd4d82db332c4c33ce4a5edc1b7f9f301bbf781238cf7b7923e0f7f2542f4ef",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "_WKBReader.read",
+              "functionId": "abf63c370c5adeb52c21ffaa0ee41094db34bac2898ea3afdb1d07c2871244da"
+            },
+            "handlerNameSyntax": null,
+            "raises": [
+              {
+                "line": 360,
+                "column": 16,
+                "endLine": 360,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "GEOSException",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "none",
+                  "astKind": "Constant",
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "6effebfa4732ff1f2ecea13108e1d624fe773f191bd052aed90d7975a735f0c8"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                359
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-raise-from-none",
+              "evidenceLines": [
+                359,
+                360
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "b352550ce7a5e1fd0a5605e77d7c4e2f06516610ff661ace68e1a4176635dae9",
+            "file": "django/core/mail/__init__.py",
+            "line": 395,
+            "sourceSha256": "2603947c476c230445b977aee417f348729b01cc002d3ccdb0214a9afae0a865",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "__getattr__",
+              "functionId": "f8b85bde723018d6298f6435b14b5996ac96f8fcdf60fa9e2f8cc7aadcda4984"
+            },
+            "handlerNameSyntax": null,
+            "raises": [
+              {
+                "line": 396,
+                "column": 8,
+                "endLine": 396,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "AttributeError",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "none",
+                  "astKind": "Constant",
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "522b322f8ed6a74e69d7ff85b88f92d81bc9023b860286d520e1313c63a6c7d8"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                395
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-raise-from-none",
+              "evidenceLines": [
+                395,
+                396
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "direct-symbol-or-call-raise": [
+          {
+            "handlerId": "2e3cc63b5669c1247564025c23bb814a98e6df3a48c7b6baff32b50108026cc1",
+            "file": "django/apps/config.py",
+            "line": 205,
+            "sourceSha256": "d59871b783abc119ce9ac4ff07f06eac89b3de88bcdf7d13246d2b451279f1b4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AppConfig.create",
+              "functionId": "3f3f80a2595d345e1b2648d311eac00548480b34d117f01f94eca3a51fca2e6c"
+            },
+            "handlerNameSyntax": null,
+            "raises": [
+              {
+                "line": 206,
+                "column": 16,
+                "endLine": 206,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "ImproperlyConfigured",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "35078ab406757d32164a01b16a72e310da06316432d0642fffa167dd36d64148"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                205
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-symbol-or-call-raise",
+              "evidenceLines": [
+                205,
+                206
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "fc864beaae1a98a8ca6fc1f61f77f7a830229af10de6ef86200d8447f0e34ee5",
+            "file": "django/apps/config.py",
+            "line": 211,
+            "sourceSha256": "d59871b783abc119ce9ac4ff07f06eac89b3de88bcdf7d13246d2b451279f1b4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AppConfig.create",
+              "functionId": "3f3f80a2595d345e1b2648d311eac00548480b34d117f01f94eca3a51fca2e6c"
+            },
+            "handlerNameSyntax": null,
+            "raises": [
+              {
+                "line": 212,
+                "column": 12,
+                "endLine": 219,
+                "direct": true,
+                "exception": {
+                  "kind": "call",
+                  "astKind": "Call",
+                  "symbol": "ImproperlyConfigured",
+                  "matchesHandlerNameSyntax": false
+                },
+                "cause": {
+                  "kind": "absent",
+                  "astKind": null,
+                  "symbol": null,
+                  "matchesHandlerNameSyntax": false
+                },
+                "containsNamedExpression": false,
+                "containers": [],
+                "containersTruncated": false,
+                "id": "a3017adaafcf2120e8de5820cb591a32c7c6fda766dc20aaaa8185d9e44883ca"
+              }
+            ],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                211
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "direct-symbol-or-call-raise",
+              "evidenceLines": [
+                211,
+                212
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "guarded-import-literal-default": [
+          {
+            "handlerId": "1db47f2c4db73aa78d3ade1cf545b2223c71ea5f9b4cf5c0663423337a72595a",
+            "file": "django/contrib/gis/shortcuts.py",
+            "line": 11,
+            "sourceSha256": "69af73163554dfca9a12f45cd2f007fe3d80800111948d35ae98582c76dced38",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                10,
+                11,
+                12
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                10,
+                11,
+                12
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "8e930710648fdcf8161da48ea16ebc9481a153fa9fe57605ec917307a4910e3d",
+            "file": "django/test/runner.py",
+            "line": 41,
+            "sourceSha256": "031e5fad322d39e15909842f99396021bf113a0ea5dda7e9fe66a9e19b9c3c9f",
+            "population": "production",
+            "owner": {
+              "kind": "module",
+              "member": "<module>",
+              "functionId": null
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                40,
+                41,
+                42
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "guarded-import-literal-default",
+              "evidenceLines": [
+                40,
+                41,
+                42
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "locally-documented-no-op": [
+          {
+            "handlerId": "a5380ef8c35a50ca7ee7ebed43c83e2026242e44e1c41a79d3c1f1070cdbfb02",
+            "file": "django/contrib/admin/options.py",
+            "line": 1852,
+            "sourceSha256": "80963d8b0288171846ca14fbbf42b26e72ec5a9bbd310eb0e032671391917797",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "ModelAdmin.response_action",
+              "functionId": "c21a4fa54736079b606a73919c397f627e318a6f42b512f50be27a410102e67c"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                1853,
+                1854,
+                1855
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                1853,
+                1854,
+                1855
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "7b89393dc328bf0cc11c880ef140de4429892a111e6639d7b6e19dddb6b78d5d",
+            "file": "django/contrib/admin/templatetags/admin_list.py",
+            "line": 235,
+            "sourceSha256": "f1fda4e7be54176dabc2256d2e001827d113869e594da620567981f402753cea",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "items_for_result",
+              "functionId": "95cf6f666d66060e410d7ce2a8bbf3b43fd32f659c4908564c7c05449a3d5895"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                236
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "locally-documented-no-op",
+              "evidenceLines": [
+                236
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "no-op-then-literal-return": [
+          {
+            "handlerId": "8c07e6865c895a46f316e038cfdc0f2564adff0a449f49dc0ac0a6241709fc7e",
+            "file": "django/contrib/sessions/backends/base.py",
+            "line": 378,
+            "sourceSha256": "a78d5d0f5c41d7b2523f37b36921c87023262e7479aec1ea739836c8db4d3105",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "SessionBase.set_expiry",
+              "functionId": "4af0414b2c368a27e7e2bafb4efcd13554445045b399fb9ccc55e086446fce41"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "no-op-then-literal-return",
+              "evidenceLines": [
+                378,
+                380
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "no-op-then-literal-return",
+              "evidenceLines": [
+                378,
+                380
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "6451d9502f216d4cf0b702dfd118833dcbc19df39669d0244a790e835d745c28",
+            "file": "django/contrib/sessions/backends/base.py",
+            "line": 392,
+            "sourceSha256": "a78d5d0f5c41d7b2523f37b36921c87023262e7479aec1ea739836c8db4d3105",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "SessionBase.aset_expiry",
+              "functionId": "0d74b0398846e17828c5167598b99b1d7d9063eff80d58f78117f6824e58200c"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "recognized-shape",
+              "pattern": "no-op-then-literal-return",
+              "evidenceLines": [
+                392,
+                394
+              ],
+              "unresolvedReasons": []
+            },
+            "classification": {
+              "status": "recognized-shape",
+              "pattern": "no-op-then-literal-return",
+              "evidenceLines": [
+                392,
+                394
+              ],
+              "unresolvedReasons": []
+            },
+            "disposition": "review-only"
+          }
+        ],
+        "unresolved": [
+          {
+            "handlerId": "0d638fb2526c5c979a01eca13abd32052af55c0faad76aeaefbf86b97e50e889",
+            "file": "django/apps/config.py",
+            "line": 112,
+            "sourceSha256": "d59871b783abc119ce9ac4ff07f06eac89b3de88bcdf7d13246d2b451279f1b4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AppConfig.create",
+              "functionId": "3f3f80a2595d345e1b2648d311eac00548480b34d117f01f94eca3a51fca2e6c"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                112
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                112
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "disposition": "review-only"
+          },
+          {
+            "handlerId": "d756c060fae31db86724c876289b29dca3f93755d3a44ed012653882ef049d5e",
+            "file": "django/apps/config.py",
+            "line": 163,
+            "sourceSha256": "d59871b783abc119ce9ac4ff07f06eac89b3de88bcdf7d13246d2b451279f1b4",
+            "population": "production",
+            "owner": {
+              "kind": "function",
+              "member": "AppConfig.create",
+              "functionId": "3f3f80a2595d345e1b2648d311eac00548480b34d117f01f94eca3a51fca2e6c"
+            },
+            "handlerNameSyntax": null,
+            "raises": [],
+            "originalClassification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                163
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "classification": {
+              "status": "unresolved",
+              "pattern": null,
+              "evidenceLines": [
+                163
+              ],
+              "unresolvedReasons": [
+                "no-supported-local-shape"
+              ]
+            },
+            "disposition": "review-only"
+          }
+        ]
+      },
+      "unresolvedExamples": [
+        {
+          "handlerId": "0d638fb2526c5c979a01eca13abd32052af55c0faad76aeaefbf86b97e50e889",
+          "file": "django/apps/config.py",
+          "line": 112,
+          "sourceSha256": "d59871b783abc119ce9ac4ff07f06eac89b3de88bcdf7d13246d2b451279f1b4",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "AppConfig.create",
+            "functionId": "3f3f80a2595d345e1b2648d311eac00548480b34d117f01f94eca3a51fca2e6c"
+          },
+          "handlerNameSyntax": null,
+          "raises": [],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              112
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              112
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "d756c060fae31db86724c876289b29dca3f93755d3a44ed012653882ef049d5e",
+          "file": "django/apps/config.py",
+          "line": 163,
+          "sourceSha256": "d59871b783abc119ce9ac4ff07f06eac89b3de88bcdf7d13246d2b451279f1b4",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "AppConfig.create",
+            "functionId": "3f3f80a2595d345e1b2648d311eac00548480b34d117f01f94eca3a51fca2e6c"
+          },
+          "handlerNameSyntax": null,
+          "raises": [],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              163
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              163
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "d2601321cc896a0afc047bf26ef51542e3f07ac4e67f1c6a1930fee988dfbca2",
+          "file": "django/apps/registry.py",
+          "line": 159,
+          "sourceSha256": "ec931677450952aad787249d5582cc3fe0cb0bdb2a9a7ee7fdd817c4263a0d66",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "Apps.get_app_config",
+            "functionId": "d49076938bb5cfbe078c2eaffba3e2c148e4b726b829e1a9b67dd07d8bfc77b2"
+          },
+          "handlerNameSyntax": null,
+          "raises": [
+            {
+              "line": 165,
+              "column": 12,
+              "endLine": 165,
+              "direct": true,
+              "exception": {
+                "kind": "call",
+                "astKind": "Call",
+                "symbol": "LookupError",
+                "matchesHandlerNameSyntax": false
+              },
+              "cause": {
+                "kind": "absent",
+                "astKind": null,
+                "symbol": null,
+                "matchesHandlerNameSyntax": false
+              },
+              "containsNamedExpression": false,
+              "containers": [],
+              "containersTruncated": false,
+              "id": "d5c09e02a05eedacb5cf22ff993f82cc2483ad0455f4634cbe5ff93477234d3f"
+            }
+          ],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              159
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              159
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        },
+        {
+          "handlerId": "7ca777b4ac887b9ca01b1a1be82ae48e82791604063f5e5c32b3c378f80a85f5",
+          "file": "django/apps/registry.py",
+          "line": 423,
+          "sourceSha256": "ec931677450952aad787249d5582cc3fe0cb0bdb2a9a7ee7fdd817c4263a0d66",
+          "population": "production",
+          "owner": {
+            "kind": "function",
+            "member": "Apps.lazy_model_operation",
+            "functionId": "1885db376a7bd7aa670c1ef0a066ecf78d7559ee090a29a580c019d80507736c"
+          },
+          "handlerNameSyntax": null,
+          "raises": [],
+          "originalClassification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              423
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "classification": {
+            "status": "unresolved",
+            "pattern": null,
+            "evidenceLines": [
+              423
+            ],
+            "unresolvedReasons": [
+              "no-supported-local-shape"
+            ]
+          },
+          "disposition": "review-only"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "pythonTestsPassed": 124,
+    "focusedTransferTestsIncluded": 14,
+    "sharedContractCalibrationTestsPassed": 9,
+    "targetProjectsExecuted": false,
+    "packagedContractChanged": false,
+    "errorHandlingScored": false
+  },
+  "sourceReview": {
+    "selection": "Purposeful source review across all four projects: direct raise forms, explicit causes/suppression, conditional dispatch, context blockers, and alternate causes. Not a random sample or accuracy estimate.",
+    "cases": [
+      {
+        "project": "requests",
+        "file": "src/requests/adapters.py",
+        "line": 490,
+        "handlerId": "a69ab65f96de38aa80846d18a8c37465c50301662eb84ae3bd59d29b1fefcd50",
+        "sourceSha256": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+        "observedClassification": {
+          "status": "recognized-shape",
+          "pattern": "direct-symbol-or-call-raise",
+          "evidenceLines": [
+            490,
+            491
+          ],
+          "unresolvedReasons": []
+        },
+        "reviewInterpretation": "Direct call-form raise wraps a lower-level failure; type and semantic correctness are unresolved."
+      },
+      {
+        "project": "requests",
+        "file": "src/requests/models.py",
+        "line": 479,
+        "handlerId": "1ea3ea0fb150d6fce1751e6c4456db56f0a8b44d82eda557fe0cfdc6aae37ee7",
+        "sourceSha256": "a3351c3c12a86bf5ed211533875350bc4791e9327a685f8c19ba54343e471e26",
+        "observedClassification": {
+          "status": "recognized-shape",
+          "pattern": "direct-symbol-or-call-raise",
+          "evidenceLines": [
+            479,
+            480
+          ],
+          "unresolvedReasons": []
+        },
+        "reviewInterpretation": "Raising a name can denote an exception class; no constructor-call requirement or name-based defect judgment."
+      },
+      {
+        "project": "requests",
+        "file": "src/requests/adapters.py",
+        "line": 713,
+        "handlerId": "327d05446fc876eb40b4fb083346d95e9a1d4e2aea63309192ec57f4212412d4",
+        "sourceSha256": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937",
+        "observedClassification": {
+          "status": "unresolved",
+          "pattern": null,
+          "evidenceLines": [
+            713
+          ],
+          "unresolvedReasons": [
+            "no-supported-local-shape"
+          ]
+        },
+        "reviewInterpretation": "Conditional translation dispatch remains unresolved; individual raises are retained without path-completeness claims."
+      },
+      {
+        "project": "requests",
+        "file": "src/requests/__init__.py",
+        "line": 118,
+        "handlerId": "c2a7be571ea3be83306cb674f3788f9dd15cfd96ddf79de69477b6331e00a6f0",
+        "sourceSha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5",
+        "observedClassification": {
+          "status": "unresolved",
+          "pattern": null,
+          "evidenceLines": [
+            118
+          ],
+          "unresolvedReasons": [
+            "no-supported-local-shape"
+          ]
+        },
+        "reviewInterpretation": "Warning emission remains unresolved; a call does not prove successful handling."
+      },
+      {
+        "project": "starlette",
+        "file": "starlette/middleware/opentelemetry.py",
+        "line": 9,
+        "handlerId": "463b75b9f2211b8bb604f6ff5c163e87db1b98a59da167c8c6be9c929093d8ed",
+        "sourceSha256": "9403f7058bce8ee9ef9cf04af4671069947b305eb056660b6e973be7ee788702",
+        "observedClassification": {
+          "status": "recognized-shape",
+          "pattern": "direct-raise-from-none",
+          "evidenceLines": [
+            9,
+            10
+          ],
+          "unresolvedReasons": []
+        },
+        "reviewInterpretation": "Explicit from None is recorded without a lost-context deduction."
+      },
+      {
+        "project": "starlette",
+        "file": "starlette/templating.py",
+        "line": 27,
+        "handlerId": "cc330af7448d930508f9696f5725a5dc76263e95c11da9b9bc064909ed222a44",
+        "sourceSha256": "cbe013950acd0e82cc66ce61ac7cd00536a9102043afdc0097e6ecf01964e63c",
+        "observedClassification": {
+          "status": "recognized-shape",
+          "pattern": "direct-raise-from-handler-name",
+          "evidenceLines": [
+            27,
+            28
+          ],
+          "unresolvedReasons": []
+        },
+        "reviewInterpretation": "Direct call-form raise uses a cause with the handler name spelling."
+      },
+      {
+        "project": "starlette",
+        "file": "starlette/_exception_handler.py",
+        "line": 43,
+        "handlerId": "c32c2dfaa7a82b229a034bfdac551959c3ae390b8c3b954bd1721cf85bf9fc04",
+        "sourceSha256": "f159bdd797d661ef712e8ff36b9890e56cab02f141bb690410973b5eb793c8e9",
+        "observedClassification": {
+          "status": "unresolved",
+          "pattern": null,
+          "evidenceLines": [
+            43
+          ],
+          "unresolvedReasons": [
+            "no-supported-local-shape"
+          ]
+        },
+        "reviewInterpretation": "Conditional reraising and handler invocation remain unresolved; runtime dispatch is not a defect."
+      },
+      {
+        "project": "starlette",
+        "file": "starlette/testclient.py",
+        "line": 34,
+        "handlerId": "5bba0d6ca119f73f67c0f3a230c27bb10e0ca480e3918c93fd4d59242b6387a6",
+        "sourceSha256": "dc228e34cc3753833a20a28eff0f6fa01570e700565270cd79e80e9d12a72cc1",
+        "observedClassification": {
+          "status": "unresolved",
+          "pattern": null,
+          "evidenceLines": [
+            34
+          ],
+          "unresolvedReasons": [
+            "nested-handler"
+          ]
+        },
+        "reviewInterpretation": "Nested handler retains its blocker even with explicit from None."
+      },
+      {
+        "project": "httpie",
+        "file": "httpie/cli/argtypes.py",
+        "line": 198,
+        "handlerId": "4dfbca2578e4caf2905fa503b459418d6d7d553cd2ef4fc0f954682352a6995a",
+        "sourceSha256": "de2f97a67bc7babfacf61098b7344f4c8c5f28e29216d09d1ab9c3cb45e96518",
+        "observedClassification": {
+          "status": "recognized-shape",
+          "pattern": "direct-symbol-or-call-raise",
+          "evidenceLines": [
+            198,
+            199
+          ],
+          "unresolvedReasons": []
+        },
+        "reviewInterpretation": "A qualified call-form raise without explicit from is observable; omitted from does not establish lost implicit context."
+      },
+      {
+        "project": "httpie",
+        "file": "httpie/manager/compat.py",
+        "line": 56,
+        "handlerId": "9dc360395defc6fb4300a5d5df517fef383bfd1922079d87791f5e43ebc9a24b",
+        "sourceSha256": "f3e067f51650fd9ff5263a42c82131128183e225c1390108d7a3136bf3caa386",
+        "observedClassification": {
+          "status": "recognized-shape",
+          "pattern": "direct-raise-from-handler-name",
+          "evidenceLines": [
+            56,
+            57
+          ],
+          "unresolvedReasons": []
+        },
+        "reviewInterpretation": "Direct PipError call with handler-name cause is a syntactic translation candidate."
+      },
+      {
+        "project": "httpie",
+        "file": "httpie/cli/argparser.py",
+        "line": 132,
+        "handlerId": "b94f8df8ac5def1ff14cd34336ef7959b8f223c560f686d646757b0a13e1aec1",
+        "sourceSha256": "6f2408a5e917e3d0fc5ad5c725252d98022990299b1ec5182b2237749d513077",
+        "observedClassification": {
+          "status": "unresolved",
+          "pattern": null,
+          "evidenceLines": [
+            132
+          ],
+          "unresolvedReasons": [
+            "no-supported-local-shape"
+          ]
+        },
+        "reviewInterpretation": "Conditional SystemExit translation and bare rethrow remain unresolved."
+      },
+      {
+        "project": "httpie",
+        "file": "httpie/config.py",
+        "line": 70,
+        "handlerId": "55b49b8427360677eecf429d6bbe281ce298be5da851baf82c337c9083b5e422",
+        "sourceSha256": "e85d8fd00aa6ae3bd5bc8d8ad2adbaabc224d172d41b37dd4aa5d23b29b37960",
+        "observedClassification": {
+          "status": "unresolved",
+          "pattern": null,
+          "evidenceLines": [
+            70
+          ],
+          "unresolvedReasons": [
+            "enclosing-context-manager"
+          ]
+        },
+        "reviewInterpretation": "A one-raise suite remains blocked by enclosing context-manager execution."
+      },
+      {
+        "project": "django",
+        "file": "django/contrib/admin/views/autocomplete.py",
+        "line": 83,
+        "handlerId": "5ad90ea937bc03b6f87808109df96dbf28ece14a570895aac985291e1b2330f2",
+        "sourceSha256": "3e30bc75bdb9ce1620c0b4bfe29aba3c0a530ff6119f89ae207d00fd537b9028",
+        "observedClassification": {
+          "status": "recognized-shape",
+          "pattern": "direct-raise-from-handler-name",
+          "evidenceLines": [
+            83,
+            84
+          ],
+          "unresolvedReasons": []
+        },
+        "reviewInterpretation": "Name-form raise with handler-name cause is supported even without a call."
+      },
+      {
+        "project": "django",
+        "file": "django/core/mail/__init__.py",
+        "line": 395,
+        "handlerId": "b352550ce7a5e1fd0a5605e77d7c4e2f06516610ff661ace68e1a4176635dae9",
+        "sourceSha256": "2603947c476c230445b977aee417f348729b01cc002d3ccdb0214a9afae0a865",
+        "observedClassification": {
+          "status": "recognized-shape",
+          "pattern": "direct-raise-from-none",
+          "evidenceLines": [
+            395,
+            396
+          ],
+          "unresolvedReasons": []
+        },
+        "reviewInterpretation": "Explicit suppression of context display is recorded without grading the decision."
+      },
+      {
+        "project": "django",
+        "file": "django/db/models/sql/compiler.py",
+        "line": 1654,
+        "handlerId": "b3b23e63e8c910d468429996e7de4a70399593c582c24d8bb3f0306a7221ead6",
+        "sourceSha256": "4a2992654f9c628caa61ab2d89f97e9528c102808112e5015d9d34de3635fcea",
+        "observedClassification": {
+          "status": "unresolved",
+          "pattern": null,
+          "evidenceLines": [
+            1654
+          ],
+          "unresolvedReasons": [
+            "nested-handler"
+          ]
+        },
+        "reviewInterpretation": "Nested cleanup reraises an outer name from None; raw syntax is retained, handler pattern remains blocked."
+      },
+      {
+        "project": "django",
+        "file": "django/utils/autoreload.py",
+        "line": 636,
+        "handlerId": "565f2788d6057a02e99c4d2bb4f3d5b9907612099b7a60c3e997528d336ac46b",
+        "sourceSha256": "993ebf655deb5ecd58528a0eafa190172ca0607a038ea79d89ad6fcde8d8005c",
+        "observedClassification": {
+          "status": "unresolved",
+          "pattern": null,
+          "evidenceLines": [
+            636
+          ],
+          "unresolvedReasons": [
+            "raise-expression-or-cause-unresolved"
+          ]
+        },
+        "reviewInterpretation": "The cause is a parameter rather than the current handler binding; retained as syntax but not recognized as the handler-name pattern."
+      }
+    ]
+  }
+}

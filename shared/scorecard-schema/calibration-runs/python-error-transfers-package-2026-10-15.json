@@ -1,0 +1,599 @@
+{
+  "date": "2026-10-15",
+  "adapterVersion": "0.10.0",
+  "ruleset": "python-2026-10-15-exception-transfers-review-v1",
+  "archiveSha256": "53f6a08225408f86ffced4268dc3e11b9d30db3e8b0deeaefabacf5d0dcd56a9",
+  "results": [
+    {
+      "id": "requests",
+      "revision": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "runId": "57874b0e-37cb-42db-9b0e-bb291f701cc4",
+      "auditId": "57874b0e-37cb-42db-9b0e-bb291f701cc4",
+      "selectedFunctions": 246,
+      "methodComplexityScore": 7,
+      "handlers": {
+        "handlers": 66,
+        "byClassification": {
+          "documented-no-op": 2,
+          "other-body": 25,
+          "terminal-loop-control": 1,
+          "terminal-raise": 21,
+          "terminal-return": 13,
+          "undocumented-no-op": 4
+        },
+        "functionsWithHandlers": 34,
+        "byOwnerKind": {
+          "function": 55,
+          "module": 11
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "byClassification": {
+              "documented-no-op": 2,
+              "other-body": 25,
+              "terminal-loop-control": 1,
+              "terminal-raise": 21,
+              "terminal-return": 13,
+              "undocumented-no-op": 4
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 66,
+        "recognizedShapes": 17,
+        "unresolved": 49,
+        "byPattern": {
+          "direct-literal-fallback-return": 10,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 2
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 1,
+          "no-supported-local-shape": 48
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "recognizedShapes": 17,
+            "unresolved": 49,
+            "byPattern": {
+              "direct-literal-fallback-return": 10,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 2
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 1,
+              "no-supported-local-shape": 48
+            }
+          }
+        }
+      },
+      "transfers": {
+        "handlers": 66,
+        "recognizedShapes": 36,
+        "unresolved": 30,
+        "byPattern": {
+          "direct-literal-fallback-return": 10,
+          "direct-symbol-or-call-raise": 19,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 2
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 1,
+          "no-supported-local-shape": 29
+        },
+        "raiseStatements": 30,
+        "handlersWithRaises": 23,
+        "newlyRecognizedShapes": 19,
+        "byExceptionSyntax": {
+          "absent": 3,
+          "call": 26,
+          "name": 1
+        },
+        "handlerNameRaiseSyntax": 0,
+        "handlerNameCauseSyntax": 0,
+        "byCauseSyntax": {
+          "absent": 30
+        },
+        "populations": {
+          "production": {
+            "handlers": 66,
+            "recognizedShapes": 36,
+            "unresolved": 30,
+            "byPattern": {
+              "direct-literal-fallback-return": 10,
+              "direct-symbol-or-call-raise": 19,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 2
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 1,
+              "no-supported-local-shape": 29
+            },
+            "raiseStatements": 30,
+            "handlersWithRaises": 23,
+            "newlyRecognizedShapes": 19,
+            "byExceptionSyntax": {
+              "absent": 3,
+              "call": 26,
+              "name": 1
+            },
+            "handlerNameRaiseSyntax": 0,
+            "handlerNameCauseSyntax": 0,
+            "byCauseSyntax": {
+              "absent": 30
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneTransferReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-transfers-package-2026-10-15/requests-evidence.json",
+      "evidenceSha256": "86819677ba846776cdbc9b0d33e9fe362e068f93bd0424ea96687dbce7dc0481"
+    },
+    {
+      "id": "starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "runId": "8e3be082-3cae-43b2-9a2c-2c136ee4288b",
+      "auditId": "8e3be082-3cae-43b2-9a2c-2c136ee4288b",
+      "selectedFunctions": 508,
+      "methodComplexityScore": 7.1,
+      "handlers": {
+        "handlers": 62,
+        "byClassification": {
+          "other-body": 14,
+          "terminal-loop-control": 3,
+          "terminal-raise": 26,
+          "terminal-return": 10,
+          "undocumented-no-op": 9
+        },
+        "functionsWithHandlers": 45,
+        "byOwnerKind": {
+          "function": 53,
+          "module": 9
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "byClassification": {
+              "other-body": 14,
+              "terminal-loop-control": 3,
+              "terminal-raise": 26,
+              "terminal-return": 10,
+              "undocumented-no-op": 9
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 62,
+        "recognizedShapes": 5,
+        "unresolved": 57,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "guarded-import-literal-default": 1,
+          "no-op-then-literal-return": 1
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "enclosing-finally": 4,
+          "nested-handler": 1,
+          "no-supported-local-shape": 51
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "recognizedShapes": 5,
+            "unresolved": 57,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "guarded-import-literal-default": 1,
+              "no-op-then-literal-return": 1
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "enclosing-finally": 4,
+              "nested-handler": 1,
+              "no-supported-local-shape": 51
+            }
+          }
+        }
+      },
+      "transfers": {
+        "handlers": 62,
+        "recognizedShapes": 17,
+        "unresolved": 45,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "direct-raise-from-handler-name": 1,
+          "direct-raise-from-none": 1,
+          "direct-symbol-or-call-raise": 10,
+          "guarded-import-literal-default": 1,
+          "no-op-then-literal-return": 1
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "enclosing-finally": 4,
+          "nested-handler": 1,
+          "no-supported-local-shape": 39
+        },
+        "raiseStatements": 36,
+        "handlersWithRaises": 29,
+        "newlyRecognizedShapes": 12,
+        "byExceptionSyntax": {
+          "absent": 5,
+          "call": 21,
+          "name": 10
+        },
+        "handlerNameRaiseSyntax": 7,
+        "handlerNameCauseSyntax": 3,
+        "byCauseSyntax": {
+          "absent": 29,
+          "name": 3,
+          "none": 2,
+          "other": 2
+        },
+        "populations": {
+          "production": {
+            "handlers": 62,
+            "recognizedShapes": 17,
+            "unresolved": 45,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "direct-raise-from-handler-name": 1,
+              "direct-raise-from-none": 1,
+              "direct-symbol-or-call-raise": 10,
+              "guarded-import-literal-default": 1,
+              "no-op-then-literal-return": 1
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "enclosing-finally": 4,
+              "nested-handler": 1,
+              "no-supported-local-shape": 39
+            },
+            "raiseStatements": 36,
+            "handlersWithRaises": 29,
+            "newlyRecognizedShapes": 12,
+            "byExceptionSyntax": {
+              "absent": 5,
+              "call": 21,
+              "name": 10
+            },
+            "handlerNameRaiseSyntax": 7,
+            "handlerNameCauseSyntax": 3,
+            "byCauseSyntax": {
+              "absent": 29,
+              "name": 3,
+              "none": 2,
+              "other": 2
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneTransferReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-transfers-package-2026-10-15/starlette-evidence.json",
+      "evidenceSha256": "c4361d41f136b605d281019f100a8d9ce0677a0f7312ceebbc0815099f4c6870"
+    },
+    {
+      "id": "httpie",
+      "revision": "5b604c37c6c67e18e7c3e9aee6c88a8c22b98345",
+      "runId": "23bf4906-1318-4084-927e-79eb554e2cc3",
+      "auditId": "23bf4906-1318-4084-927e-79eb554e2cc3",
+      "selectedFunctions": 464,
+      "methodComplexityScore": 6.8,
+      "handlers": {
+        "handlers": 69,
+        "byClassification": {
+          "documented-no-op": 5,
+          "other-body": 29,
+          "terminal-loop-control": 3,
+          "terminal-raise": 16,
+          "terminal-return": 10,
+          "undocumented-no-op": 6
+        },
+        "functionsWithHandlers": 48,
+        "byOwnerKind": {
+          "class-body": 1,
+          "function": 66,
+          "module": 2
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "byClassification": {
+              "documented-no-op": 5,
+              "other-body": 29,
+              "terminal-loop-control": 3,
+              "terminal-raise": 16,
+              "terminal-return": 10,
+              "undocumented-no-op": 6
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 69,
+        "recognizedShapes": 9,
+        "unresolved": 60,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "guarded-import-literal-default": 1,
+          "locally-documented-no-op": 5
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "no-supported-local-shape": 58
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "recognizedShapes": 9,
+            "unresolved": 60,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "guarded-import-literal-default": 1,
+              "locally-documented-no-op": 5
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "no-supported-local-shape": 58
+            }
+          }
+        }
+      },
+      "transfers": {
+        "handlers": 69,
+        "recognizedShapes": 22,
+        "unresolved": 47,
+        "byPattern": {
+          "direct-literal-fallback-return": 3,
+          "direct-raise-from-handler-name": 3,
+          "direct-symbol-or-call-raise": 10,
+          "guarded-import-literal-default": 1,
+          "locally-documented-no-op": 5
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 2,
+          "no-supported-local-shape": 45
+        },
+        "raiseStatements": 26,
+        "handlersWithRaises": 25,
+        "newlyRecognizedShapes": 13,
+        "byExceptionSyntax": {
+          "absent": 11,
+          "call": 15
+        },
+        "handlerNameRaiseSyntax": 0,
+        "handlerNameCauseSyntax": 3,
+        "byCauseSyntax": {
+          "absent": 23,
+          "name": 3
+        },
+        "populations": {
+          "production": {
+            "handlers": 69,
+            "recognizedShapes": 22,
+            "unresolved": 47,
+            "byPattern": {
+              "direct-literal-fallback-return": 3,
+              "direct-raise-from-handler-name": 3,
+              "direct-symbol-or-call-raise": 10,
+              "guarded-import-literal-default": 1,
+              "locally-documented-no-op": 5
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 2,
+              "no-supported-local-shape": 45
+            },
+            "raiseStatements": 26,
+            "handlersWithRaises": 25,
+            "newlyRecognizedShapes": 13,
+            "byExceptionSyntax": {
+              "absent": 11,
+              "call": 15
+            },
+            "handlerNameRaiseSyntax": 0,
+            "handlerNameCauseSyntax": 3,
+            "byCauseSyntax": {
+              "absent": 23,
+              "name": 3
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneTransferReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-transfers-package-2026-10-15/httpie-evidence.json",
+      "evidenceSha256": "fe429359dfe468d038945466e381b71ee068bc8e45f1eaf26f6a670470f7b249"
+    },
+    {
+      "id": "django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "runId": "3b9bfe98-48ee-4e4b-944c-cd5b530db8a1",
+      "auditId": "3b9bfe98-48ee-4e4b-944c-cd5b530db8a1",
+      "selectedFunctions": 9748,
+      "methodComplexityScore": 5.6,
+      "handlers": {
+        "handlers": 1267,
+        "byClassification": {
+          "documented-no-op": 41,
+          "other-body": 422,
+          "terminal-loop-control": 60,
+          "terminal-raise": 338,
+          "terminal-return": 255,
+          "undocumented-no-op": 151
+        },
+        "functionsWithHandlers": 940,
+        "byOwnerKind": {
+          "function": 1246,
+          "module": 21
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "byClassification": {
+              "documented-no-op": 41,
+              "other-body": 422,
+              "terminal-loop-control": 60,
+              "terminal-raise": 338,
+              "terminal-return": 255,
+              "undocumented-no-op": 151
+            }
+          }
+        }
+      },
+      "context": {
+        "handlers": 1267,
+        "recognizedShapes": 162,
+        "unresolved": 1105,
+        "byPattern": {
+          "direct-bare-rethrow": 6,
+          "direct-literal-fallback-return": 107,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 41,
+          "no-op-then-literal-return": 3
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 32,
+          "enclosing-finally": 18,
+          "exception-group-semantics": 1,
+          "import-exception-binding-unresolved": 1,
+          "nested-handler": 39,
+          "no-supported-local-shape": 1024
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "recognizedShapes": 162,
+            "unresolved": 1105,
+            "byPattern": {
+              "direct-bare-rethrow": 6,
+              "direct-literal-fallback-return": 107,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 41,
+              "no-op-then-literal-return": 3
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 32,
+              "enclosing-finally": 18,
+              "exception-group-semantics": 1,
+              "import-exception-binding-unresolved": 1,
+              "nested-handler": 39,
+              "no-supported-local-shape": 1024
+            }
+          }
+        }
+      },
+      "transfers": {
+        "handlers": 1267,
+        "recognizedShapes": 413,
+        "unresolved": 854,
+        "byPattern": {
+          "direct-bare-rethrow": 6,
+          "direct-literal-fallback-return": 107,
+          "direct-raise-from-handler-name": 44,
+          "direct-raise-from-none": 7,
+          "direct-symbol-or-call-raise": 200,
+          "guarded-import-literal-default": 5,
+          "locally-documented-no-op": 41,
+          "no-op-then-literal-return": 3
+        },
+        "unresolvedReasons": {
+          "enclosing-context-manager": 32,
+          "enclosing-finally": 18,
+          "exception-group-semantics": 1,
+          "import-exception-binding-unresolved": 1,
+          "nested-handler": 39,
+          "no-supported-local-shape": 772,
+          "raise-expression-or-cause-unresolved": 1
+        },
+        "raiseStatements": 439,
+        "handlersWithRaises": 412,
+        "newlyRecognizedShapes": 251,
+        "byExceptionSyntax": {
+          "absent": 103,
+          "call": 310,
+          "name": 24,
+          "other": 2
+        },
+        "handlerNameRaiseSyntax": 5,
+        "handlerNameCauseSyntax": 57,
+        "byCauseSyntax": {
+          "absent": 372,
+          "name": 59,
+          "none": 8
+        },
+        "populations": {
+          "production": {
+            "handlers": 1267,
+            "recognizedShapes": 413,
+            "unresolved": 854,
+            "byPattern": {
+              "direct-bare-rethrow": 6,
+              "direct-literal-fallback-return": 107,
+              "direct-raise-from-handler-name": 44,
+              "direct-raise-from-none": 7,
+              "direct-symbol-or-call-raise": 200,
+              "guarded-import-literal-default": 5,
+              "locally-documented-no-op": 41,
+              "no-op-then-literal-return": 3
+            },
+            "unresolvedReasons": {
+              "enclosing-context-manager": 32,
+              "enclosing-finally": 18,
+              "exception-group-semantics": 1,
+              "import-exception-binding-unresolved": 1,
+              "nested-handler": 39,
+              "no-supported-local-shape": 772,
+              "raise-expression-or-cause-unresolved": 1
+            },
+            "raiseStatements": 439,
+            "handlersWithRaises": 412,
+            "newlyRecognizedShapes": 251,
+            "byExceptionSyntax": {
+              "absent": 103,
+              "call": 310,
+              "name": 24,
+              "other": 2
+            },
+            "handlerNameRaiseSyntax": 5,
+            "handlerNameCauseSyntax": 57,
+            "byCauseSyntax": {
+              "absent": 372,
+              "name": 59,
+              "none": 8
+            }
+          }
+        }
+      },
+      "unchangedComplexityAndPriorReviews": true,
+      "matchedStandaloneTransferReport": true,
+      "crossVersionComparisonRejected": true,
+      "evidence": "TestResults/python-error-transfers-package-2026-10-15/django-evidence.json",
+      "evidenceSha256": "06c2e086bfe9ec5e45095c3eb25e90b3e6d7efd5aa1ca9c2aa70ea76e039fd17"
+    }
+  ],
+  "checkpoint": "0f97873",
+  "archive": "TestResults/python-error-transfers-package-2026-10-15/codemetrics-ai-0.5.0.tgz",
+  "checks": {
+    "pythonTestsPassed": 125,
+    "sharedTestsPassed": 9,
+    "javascriptTypescriptTestsPassed": 256,
+    "installedPythonEvidenceTestsPassed": 31,
+    "skillIntegrationSupportingHarnessChecksPassed": 33,
+    "pythonIntegrationSubtestsIncluded": 16,
+    "skillStructuralValidation": "passed",
+    "packagedProducerAndGuideBytesMatchSource": true,
+    "matchedPackagedFiles": 20,
+    "archiveExcludesPythonBytecode": true,
+    "reportingFixture": "analyzer-generated, inspector-validated, offline harness only; no live-model evaluation"
+  },
+  "releaseState": "Local development archive; not pushed or published. Error Handling unscored; Method Complexity remains the only scored Python dimension."
+}

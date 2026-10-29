@@ -1,0 +1,1385 @@
+{
+  "schemaVersion": 1,
+  "policy": "python/async-call-context-review-v1",
+  "auditId": "c6036e1e-c31a-466e-bf85-b8cfcfd5fb60",
+  "implementationSha256": "ed1589d4a8a769258ba3367a5dabbbf11ca717555faa0ef277207a04bd33402c",
+  "scope": "Unresolved-call inventory and lexical links only. Async/Blocking Usage and Error Handling remain unscored.",
+  "samples": [
+    {
+      "id": "starlette",
+      "repository": "starlette",
+      "url": "https://github.com/Kludex/starlette",
+      "revision": "96d5023c55b29224edb8d684868c49f681d079a9",
+      "role": "ASGI framework",
+      "include": [
+        "starlette/**"
+      ],
+      "productionPaths": [],
+      "runId": "7bc39b63-86da-4252-baff-4d003bfb2176",
+      "configurationFingerprint": "ae99a5dc5425a26317238192f881e2f90601a2243224ea4c04faec08b882a278",
+      "functionFactsSha256": "b2e5495c18c8532661f8d0269aab2b4413dfe192c116038807a03813c229457c",
+      "selectedSourceSha256": "2a51420a3bfbda775c692446934792dfc86b9d289056bf5a1fae501579ed9dd7",
+      "asyncRowsSha256": "50458f0f60e2f5d3c4f86f7b646ff7f66c4c1a6cc4e6e8dc150aaf626263e2b0",
+      "contextRowsSha256": "36931d47fa1ca784d61e611eadd3acb04f95a244e2ec4ddab567e78ff807710f",
+      "summary": {
+        "selectedFunctions": 508,
+        "asyncFunctions": 135,
+        "excludedSynchronousFunctions": 373,
+        "availability": "available",
+        "contexts": {
+          "async-body": {
+            "callExpressions": 717,
+            "unresolvedImportCallExpressions": 585,
+            "unresolvedReasons": {
+              "comprehension-local-binding": 3,
+              "dynamic-callee-expression": 39,
+              "no-lexical-import": 94,
+              "non-import-or-ambiguous-binding": 448,
+              "reflective-or-cross-scope-binding": 1
+            },
+            "unresolvedShapes": {
+              "attribute-on-expression": 30,
+              "attribute-path": 333,
+              "call-result": 6,
+              "name": 213,
+              "subscript": 3
+            },
+            "unresolvedInventory": [
+              {
+                "reason": "comprehension-local-binding",
+                "shape": "attribute-path",
+                "callExpressions": 3,
+                "examples": [
+                  {
+                    "ownerId": "1ce6e6bc908d8c5f839267b91aaa5fc044d5cef3d369f9557bcf628e47cb60b7",
+                    "callId": "81f88fbc546f6db45eadd93caa0b8d93dcee00f2601e1a8e2b64b20a3b1f954a"
+                  },
+                  {
+                    "ownerId": "ae2aaeb6730205e311ffd3de103a8f1642f5b1f811cab49de5fd224d2f31385b",
+                    "callId": "48fc76a3c613b2b8568f371230c324cd70c383ca54f5a2918b920ab1afe41a14"
+                  },
+                  {
+                    "ownerId": "ae2aaeb6730205e311ffd3de103a8f1642f5b1f811cab49de5fd224d2f31385b",
+                    "callId": "010d2ce452a22759cf3619cce9362199c5fb95f411c2675bd07c9534dc5b656d"
+                  }
+                ]
+              },
+              {
+                "reason": "dynamic-callee-expression",
+                "shape": "attribute-on-expression",
+                "callExpressions": 30,
+                "examples": [
+                  {
+                    "ownerId": "49714538066dbd8b62510e984a09c057f032251ac73ce79e0e430a5b7019f664",
+                    "callId": "0757161e1a4b3513fd17ffac6f8c3e5fc7c79e84af0efdcef3db60e2263cc0e0"
+                  },
+                  {
+                    "ownerId": "c755d9d5094580b977c916aa784327f263dc46715152dd59cb00715a031c2703",
+                    "callId": "a047ba828b6d733ecae0dc88bc2544b5f6cf1d5fdd0ef0e29ce4f495e4abfe57"
+                  },
+                  {
+                    "ownerId": "a5806a9f0f9c4ad9917af73ab72f3129621ee9384ca7f7c17786a53bcddb8b77",
+                    "callId": "4453ba5ad2eefe8b9af084dd31e298701360dd5d791e637f8a172194b13997a6"
+                  }
+                ]
+              },
+              {
+                "reason": "dynamic-callee-expression",
+                "shape": "call-result",
+                "callExpressions": 6,
+                "examples": [
+                  {
+                    "ownerId": "f624f724adf4fca7523293bc4752d7ed492f07bc6ef97e62f1791b0fe4271d69",
+                    "callId": "0b84c15eaf340f6845736e7487c3ad468a0c3def32a5dd926aed662685debe48"
+                  },
+                  {
+                    "ownerId": "dc465ea246a2d1fb5cbe284beb8a027fb4906714fafff0e924623a0252b278fc",
+                    "callId": "d37106d7b3d1fc2d7a340399436d7f4a054b85c7266ae25a1e161f54998ea72b"
+                  },
+                  {
+                    "ownerId": "d342b8a39dc5bf572de2185a7374b54a895d080f05a8211a44ad324d5680a3ff",
+                    "callId": "dbe176ee919fa9941ffc8972a30486c9c1cec69a8e4f50615e495d7ff633ed80"
+                  }
+                ]
+              },
+              {
+                "reason": "dynamic-callee-expression",
+                "shape": "subscript",
+                "callExpressions": 3,
+                "examples": [
+                  {
+                    "ownerId": "8fb5509a98f4db3366f53d439b924f53eaf018e83e1870e0dd2e623dfc07d50b",
+                    "callId": "4ba99a76d746e441d9905a572a799959e2ff6485157b807da6ac77c715d6fd1d"
+                  },
+                  {
+                    "ownerId": "1f2752055c57755c2a5a90e6cd91b33dc316a47c4deff9a88da35d7aa124295d",
+                    "callId": "09008bcd42fb237722cfdf815cbcfdb89542293350655370f5309072f8d317b0"
+                  },
+                  {
+                    "ownerId": "1f2752055c57755c2a5a90e6cd91b33dc316a47c4deff9a88da35d7aa124295d",
+                    "callId": "72fb2f70772a3763e93f2dd04e53824329e6a4d56966341f20942995e2fbbce0"
+                  }
+                ]
+              },
+              {
+                "reason": "no-lexical-import",
+                "shape": "name",
+                "callExpressions": 94,
+                "examples": [
+                  {
+                    "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                    "callId": "1d2c7532c8a790ed20f8cf8424a7c9238f62db1fafa8f873b542f56971c4f6cf"
+                  },
+                  {
+                    "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                    "callId": "1c235e9067f3ac11cb3b43e9b318deefa0f5deeac4fbc33d75991743943eb610"
+                  },
+                  {
+                    "ownerId": "cdb44d3389823338795fe9d4ae646906edeff98df3ac484885057497668deff1",
+                    "callId": "3f3ab4ad7c9001b12c42db9ef87c784c09a7b6c35c8c3ecc8ab9e1093266bc0a"
+                  }
+                ]
+              },
+              {
+                "reason": "non-import-or-ambiguous-binding",
+                "shape": "attribute-path",
+                "callExpressions": 330,
+                "examples": [
+                  {
+                    "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                    "callId": "30511fb0a914fa8051a892d259bfbbbf572e990ba99104fea5f54323b9a976a5"
+                  },
+                  {
+                    "ownerId": "ed5374ce6649a1d2d2172216d3777e363f51fb608021180aabe8eabceb311548",
+                    "callId": "bed1992053d2e734c9f58ac625cf6e37d777ae724cabc559d1167ca77f3f38e1"
+                  },
+                  {
+                    "ownerId": "9e78c1c8e8436510210cc55ec10499904c81cdfaf67c6ac9dac79488ea6562f7",
+                    "callId": "b742093fcacdf064776c82506d1248fb9ebb74ff7915a5bc64f800753938a397"
+                  }
+                ]
+              },
+              {
+                "reason": "non-import-or-ambiguous-binding",
+                "shape": "name",
+                "callExpressions": 118,
+                "examples": [
+                  {
+                    "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                    "callId": "078a66c0888b3adc172c16b8bec3076e1c71ea2579834ce76e69e7e3c951afd4"
+                  },
+                  {
+                    "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                    "callId": "8a85c8089cbaeb490cfc79a6868a505f4f95ec6832a98e1639f43f8fcd08bd3e"
+                  },
+                  {
+                    "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                    "callId": "788d493594bc840b4327461ec5c2a13d6a2ff7ea6f722fa74438e53ac4363e10"
+                  }
+                ]
+              },
+              {
+                "reason": "reflective-or-cross-scope-binding",
+                "shape": "name",
+                "callExpressions": 1,
+                "examples": [
+                  {
+                    "ownerId": "2f0d461e89fff9fef5038790d9bbffa4a60858881ed8a3147e9eb52b5e6462e7",
+                    "callId": "561edffeca502a74dbe6397ff58b75492dec13c10cdc2e756f946f3ff50fd3a4"
+                  }
+                ]
+              }
+            ],
+            "localCalleeLinks": 10,
+            "storedWrapperInvocationLinks": 0,
+            "localCallbackReferenceLinks": 1
+          },
+          "deferred-generator-body": {
+            "callExpressions": 2,
+            "unresolvedImportCallExpressions": 2,
+            "unresolvedReasons": {
+              "comprehension-local-binding": 1,
+              "no-lexical-import": 1
+            },
+            "unresolvedShapes": {
+              "attribute-path": 1,
+              "name": 1
+            },
+            "unresolvedInventory": [
+              {
+                "reason": "comprehension-local-binding",
+                "shape": "attribute-path",
+                "callExpressions": 1,
+                "examples": [
+                  {
+                    "ownerId": "0aef057a748e39f29cdd3d4cc12d8b45513298d6965f5309768a7c7c93513e24",
+                    "callId": "85b536bbe701e53901c0abf90988bf77b1862037e597a0ca5b08989697cc72e2"
+                  }
+                ]
+              },
+              {
+                "reason": "no-lexical-import",
+                "shape": "name",
+                "callExpressions": 1,
+                "examples": [
+                  {
+                    "ownerId": "0aef057a748e39f29cdd3d4cc12d8b45513298d6965f5309768a7c7c93513e24",
+                    "callId": "2fb35608588f83a74c00f9999e80086b21f44abcc656b625f63172b128929e45"
+                  }
+                ]
+              }
+            ],
+            "localCalleeLinks": 0,
+            "storedWrapperInvocationLinks": 0,
+            "localCallbackReferenceLinks": 0
+          }
+        },
+        "populations": {
+          "production": {
+            "selectedFunctions": 508,
+            "asyncFunctions": 135,
+            "excludedSynchronousFunctions": 373,
+            "availability": "available",
+            "contexts": {
+              "async-body": {
+                "callExpressions": 717,
+                "unresolvedImportCallExpressions": 585,
+                "unresolvedReasons": {
+                  "comprehension-local-binding": 3,
+                  "dynamic-callee-expression": 39,
+                  "no-lexical-import": 94,
+                  "non-import-or-ambiguous-binding": 448,
+                  "reflective-or-cross-scope-binding": 1
+                },
+                "unresolvedShapes": {
+                  "attribute-on-expression": 30,
+                  "attribute-path": 333,
+                  "call-result": 6,
+                  "name": 213,
+                  "subscript": 3
+                },
+                "unresolvedInventory": [
+                  {
+                    "reason": "comprehension-local-binding",
+                    "shape": "attribute-path",
+                    "callExpressions": 3,
+                    "examples": [
+                      {
+                        "ownerId": "1ce6e6bc908d8c5f839267b91aaa5fc044d5cef3d369f9557bcf628e47cb60b7",
+                        "callId": "81f88fbc546f6db45eadd93caa0b8d93dcee00f2601e1a8e2b64b20a3b1f954a"
+                      },
+                      {
+                        "ownerId": "ae2aaeb6730205e311ffd3de103a8f1642f5b1f811cab49de5fd224d2f31385b",
+                        "callId": "48fc76a3c613b2b8568f371230c324cd70c383ca54f5a2918b920ab1afe41a14"
+                      },
+                      {
+                        "ownerId": "ae2aaeb6730205e311ffd3de103a8f1642f5b1f811cab49de5fd224d2f31385b",
+                        "callId": "010d2ce452a22759cf3619cce9362199c5fb95f411c2675bd07c9534dc5b656d"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "dynamic-callee-expression",
+                    "shape": "attribute-on-expression",
+                    "callExpressions": 30,
+                    "examples": [
+                      {
+                        "ownerId": "49714538066dbd8b62510e984a09c057f032251ac73ce79e0e430a5b7019f664",
+                        "callId": "0757161e1a4b3513fd17ffac6f8c3e5fc7c79e84af0efdcef3db60e2263cc0e0"
+                      },
+                      {
+                        "ownerId": "c755d9d5094580b977c916aa784327f263dc46715152dd59cb00715a031c2703",
+                        "callId": "a047ba828b6d733ecae0dc88bc2544b5f6cf1d5fdd0ef0e29ce4f495e4abfe57"
+                      },
+                      {
+                        "ownerId": "a5806a9f0f9c4ad9917af73ab72f3129621ee9384ca7f7c17786a53bcddb8b77",
+                        "callId": "4453ba5ad2eefe8b9af084dd31e298701360dd5d791e637f8a172194b13997a6"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "dynamic-callee-expression",
+                    "shape": "call-result",
+                    "callExpressions": 6,
+                    "examples": [
+                      {
+                        "ownerId": "f624f724adf4fca7523293bc4752d7ed492f07bc6ef97e62f1791b0fe4271d69",
+                        "callId": "0b84c15eaf340f6845736e7487c3ad468a0c3def32a5dd926aed662685debe48"
+                      },
+                      {
+                        "ownerId": "dc465ea246a2d1fb5cbe284beb8a027fb4906714fafff0e924623a0252b278fc",
+                        "callId": "d37106d7b3d1fc2d7a340399436d7f4a054b85c7266ae25a1e161f54998ea72b"
+                      },
+                      {
+                        "ownerId": "d342b8a39dc5bf572de2185a7374b54a895d080f05a8211a44ad324d5680a3ff",
+                        "callId": "dbe176ee919fa9941ffc8972a30486c9c1cec69a8e4f50615e495d7ff633ed80"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "dynamic-callee-expression",
+                    "shape": "subscript",
+                    "callExpressions": 3,
+                    "examples": [
+                      {
+                        "ownerId": "8fb5509a98f4db3366f53d439b924f53eaf018e83e1870e0dd2e623dfc07d50b",
+                        "callId": "4ba99a76d746e441d9905a572a799959e2ff6485157b807da6ac77c715d6fd1d"
+                      },
+                      {
+                        "ownerId": "1f2752055c57755c2a5a90e6cd91b33dc316a47c4deff9a88da35d7aa124295d",
+                        "callId": "09008bcd42fb237722cfdf815cbcfdb89542293350655370f5309072f8d317b0"
+                      },
+                      {
+                        "ownerId": "1f2752055c57755c2a5a90e6cd91b33dc316a47c4deff9a88da35d7aa124295d",
+                        "callId": "72fb2f70772a3763e93f2dd04e53824329e6a4d56966341f20942995e2fbbce0"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "no-lexical-import",
+                    "shape": "name",
+                    "callExpressions": 94,
+                    "examples": [
+                      {
+                        "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                        "callId": "1d2c7532c8a790ed20f8cf8424a7c9238f62db1fafa8f873b542f56971c4f6cf"
+                      },
+                      {
+                        "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                        "callId": "1c235e9067f3ac11cb3b43e9b318deefa0f5deeac4fbc33d75991743943eb610"
+                      },
+                      {
+                        "ownerId": "cdb44d3389823338795fe9d4ae646906edeff98df3ac484885057497668deff1",
+                        "callId": "3f3ab4ad7c9001b12c42db9ef87c784c09a7b6c35c8c3ecc8ab9e1093266bc0a"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "non-import-or-ambiguous-binding",
+                    "shape": "attribute-path",
+                    "callExpressions": 330,
+                    "examples": [
+                      {
+                        "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                        "callId": "30511fb0a914fa8051a892d259bfbbbf572e990ba99104fea5f54323b9a976a5"
+                      },
+                      {
+                        "ownerId": "ed5374ce6649a1d2d2172216d3777e363f51fb608021180aabe8eabceb311548",
+                        "callId": "bed1992053d2e734c9f58ac625cf6e37d777ae724cabc559d1167ca77f3f38e1"
+                      },
+                      {
+                        "ownerId": "9e78c1c8e8436510210cc55ec10499904c81cdfaf67c6ac9dac79488ea6562f7",
+                        "callId": "b742093fcacdf064776c82506d1248fb9ebb74ff7915a5bc64f800753938a397"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "non-import-or-ambiguous-binding",
+                    "shape": "name",
+                    "callExpressions": 118,
+                    "examples": [
+                      {
+                        "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                        "callId": "078a66c0888b3adc172c16b8bec3076e1c71ea2579834ce76e69e7e3c951afd4"
+                      },
+                      {
+                        "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                        "callId": "8a85c8089cbaeb490cfc79a6868a505f4f95ec6832a98e1639f43f8fcd08bd3e"
+                      },
+                      {
+                        "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+                        "callId": "788d493594bc840b4327461ec5c2a13d6a2ff7ea6f722fa74438e53ac4363e10"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "reflective-or-cross-scope-binding",
+                    "shape": "name",
+                    "callExpressions": 1,
+                    "examples": [
+                      {
+                        "ownerId": "2f0d461e89fff9fef5038790d9bbffa4a60858881ed8a3147e9eb52b5e6462e7",
+                        "callId": "561edffeca502a74dbe6397ff58b75492dec13c10cdc2e756f946f3ff50fd3a4"
+                      }
+                    ]
+                  }
+                ],
+                "localCalleeLinks": 10,
+                "storedWrapperInvocationLinks": 0,
+                "localCallbackReferenceLinks": 1
+              },
+              "deferred-generator-body": {
+                "callExpressions": 2,
+                "unresolvedImportCallExpressions": 2,
+                "unresolvedReasons": {
+                  "comprehension-local-binding": 1,
+                  "no-lexical-import": 1
+                },
+                "unresolvedShapes": {
+                  "attribute-path": 1,
+                  "name": 1
+                },
+                "unresolvedInventory": [
+                  {
+                    "reason": "comprehension-local-binding",
+                    "shape": "attribute-path",
+                    "callExpressions": 1,
+                    "examples": [
+                      {
+                        "ownerId": "0aef057a748e39f29cdd3d4cc12d8b45513298d6965f5309768a7c7c93513e24",
+                        "callId": "85b536bbe701e53901c0abf90988bf77b1862037e597a0ca5b08989697cc72e2"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "no-lexical-import",
+                    "shape": "name",
+                    "callExpressions": 1,
+                    "examples": [
+                      {
+                        "ownerId": "0aef057a748e39f29cdd3d4cc12d8b45513298d6965f5309768a7c7c93513e24",
+                        "callId": "2fb35608588f83a74c00f9999e80086b21f44abcc656b625f63172b128929e45"
+                      }
+                    ]
+                  }
+                ],
+                "localCalleeLinks": 0,
+                "storedWrapperInvocationLinks": 0,
+                "localCallbackReferenceLinks": 0
+              }
+            }
+          }
+        }
+      },
+      "methodComplexityScore": 7.1,
+      "unchangedMethodComplexityAndErrorHandlingEvidence": true,
+      "unchangedAsyncEvidence": true,
+      "examples": {
+        "localCallee": [
+          {
+            "ownerId": "4003fbb5b7521a953f0bcd82c556313875e8e14f23529a045da136ebe442a0d3",
+            "file": "starlette/_exception_handler.py",
+            "member": "wrap_app_handling_exceptions.wrapped_app",
+            "callId": "8a85c8089cbaeb490cfc79a6868a505f4f95ec6832a98e1639f43f8fcd08bd3e",
+            "executionContext": "async-body",
+            "shape": "name",
+            "unresolvedReason": "non-import-or-ambiguous-binding",
+            "localCallee": {
+              "status": "local-definition",
+              "reason": "unique-direct-lexical-definition",
+              "definition": {
+                "ownerId": "7321849bcf0e5a9519ef73ba8356a678e19f2fe57a589de0e4b2d14816fdfb95",
+                "file": "starlette/_exception_handler.py",
+                "member": "_lookup_exception_handler",
+                "functionKind": "FunctionDef",
+                "line": 16,
+                "column": 0,
+                "endLine": 20,
+                "endColumn": 15
+              }
+            },
+            "storedWrapper": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "callback": null
+          },
+          {
+            "ownerId": "51629f7f0ce66bb2cbbc4af2813bce6359550078a1729e03db1b5cfcba8c1066",
+            "file": "starlette/authentication.py",
+            "member": "requires.decorator.websocket_wrapper",
+            "callId": "5fcc2f75e00b42b304e77f9d51321de5c8240216e897d514d0c4d74b34d07d8d",
+            "executionContext": "async-body",
+            "shape": "name",
+            "unresolvedReason": "non-import-or-ambiguous-binding",
+            "localCallee": {
+              "status": "local-definition",
+              "reason": "unique-direct-lexical-definition",
+              "definition": {
+                "ownerId": "66a008909270498837a82da50e38f20d753a508d7282236fa57c29cee592e63d",
+                "file": "starlette/authentication.py",
+                "member": "has_required_scope",
+                "functionKind": "FunctionDef",
+                "line": 18,
+                "column": 0,
+                "endLine": 22,
+                "endColumn": 15
+              }
+            },
+            "storedWrapper": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "callback": null
+          },
+          {
+            "ownerId": "2c4c042ba6713f7e33fb5ed733e5350f9a861431c6b3a476d58c9f200fe7bb36",
+            "file": "starlette/authentication.py",
+            "member": "requires.decorator.async_wrapper",
+            "callId": "efb64eec38fe95c91630ded3436116b1f8311c29420c15218ed54b1a4914df83",
+            "executionContext": "async-body",
+            "shape": "name",
+            "unresolvedReason": "non-import-or-ambiguous-binding",
+            "localCallee": {
+              "status": "local-definition",
+              "reason": "unique-direct-lexical-definition",
+              "definition": {
+                "ownerId": "66a008909270498837a82da50e38f20d753a508d7282236fa57c29cee592e63d",
+                "file": "starlette/authentication.py",
+                "member": "has_required_scope",
+                "functionKind": "FunctionDef",
+                "line": 18,
+                "column": 0,
+                "endLine": 22,
+                "endColumn": 15
+              }
+            },
+            "storedWrapper": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "callback": null
+          },
+          {
+            "ownerId": "fb7e45dbad67af576eb07f83b3cf8ab790e8edcced41db4397a9d8cfafe08f2f",
+            "file": "starlette/middleware/base.py",
+            "member": "BaseHTTPMiddleware.__call__.call_next",
+            "callId": "45ca1ce2573993d9f49ea622dbcfd9a00ea8a3e9981a1a6d6f7db30226a755cd",
+            "executionContext": "async-body",
+            "shape": "name",
+            "unresolvedReason": "non-import-or-ambiguous-binding",
+            "localCallee": {
+              "status": "local-definition",
+              "reason": "unique-direct-lexical-definition",
+              "definition": {
+                "ownerId": "ca97f29f7127e03a59e46334dba0eac4a1e5c8528b3b61d40018bb57da27219c",
+                "file": "starlette/middleware/base.py",
+                "member": "BaseHTTPMiddleware.__call__.call_next.body_stream",
+                "functionKind": "AsyncFunctionDef",
+                "line": 184,
+                "column": 12,
+                "endLine": 194,
+                "endColumn": 29
+              }
+            },
+            "storedWrapper": {
+              "status": "unresolved",
+              "reason": "not-a-direct-wrapper-assignment",
+              "definition": null
+            },
+            "callback": null
+          },
+          {
+            "ownerId": "b9639cd13f89006692d7a4e61222f6c19b3c45b9cb87458b04217872d9bcb75f",
+            "file": "starlette/middleware/gzip.py",
+            "member": "GZipResponder.apply_compression",
+            "callId": "a1a116fcbeb7c2102c5b34edec771e41094cb6756f5c546ade44f147bbf6479b",
+            "executionContext": "async-body",
+            "shape": "name",
+            "unresolvedReason": "non-import-or-ambiguous-binding",
+            "localCallee": {
+              "status": "local-definition",
+              "reason": "unique-direct-lexical-definition",
+              "definition": {
+                "ownerId": "e154003e56d404f33da935fcc49d6b165ce0f3025576bac5fc772ab0c95b032a",
+                "file": "starlette/middleware/gzip.py",
+                "member": "_get_gzip_capacity_limiter",
+                "functionKind": "FunctionDef",
+                "line": 33,
+                "column": 0,
+                "endLine": 42,
+                "endColumn": 22
+              }
+            },
+            "storedWrapper": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "callback": null
+          }
+        ],
+        "callback": [
+          {
+            "ownerId": "76615b6fe373032e03d77251141c339509e2dc7fc0d2cc34345fd35bffca6570",
+            "file": "starlette/concurrency.py",
+            "member": "iterate_in_threadpool",
+            "callId": "79151d30fe90cfca1ba78e55b3474939c26634597d40bb02fc12b181f1b57e18",
+            "executionContext": "async-body",
+            "shape": "attribute-path",
+            "unresolvedReason": null,
+            "localCallee": null,
+            "storedWrapper": null,
+            "callback": {
+              "kind": "Name",
+              "evaluation": "callback-expression-only",
+              "reference": {
+                "status": "local-definition",
+                "reason": "unique-direct-lexical-definition",
+                "definition": {
+                  "ownerId": "bb622109c1ae8cf0ad7f8ccb53ad66cb2ee4cb4cf46946ade58aa96913fd9118",
+                  "file": "starlette/concurrency.py",
+                  "member": "_next",
+                  "functionKind": "FunctionDef",
+                  "line": 41,
+                  "column": 0,
+                  "endLine": 48,
+                  "endColumn": 28
+                }
+              }
+            }
+          }
+        ]
+      },
+      "artifacts": {
+        "": {
+          "path": "TestResults/python-async-context-2026-10-17/starlette.json",
+          "sha256": "2e67d1db9dc8137b544127a693bc7397a855467df2e745ab2e0ff0ffd971aba7"
+        },
+        "-context": {
+          "path": "TestResults/python-async-context-2026-10-17/starlette-context.json",
+          "sha256": "2d230aa0b6b75b4a935dd4ddd22e28d207701c9db0f956c123c752b5a6d9391c"
+        },
+        "-source-facts": {
+          "path": "TestResults/python-async-context-2026-10-17/starlette-source-facts.json",
+          "sha256": "abecfbcbe077a3337ce94a336a3c3df4d501327fbc3167424d99634656b4be33"
+        }
+      },
+      "uniqueLocalCallbackDefinitions": 1
+    },
+    {
+      "id": "django",
+      "repository": "django",
+      "url": "https://github.com/django/django",
+      "revision": "dab0a5c47f159eb58472110dcbc10bd4a9b01adb",
+      "role": "larger web framework",
+      "include": [
+        "django/**"
+      ],
+      "productionPaths": [
+        "django/test/**"
+      ],
+      "runId": "8b9a6faa-0c5b-4269-bdcd-c920b3516d89",
+      "configurationFingerprint": "be8f299cfab886f65c7a07fef228ef778f09e2e9bae5930a73bbd5b203510b61",
+      "functionFactsSha256": "82a893dd6660923a67138b3e313310ffff9bee80c1344c56d5a4d309cf35d455",
+      "selectedSourceSha256": "2cb4a5b24cda391c3278706e0de5eb522f2d8e5458cceed6c898fdfb27b9a70f",
+      "asyncRowsSha256": "bbc54ef4007a83bbde2ec1db49d4dce72fde00cc89a0dd939df70f31d62507d6",
+      "contextRowsSha256": "5b96d1c87b217c254a176f06eaabdcd8fd5863ec4db48df3053f924824a1d451",
+      "summary": {
+        "selectedFunctions": 9748,
+        "asyncFunctions": 266,
+        "excludedSynchronousFunctions": 9482,
+        "availability": "available",
+        "contexts": {
+          "async-body": {
+            "callExpressions": 818,
+            "unresolvedImportCallExpressions": 644,
+            "unresolvedReasons": {
+              "dynamic-callee-expression": 84,
+              "no-lexical-import": 100,
+              "non-import-or-ambiguous-binding": 354,
+              "reflective-or-cross-scope-binding": 106
+            },
+            "unresolvedShapes": {
+              "attribute-on-expression": 30,
+              "attribute-path": 303,
+              "call-result": 54,
+              "name": 257
+            },
+            "unresolvedInventory": [
+              {
+                "reason": "dynamic-callee-expression",
+                "shape": "attribute-on-expression",
+                "callExpressions": 30,
+                "examples": [
+                  {
+                    "ownerId": "bd381a0ef00a0cee94378157c01cb98c367f11372d5ba95e1af205c39e64ccd2",
+                    "callId": "8afd1835be0a582645d6a79394f33b556afda75537f012754dcedbbd4954f1c3"
+                  },
+                  {
+                    "ownerId": "fdb4313565046e437b6572b7f1ca1baab46e943febb3dd7684a6188ce38be744",
+                    "callId": "d56322a19fd24aa92b2c960f25f9988958ab1ea56233c65fa0fa18ffa06aa035"
+                  },
+                  {
+                    "ownerId": "6df6cbe6760addade31a6571b3b5a0c3246d5ea00b7e1e1cada4d18073d62469",
+                    "callId": "de47e98664c96670fc564257a65c950e0f889115ef48ca2818a8ccae6644317d"
+                  }
+                ]
+              },
+              {
+                "reason": "dynamic-callee-expression",
+                "shape": "call-result",
+                "callExpressions": 54,
+                "examples": [
+                  {
+                    "ownerId": "dd6ffdde817136957676ad184f7feb9a47e6b7e32c38b7099f80c28302357dda",
+                    "callId": "97c8ca3dc606bcf87d7ee173d9c5c2412cd1a41347b6ac02cc85e3daba817c0f"
+                  },
+                  {
+                    "ownerId": "b21025a0f4212b8331d460ce7e9b6c48fc7c58cb2f5c459a774ae5c16fcb1474",
+                    "callId": "16ca3331db10283324e952086bf0baca679010b11916904a9e3d985035adbfcd"
+                  },
+                  {
+                    "ownerId": "f75ef6132936c32c3f7ee3421c6db8a91b2bd160e1a8a297107412e6c7e809d3",
+                    "callId": "13c4c55c54ba213a1533147db1261b4393d31cae237a0f19335a0c59f5647448"
+                  }
+                ]
+              },
+              {
+                "reason": "no-lexical-import",
+                "shape": "attribute-path",
+                "callExpressions": 1,
+                "examples": [
+                  {
+                    "ownerId": "6f3fc01d9331a76e30a2c7c68d2704167c8b422e602384ff93632e8945693d47",
+                    "callId": "a248f8fdfef76ecb2fcd25e45a26ba73c9822fa7fb75972f828ab2acd28a6d55"
+                  }
+                ]
+              },
+              {
+                "reason": "no-lexical-import",
+                "shape": "name",
+                "callExpressions": 99,
+                "examples": [
+                  {
+                    "ownerId": "bd381a0ef00a0cee94378157c01cb98c367f11372d5ba95e1af205c39e64ccd2",
+                    "callId": "f51ba92c3a21d8399ec4bc6d96701ad68a08390f1d86d7dd239c8c950f70b54a"
+                  },
+                  {
+                    "ownerId": "8cf1ab5aa1faa0ba2d1bd889ebf4281460e8512b6f0c7ed50639518df61127c2",
+                    "callId": "e9da4f8ee307c2e5bc524b2f5f92c5ade4f6aa4d5c6271a358f9a2afa0deb2dc"
+                  },
+                  {
+                    "ownerId": "8cf1ab5aa1faa0ba2d1bd889ebf4281460e8512b6f0c7ed50639518df61127c2",
+                    "callId": "08d3deaed3a00bc9834079fdfa4c63edf458508463de072c3dfdeab4d35070ca"
+                  }
+                ]
+              },
+              {
+                "reason": "non-import-or-ambiguous-binding",
+                "shape": "attribute-path",
+                "callExpressions": 276,
+                "examples": [
+                  {
+                    "ownerId": "bd381a0ef00a0cee94378157c01cb98c367f11372d5ba95e1af205c39e64ccd2",
+                    "callId": "55e69ca330d68bee4267c80f86440228382b0a9362b3d8f1eaf59106843cd3a6"
+                  },
+                  {
+                    "ownerId": "90482cd0b06d20d6c412fea3ea360b3b0aafb50477389dad9fc328fd6afdefdd",
+                    "callId": "9e315397262744e86b51f62452c35b68bfa517b17ebadd680e625a05e592ee50"
+                  },
+                  {
+                    "ownerId": "90482cd0b06d20d6c412fea3ea360b3b0aafb50477389dad9fc328fd6afdefdd",
+                    "callId": "73b990438d466dfc947b01b77915f44bd5253de38caf208df74128c926de7e3c"
+                  }
+                ]
+              },
+              {
+                "reason": "non-import-or-ambiguous-binding",
+                "shape": "name",
+                "callExpressions": 78,
+                "examples": [
+                  {
+                    "ownerId": "bd381a0ef00a0cee94378157c01cb98c367f11372d5ba95e1af205c39e64ccd2",
+                    "callId": "82a3c8d9a200284adeb4c8e3470b8b5c3d7687e742098223e085b7940dd35314"
+                  },
+                  {
+                    "ownerId": "90482cd0b06d20d6c412fea3ea360b3b0aafb50477389dad9fc328fd6afdefdd",
+                    "callId": "522ee3f4b3570343017bc4054af4c431f41d3a9105565597a7159090c3e1630f"
+                  },
+                  {
+                    "ownerId": "90482cd0b06d20d6c412fea3ea360b3b0aafb50477389dad9fc328fd6afdefdd",
+                    "callId": "9d3b6095c716df46b21cbbad8b50898a418683ebce1110f108b5f5e8bf99a6f9"
+                  }
+                ]
+              },
+              {
+                "reason": "reflective-or-cross-scope-binding",
+                "shape": "attribute-path",
+                "callExpressions": 26,
+                "examples": [
+                  {
+                    "ownerId": "0543c7da8ff3f1673acc7ee6cb26ca53189a631e40b3f9b5f2fb2bac42ea0562",
+                    "callId": "211e83931f4fdc33430337605d64a3a5eef0a30ef69709079b09aa34e6acf2e6"
+                  },
+                  {
+                    "ownerId": "0543c7da8ff3f1673acc7ee6cb26ca53189a631e40b3f9b5f2fb2bac42ea0562",
+                    "callId": "18a70ec15eb9f42230110a644e373ca992d9c71fe75d1570a5548995cf57c3f7"
+                  },
+                  {
+                    "ownerId": "e66e1f44b71bbc3872e5675c0d9ec746d83e6e45cd6fcd4d83b41c62f865aff9",
+                    "callId": "388d2c4305f20ebd0f99dcf72f6df09377a1f2f5c1faf5b6077dd4393dee6f21"
+                  }
+                ]
+              },
+              {
+                "reason": "reflective-or-cross-scope-binding",
+                "shape": "name",
+                "callExpressions": 80,
+                "examples": [
+                  {
+                    "ownerId": "b21025a0f4212b8331d460ce7e9b6c48fc7c58cb2f5c459a774ae5c16fcb1474",
+                    "callId": "57eda89738c46179e73be3ae15eceae3903bcb710b4b23f536265031f31f1d8e"
+                  },
+                  {
+                    "ownerId": "f75ef6132936c32c3f7ee3421c6db8a91b2bd160e1a8a297107412e6c7e809d3",
+                    "callId": "8fc8d2e21c5fa4c6a41bfe0a101014b9afe6e10d02ff684686cd80075188af35"
+                  },
+                  {
+                    "ownerId": "04f2e78eb4e08ed580ea2112c14d59cd846a2d7b76d0c865a3d098b39fe34cb8",
+                    "callId": "759b2202aefe67d2b45e36ed6b9d283db5f08438a71ce1c6da51a70e03c47a8c"
+                  }
+                ]
+              }
+            ],
+            "localCalleeLinks": 35,
+            "storedWrapperInvocationLinks": 0,
+            "localCallbackReferenceLinks": 2
+          },
+          "deferred-generator-body": {
+            "callExpressions": 6,
+            "unresolvedImportCallExpressions": 5,
+            "unresolvedReasons": {
+              "comprehension-local-binding": 3,
+              "non-import-or-ambiguous-binding": 2
+            },
+            "unresolvedShapes": {
+              "attribute-path": 1,
+              "name": 4
+            },
+            "unresolvedInventory": [
+              {
+                "reason": "comprehension-local-binding",
+                "shape": "attribute-path",
+                "callExpressions": 1,
+                "examples": [
+                  {
+                    "ownerId": "22aeafd47a97abba0e9fb4a3ba65029c114515720cf3d44a2ce1660af7729b12",
+                    "callId": "875387495c7b73e61eee43c7d7fde8243be6b4dbfc68ad3dcc722507fc32ca56"
+                  }
+                ]
+              },
+              {
+                "reason": "comprehension-local-binding",
+                "shape": "name",
+                "callExpressions": 2,
+                "examples": [
+                  {
+                    "ownerId": "de4f5a3d18588b5ce74a4bb111f11bcae4c13772b3fa099520453875271ec3c3",
+                    "callId": "eddfaf52278447c4a2c797951bc1b59d7ea12963f54d846dfb3133b7249651a5"
+                  },
+                  {
+                    "ownerId": "3c3892f3d7f6c03dcdf6e35ef8b7b1dd3b8ecff3386170e83632236a268ecbc7",
+                    "callId": "1998425843c057ce28d677897aee70f526914384a1c0fac83e1ee90f6c75ec48"
+                  }
+                ]
+              },
+              {
+                "reason": "non-import-or-ambiguous-binding",
+                "shape": "name",
+                "callExpressions": 2,
+                "examples": [
+                  {
+                    "ownerId": "0a6ea241ea4fabaec252b97bcfc586716862106732d614fbd46f1bbb2357702f",
+                    "callId": "1213824d574877ff8068ed694be862f8992344b86443fe029f9d4e33573fc281"
+                  },
+                  {
+                    "ownerId": "a60da7450f2a35249db420bafae4decbf9185e4fbf4cdd8309f4a0a2bfbb4109",
+                    "callId": "ea2ac985a8a8f3bd9c3748cc4c74aded3cba796ebd3868363b0c65588bf947a8"
+                  }
+                ]
+              }
+            ],
+            "localCalleeLinks": 1,
+            "storedWrapperInvocationLinks": 0,
+            "localCallbackReferenceLinks": 0
+          }
+        },
+        "populations": {
+          "production": {
+            "selectedFunctions": 9748,
+            "asyncFunctions": 266,
+            "excludedSynchronousFunctions": 9482,
+            "availability": "available",
+            "contexts": {
+              "async-body": {
+                "callExpressions": 818,
+                "unresolvedImportCallExpressions": 644,
+                "unresolvedReasons": {
+                  "dynamic-callee-expression": 84,
+                  "no-lexical-import": 100,
+                  "non-import-or-ambiguous-binding": 354,
+                  "reflective-or-cross-scope-binding": 106
+                },
+                "unresolvedShapes": {
+                  "attribute-on-expression": 30,
+                  "attribute-path": 303,
+                  "call-result": 54,
+                  "name": 257
+                },
+                "unresolvedInventory": [
+                  {
+                    "reason": "dynamic-callee-expression",
+                    "shape": "attribute-on-expression",
+                    "callExpressions": 30,
+                    "examples": [
+                      {
+                        "ownerId": "bd381a0ef00a0cee94378157c01cb98c367f11372d5ba95e1af205c39e64ccd2",
+                        "callId": "8afd1835be0a582645d6a79394f33b556afda75537f012754dcedbbd4954f1c3"
+                      },
+                      {
+                        "ownerId": "fdb4313565046e437b6572b7f1ca1baab46e943febb3dd7684a6188ce38be744",
+                        "callId": "d56322a19fd24aa92b2c960f25f9988958ab1ea56233c65fa0fa18ffa06aa035"
+                      },
+                      {
+                        "ownerId": "6df6cbe6760addade31a6571b3b5a0c3246d5ea00b7e1e1cada4d18073d62469",
+                        "callId": "de47e98664c96670fc564257a65c950e0f889115ef48ca2818a8ccae6644317d"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "dynamic-callee-expression",
+                    "shape": "call-result",
+                    "callExpressions": 54,
+                    "examples": [
+                      {
+                        "ownerId": "dd6ffdde817136957676ad184f7feb9a47e6b7e32c38b7099f80c28302357dda",
+                        "callId": "97c8ca3dc606bcf87d7ee173d9c5c2412cd1a41347b6ac02cc85e3daba817c0f"
+                      },
+                      {
+                        "ownerId": "b21025a0f4212b8331d460ce7e9b6c48fc7c58cb2f5c459a774ae5c16fcb1474",
+                        "callId": "16ca3331db10283324e952086bf0baca679010b11916904a9e3d985035adbfcd"
+                      },
+                      {
+                        "ownerId": "f75ef6132936c32c3f7ee3421c6db8a91b2bd160e1a8a297107412e6c7e809d3",
+                        "callId": "13c4c55c54ba213a1533147db1261b4393d31cae237a0f19335a0c59f5647448"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "no-lexical-import",
+                    "shape": "attribute-path",
+                    "callExpressions": 1,
+                    "examples": [
+                      {
+                        "ownerId": "6f3fc01d9331a76e30a2c7c68d2704167c8b422e602384ff93632e8945693d47",
+                        "callId": "a248f8fdfef76ecb2fcd25e45a26ba73c9822fa7fb75972f828ab2acd28a6d55"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "no-lexical-import",
+                    "shape": "name",
+                    "callExpressions": 99,
+                    "examples": [
+                      {
+                        "ownerId": "bd381a0ef00a0cee94378157c01cb98c367f11372d5ba95e1af205c39e64ccd2",
+                        "callId": "f51ba92c3a21d8399ec4bc6d96701ad68a08390f1d86d7dd239c8c950f70b54a"
+                      },
+                      {
+                        "ownerId": "8cf1ab5aa1faa0ba2d1bd889ebf4281460e8512b6f0c7ed50639518df61127c2",
+                        "callId": "e9da4f8ee307c2e5bc524b2f5f92c5ade4f6aa4d5c6271a358f9a2afa0deb2dc"
+                      },
+                      {
+                        "ownerId": "8cf1ab5aa1faa0ba2d1bd889ebf4281460e8512b6f0c7ed50639518df61127c2",
+                        "callId": "08d3deaed3a00bc9834079fdfa4c63edf458508463de072c3dfdeab4d35070ca"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "non-import-or-ambiguous-binding",
+                    "shape": "attribute-path",
+                    "callExpressions": 276,
+                    "examples": [
+                      {
+                        "ownerId": "bd381a0ef00a0cee94378157c01cb98c367f11372d5ba95e1af205c39e64ccd2",
+                        "callId": "55e69ca330d68bee4267c80f86440228382b0a9362b3d8f1eaf59106843cd3a6"
+                      },
+                      {
+                        "ownerId": "90482cd0b06d20d6c412fea3ea360b3b0aafb50477389dad9fc328fd6afdefdd",
+                        "callId": "9e315397262744e86b51f62452c35b68bfa517b17ebadd680e625a05e592ee50"
+                      },
+                      {
+                        "ownerId": "90482cd0b06d20d6c412fea3ea360b3b0aafb50477389dad9fc328fd6afdefdd",
+                        "callId": "73b990438d466dfc947b01b77915f44bd5253de38caf208df74128c926de7e3c"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "non-import-or-ambiguous-binding",
+                    "shape": "name",
+                    "callExpressions": 78,
+                    "examples": [
+                      {
+                        "ownerId": "bd381a0ef00a0cee94378157c01cb98c367f11372d5ba95e1af205c39e64ccd2",
+                        "callId": "82a3c8d9a200284adeb4c8e3470b8b5c3d7687e742098223e085b7940dd35314"
+                      },
+                      {
+                        "ownerId": "90482cd0b06d20d6c412fea3ea360b3b0aafb50477389dad9fc328fd6afdefdd",
+                        "callId": "522ee3f4b3570343017bc4054af4c431f41d3a9105565597a7159090c3e1630f"
+                      },
+                      {
+                        "ownerId": "90482cd0b06d20d6c412fea3ea360b3b0aafb50477389dad9fc328fd6afdefdd",
+                        "callId": "9d3b6095c716df46b21cbbad8b50898a418683ebce1110f108b5f5e8bf99a6f9"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "reflective-or-cross-scope-binding",
+                    "shape": "attribute-path",
+                    "callExpressions": 26,
+                    "examples": [
+                      {
+                        "ownerId": "0543c7da8ff3f1673acc7ee6cb26ca53189a631e40b3f9b5f2fb2bac42ea0562",
+                        "callId": "211e83931f4fdc33430337605d64a3a5eef0a30ef69709079b09aa34e6acf2e6"
+                      },
+                      {
+                        "ownerId": "0543c7da8ff3f1673acc7ee6cb26ca53189a631e40b3f9b5f2fb2bac42ea0562",
+                        "callId": "18a70ec15eb9f42230110a644e373ca992d9c71fe75d1570a5548995cf57c3f7"
+                      },
+                      {
+                        "ownerId": "e66e1f44b71bbc3872e5675c0d9ec746d83e6e45cd6fcd4d83b41c62f865aff9",
+                        "callId": "388d2c4305f20ebd0f99dcf72f6df09377a1f2f5c1faf5b6077dd4393dee6f21"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "reflective-or-cross-scope-binding",
+                    "shape": "name",
+                    "callExpressions": 80,
+                    "examples": [
+                      {
+                        "ownerId": "b21025a0f4212b8331d460ce7e9b6c48fc7c58cb2f5c459a774ae5c16fcb1474",
+                        "callId": "57eda89738c46179e73be3ae15eceae3903bcb710b4b23f536265031f31f1d8e"
+                      },
+                      {
+                        "ownerId": "f75ef6132936c32c3f7ee3421c6db8a91b2bd160e1a8a297107412e6c7e809d3",
+                        "callId": "8fc8d2e21c5fa4c6a41bfe0a101014b9afe6e10d02ff684686cd80075188af35"
+                      },
+                      {
+                        "ownerId": "04f2e78eb4e08ed580ea2112c14d59cd846a2d7b76d0c865a3d098b39fe34cb8",
+                        "callId": "759b2202aefe67d2b45e36ed6b9d283db5f08438a71ce1c6da51a70e03c47a8c"
+                      }
+                    ]
+                  }
+                ],
+                "localCalleeLinks": 35,
+                "storedWrapperInvocationLinks": 0,
+                "localCallbackReferenceLinks": 2
+              },
+              "deferred-generator-body": {
+                "callExpressions": 6,
+                "unresolvedImportCallExpressions": 5,
+                "unresolvedReasons": {
+                  "comprehension-local-binding": 3,
+                  "non-import-or-ambiguous-binding": 2
+                },
+                "unresolvedShapes": {
+                  "attribute-path": 1,
+                  "name": 4
+                },
+                "unresolvedInventory": [
+                  {
+                    "reason": "comprehension-local-binding",
+                    "shape": "attribute-path",
+                    "callExpressions": 1,
+                    "examples": [
+                      {
+                        "ownerId": "22aeafd47a97abba0e9fb4a3ba65029c114515720cf3d44a2ce1660af7729b12",
+                        "callId": "875387495c7b73e61eee43c7d7fde8243be6b4dbfc68ad3dcc722507fc32ca56"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "comprehension-local-binding",
+                    "shape": "name",
+                    "callExpressions": 2,
+                    "examples": [
+                      {
+                        "ownerId": "de4f5a3d18588b5ce74a4bb111f11bcae4c13772b3fa099520453875271ec3c3",
+                        "callId": "eddfaf52278447c4a2c797951bc1b59d7ea12963f54d846dfb3133b7249651a5"
+                      },
+                      {
+                        "ownerId": "3c3892f3d7f6c03dcdf6e35ef8b7b1dd3b8ecff3386170e83632236a268ecbc7",
+                        "callId": "1998425843c057ce28d677897aee70f526914384a1c0fac83e1ee90f6c75ec48"
+                      }
+                    ]
+                  },
+                  {
+                    "reason": "non-import-or-ambiguous-binding",
+                    "shape": "name",
+                    "callExpressions": 2,
+                    "examples": [
+                      {
+                        "ownerId": "0a6ea241ea4fabaec252b97bcfc586716862106732d614fbd46f1bbb2357702f",
+                        "callId": "1213824d574877ff8068ed694be862f8992344b86443fe029f9d4e33573fc281"
+                      },
+                      {
+                        "ownerId": "a60da7450f2a35249db420bafae4decbf9185e4fbf4cdd8309f4a0a2bfbb4109",
+                        "callId": "ea2ac985a8a8f3bd9c3748cc4c74aded3cba796ebd3868363b0c65588bf947a8"
+                      }
+                    ]
+                  }
+                ],
+                "localCalleeLinks": 1,
+                "storedWrapperInvocationLinks": 0,
+                "localCallbackReferenceLinks": 0
+              }
+            }
+          }
+        }
+      },
+      "methodComplexityScore": 5.6,
+      "unchangedMethodComplexityAndErrorHandlingEvidence": true,
+      "unchangedAsyncEvidence": true,
+      "examples": {
+        "localCallee": [
+          {
+            "ownerId": "90482cd0b06d20d6c412fea3ea360b3b0aafb50477389dad9fc328fd6afdefdd",
+            "file": "django/contrib/auth/__init__.py",
+            "member": "aauthenticate",
+            "callId": "522ee3f4b3570343017bc4054af4c431f41d3a9105565597a7159090c3e1630f",
+            "executionContext": "async-body",
+            "shape": "name",
+            "unresolvedReason": "non-import-or-ambiguous-binding",
+            "localCallee": {
+              "status": "local-definition",
+              "reason": "unique-direct-lexical-definition",
+              "definition": {
+                "ownerId": "292057e4fa8d04255dffee940f13f1fbff27e1fe859ba7cde323d49edbb7f8d9",
+                "file": "django/contrib/auth/__init__.py",
+                "member": "_get_compatible_backends",
+                "functionKind": "FunctionDef",
+                "line": 43,
+                "column": 0,
+                "endLine": 52,
+                "endColumn": 35
+              }
+            },
+            "storedWrapper": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "callback": null
+          },
+          {
+            "ownerId": "eecd4c924bd6ad78a73b00b9fb2a15cb657ddb7393f9b60dfb23b01b723a25c5",
+            "file": "django/contrib/auth/__init__.py",
+            "member": "alogin",
+            "callId": "a6e4fc0dd0e4d745172e45d3bcea62abb81cdfb13d39f552fb5dc22b08fa5ffe",
+            "executionContext": "async-body",
+            "shape": "name",
+            "unresolvedReason": "non-import-or-ambiguous-binding",
+            "localCallee": {
+              "status": "local-definition",
+              "reason": "unique-direct-lexical-definition",
+              "definition": {
+                "ownerId": "bd381a0ef00a0cee94378157c01cb98c367f11372d5ba95e1af205c39e64ccd2",
+                "file": "django/contrib/auth/__init__.py",
+                "member": "_aget_user_session_key",
+                "functionKind": "AsyncFunctionDef",
+                "line": 114,
+                "column": 0,
+                "endLine": 120,
+                "endColumn": 59
+              }
+            },
+            "storedWrapper": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "callback": null
+          },
+          {
+            "ownerId": "eecd4c924bd6ad78a73b00b9fb2a15cb657ddb7393f9b60dfb23b01b723a25c5",
+            "file": "django/contrib/auth/__init__.py",
+            "member": "alogin",
+            "callId": "1a1e0fc6f8921abfcae9554e9ae788f980fd20e4158ef788772c16f9b733e76f",
+            "executionContext": "async-body",
+            "shape": "name",
+            "unresolvedReason": "non-import-or-ambiguous-binding",
+            "localCallee": {
+              "status": "local-definition",
+              "reason": "unique-direct-lexical-definition",
+              "definition": {
+                "ownerId": "46372a83716fd338a26143a43c22e5b0831100444f5e82c0a3d50f320ca68713",
+                "file": "django/contrib/auth/__init__.py",
+                "member": "_get_backend_from_user",
+                "functionKind": "FunctionDef",
+                "line": 55,
+                "column": 0,
+                "endLine": 73,
+                "endColumn": 18
+              }
+            },
+            "storedWrapper": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "callback": null
+          },
+          {
+            "ownerId": "eecd4c924bd6ad78a73b00b9fb2a15cb657ddb7393f9b60dfb23b01b723a25c5",
+            "file": "django/contrib/auth/__init__.py",
+            "member": "alogin",
+            "callId": "87e8ebb3d2d00267071b5f1cb75ba92aa512e5e9dd06763aa5264f0e7e2a95d5",
+            "executionContext": "async-body",
+            "shape": "name",
+            "unresolvedReason": "non-import-or-ambiguous-binding",
+            "localCallee": {
+              "status": "local-definition",
+              "reason": "unique-direct-lexical-definition",
+              "definition": {
+                "ownerId": "53aa01f85076f8cc7286d272f021f98586c5fdeed9a06392259737aeb86c10df",
+                "file": "django/contrib/auth/__init__.py",
+                "member": "_set_auth_user",
+                "functionKind": "FunctionDef",
+                "line": 92,
+                "column": 0,
+                "endLine": 105,
+                "endColumn": 29
+              }
+            },
+            "storedWrapper": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "callback": null
+          },
+          {
+            "ownerId": "8cf1ab5aa1faa0ba2d1bd889ebf4281460e8512b6f0c7ed50639518df61127c2",
+            "file": "django/contrib/auth/__init__.py",
+            "member": "alogout",
+            "callId": "b0e1765a06b02ad043d781e051b59711380ae2acd5b95d0bd4bcca2e9bdf6743",
+            "executionContext": "async-body",
+            "shape": "name",
+            "unresolvedReason": "non-import-or-ambiguous-binding",
+            "localCallee": {
+              "status": "local-definition",
+              "reason": "unique-direct-lexical-definition",
+              "definition": {
+                "ownerId": "53aa01f85076f8cc7286d272f021f98586c5fdeed9a06392259737aeb86c10df",
+                "file": "django/contrib/auth/__init__.py",
+                "member": "_set_auth_user",
+                "functionKind": "FunctionDef",
+                "line": 92,
+                "column": 0,
+                "endLine": 105,
+                "endColumn": 29
+              }
+            },
+            "storedWrapper": {
+              "status": "unresolved",
+              "reason": "not-a-unique-same-owner-binding",
+              "definition": null
+            },
+            "callback": null
+          }
+        ],
+        "callback": [
+          {
+            "ownerId": "feea06be0992cb54304525fcd8c08771461c11510c300b0f4e281739d32becca",
+            "file": "django/contrib/auth/hashers.py",
+            "member": "acheck_password",
+            "callId": "e86c0688255bb0f4eb39193433aabad2377dbe9fdecf8251070c5262fbeb223f",
+            "executionContext": "async-body",
+            "shape": "name",
+            "unresolvedReason": null,
+            "localCallee": null,
+            "storedWrapper": null,
+            "callback": {
+              "kind": "Name",
+              "evaluation": "callback-expression-only",
+              "reference": {
+                "status": "local-definition",
+                "reason": "unique-direct-lexical-definition",
+                "definition": {
+                  "ownerId": "1b4160b3a67bac3307ad8b5b396da56e57547891f0a99596af177dff2ac897c4",
+                  "file": "django/contrib/auth/hashers.py",
+                  "member": "verify_password",
+                  "functionKind": "FunctionDef",
+                  "line": 39,
+                  "column": 0,
+                  "endLine": 72,
+                  "endColumn": 34
+                }
+              }
+            }
+          },
+          {
+            "ownerId": "feea06be0992cb54304525fcd8c08771461c11510c300b0f4e281739d32becca",
+            "file": "django/contrib/auth/hashers.py",
+            "member": "acheck_password",
+            "callId": "7d1d161708aed3e8bff2879246b5b68fa04e64e9a895a8cf0449cd14ce698f70",
+            "executionContext": "async-body",
+            "shape": "call-result",
+            "unresolvedReason": null,
+            "localCallee": null,
+            "storedWrapper": null,
+            "callback": {
+              "kind": "Name",
+              "evaluation": "callback-expression-only",
+              "reference": {
+                "status": "local-definition",
+                "reason": "unique-direct-lexical-definition",
+                "definition": {
+                  "ownerId": "1b4160b3a67bac3307ad8b5b396da56e57547891f0a99596af177dff2ac897c4",
+                  "file": "django/contrib/auth/hashers.py",
+                  "member": "verify_password",
+                  "functionKind": "FunctionDef",
+                  "line": 39,
+                  "column": 0,
+                  "endLine": 72,
+                  "endColumn": 34
+                }
+              }
+            }
+          }
+        ]
+      },
+      "artifacts": {
+        "": {
+          "path": "TestResults/python-async-context-2026-10-17/django.json",
+          "sha256": "771bd501c3f36cde14f6692a407306f96a6f7a9434bb5fc17f412f8d5c4259da"
+        },
+        "-context": {
+          "path": "TestResults/python-async-context-2026-10-17/django-context.json",
+          "sha256": "cf57bc55e3aba60261875f97ecac4f15362626522881fde7509b26ac7d96db8a"
+        },
+        "-source-facts": {
+          "path": "TestResults/python-async-context-2026-10-17/django-source-facts.json",
+          "sha256": "715c268e029285b5c94ffc3205ba154a3222bc45765acbd29d0eada94c45fa28"
+        }
+      },
+      "uniqueLocalCallbackDefinitions": 1
+    }
+  ],
+  "validation": {
+    "pythonTests": {
+      "passed": 182,
+      "skipped": 0,
+      "log": "TestResults/python-async-context-tests-full-2026-10-17.log"
+    },
+    "sharedConformanceTests": {
+      "passed": 7,
+      "skipped": 0
+    },
+    "newContextTests": 18,
+    "earlierDefaultInterpreterRun": {
+      "tests": 182,
+      "skipped": 4,
+      "reason": "Coverage collection requires coverage.py; full run used the existing coverage-enabled Python 3.12 interpreter."
+    },
+    "targetSourceExecuted": false,
+    "packagedContractChanged": false,
+    "asyncAndErrorHandlingScored": false
+  },
+  "artifactsDirectory": "TestResults/python-async-context-2026-10-17"
+}
