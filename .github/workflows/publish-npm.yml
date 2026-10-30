@@ -2,10 +2,12 @@ name: Publish npm analyzers
 on:
   push:
     tags: ['js-v*']
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
   publish:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -43,3 +45,45 @@ jobs:
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  preview-channel:
+    # Also dispatchable to reconcile registry processing after an accepted upload.
+    needs: publish
+    if: always() && (needs.publish.result == 'success' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Keep preview releases off latest
+        working-directory: analyzers/javascript-typescript
+        shell: bash
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          package=$(node -p 'require("./package.json").name')
+          version=$(node -p 'require("./package.json").version')
+          test "$package" = codetestament
+          [[ "$version" == *-* ]] || exit 0
+          for attempt in {1..24}; do
+            actual=$(npm view "$package@$version" version 2>/dev/null || true)
+            if [[ "$actual" == "$version" ]]; then break; fi
+            sleep 5
+          done
+          test "$actual" = "$version"
+          tags=$(npm view "$package" dist-tags --json)
+          preview=$(printf '%s' "$tags" | node -p 'JSON.parse(require("fs").readFileSync(0,"utf8")).preview || ""')
+          latest=$(printf '%s' "$tags" | node -p 'JSON.parse(require("fs").readFileSync(0,"utf8")).latest || ""')
+          test "$preview" = "$version"
+          if [[ "$latest" == "$version" ]]; then npm dist-tag rm "$package" latest; fi
+          for attempt in {1..24}; do
+            tags=$(npm view "$package" dist-tags --json)
+            if printf '%s' "$tags" | node -e 'const t=JSON.parse(require("fs").readFileSync(0,"utf8")); process.exit(t.preview === process.argv[1] && t.latest !== process.argv[1] ? 0 : 1)' "$version"; then
+              printf '%s\n' "$tags"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo 'Registry channel verification did not converge.' >&2
+          exit 1
