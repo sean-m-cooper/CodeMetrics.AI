@@ -18,7 +18,7 @@ Invoke `/codetestament:code-scorecard`. The unqualified skill name stays
 when copying it into a host's skill directory, copy the **whole folder**, including
 scripts, compatibility data and supporting documents.
 
-Once the marketplace change is merged into ai_tools main, install through that marketplace:
+Install through the ai_tools marketplace:
 
 ```text
 /plugin marketplace add sean-m-cooper/ai_tools
@@ -26,7 +26,7 @@ Once the marketplace change is merged into ai_tools main, install through that m
 /reload-plugins
 ```
 
-Once the plugin is merged into this repository's default branch, install directly:
+Or install directly:
 
 ```text
 /plugin marketplace add sean-m-cooper/CodeTestament
@@ -34,10 +34,8 @@ Once the plugin is merged into this repository's default branch, install directl
 /reload-plugins
 ```
 
-GitHub was renamed to `CodeTestament` on 2026-10-29. Until these migration
-branches are merged, default-branch discovery does not expose the new plugin.
-Test the source branch explicitly with
-`claude plugin marketplace add "sean-m-cooper/CodeTestament#codex/codetestament-migration"`.
+GitHub was renamed to `CodeTestament` on 2026-10-29. The plugin and marketplace
+migrations are merged; default-branch discovery exposes the plugin.
 The ai_tools entry pins a source commit; that commit must be pushed before
 its marketplace update is published.
 
@@ -55,10 +53,10 @@ compatibility checks. No automatic user configuration or cache migration occurs.
 
 ## Package and release contract
 
-The plugin's `0.1.1` version is independent of analyzer versions. The compatibility
-manifest still selects the verified public legacy defaults. New CodeTestament
-packages require their exact selection and local archives until registry
-publication is verified. See [bootstrap](../skills/code-scorecard/bootstrap.md).
+The plugin's `0.2.0` version is independent of analyzer versions. The compatibility
+manifest selects published `CodeTestament.Scorecard@2.4.0` and
+`codetestament@0.6.0-preview.3`. Clean-cache registry tests verify these defaults
+without local archives; existing supported exact repository pins remain honored. See [bootstrap](../skills/code-scorecard/bootstrap.md).
 Python remains a preview with at most two scored dimensions; Error Handling
 remains unscored.
 
@@ -66,7 +64,8 @@ Make skill changes here. Run `node scripts/verify-scorecard-plugin.mjs` after
 staging new skill files: it exports only tracked plugin files to an isolated
 directory, checks manifest parity and runs the offline tests there. The
 `code-scorecard-integration.yml` workflow tests both current checkout packages and
-the pinned legacy packages on Windows and Linux. The historical legacy source pin
+the pinned legacy packages on Windows and Linux, plus fresh registry installs
+of the published defaults. The historical legacy source pin
 is a compatibility fixture, not the location of current development.
 
 For plugin releases, bump the version in both plugin manifests whenever publishing

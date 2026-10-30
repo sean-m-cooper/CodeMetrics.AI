@@ -11,10 +11,9 @@ Released scorecard analyzers run in the package ecosystem natural to their targe
 | `.scorecard/<ecosystem>/metrics.csv` | Raw code metrics in the shared CSV shape |
 | `.scorecard/<ecosystem>/evidence.json` | Scored evidence across stable quality dimensions |
 
-> **Brand migration in progress.** This branch builds CodeTestament locally.
-> The table and registry commands below describe the existing published packages.
-> See the [local migration guide](docs/codetestament-migration.md) for new names,
-> installation, compatibility and validation status.
+> **CodeTestament packages are published.** NuGet `CodeTestament.Scorecard@2.4.0`
+> and npm `codetestament@0.6.0-preview.3` are the skill defaults. See the
+> [migration guide](docs/codetestament-migration.md) for installation and baseline compatibility.
 
 ## Agent skill
 
@@ -25,16 +24,16 @@ pinned commit instead of maintaining another copy.
 
 See [skill installation and maintenance](docs/scorecard-skill.md) and the
 [scorecard guide](docs/code-scorecard.md). The skill retains its CC BY 4.0 license;
-analyzer code remains MIT. Public analyzer defaults stay on the verified legacy
-packages until CodeTestament packages pass publication checks.
+analyzer code remains MIT. Exact repository pins to supported legacy packages
+remain honored; unpinned runs use the verified CodeTestament packages.
 
 ## Analyzers
 
 | Ecosystem | Location | Package | Status |
 |-----------|----------|---------|--------|
-| .NET / C# | `analyzers/dotnet` | `CodeMetrics.AI` NuGet global tool | Available |
-| JavaScript / TypeScript / React | `analyzers/javascript-typescript` | `codemetrics-ai` NPM package | Implemented; scores uncalibrated |
-| Python | `analyzers/python` | `codemetrics-python` in `codemetrics-ai@0.6.0-preview.2`; Python 3.12 required | Preview: Method Complexity and Async/Blocking Usage scoring; other evidence unscored |
+| .NET / C# | `analyzers/dotnet` | `CodeTestament.Scorecard@2.4.0` NuGet global tool | Available |
+| JavaScript / TypeScript / React | `analyzers/javascript-typescript` | `codetestament@0.6.0-preview.3` npm package | Implemented; scores uncalibrated |
+| Python | `analyzers/python` | `codetestament-python` in `codetestament@0.6.0-preview.3`; Python 3.12 required | Preview: Method Complexity and Async/Blocking Usage scoring; other evidence unscored |
 | Rust | `analyzers/rust` | Rust crate | Planned next wave |
 
 ## Shared Contract
@@ -58,8 +57,8 @@ Stable dimensions:
 ## .NET Usage
 
 ```bash
-dotnet tool install -g CodeMetrics.AI
-code-metrics
+dotnet tool install -g CodeTestament.Scorecard --version 2.4.0
+codetestament-dotnet
 ```
 
 See the [.NET analyzer README](analyzers/dotnet/README.md) for installation, usage, options, filtering, and code-annotation details.
@@ -79,12 +78,12 @@ for exact placement, supported spellings, and scoring effects.
 ## JavaScript / TypeScript Usage
 
 ```bash
-npx codemetrics-ai
+npm exec --yes --package=codetestament@0.6.0-preview.3 -- codetestament
 ```
 
-The published JS/TS 0.4.0 analyzer implements source metrics, function-based complexity and maintainability, React hook/effect checks and bounded standard-Promise/Array callback checks. Its module dependency graph reports resolution coverage, type-only references, cycles and fan-in/out as unscored architecture evidence. Decomposition reports owned executable statements, and error-handling evidence resolves selected-source callback bodies without double-counting reuse. Architecture, decomposition, and error handling remain unscored; the other unsupported dimensions remain unavailable. See its [README](analyzers/javascript-typescript/README.md) for scope and scoring policy, and the [0.4.0 release notes](docs/releases/javascript-typescript-0.4.0.md) for migration requirements.
+The JS/TS analyzer implements source metrics, function-based complexity and maintainability, React hook/effect checks and bounded standard-Promise/Array callback checks. Its module dependency graph reports resolution coverage, type-only references, cycles and fan-in/out as unscored architecture evidence. Decomposition reports owned executable statements, and error-handling evidence resolves selected-source callback bodies without double-counting reuse. Architecture and decomposition remain unscored; the other unsupported dimensions remain unavailable. See its [README](analyzers/javascript-typescript/README.md) for scope and scoring policy, and the [0.4.0 release notes](docs/releases/javascript-typescript-0.4.0.md) for migration requirements.
 
-Version 0.5.0 adds [contextual Error Handling scoring](shared/scorecard-schema/javascript-typescript-error-handling-policy.md).
+Legacy version 0.5.0 introduced [contextual Error Handling scoring](shared/scorecard-schema/javascript-typescript-error-handling-policy.md).
 It honors documented intent and scores unexplained swallowing only when all
 observed handlers are assessable; unknown paths withhold the dimension score.
 Architecture and decomposition remain unscored.
@@ -94,11 +93,11 @@ Architecture and decomposition remain unscored.
 Requires Node.js 20+ and Python 3.12. Install the exact preview without changing your project dependencies:
 
 ```sh
-npm exec --yes --package=codemetrics-ai@0.6.0-preview.2 -- codemetrics-python --project ./pyproject.toml --scorecard-output ./python-evidence.json
-npm exec --yes --package=codemetrics-ai@0.6.0-preview.2 -- codemetrics-evidence --input ./python-evidence.json --inspect-output ./python-inspection.json
+npm exec --yes --package=codetestament@0.6.0-preview.3 -- codetestament-python --project ./pyproject.toml --scorecard-output ./python-evidence.json
+npm exec --yes --package=codetestament@0.6.0-preview.3 -- codetestament-evidence --input ./python-evidence.json --inspect-output ./python-inspection.json
 ```
 
-Use new output filenames for each run. The npm `preview` tag is opt-in; `latest` remains the stable release. See the [preview release notes](docs/releases/python-preview-0.6.0-preview.2.md) and [Python guide](analyzers/python/README.md) for source selection, score limits, and feedback guidance.
+Use new output filenames for each run. Use the exact npm preview version. The existing stable release remains `codemetrics-ai@0.5.0`; there is no stable CodeTestament npm release yet. See the [preview release notes](docs/releases/python-preview-0.6.0-preview.2.md) and [Python guide](analyzers/python/README.md) for source selection, score limits, and feedback guidance.
 
 ## Evidence and release verification
 

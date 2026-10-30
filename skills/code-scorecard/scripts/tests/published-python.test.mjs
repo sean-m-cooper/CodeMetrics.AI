@@ -66,11 +66,11 @@ def optional_feature():
   assert.equal(dimensions.errorHandling.score, undefined);
   assert.equal(Object.values(dimensions).filter(item => item.status === 'scored').length, 2);
   const install = result.tooling.analyzer.cache;
-  const manifest = JSON.parse(fs.readFileSync(path.join(install, 'node_modules/codemetrics-ai/package.json'), 'utf8'));
+  const manifest = JSON.parse(fs.readFileSync(path.join(install, 'node_modules/codetestament/package.json'), 'utf8'));
   assert.equal(manifest.version, compatibility.evidenceToolVersion);
   const lock = JSON.parse(fs.readFileSync(path.join(install, 'package-lock.json'), 'utf8'));
-  const published = lock.packages['node_modules/codemetrics-ai'];
-  assert.match(published.resolved, /^https:\/\/registry\.npmjs\.org\/codemetrics-ai\/-\//);
+  const published = lock.packages['node_modules/codetestament'];
+  assert.match(published.resolved, /^https:\/\/registry\.npmjs\.org\/codetestament\/-\//);
   assert.match(published.integrity, /^sha512-/);
   fs.writeFileSync(path.join(output, 'report-input.json'), JSON.stringify({
     request: 'Show the full Python scorecard. Explain the async score, repeated helper calls, documented choice, offloaded callback, and unresolved receiver. Should the documented optional-feature handler lower Error Handling? How should I compare this with a Python adapter 0.14.0 report?',

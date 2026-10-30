@@ -7,16 +7,16 @@ import { compatibility } from '../run-scorecard.mjs';
 import { selectInstallation, defaultInstallation, assertEvidenceIdentity } from '../package-selection.mjs';
 import { cacheLocation } from '../runtime.mjs';
 
-test('published defaults and legacy metadata agree, while new-brand packages remain local-only', () => {
+test('published CodeTestament defaults agree with compatibility metadata', () => {
   const npm = defaultInstallation({}, compatibility, 'npm'), dotnet = defaultInstallation({}, compatibility, 'dotnet');
-  assert.equal(npm.package, 'codemetrics-ai'); assert.equal(dotnet.package, 'CodeMetrics.AI');
+  assert.equal(npm.package, 'codetestament'); assert.equal(dotnet.package, 'CodeTestament.Scorecard');
   assert.equal(npm.version, compatibility.evidenceToolVersion);
   for (const ecosystem of Object.keys(compatibility.analyzers)) {
     const record = ecosystem === 'dotnet' ? dotnet : npm;
     assert.equal(record.tools[ecosystem].version, compatibility.analyzers[ecosystem].preferredVersion);
     assert.equal(record.requiresLocalPackage, false);
   }
-  assert.ok(Object.values(compatibility.installations).flat().filter(record => record.package.startsWith('CodeTestament') || record.package === 'codetestament').every(record => record.requiresLocalPackage));
+  assert.ok(Object.values(compatibility.installations).flat().filter(record => record.package.startsWith('CodeTestament') || record.package === 'codetestament').every(record => !record.requiresLocalPackage));
 });
 
 test('selects exact package records and rejects ambiguous or conflicting repository pins', t => {
@@ -26,8 +26,8 @@ test('selects exact package records and rejects ambiguous or conflicting reposit
   const write = manifest => fs.writeFileSync(file, JSON.stringify(manifest));
   const select = options => selectInstallation(root, file, 'javascript-typescript', options ?? {}, compatibility);
   write({ name: 'app' });
-  assert.equal(select().package, 'codemetrics-ai');
-  assert.equal(select().version, '0.6.0-preview.2');
+  assert.equal(select().package, 'codetestament');
+  assert.equal(select().version, '0.6.0-preview.3');
   assert.equal(select({ 'npm-tool': 'codetestament@0.6.0-preview.3' }).toolName, 'CodeTestament.JavaScript');
   write({ dependencies: { 'codemetrics-ai': '0.2.0' } });
   assert.equal(select().record.version, '0.2.0');
@@ -60,7 +60,7 @@ test('honors dotnet manifest roots and nearest npm scopes, with case-insensitive
   fs.writeFileSync(path.join(root, '.config/dotnet-tools.json'), JSON.stringify({ tools: { 'codetestament.scorecard': { version: '2.4.0' } } }));
   assert.equal(selectInstallation(root, project, 'dotnet', {}, compatibility).toolName, 'CodeTestament.Scorecard');
   fs.writeFileSync(path.join(child, '.config/dotnet-tools.json'), JSON.stringify({ isRoot: true, tools: {} }));
-  assert.equal(selectInstallation(root, project, 'dotnet', {}, compatibility).packageVersion, '2.3.1');
+  assert.equal(selectInstallation(root, project, 'dotnet', {}, compatibility).packageVersion, '2.4.0');
   fs.writeFileSync(path.join(child, '.config/dotnet-tools.json'), JSON.stringify({ tools: {
     'codemetrics.ai': { version: '2.3.1' }, 'CodeTestament.Scorecard': { version: '2.4.0' } } }));
   assert.throws(() => selectInstallation(root, project, 'dotnet', {}, compatibility), /Ambiguous/);
@@ -74,7 +74,7 @@ test('cache identity includes package, version and complete local archive conten
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const file = path.join(root, 'package.tgz'); fs.writeFileSync(file, 'one');
   const old = defaultInstallation({}, compatibility, 'npm');
-  const next = { ...old, package: 'codetestament' };
+  const next = { ...old, package: 'codemetrics-ai' };
   const key = cacheLocation(root, 'npm', old, file);
   assert.notEqual(key, cacheLocation(root, 'npm', next, file));
   assert.notEqual(key, cacheLocation(root, 'npm', old));

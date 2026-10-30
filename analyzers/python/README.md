@@ -1,12 +1,12 @@
 # CodeTestament Python Analyzer
 
-> Migration build: the CodeTestament packages shown here are not published yet.
-> Use the local artifacts described in the repository migration guide; existing
-> published CodeMetrics.AI/codemetrics-ai installations remain supported.
+> Published preview: `codetestament@0.6.0-preview.3`. Use this exact version;
+> existing CodeMetrics.AI/codemetrics-ai installations remain supported.
+> See the [migration guide](../../docs/codetestament-migration.md).
 
 Preview source analyzer for Python 3.12, using only the standard library. It parses files without importing or executing the target project. No package installation or target build is required.
 
-This is **not a full Python scorecard**. The packaged `codetestament-python` CLI now wraps function-complexity [source facts](../../shared/source-facts/README.md) in standard scorecard evidence v3. Method Complexity uses the accepted [complexity policy](METHOD_COMPLEXITY.md); adapter 0.15.0 also scores [Async/Blocking Usage](ASYNC_SCORING.md) when production async implementations exist. The other seven dimensions remain unavailable, including Error Handling. There is no CSV. Any aggregate is a partial assessment with the actual number of scored dimensions: at most 2/9, or 1/9 for synchronous-only code. The companion code-scorecard skill currently supports this workflow through the published legacy preview; new-brand package selection is the next migration stage.
+This is **not a full Python scorecard**. The packaged `codetestament-python` CLI now wraps function-complexity [source facts](../../shared/source-facts/README.md) in standard scorecard evidence v3. Method Complexity uses the accepted [complexity policy](METHOD_COMPLEXITY.md); adapter 0.15.0 also scores [Async/Blocking Usage](ASYNC_SCORING.md) when production async implementations exist. The other seven dimensions remain unavailable, including Error Handling. There is no CSV. Any aggregate is a partial assessment with the actual number of scored dimensions: at most 2/9, or 1/9 for synchronous-only code. The canonical code-scorecard skill uses the published CodeTestament preview by default, while honoring supported legacy pins.
 
 ## Packaged evidence workflow
 
@@ -19,7 +19,7 @@ The standalone [behavior reviewers](BEHAVIOR_REVIEW.md) add bounded handler disp
 
 The standalone [handler-continuation extension](ERROR_HANDLING_CONTINUATIONS.md) follows explicit returns/raises after enclosing branches and links narrowly retained defaults. It preserves the original disposition evidence and remains unscored. Packaged async scoring is a separate extension.
 
-The local `codetestament` migration package bundles the Python scripts, shared population engine, and canonical evidence validator. This delivery does not create a separate PyPI distribution. The canonical package independently recomputes the standalone async owner-rate arithmetic. Node.js 20+ and Python 3.12 are required. The local preview is version `codetestament@0.6.0-preview.3` (intended for the npm `preview` tag after publication), with Python adapter version `0.15.0`. The existing stable `codemetrics-ai@0.5.0` does not contain Python support. There is no separate PyPI package.
+The published `codetestament` package bundles the Python scripts, shared population engine, and canonical evidence validator. This delivery does not create a separate PyPI distribution. The canonical package independently recomputes the standalone async owner-rate arithmetic. Node.js 20+ and Python 3.12 are required. The published preview is version `codetestament@0.6.0-preview.3`, with Python adapter version `0.15.0`. The existing stable `codemetrics-ai@0.5.0` does not contain Python support. There is no separate PyPI package.
 
 ```powershell
 npm exec --yes --package=codetestament@0.6.0-preview.3 -- codetestament-python --project E:/repos/my-python-project/pyproject.toml --scorecard-output evidence.json
@@ -34,11 +34,11 @@ The evidence embeds facts at `dimensions.codeQuality.sourceFacts`. Its `methodCo
 
 The shared validator checks the v3 envelope and embedded facts, recomputes the score and contributions, and rejects invented dimension scores, inconsistent populations, and mismatched expected run IDs. Incomplete results have no usable score or findings. Historical imports remain historical. Matching supported versions, policies, selections, and scopes can compare available Method Complexity and Async/Blocking Usage scores and apply score-drop gates. Historical previews, empty eligible populations, and incomplete evidence cannot gate. Informational SARIF export is supported.
 
-The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper requires `--npm-package <local-archive.tgz>` and writes a fresh run directory with validated inspection. Python's packaged adapter version is `0.15.0`, independently of the enclosing npm version and unchanged source-facts producer `0.4.0-experimental`.
+The CLI accepts the same selection flags described below. In the skill helper, prefix selection flags with `python-`, for example `--python-include 'src/**'`, and pass `--ecosystem python` for an explicit directory scope. The helper installs the exact registry default (or accepts `--npm-package <local-archive.tgz>` for local development) and writes a fresh run directory with validated inspection. Python's packaged adapter version is `0.15.0`, independently of the enclosing npm version and unchanged source-facts producer `0.4.0-experimental`.
 
 ## Optional coverage review and explicit collection
 
-The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON through `codetestament-python --coverage-json`, with optional `--collection-manifest`. Missing or ambiguous coverage stays unavailable. The separate `codetestament-python-collect` command explicitly runs a chosen test module using a caller-supplied interpreter with coverage.py and test dependencies. It binds newly generated coverage to before/after source hashes. Analysis rejects stale source or substituted reports when provenance is supplied; ordinary imports remain conditional. Both paths ship in the development archive; the skill imports evidence but never silently collects coverage. Neither enables a dimension score.
+The [coverage and CRAP review](COVERAGE.md) imports coverage.py JSON through `codetestament-python --coverage-json`, with optional `--collection-manifest`. Missing or ambiguous coverage stays unavailable. The separate `codetestament-python-collect` command explicitly runs a chosen test module using a caller-supplied interpreter with coverage.py and test dependencies. It binds newly generated coverage to before/after source hashes. Analysis rejects stale source or substituted reports when provenance is supplied; ordinary imports remain conditional. Both paths ship in the published preview; the skill imports evidence but never silently collects coverage. Neither enables a dimension score.
 
 ## Raw source-facts workflow
 

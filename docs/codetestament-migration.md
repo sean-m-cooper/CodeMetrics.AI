@@ -1,16 +1,17 @@
 # Moving to CodeTestament
 
 CodeMetrics.AI is becoming **CodeTestament**, with **CodeTestament Scorecard** as
-the assessment product. This branch contains local migration builds. The new
-packages are not published, GitHub is now `sean-m-cooper/CodeTestament`, and the `code-scorecard`
-skill still defaults to the existing published packages.
+the assessment product. NuGet `CodeTestament.Scorecard@2.4.0` and npm
+`codetestament@0.6.0-preview.3` are published. GitHub is now
+`sean-m-cooper/CodeTestament`, and plugin 0.2.0 selects these exact defaults.
+Supported legacy repository pins remain honored.
 
 The [local validation checkpoint](codetestament-migration-validation.md) records
 executed tests, paired artifact hashes and remaining release checks.
 
-## Local package identities
+## Published package identities
 
-| Distribution | Migration build | Commands |
+| Distribution | Version | Commands |
 | --- | --- | --- |
 | NuGet `CodeTestament.Scorecard` | `2.4.0` | `codetestament-dotnet` |
 | npm `codetestament` | `0.6.0-preview.3` | `codetestament`, `codetestament-evidence`, `codetestament-python`, `codetestament-python-collect` |
@@ -23,6 +24,18 @@ ordinary Python analysis parses source without importing the target.
 
 No stable npm build is being created from this preview source. Published
 `codemetrics-ai@0.5.0` remains the existing stable release.
+
+## Install published packages
+
+```sh
+dotnet tool install --global CodeTestament.Scorecard --version 2.4.0
+npm exec --yes --package=codetestament@0.6.0-preview.3 -- codetestament --help
+npm exec --yes --package=codetestament@0.6.0-preview.3 -- codetestament-python --help
+```
+
+The new commands coexist with legacy installations. The npm package is a preview;
+use the exact version above. The skill installs both distributions into isolated
+caches automatically. Existing `.scorecard` data and CMAI annotations stay valid.
 
 ## Build and install locally
 
@@ -103,13 +116,12 @@ These remain unchanged in this migration:
 - Historical fixtures, release notes, calibration evidence and published tags.
 - Historical URLs in recorded validation evidence; active repository links now use CodeTestament.
 
-## Next migration stages
+## Remaining migration work
 
-The canonical skill now lives in `skills/code-scorecard` in this repository;
-`ai_tools` carries a pinned marketplace reference. Exact old/new package selection
-and isolated caches have passed local installed-package checks. See
-[skill ownership and validation](scorecard-skill.md). Complete release
-validation on Windows and Linux. Verify SARIF upload stream behavior before
-changing CI defaults. Publish and verify producers before changing skill
-defaults. The repository rename is complete; registry deprecation follows release validation.
-See the [full migration plan](codetestament-migration-plan.md) for sequencing.
+The canonical skill lives in `skills/code-scorecard`; `ai_tools` carries a pinned
+marketplace reference. Published producers now supply the default installations.
+See [skill ownership and validation](scorecard-skill.md) for the Windows/Linux
+integration and registry checks. Preserve old baselines and verify SARIF stream
+behavior before changing a project's CI configuration. Legacy registry deprecation
+and a stable CodeTestament npm release remain separate follow-up decisions.
+See the [full migration plan](codetestament-migration-plan.md) for historical sequencing.
