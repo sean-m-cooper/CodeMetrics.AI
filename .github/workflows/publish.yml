@@ -26,13 +26,13 @@ jobs:
         shell: bash
         run: |
           version="${GITHUB_REF_NAME#v}"
-          dotnet tool install --tool-path ./tool-smoke CodeMetrics.AI \
+          dotnet tool install --tool-path ./tool-smoke CodeTestament.Scorecard \
             --version "$version" --add-source ./nupkg
 
-          actual_version="$(./tool-smoke/code-metrics --version)"
+          actual_version="$(./tool-smoke/codetestament-dotnet --version)"
           test "$actual_version" = "$version+$GITHUB_SHA"
 
-          ./tool-smoke/code-metrics \
+          ./tool-smoke/codetestament-dotnet \
             --solution analyzers/dotnet/CodeMetrics.AI.slnx \
             --output /tmp/code-metrics.csv \
             --scorecard-output /tmp/code-metrics-evidence.json \

@@ -125,7 +125,7 @@ public class EvidenceWriterTests
             using var doc = JsonDocument.Parse(json);
             var tool = doc.RootElement.GetProperty("tool");
 
-            tool.GetProperty("name").GetString().Should().Be("CodeMetrics.AI");
+            tool.GetProperty("name").GetString().Should().Be("CodeTestament.Scorecard");
             tool.GetProperty("version").GetString().Should().NotBeNullOrEmpty();
             tool.GetProperty("ecosystem").GetString().Should().Be("dotnet");
         }
@@ -140,7 +140,7 @@ public class EvidenceWriterTests
     {
         var tool = new ToolInfo();
 
-        tool.Version.Should().Be("2.3.1");
+        tool.Version.Should().Be("2.4.0");
     }
 
     [Fact]

@@ -23,6 +23,8 @@ jobs:
       - run: npm ci
       - name: Verify tag matches package version
         run: node -e 'if ("js-v" + require("./package.json").version !== process.env.GITHUB_REF_NAME) process.exit(1)'
+      - name: Verify renamed package identity
+        run: node -e 'if (require("./package.json").name !== "codetestament") process.exit(1)'
       - run: npm test
       - run: npm run test:package
       - run: npm run test:architecture

@@ -1,0 +1,79 @@
+name: Code scorecard integration
+on:
+  pull_request:
+    paths: ['skills/code-scorecard/**', 'plugin.json', '.claude-plugin/**', 'scripts/verify-scorecard-plugin.mjs', '.github/workflows/code-scorecard-integration.yml', 'analyzers/**', 'shared/**']
+  push:
+    branches: [master]
+    paths: ['skills/code-scorecard/**', 'plugin.json', '.claude-plugin/**', 'scripts/verify-scorecard-plugin.mjs', '.github/workflows/code-scorecard-integration.yml', 'analyzers/**', 'shared/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  packaged-contract:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify isolated plugin package
+        run: node scripts/verify-scorecard-plugin.mjs
+      - id: contract
+        shell: pwsh
+        run: |
+          $contract = Get-Content skills/code-scorecard/compatibility.json | ConvertFrom-Json
+          "revision=$($contract.source.revision)" >> $env:GITHUB_OUTPUT
+          "repository=$($contract.source.repository)" >> $env:GITHUB_OUTPUT
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.contract.outputs.repository }}
+          ref: ${{ steps.contract.outputs.revision }}
+          path: contract-source
+      - name: Package legacy and current checkout analyzers
+        shell: pwsh
+        run: |
+          $roots = @('contract-source', '.')
+          $outputs = @('packages/legacy', 'packages/current')
+          for ($i = 0; $i -lt $roots.Count; $i++) {
+            $output = [IO.Path]::GetFullPath($outputs[$i])
+            New-Item -ItemType Directory -Force $output | Out-Null
+            dotnet pack "$($roots[$i])/analyzers/dotnet/src/CodeMetrics.AI/CodeMetrics.AI.csproj" -c Release -o $output
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            Push-Location "$($roots[$i])/analyzers/javascript-typescript"
+            try {
+              npm ci
+              if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+              npm pack --pack-destination $output
+              if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            } finally { Pop-Location }
+          }
+      - name: Install authored coverage fixture dependency
+        run: python -m pip install coverage==7.6.1
+      - name: Verify legacy installed integration and Python preview
+        shell: pwsh
+        run: |
+          $env:SCORECARD_NPM_PACKAGE = (Get-Item packages/legacy/codemetrics-ai-0.6.0-preview.2.tgz).FullName
+          $env:SCORECARD_DOTNET_PACKAGE = (Get-Item packages/legacy/CodeMetrics.AI.2.3.1.nupkg).FullName
+          node --test skills/code-scorecard/scripts/tests/integration.test.mjs skills/code-scorecard/scripts/tests/python.test.mjs
+          exit $LASTEXITCODE
+      - name: Verify current packages and cross-brand cache isolation
+        shell: pwsh
+        run: |
+          $env:SCORECARD_NPM_PACKAGE = (Get-Item packages/legacy/codemetrics-ai-0.6.0-preview.2.tgz).FullName
+          $env:SCORECARD_DOTNET_PACKAGE = (Get-Item packages/legacy/CodeMetrics.AI.2.3.1.nupkg).FullName
+          $env:SCORECARD_NEW_NPM_PACKAGE = (Get-Item packages/current/codetestament-0.6.0-preview.3.tgz).FullName
+          $env:SCORECARD_NEW_DOTNET_PACKAGE = (Get-Item packages/current/CodeTestament.Scorecard.2.4.0.nupkg).FullName
+          npm pack codemetrics-ai@0.2.0 --pack-destination packages/legacy
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:SCORECARD_OLD_JS_PACKAGE = (Get-Item packages/legacy/codemetrics-ai-0.2.0.tgz).FullName
+          node --test skills/code-scorecard/scripts/tests/brand-migration.test.mjs
+          exit $LASTEXITCODE

@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-29",
+  "scope": "Skill ownership and plugin relocation",
+  "origin": {
+    "repository": "sean-m-cooper/ai_tools",
+    "revision": "3cc4cc8a607284764706a041dede387b6307629c",
+    "path": "skills/code-scorecard",
+    "copiedTrackedFiles": 90,
+    "copyVerified": "SHA-256 equality before ownership/documentation edits"
+  },
+  "destination": {
+    "repository": "sean-m-cooper/CodeMetrics.AI",
+    "path": "skills/code-scorecard",
+    "plugin": "codetestament",
+    "pluginVersion": "0.1.0"
+  },
+  "validation": {
+    "platform": "Windows",
+    "dotnetSdk": "10.0.401",
+    "isolatedPluginOffline": {
+      "passed": 21,
+      "command": "node scripts/verify-scorecard-plugin.mjs"
+    },
+    "installedLegacyAndPython": {
+      "passed": 37,
+      "command": "node --test skills/code-scorecard/scripts/tests/integration.test.mjs skills/code-scorecard/scripts/tests/python.test.mjs"
+    },
+    "installedBrandMigration": {
+      "passed": 7,
+      "command": "node --test skills/code-scorecard/scripts/tests/brand-migration.test.mjs"
+    },
+    "totalPassed": 65,
+    "skillQuickValidate": "passed",
+    "claudePluginManifestValidation": "passed",
+    "workflowYaml": "parsed; Windows/Linux matrix present",
+    "logs": [
+      "TestResults/skill-migration/relocation-isolated.log",
+      "TestResults/skill-migration/relocation-installed.log",
+      "TestResults/skill-migration/relocation-brand.log"
+    ],
+    "installedRunReceipt": "TestResults/skill-migration/relocation-receipt.json"
+  },
+  "boundaries": [
+    "No scoring or analyzer code changes",
+    "Public analyzer defaults unchanged",
+    "Python Error Handling remains unscored",
+    "No live model evaluations or installed-host session test",
+    "Linux workflow configured but not executed locally",
+    "Remote installation requires publishing the referenced commits; no push or release in this change"
+  ]
+}

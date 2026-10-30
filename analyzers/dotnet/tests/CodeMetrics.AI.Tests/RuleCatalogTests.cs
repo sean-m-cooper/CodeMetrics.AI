@@ -59,6 +59,7 @@ public class RuleCatalogTests
     public void JsonReportsTheActualAnalyzerVersionAndSupportedCapabilities()
     {
         var catalog = JsonDocument.Parse(RuleCatalog.Render("json")).RootElement;
+        catalog.GetProperty("tool").GetProperty("name").GetString().Should().Be("CodeTestament.Scorecard");
         catalog.GetProperty("tool").GetProperty("version").GetString().Should().Be(new ToolInfo().Version);
         catalog.GetProperty("rules").GetArrayLength().Should().Be(44);
         RuleCatalog.Document.Rules.Where(rule => rule.Annotation.Supported).Select(rule => rule.Code)

@@ -35,7 +35,7 @@ var skipDepsOption = new Option<bool>("--skip-dependency-probe")
     Description = "Skip dependency management checks"
 };
 
-var rootCommand = new RootCommand("CodeMetrics.AI — deterministic code metrics and scorecard evidence")
+var rootCommand = new RootCommand("CodeTestament Scorecard — deterministic code metrics and scorecard evidence")
 {
     solutionOption,
     outputOption,

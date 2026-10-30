@@ -2,8 +2,8 @@
   "corpusKind": "labeled-regression-fixtures",
   "corpusSha256": "2e439e89ff5833b0567c2f74faabe6b4cafb5bcaf3482778ae004fa34197d1b0",
   "tool": {
-    "name": "CodeMetrics.AI",
-    "version": "2.3.1",
+    "name": "CodeTestament.Scorecard",
+    "version": "2.4.0",
     "ecosystem": "dotnet"
   },
   "ruleset": "dotnet-2026-09-15-declared-async-boundaries",

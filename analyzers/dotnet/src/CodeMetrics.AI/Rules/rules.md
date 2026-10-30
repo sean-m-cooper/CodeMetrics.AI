@@ -1,8 +1,8 @@
-# CodeMetrics.AI rule catalog
+# CodeTestament Scorecard rule catalog
 
 Generated from the catalog shipped in the analyzer package. Codes are permanent aliases; existing rule IDs remain stable. Number ranges identify dimensions (1000 architecture through 9000 maintainability).
 
-Use `code-metrics rules --format json` for the installed package version and machine-readable definitions, or `code-metrics rules --code CMAI5001` to look up a code. Metric entries describe aggregate components; they are not emitted per-site diagnostics.
+Use `codetestament-dotnet rules --format json` for the installed package version and machine-readable definitions, or `codetestament-dotnet rules --code CMAI5001` to look up a code. Metric entries describe aggregate components; they are not emitted per-site diagnostics.
 
 Only entries marked as supporting annotations accept CMAI comments. Place a directive immediately before the indicated syntax or its containing member. CMAI directives require a reason after ` -- ` or `—`; its content is accepted without evaluating the developer's business decision. Existing category directives retain their legacy behavior. Each code addresses only its own rule; one source site can participate in multiple rules. A declaration in evidence is not proof it matched an occurrence.
 

@@ -1,0 +1,19 @@
+{
+  "name": "codetestament",
+  "owner": {
+    "name": "Sean Cooper"
+  },
+  "plugins": [
+    {
+      "name": "codetestament",
+      "source": "./",
+      "description": "Evidence-backed code scorecards for .NET, JavaScript/TypeScript, and the Python preview.",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer tools"
+    }
+  ],
+  "description": "CodeTestament skills for evidence-backed codebase quality reviews."
+}

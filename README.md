@@ -1,6 +1,6 @@
-# CodeMetrics.AI
+# CodeTestament
 
-CodeMetrics.AI is a suite of deterministic code analyzers that produce shared scorecard evidence for AI-assisted codebase review.
+CodeTestament is a suite of deterministic code analyzers that produce shared scorecard evidence for AI-assisted codebase review.
 
 Its goal is to guide human and AI developers toward better, more maintainable and performant code. Scores express documented product expectations and identify opportunities for improvement; they do not prove defects or replace engineering judgment. The [complexity scoring policy](shared/scorecard-schema/calibration.md#complexity-scoring-product-decision) records the accepted method-CC bands and the distinction between product decisions and their scoring implementation. Real-world usage and developer feedback should inform explicit, versioned policy revisions.
 
@@ -10,6 +10,23 @@ Released scorecard analyzers run in the package ecosystem natural to their targe
 |------|-------------|
 | `.scorecard/<ecosystem>/metrics.csv` | Raw code metrics in the shared CSV shape |
 | `.scorecard/<ecosystem>/evidence.json` | Scored evidence across stable quality dimensions |
+
+> **Brand migration in progress.** This branch builds CodeTestament locally.
+> The table and registry commands below describe the existing published packages.
+> See the [local migration guide](docs/codetestament-migration.md) for new names,
+> installation, compatibility and validation status.
+
+## Agent skill
+
+The canonical [code-scorecard skill](skills/code-scorecard/SKILL.md) lives in this
+repository with its helpers, compatibility manifest, tests and evaluation fixtures.
+The `codetestament` plugin packages it for agent hosts; `ai_tools` references a
+pinned commit instead of maintaining another copy.
+
+See [skill installation and maintenance](docs/scorecard-skill.md) and the
+[scorecard guide](docs/code-scorecard.md). The skill retains its CC BY 4.0 license;
+analyzer code remains MIT. Public analyzer defaults stay on the verified legacy
+packages until CodeTestament packages pass publication checks.
 
 ## Analyzers
 

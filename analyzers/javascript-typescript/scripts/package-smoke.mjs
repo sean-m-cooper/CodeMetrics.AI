@@ -18,21 +18,28 @@ try {
   const packed = JSON.parse(output.slice(output.indexOf('[')))[0];
   const install = path.join(temporary, 'install'); fs.mkdirSync(install);
   run([npm, 'install', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund', path.join(temporary, packed.filename)], install);
+  const manifest = JSON.parse(fs.readFileSync(path.join(install, 'node_modules/codetestament/package.json'), 'utf8'));
+  assert.equal(manifest.name, 'codetestament');
+  assert.deepEqual(Object.keys(manifest.bin).sort(), ['codetestament', 'codetestament-evidence', 'codetestament-python', 'codetestament-python-collect']);
+  for (const name of Object.keys(manifest.bin))
+    assert.ok(fs.existsSync(path.join(install, 'node_modules/.bin', name + (process.platform === 'win32' ? '.cmd' : ''))));
   const fixture = path.join(temporary, 'fixture'); fs.mkdirSync(fixture);
   fs.writeFileSync(path.join(fixture, 'package.json'), '{"name":"installed-smoke"}');
   fs.writeFileSync(path.join(fixture, 'App.tsx'), "import {useEffect} from 'react'; export function App(){useEffect(async()=>{},[]); return <div/>;}");
-  const cli = path.join(install, 'node_modules/codemetrics-ai/dist/cli.js');
+  const cli = path.join(install, 'node_modules/codetestament/dist/cli.js');
   for (const name of ['arithmetic', 'contract', 'population']) {
     for (const extension of ['mjs', 'd.mts']) {
       const filename = `${name}.${extension}`;
-      assert.equal(fs.readFileSync(path.join(install, 'node_modules/codemetrics-ai/dist/shared-source-facts', filename), 'utf8'),
+      assert.equal(fs.readFileSync(path.join(install, 'node_modules/codetestament/dist/shared-source-facts', filename), 'utf8'),
         fs.readFileSync(new URL(`../../../shared/source-facts/${filename}`, import.meta.url), 'utf8'), `Packaged shared runtime drift: ${filename}`);
     }
   }
-  const evidenceCli = path.join(install, 'node_modules/codemetrics-ai/dist/evidence-cli.js');
+  const evidenceCli = path.join(install, 'node_modules/codetestament/dist/evidence-cli.js');
   assert.ok(fs.readFileSync(cli, 'utf8').startsWith('#!/usr/bin/env node'));
   run([cli, '--scorecard-output', 'before.json', '--sarif', 'before.sarif'], fixture);
   const evidence = JSON.parse(fs.readFileSync(path.join(fixture, 'before.json'), 'utf8'));
+  assert.equal(evidence.tool.name, 'CodeTestament.JavaScript');
+  assert.equal(evidence.tool.version, manifest.version);
   assert.equal(evidence.schemaVersion, 3); assert.ok(evidence.population.members >= 1);
   assert.equal(evidence.analysis.ruleset, 'javascript-typescript-2026-10-09-dependency-evidence');
   assert.equal(evidence.dimensions.dependencyManagement.dependencyInventory.status, 'gaps');

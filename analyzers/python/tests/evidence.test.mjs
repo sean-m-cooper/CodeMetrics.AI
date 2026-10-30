@@ -56,6 +56,24 @@ function fixture(t) {
   return { directory, root, write, run, inspect };
 }
 
+test('new Python branding preserves legacy imports and strict nested producer identities', t => {
+  const f = fixture(t);
+  f.write('work.py', 'import time\nasync def work():\n    time.sleep(1)\n');
+  const { evidence, output } = f.run();
+  assert.equal(evidence.tool.name, 'CodeTestament.Python');
+  assert.equal(evidence.tool.version, '0.15.0');
+  assertSupportedPythonScores(evidence);
+  f.inspect(output, ['--expected-name', 'CodeTestament.Python']);
+  f.inspect(output, ['--expected-name', 'CodeMetrics.AI.Python'], 2);
+  const legacy = structuredClone(evidence);
+  legacy.tool.name = 'CodeMetrics.AI.Python';
+  validateEvidence(legacy);
+  assert.deepEqual(legacy.dimensions, evidence.dimensions);
+  const altered = structuredClone(evidence);
+  altered.dimensions.codeQuality.sourceFacts.producer.name = 'codetestament/python-source-facts';
+  assert.throws(() => validateEvidence(altered), /producer/i);
+});
+
 
 function incompleteScoringReports(evidence, base = evidence.dimensions.performanceAsync.review) {
   const helpers = structuredClone(evidence.dimensions.performanceAsync.helperReview);

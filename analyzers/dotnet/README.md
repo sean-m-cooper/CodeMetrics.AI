@@ -1,27 +1,31 @@
-# CodeMetrics.AI
+# CodeTestament Scorecard
+
+> Migration build: CodeTestament.Scorecard 2.4.0 is not published yet. Install
+> the local package as described in the repository migration guide. Published
+> CodeMetrics.AI installations continue to use code-metrics.
 
 A .NET 10 global tool that performs deterministic static analysis on .NET solutions using the Roslyn compiler API. Produces VS-compatible code metrics and scored scorecard evidence across 9 quality dimensions.
 
 ## Install
 
 ```bash
-dotnet tool install -g CodeMetrics.AI
+dotnet tool install -g CodeTestament.Scorecard
 ```
 
 ## Usage
 
 ```bash
 # Auto-discover solution in current directory
-code-metrics
+codetestament-dotnet
 
 # Specify solution explicitly
-code-metrics --solution MyApp.slnx
+codetestament-dotnet --solution MyApp.slnx
 
 # Skip dependency probe (avoids dotnet list package calls)
-code-metrics --skip-dependency-probe
+codetestament-dotnet --skip-dependency-probe
 
 # Custom output paths
-code-metrics --output ./results/metrics.csv --scorecard-output ./results/evidence.json
+codetestament-dotnet --output ./results/metrics.csv --scorecard-output ./results/evidence.json
 ```
 
 ## Output
@@ -63,7 +67,7 @@ Per-type and per-member metrics collected via Roslyn:
 
 ## MSBuild Integration
 
-Copy `Directory.Build.targets` from the [scorecard-tooling](https://github.com/sean-m-cooper/ai_tools/tree/main/skills/code-scorecard/scorecard-tooling) directory to your solution root:
+Copy `Directory.Build.targets` from the [scorecard-tooling](../../skills/code-scorecard/scorecard-tooling) directory to your solution root:
 
 ```bash
 dotnet build /t:Scorecard
@@ -130,10 +134,10 @@ CodeMetrics.AI recognizes category-scoped suppression comments and selected fram
 The package includes a [CMAI rule catalog](src/CodeMetrics.AI/Rules/rules.md), with JSON and Markdown copies under `Rules/` in the tool installation. Read the catalog from the analyzer version used for the run:
 
 ```powershell
-code-metrics rules
-code-metrics rules --code CMAI5001
-code-metrics rules --format json
-code-metrics rules --format markdown --output rules.md
+codetestament-dotnet rules
+codetestament-dotnet rules --code CMAI5001
+codetestament-dotnet rules --format json
+codetestament-dotnet rules --format markdown --output rules.md
 ```
 
 This command needs no solution, restore, package-feed access or MSBuild workspace. Codes are permanent aliases for existing `dotnet/<dimension>/<category>` identities. Findings expose the alias in `observations.diagnosticCode`; each dimension's `ruleCatalog` references also identify aggregate metric components. These additions do not change finding fingerprints, scores or schema-v3 compatibility.

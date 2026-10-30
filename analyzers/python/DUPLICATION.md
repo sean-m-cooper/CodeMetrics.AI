@@ -1,6 +1,6 @@
 # Experimental Python duplication review
 
-This capability reports exact repeated function bodies for source review. The development `codemetrics-python` package (adapter `0.7.0`) embeds it at `dimensions.codeQuality.duplication` in evidence v3. The code-scorecard skill presents it as unscored review evidence. The standalone CLI remains available for focused analysis. Coverage integration does not change the duplication policy or complexity formula.
+This capability reports exact repeated function bodies for source review. The development `codetestament-python` package (adapter `0.7.0`) embeds it at `dimensions.codeQuality.duplication` in evidence v3. The code-scorecard skill presents it as unscored review evidence. The standalone CLI remains available for focused analysis. Coverage integration does not change the duplication policy or complexity formula.
 
 ```powershell
 py -3.12 analyzers/python/duplication.py E:/repos/my-project --include 'src/**' --output TestResults/duplication.json
