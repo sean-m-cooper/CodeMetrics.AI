@@ -11,8 +11,8 @@
     <Description>Deterministic code metrics and scorecard evidence for .NET solutions</Description>
     <Authors>Sean Cooper</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/sean-m-cooper/CodeMetrics.AI</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/sean-m-cooper/CodeMetrics.AI</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/sean-m-cooper/CodeTestament</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sean-m-cooper/CodeTestament</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>code-metrics;roslyn;static-analysis;scorecard;dotnet-tool</PackageTags>

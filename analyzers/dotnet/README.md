@@ -67,7 +67,7 @@ Per-type and per-member metrics collected via Roslyn:
 
 ## MSBuild Integration
 
-Copy `Directory.Build.targets` from the [scorecard-tooling](https://github.com/sean-m-cooper/ai_tools/tree/main/skills/code-scorecard/scorecard-tooling) directory to your solution root:
+Copy `Directory.Build.targets` from the [scorecard-tooling](../../skills/code-scorecard/scorecard-tooling) directory to your solution root:
 
 ```bash
 dotnet build /t:Scorecard

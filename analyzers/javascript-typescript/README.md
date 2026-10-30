@@ -12,7 +12,7 @@ Legacy codemetrics-ai version 0.5.0 uses `javascript-typescript-2026-10-09-handl
 contextual Error Handling scoring. Adopting it requires a fresh baseline. See the
 [0.5.0 release notes](../../docs/releases/javascript-typescript-0.5.0.md).
 
-The earlier 0.4.0 ruleset `javascript-typescript-2026-10-04-local-handlers` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines when upgrading from 0.3.0. See the [0.4.0 release and migration notes](https://github.com/sean-m-cooper/CodeMetrics.AI/blob/master/docs/releases/javascript-typescript-0.4.0.md).
+The earlier 0.4.0 ruleset `javascript-typescript-2026-10-04-local-handlers` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines when upgrading from 0.3.0. See the [0.4.0 release and migration notes](https://github.com/sean-m-cooper/CodeTestament/blob/master/docs/releases/javascript-typescript-0.4.0.md).
 
 ```sh
 npx codetestament --project package.json

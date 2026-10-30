@@ -5,7 +5,7 @@
   ],
   "preferredEvidenceSchema": 3,
   "source": {
-    "repository": "sean-m-cooper/CodeMetrics.AI",
+    "repository": "sean-m-cooper/CodeTestament",
     "revision": "16d311832fa4d1b934129a0cdb2b66d728443ecd"
   },
   "analyzers": {
@@ -292,7 +292,7 @@
     ]
   },
   "localMigration": {
-    "repository": "sean-m-cooper/CodeMetrics.AI",
+    "repository": "sean-m-cooper/CodeTestament",
     "revision": "b3b655a4da0e40166162d7cc587fd689b043149e",
     "status": "local-artifacts-only; public defaults unchanged"
   }

@@ -18,7 +18,7 @@ Invoke `/codetestament:code-scorecard`. The unqualified skill name stays
 when copying it into a host's skill directory, copy the **whole folder**, including
 scripts, compatibility data and supporting documents.
 
-After these commits are pushed, install through the existing ai_tools marketplace:
+Once the marketplace change is merged into ai_tools main, install through that marketplace:
 
 ```text
 /plugin marketplace add sean-m-cooper/ai_tools
@@ -26,21 +26,23 @@ After these commits are pushed, install through the existing ai_tools marketplac
 /reload-plugins
 ```
 
-Or install directly from this repository:
+Once the plugin is merged into this repository's default branch, install directly:
 
 ```text
-/plugin marketplace add sean-m-cooper/CodeMetrics.AI
+/plugin marketplace add sean-m-cooper/CodeTestament
 /plugin install codetestament@codetestament
 /reload-plugins
 ```
 
-The current GitHub name is still `CodeMetrics.AI`. Do not substitute the proposed
-repository rename until it exists. These remote installation paths require the
-plugin commit and marketplace reference to be published. Local verification does
-not establish that a remote installation works.
+GitHub was renamed to `CodeTestament` on 2026-10-29. Until these migration
+branches are merged, default-branch discovery does not expose the new plugin.
+Test the source branch explicitly with
+`claude plugin marketplace add "sean-m-cooper/CodeTestament#codex/codetestament-migration"`.
+The ai_tools entry pins a source commit; that commit must be pushed before
+its marketplace update is published.
 
 For Codex, add the repository with `codex plugin marketplace add
-sean-m-cooper/CodeMetrics.AI`, then select CodeTestament from that marketplace in
+sean-m-cooper/CodeTestament`, then select CodeTestament from that marketplace in
 the desktop app. The root portable `plugin.json` and Claude compatibility manifest
 describe the same skill. No MCP server, credentials or install hooks are required.
 

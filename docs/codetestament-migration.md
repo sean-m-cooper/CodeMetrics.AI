@@ -2,7 +2,7 @@
 
 CodeMetrics.AI is becoming **CodeTestament**, with **CodeTestament Scorecard** as
 the assessment product. This branch contains local migration builds. The new
-packages are not published, the repository has not moved, and the `code-scorecard`
+packages are not published, GitHub is now `sean-m-cooper/CodeTestament`, and the `code-scorecard`
 skill still defaults to the existing published packages.
 
 The [local validation checkpoint](codetestament-migration-validation.md) records
@@ -101,7 +101,7 @@ These remain unchanged in this migration:
 - Nested `codemetrics-ai/...` source-facts and Python producer identifiers.
 - Internal .NET namespaces, assembly/resource names, project and solution paths.
 - Historical fixtures, release notes, calibration evidence and published tags.
-- Repository URLs, until the actual GitHub rename is completed and checked.
+- Historical URLs in recorded validation evidence; active repository links now use CodeTestament.
 
 ## Next migration stages
 
@@ -111,5 +111,5 @@ and isolated caches have passed local installed-package checks. See
 [skill ownership and validation](scorecard-skill.md). Complete release
 validation on Windows and Linux. Verify SARIF upload stream behavior before
 changing CI defaults. Publish and verify producers before changing skill
-defaults. Repository rename and registry deprecation follow that validation.
+defaults. The repository rename is complete; registry deprecation follows release validation.
 See the [full migration plan](codetestament-migration-plan.md) for sequencing.

@@ -4,6 +4,15 @@ Date: 2026-10-29
 Status: brand selected by Sean; local producer migration started on
 `codex/codetestament-migration`. See the [implementation guide](codetestament-migration.md).
 
+## Repository rename update (2026-10-29)
+
+GitHub is now `sean-m-cooper/CodeTestament`, retaining repository ID 1247701388.
+Both migration branches were pushed before the rename. The local checkout stays
+at `E:/repos/CodeMetrics.AI`; its origin now uses the new URL. Active package,
+plugin and skill source URLs follow the rename. Historical evidence, schema IDs,
+internal .NET names and exact source revision pins remain unchanged.
+Package publishing is still a separate release step.
+
 ## Skill ownership update (2026-10-29)
 
 The canonical skill now lives in this repository at `skills/code-scorecard`.

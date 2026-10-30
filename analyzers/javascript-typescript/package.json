@@ -41,5 +41,14 @@
   "types": "./dist/index.d.ts",
   "imports": {
     "#source-facts/*": "./dist/shared-source-facts/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sean-m-cooper/CodeTestament.git",
+    "directory": "analyzers/javascript-typescript"
+  },
+  "homepage": "https://github.com/sean-m-cooper/CodeTestament#readme",
+  "bugs": {
+    "url": "https://github.com/sean-m-cooper/CodeTestament/issues"
   }
 }
