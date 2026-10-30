@@ -1,8 +1,8 @@
 # CodeTestament JavaScript and TypeScript
 
-> Migration build: the CodeTestament packages shown here are not published yet.
-> Use the local artifacts described in the repository migration guide; existing
-> published CodeMetrics.AI/codemetrics-ai installations remain supported.
+> Published preview: `codetestament@0.6.0-preview.3`. Use this exact version;
+> existing CodeMetrics.AI/codemetrics-ai installations remain supported.
+> See the [migration guide](../../docs/codetestament-migration.md).
 
 Deterministic source analysis for JavaScript, TypeScript, JSX and TSX, with Python support in preview 0.6.0-preview.3. The package implements source metrics and React hook/effect checks and emits schema-v3 evidence, including executed scoring decisions. Scores are **uncalibrated across ecosystems**; compare them only with compatible runs of this analyzer.
 
@@ -15,9 +15,9 @@ contextual Error Handling scoring. Adopting it requires a fresh baseline. See th
 The earlier 0.4.0 ruleset `javascript-typescript-2026-10-04-local-handlers` replaces the published 0.3.0 maximum-CC/median-MI ladders with owned-function population scores and extends React-only checks with bounded promise-usage analysis. It also corrects erased TypeScript syntax in owned-body measurements, scores async usage by affected eligible owners, and adds unscored module dependency, decomposition, and error-handler evidence. Generate new baselines when upgrading from 0.3.0. See the [0.4.0 release and migration notes](https://github.com/sean-m-cooper/CodeTestament/blob/master/docs/releases/javascript-typescript-0.4.0.md).
 
 ```sh
-npx codetestament --project package.json
-npx codetestament --project package.json --tsconfig tsconfig.json
-npx codetestament --output results/metrics.csv --scorecard-output results/evidence.json
+npm exec --yes --package=codetestament@0.6.0-preview.3 -- codetestament --project package.json
+npm exec --yes --package=codetestament@0.6.0-preview.3 -- codetestament --project package.json --tsconfig tsconfig.json
+npm exec --yes --package=codetestament@0.6.0-preview.3 -- codetestament --output results/metrics.csv --scorecard-output results/evidence.json
 ```
 
 Default output paths are `.scorecard/javascript-typescript/metrics.csv` and `.scorecard/javascript-typescript/evidence.json`, relative to the current directory. Node 20 or later is required. The TypeScript compiler API is a pinned runtime dependency, so an installed package can analyze source without a development checkout.
@@ -131,7 +131,7 @@ CSV preserves the shared header. Namespace is the repository-relative module pat
 ## Baselines and SARIF
 
 ```sh
-npx codetestament --baseline quality-baselines/javascript-typescript.json \
+npm exec --yes --package=codetestament@0.6.0-preview.3 -- codetestament --baseline quality-baselines/javascript-typescript.json \
   --comparison-output results/comparison.json --fail-on-new warning \
   --max-score-drop 0 --sarif results/analysis.sarif
 

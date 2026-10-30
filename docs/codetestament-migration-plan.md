@@ -4,6 +4,13 @@ Date: 2026-10-29
 Status: brand selected by Sean; local producer migration started on
 `codex/codetestament-migration`. See the [implementation guide](codetestament-migration.md).
 
+## Publication update (2026-10-30)
+
+NuGet `CodeTestament.Scorecard@2.4.0` and npm `codetestament@0.6.0-preview.3`
+were published from `2205e9c`. Plugin 0.2.0 selects these exact versions after
+clean-cache registry verification. Python stays preview and Error Handling stays
+unscored. The original plan and historical checkpoints below remain as recorded.
+
 ## Repository rename update (2026-10-29)
 
 GitHub is now `sean-m-cooper/CodeTestament`, retaining repository ID 1247701388.

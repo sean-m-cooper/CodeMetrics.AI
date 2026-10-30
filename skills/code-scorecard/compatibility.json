@@ -6,23 +6,18 @@
   "preferredEvidenceSchema": 3,
   "source": {
     "repository": "sean-m-cooper/CodeTestament",
-    "revision": "16d311832fa4d1b934129a0cdb2b66d728443ecd"
+    "revision": "2205e9c562ef45cf893f3b455fec3c98588536f0"
   },
   "analyzers": {
     "dotnet": {
-      "package": "CodeMetrics.AI",
-      "preferredVersion": "2.3.1",
+      "package": "CodeTestament.Scorecard",
+      "preferredVersion": "2.4.0",
       "testedVersions": [
-        "2.0.0",
-        "2.0.1",
-        "2.1.0",
-        "2.2.0",
-        "2.3.0",
-        "2.3.1"
+        "2.4.0"
       ]
     },
     "python": {
-      "package": "codemetrics-ai (bundled codemetrics-python)",
+      "package": "codetestament (bundled codetestament-python)",
       "preferredVersion": "0.15.0",
       "testedVersions": [
         "0.2.0-experimental",
@@ -43,22 +38,17 @@
       "requiresLocalPackage": false
     },
     "javascript-typescript": {
-      "package": "codemetrics-ai",
-      "preferredVersion": "0.6.0-preview.2",
+      "package": "codetestament",
+      "preferredVersion": "0.6.0-preview.3",
       "testedVersions": [
-        "0.2.0",
-        "0.3.0",
-        "0.4.0",
-        "0.5.0",
-        "0.6.0-preview.1",
-        "0.6.0-preview.2"
+        "0.6.0-preview.3"
       ]
     }
   },
-  "evidenceToolVersion": "0.6.0-preview.2",
+  "evidenceToolVersion": "0.6.0-preview.3",
   "defaults": {
-    "npm": "codemetrics-ai@0.6.0-preview.2",
-    "dotnet": "CodeMetrics.AI@2.3.1"
+    "npm": "codetestament@0.6.0-preview.3",
+    "dotnet": "CodeTestament.Scorecard@2.4.0"
   },
   "installations": {
     "npm": [
@@ -186,7 +176,7 @@
             "version": "0.15.0"
           }
         },
-        "requiresLocalPackage": true,
+        "requiresLocalPackage": false,
         "expectedNameOption": true
       }
     ],
@@ -287,13 +277,17 @@
             "version": "2.4.0"
           }
         },
-        "requiresLocalPackage": true
+        "requiresLocalPackage": false
       }
     ]
   },
   "localMigration": {
     "repository": "sean-m-cooper/CodeTestament",
     "revision": "b3b655a4da0e40166162d7cc587fd689b043149e",
-    "status": "local-artifacts-only; public defaults unchanged"
+    "status": "historical local validation; superseded by published CodeTestament defaults"
+  },
+  "legacyFixtureSource": {
+    "repository": "sean-m-cooper/CodeTestament",
+    "revision": "16d311832fa4d1b934129a0cdb2b66d728443ecd"
   }
 }

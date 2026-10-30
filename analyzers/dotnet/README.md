@@ -1,15 +1,15 @@
 # CodeTestament Scorecard
 
-> Migration build: CodeTestament.Scorecard 2.4.0 is not published yet. Install
-> the local package as described in the repository migration guide. Published
-> CodeMetrics.AI installations continue to use code-metrics.
+> Published as `CodeTestament.Scorecard@2.4.0`. Existing CodeMetrics.AI
+> installations continue to use `code-metrics`; the new command is
+> `codetestament-dotnet`. See the [migration guide](../../docs/codetestament-migration.md).
 
 A .NET 10 global tool that performs deterministic static analysis on .NET solutions using the Roslyn compiler API. Produces VS-compatible code metrics and scored scorecard evidence across 9 quality dimensions.
 
 ## Install
 
 ```bash
-dotnet tool install -g CodeTestament.Scorecard
+dotnet tool install -g CodeTestament.Scorecard --version 2.4.0
 ```
 
 ## Usage

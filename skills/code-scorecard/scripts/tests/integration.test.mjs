@@ -46,7 +46,7 @@ test('packaged analyzers satisfy the scorecard skill contract', { timeout: 300_0
     });
     let dotnet;
     await t.test('project entry points load references but score only the selected project and honor repository pins', () => {
-      write('.config/dotnet-tools.json', JSON.stringify({ version: 1, isRoot: true, tools: { 'codemetrics.ai': { version: compatibility.analyzers.dotnet.preferredVersion, commands: ['code-metrics'] } } }));
+      write('.config/dotnet-tools.json', JSON.stringify({ version: 1, isRoot: true, tools: { 'codetestament.scorecard': { version: compatibility.analyzers.dotnet.preferredVersion, commands: ['codetestament-dotnet'] } } }));
       const restore = spawnSync('dotnet', ['restore', 'src/App/App.csproj', '--ignore-failed-sources'], { cwd: root, encoding: 'utf8', timeout: 90_000, windowsHide: true });
       assert.equal(restore.status, 0, restore.stdout + restore.stderr);
       dotnet = success('--entry-point', 'src/App/App.csproj', '--skip-dependency-probe');
@@ -284,12 +284,12 @@ test('packaged analyzers satisfy the scorecard skill contract', { timeout: 300_0
     await t.test('unsupported schemas, provenance mismatches and incompatible pins fail explicitly', () => {
       write('archive/invalid.json', '{"schemaVersion":99}');
       assert.equal(invoke('--entry-point', 'ui/package.json', '--existing', 'archive/invalid.json').code, 2);
-      write('ui/package.json', '{"name":"ui","devDependencies":{"codemetrics-ai":"0.2.0"}}');
+      write('ui/package.json', JSON.stringify({ name: 'ui', devDependencies: { codetestament: compatibility.analyzers['javascript-typescript'].preferredVersion } }));
       const wrong = readJson(initial.artifacts.evidence); wrong.tool.version = '99.0.0';
       write('archive/wrong.json', JSON.stringify(wrong));
       const mismatch = invoke('--entry-point', 'ui/package.json', '--existing', 'archive/wrong.json');
       assert.equal(mismatch.code, 2); assert.match(mismatch.error, /tool.version/);
-      wrong.tool.version = '0.2.0'; wrong.subject.entryPoint = path.join(root, 'different/package.json');
+      wrong.tool.version = compatibility.analyzers['javascript-typescript'].preferredVersion; wrong.subject.entryPoint = path.join(root, 'different/package.json');
       write('archive/wrong.json', JSON.stringify(wrong));
       assert.match(invoke('--entry-point', 'ui/package.json', '--existing', 'archive/wrong.json').error, /subject.entryPoint/);
       write('ui/package.json', '{"name":"ui","devDependencies":{"codemetrics-ai":"^0.2.0"}}');

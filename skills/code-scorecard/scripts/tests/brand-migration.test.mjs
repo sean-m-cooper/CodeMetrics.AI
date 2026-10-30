@@ -9,7 +9,7 @@ import { compatibility } from '../run-scorecard.mjs';
 import { installTools, readJson } from '../runtime.mjs';
 import { defaultInstallation } from '../package-selection.mjs';
 
-test('legacy and CodeTestament packages integrate without sharing caches or changing public defaults', { timeout: 360_000 }, async t => {
+test('legacy pins and CodeTestament packages integrate without sharing caches', { timeout: 360_000 }, async t => {
   const oldNpm = process.env.SCORECARD_NPM_PACKAGE, oldNet = process.env.SCORECARD_DOTNET_PACKAGE;
   const newNpm = process.env.SCORECARD_NEW_NPM_PACKAGE, newNet = process.env.SCORECARD_NEW_DOTNET_PACKAGE;
   assert.ok(oldNpm && oldNet && newNpm && newNet, 'Supply both legacy and migration npm/NuGet archives.');
@@ -25,7 +25,8 @@ test('legacy and CodeTestament packages integrate without sharing caches or chan
     assert.ifError(result.error);
     return { code: result.status, value: result.stdout.trim() ? JSON.parse(result.stdout) : null, error: result.stderr };
   };
-  const legacy = { 'npm-package': oldNpm, 'dotnet-package': oldNet };
+  const legacy = { 'npm-tool': 'codemetrics-ai@0.6.0-preview.2', 'dotnet-tool': 'CodeMetrics.AI@2.3.1',
+    'npm-package': oldNpm, 'dotnet-package': oldNet, 'evidence-package': newNpm };
   const modern = { 'npm-tool': 'codetestament@0.6.0-preview.3', 'dotnet-tool': 'CodeTestament.Scorecard@2.4.0', 'npm-package': newNpm, 'dotnet-package': newNet };
   const success = (options, ...args) => {
     const result = invoke(options, ...args); assert.equal(result.code, 0, result.error + JSON.stringify(result.value));
@@ -62,7 +63,7 @@ test('legacy and CodeTestament packages integrate without sharing caches or chan
     assert.equal(new Set(result.value.results.map(item => item.runId)).size, 3);
     after = result.value.results.find(item => item.ecosystem === 'javascript-typescript');
   });
-  await t.test('legacy defaults and explicit pins install the actual old producer separately', () => {
+  await t.test('explicit legacy selections and repository pins preserve the actual producer', () => {
     before = success(legacy, '--entry-point', 'ui/package.json');
     assert.equal(readJson(before.artifacts.evidence).tool.name, 'codemetrics-ai');
     assert.notEqual(before.tooling.analyzer.cache, after.tooling.analyzer.cache);
@@ -97,28 +98,34 @@ test('legacy and CodeTestament packages integrate without sharing caches or chan
     await assert.rejects(installTools({ ...modern, cache, 'npm-package': oldNpm }, compatibility), /identity mismatch/);
     await assert.rejects(installTools({ ...modern, cache, 'dotnet-package': oldNet }, compatibility,
       defaultInstallation(modern, compatibility, 'dotnet')), /Tool setup failed/);
-    await assert.rejects(installTools({ 'npm-tool': modern['npm-tool'], cache }, compatibility), /local-only/);
-    const noSource = invoke({ 'npm-package': oldNpm, 'dotnet-tool': modern['dotnet-tool'] }, '--ecosystem', 'dotnet');
-    assert.equal(noSource.code, 2); assert.match(noSource.value.results[0].error, /local-only/);
+    // Future unpublished records still require archives, even when release defaults do not.
+    const unpublished = structuredClone(compatibility);
+    unpublished.installations.npm.find(record => record.package === 'codetestament').requiresLocalPackage = true;
+    const localDotnet = unpublished.installations.dotnet.find(record => record.package === 'CodeTestament.Scorecard');
+    localDotnet.requiresLocalPackage = true;
+    await assert.rejects(installTools({ 'npm-tool': modern['npm-tool'], cache }, unpublished), /local-only/);
+    await assert.rejects(installTools({ ...modern, 'dotnet-package': undefined, cache }, unpublished, localDotnet), /local-only/);
   });
-  await t.test('legacy reader cannot mark a fresh run usable after an exact producer-name mismatch', async () => {
+  await t.test('canonical reader rejects a legacy producer with a mismatched identity', async () => {
     const tooling = await installTools({ ...legacy, cache }, compatibility);
     const original = fs.readFileSync(tooling.js);
     try {
       fs.appendFileSync(tooling.js, `\nconst alteredOutput = process.argv[process.argv.indexOf('--scorecard-output') + 1];\nconst altered = JSON.parse(fs.readFileSync(alteredOutput, 'utf8')); altered.tool.name = 'WrongBrand'; fs.writeFileSync(alteredOutput, JSON.stringify(altered));\n`);
       const failed = invoke(legacy, '--entry-point', 'ui/package.json');
       assert.equal(failed.code, 2);
-      const run = failed.value.results[0]; assert.equal(run.validationExitCode, 2); assert.match(run.error, /tool.name/);
-      assert.equal(readJson(run.artifacts.inspection).usable, false);
+      const run = failed.value.results[0]; assert.equal(run.validationExitCode, 2); assert.match(failed.error, /tool.name/);
+      assert.equal(run.status, 'failed');
+      // The current reader rejects provenance before writing an inspection.
+      assert.equal(fs.existsSync(run.artifacts.inspection), false);
     } finally { fs.writeFileSync(tooling.js, original); }
   });
   await t.test('a newer reader validates an older pinned JS producer without replacing it', () => {
     const archive = process.env.SCORECARD_OLD_JS_PACKAGE;
     assert.ok(archive, 'Supply SCORECARD_OLD_JS_PACKAGE for codemetrics-ai 0.2.0.');
     write('ui/package.json', JSON.stringify({ name: 'ui', devDependencies: { 'codemetrics-ai': '0.2.0' } }));
-    const run = success({ 'npm-package': archive, 'evidence-package': oldNpm }, '--entry-point', 'ui/package.json');
+    const run = success({ 'npm-package': archive, 'evidence-package': newNpm }, '--entry-point', 'ui/package.json');
     assert.equal(run.recordedTool.version, '0.2.0'); assert.equal(run.tooling.analyzer.version, '0.2.0');
-    assert.equal(run.tooling.evidence.version, '0.6.0-preview.2');
+    assert.equal(run.tooling.evidence.version, '0.6.0-preview.3');
     write('ui/package.json', '{"name":"ui"}');
   });
   if (process.env.SCORECARD_MIGRATION_RECEIPT) fs.writeFileSync(process.env.SCORECARD_MIGRATION_RECEIPT,
