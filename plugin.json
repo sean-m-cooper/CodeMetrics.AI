@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "codetestament",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Evidence-backed code scorecards for .NET, JavaScript/TypeScript, and the Python preview.",
   "author": {
     "name": "Sean Cooper"

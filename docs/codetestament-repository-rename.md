@@ -32,6 +32,13 @@ local directory remains `E:/repos/CodeMetrics.AI`; origin now uses
   four identity values preserves strict comparison; no alias or relaxed gate was
   introduced. The measured report is `TestResults/repo-rename/calibration.json`.
 
+## Plugin update behavior
+
+An update rehearsal confirmed that changing only the marketplace SHA leaves the
+host on its installed `0.1.0` version. The plugin is therefore versioned `0.1.1`
+for the repository migration. Analyzer versions remain unchanged. Future skill
+releases must bump both plugin manifests before updating marketplace pins.
+
 ## Review and release boundary
 
 The migration is on [CodeTestament PR 17](https://github.com/sean-m-cooper/CodeTestament/pull/17)

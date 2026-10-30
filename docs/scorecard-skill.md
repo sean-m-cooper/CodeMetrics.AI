@@ -55,7 +55,7 @@ compatibility checks. No automatic user configuration or cache migration occurs.
 
 ## Package and release contract
 
-The plugin's `0.1.0` version is independent of analyzer versions. The compatibility
+The plugin's `0.1.1` version is independent of analyzer versions. The compatibility
 manifest still selects the verified public legacy defaults. New CodeTestament
 packages require their exact selection and local archives until registry
 publication is verified. See [bootstrap](../skills/code-scorecard/bootstrap.md).
@@ -69,7 +69,9 @@ directory, checks manifest parity and runs the offline tests there. The
 the pinned legacy packages on Windows and Linux. The historical legacy source pin
 is a compatibility fixture, not the location of current development.
 
-For releases, commit and push this repository first, verify CI and installation,
+For plugin releases, bump the version in both plugin manifests whenever publishing
+a new skill or plugin metadata revision: the host may retain a cached install when
+only its source SHA changes. Then commit and push this repository, verify CI and installation,
 then update the `sha` in the ai_tools marketplace entry. The reference must point
 to a commit containing the plugin manifest and complete skill. Never maintain a
 parallel skill implementation there. Change analyzer defaults only after the
